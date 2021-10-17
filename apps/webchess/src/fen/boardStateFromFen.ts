@@ -1,10 +1,8 @@
-import { Color } from '../app/Color';
-import { PieceType } from '../app/PieceType';
-import {
-  BoardSquares,
-  BoardState,
-  SquareState,
-} from '../util/chessboard-state';
+import { Color } from '../common-types/Color';
+import { PieceType } from '../common-types/PieceType';
+import { BoardSquares } from '../common-types/BoardSquares';
+import { BoardState } from '../common-types/BoardState';
+import { SquareState } from '../common-types/SquareState';
 import { parseFenParts } from './parseFenParts';
 import { FenPiecePlacementPart } from './types/Fen';
 import { FenValidationError } from './types/FenValidationError';

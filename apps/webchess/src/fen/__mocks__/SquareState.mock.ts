@@ -1,6 +1,6 @@
-import { Color } from '../../app/Color';
-import { PieceType } from '../../app/PieceType';
-import { SquareState } from '../../util/chessboard-state';
+import { Color } from '../../common-types/Color';
+import { PieceType } from '../../common-types/PieceType';
+import { SquareState } from '../../common-types/SquareState';
 
 export const empty: SquareState = { isEmpty: true };
 export const K: SquareState = {

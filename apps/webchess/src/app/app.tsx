@@ -1,5 +1,5 @@
 import ChessboardView from './ChessboardView';
-import { Color } from './Color';
+import { Color } from '../common-types/Color';
 
 export function App() {
   return (
