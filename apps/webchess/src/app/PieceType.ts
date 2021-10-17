@@ -6,3 +6,5 @@ export enum PieceType {
   Queen = 'q',
   King = 'k',
 }
+
+export const AllPieceTypeValues = Object.values(PieceType)

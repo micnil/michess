@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Color } from './Color';
+import { Piece } from './Piece';
+import { PieceType } from './PieceType';
 
 // const Square = () => {
 //   return <rect width={80} height={80}></rect>;
@@ -14,6 +16,7 @@ const Square = styled.rect<SquareProps>`
 `;
 
 const Board = styled.g``;
+const Pieces = styled.g``;
 
 type Props = {
   size: number;
@@ -53,6 +56,13 @@ const ChessboardView: React.FC<Props> = ({ size = 500, orientation }) => {
           );
         })}
       </Board>
+      <Pieces>
+        <Piece
+          color={Color.White}
+          piece={PieceType.King}
+          coordinates={{ x: 50, y: 50 }}
+        />
+      </Pieces>
     </svg>
   );
 };
