@@ -8,9 +8,20 @@ type Props = {
   piece: PieceType;
   color: Color;
   position: Position;
+  scaling: number;
 };
 
-export const Piece: React.FC<Props> = ({ piece, color, position }) => {
+export const Piece: React.FC<Props> = ({
+  piece,
+  color,
+  position,
+  scaling,
+}) => {
   const colorPrefix = color === Color.Black ? 'b' : 'w';
-  return <use  {...position} href={`${pieceSprite}#${colorPrefix + piece}`} />
+  return (
+    <use
+      href={`${pieceSprite}#${colorPrefix + piece}`}
+      transform={`translate(${position.x} ${position.y}) scale(${scaling} ${scaling})`}
+    />
+  );
 };

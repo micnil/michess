@@ -2,8 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import { Color } from '../common-types/Color';
 import { Piece } from './Piece';
-import { PieceType } from '../common-types/PieceType';
 import { SQUARE_COORDINATES } from '../common-types/Coordinate';
+import { useChessboardContext } from './context/useChessboardContext';
 
 type SquareProps = {
   side: Color;
@@ -20,12 +20,16 @@ type Props = {
   orientation: Color;
 };
 
+const DEFAULT_SPRITE_SIZE = 40;
+
 const ChessboardView: React.FC<Props> = ({ size = 500, orientation }) => {
   const squareSize = size / 8;
+  const pieceScaling = squareSize / DEFAULT_SPRITE_SIZE;
   const squarePositions = SQUARE_COORDINATES.map((coord, i) => ({
     x: (i % 8) * squareSize,
     y: Math.floor(i / 8) * squareSize,
   }));
+  const boardState = useChessboardContext();
   return (
     <svg width={size} height={size}>
       <Board>
@@ -43,11 +47,21 @@ const ChessboardView: React.FC<Props> = ({ size = 500, orientation }) => {
         })}
       </Board>
       <Pieces>
-        <Piece
-          color={Color.White}
-          piece={PieceType.King}
-          position={{ x: 50, y: 50 }}
-        />
+        {boardState.squares.map((squareState, i) => {
+          if (squareState.isEmpty) {
+            return undefined;
+          } else {
+            return (
+              <Piece
+                key={i}
+                color={squareState.color}
+                piece={squareState.piece}
+                position={squarePositions[i]}
+                scaling={pieceScaling}
+              />
+            );
+          }
+        })}
       </Pieces>
     </svg>
   );
