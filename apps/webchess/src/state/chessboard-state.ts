@@ -1,5 +1,7 @@
 import { BoardState } from '../common-types/BoardState';
+import { SquareState } from '../common-types/SquareState';
 import { boardStateFromFen } from '../fen/boardStateFromFen';
+import { updateItem } from '../util/immutability';
 
 type MovePayload = {
   fromIndex: number;
@@ -11,14 +13,44 @@ type Action = {
   payload: MovePayload;
 };
 
-// const getPiece = (board: BoardState):  => {}
+const emptySquare = (): SquareState => {
+  return {
+    isEmpty: true,
+  };
+};
 
-// const movePiece = (board: BoardState, move: MovePayload): BoardState => {
-
-// }
+const movePiece = (board: BoardState, move: MovePayload): BoardState => {
+  const squareState = board.squares[move.fromIndex];
+  if (squareState.isEmpty) {
+    console.warn('attempted to move an empty square');
+    return board;
+  }
+  const squaresLiftedPiece = updateItem(board.squares, {
+    index: move.fromIndex,
+    item: emptySquare(),
+  });
+  const squaresWithMovedPiece = updateItem(squaresLiftedPiece, {
+    index: move.toIndex,
+    item: {
+      isEmpty: false,
+      color: squareState.color,
+      piece: squareState.piece,
+    },
+  });
+  return {
+    squares: squaresWithMovedPiece,
+  };
+};
 
 const createBoardState = (fen: string): BoardState => {
   return boardStateFromFen(fen);
+};
+
+export const ChessBoard = (board: BoardState) => {
+  return {
+    movePiece: (movePayload: MovePayload) =>
+      ChessBoard(movePiece(board, movePayload)),
+  };
 };
 
 const reducer = (board: BoardState, action: Action) => {

@@ -44,7 +44,7 @@ const boardSquaresFromFenPiecePlacement = (
     .flatMap(fenCharToBoardSquares);
 
   if (squares.length === 64) {
-    return squares as BoardSquares;
+    return squares;
   } else {
     throw new FenValidationError('SquaresMissing');
   }
