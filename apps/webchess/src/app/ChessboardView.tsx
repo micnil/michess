@@ -47,6 +47,7 @@ const ChessboardView: React.FC<Props> = ({ size = 500, orientation }) => {
         {squarePositions.map((pos, i) => {
           return (
             <Square
+              key={i}
               x={pos.x}
               y={pos.y}
               width={squareSize}

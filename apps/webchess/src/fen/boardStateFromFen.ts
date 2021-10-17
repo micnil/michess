@@ -41,7 +41,7 @@ const boardSquaresFromFenPiecePlacement = (
   piecePlacementPart: FenPiecePlacementPart
 ): BoardSquares => {
   const squares = piecePlacementPart
-    .replace('/', '')
+    .replace(/\//g, '')
     .split('')
     .flatMap(fenCharToBoardSquares);
 

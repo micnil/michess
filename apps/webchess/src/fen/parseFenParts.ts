@@ -20,7 +20,7 @@ function assertPiecePlacementPart(
   piecePlacementPart: string
 ): asserts piecePlacementPart is FenPiecePlacementPart {
   const match = piecePlacementPart.match(FenPiecePlacementPartRegex);
-  if (!match?.groups?.fenPiecePlacement) {
+  if (!match?.groups?.piecePlacement) {
     throw new FenValidationError('FenPiecePlacementPart');
   }
 }

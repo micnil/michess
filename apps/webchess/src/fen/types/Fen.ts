@@ -5,7 +5,7 @@ export type FenPiecePlacementPart = string;
 export const FenSideToMovePartRegex = /(?<sideToMove>b|w)/;
 export type FenSideToMovePart = 'w' | 'b';
 
-export const FenCastlingAbilityPartRegex = /(?<castling>-|K?Q?k?q)/;
+export const FenCastlingAbilityPartRegex = /(?<castlingAbility>-|K?Q?k?q)/;
 export type FenCastlingAbilityPart = string;
 
 export const FenEnPassantTargetSquarePartRegex = /(?<enPassant>-|[a-h][3-6])/;
