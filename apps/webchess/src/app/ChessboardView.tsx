@@ -12,7 +12,10 @@ const Square = styled.rect<SquareProps>`
   fill: ${(props) => (props.side === 'white' ? '#ecdab9' : '#c5a076')};
 `;
 
-const Board = styled.g``;
+const Board = styled.svg`
+  overflow: visible;
+`
+const Squares = styled.g``;
 const Pieces = styled.g``;
 
 type Props = {
@@ -31,8 +34,8 @@ const ChessboardView: React.FC<Props> = ({ size = 500, orientation }) => {
   }));
   const boardState = useChessboardContext();
   return (
-    <svg width={size} height={size}>
-      <Board>
+    <Board width={size} height={size}>
+      <Squares>
         {squarePositions.map((pos, i) => {
           return (
             <Square
@@ -45,7 +48,7 @@ const ChessboardView: React.FC<Props> = ({ size = 500, orientation }) => {
             />
           );
         })}
-      </Board>
+      </Squares>
       <Pieces>
         {boardState.squares.map((squareState, i) => {
           if (squareState.isEmpty) {
@@ -63,7 +66,7 @@ const ChessboardView: React.FC<Props> = ({ size = 500, orientation }) => {
           }
         })}
       </Pieces>
-    </svg>
+    </Board>
   );
 };
 
