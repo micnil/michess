@@ -5,6 +5,7 @@ import { Position } from '../Position';
 type Drag = {
   register(ref: Element | null): void;
   position: Position;
+  isDragging: boolean;
 };
 
 type Options = {
@@ -67,6 +68,7 @@ export const useDrag = ({ id, initialPosition }: Options): Drag => {
 
   return {
     register,
+    isDragging: state.draggingId === id,
     position: state.draggables[id]?.position ?? initialPosition,
   };
 };

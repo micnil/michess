@@ -32,6 +32,14 @@ const updateDraggingId = (
   draggingId: id,
 });
 
+const updateOverDroppableId = (
+  state: DragDropState,
+  id: Maybe<string>
+): DragDropState => ({
+  ...state,
+  overDroppableId: id,
+});
+
 const getPosition = (state: DragDropState, id: string) =>
   state.draggables[id].position;
 
@@ -39,6 +47,7 @@ export const DragDropContextProvider: React.FC = ({ children }) => {
   const [dragDropState, setDragDropState] = useState<DragDropState>({
     draggables: {},
     draggingId: undefined,
+    overDroppableId: undefined
   });
 
   const setDraggable = useCallback((id: string, position: Position) => {
@@ -59,16 +68,25 @@ export const DragDropContextProvider: React.FC = ({ children }) => {
     setDragDropState((prevState) => updateDraggingId(prevState, undefined));
   }, []);
 
-  useEffect(() => {
-    if (dragDropState.draggingId) {
-      console.log({
-        id: dragDropState.draggingId,
-        ...dragDropState.draggables[dragDropState.draggingId],
-      });
-    } else {
-      console.log(dragDropState.draggables);
-    }
-  }, [dragDropState]);
+  const enterDroppable = useCallback((id: string) => {
+    setDragDropState((prevState) => updateOverDroppableId(prevState, id));
+  }, []);
+
+  const leaveDroppable = useCallback((id: string) => {
+    setDragDropState((prevState) => updateOverDroppableId(prevState, undefined));
+  }, []);
+
+  // Logging
+  // useEffect(() => {
+  //   if (dragDropState.draggingId) {
+  //     console.log({
+  //       id: dragDropState.draggingId,
+  //       ...dragDropState.draggables[dragDropState.draggingId],
+  //     });
+  //   } else {
+  //     console.log(dragDropState.draggables);
+  //   }
+  // }, [dragDropState]);
 
   return (
     <DragDropContext.Provider
@@ -78,6 +96,8 @@ export const DragDropContextProvider: React.FC = ({ children }) => {
         updatePosition,
         startDragging,
         stopDragging,
+        enterDroppable,
+        leaveDroppable
       }}
     >
       {children}

@@ -8,7 +8,8 @@ export type DragDropState = {
     [id: string]: {
       position: Position;
     }
-  }
+  },
+  overDroppableId: Maybe<string>
   draggingId: Maybe<string>;
 }
 
@@ -17,7 +18,9 @@ export type DragDropContextState = {
   setDraggable(id: string, pos: Position): void,
   updatePosition(id: string, cb: UpdatePositionCb): void,
   startDragging(id: string): void,
-  stopDragging(id: string): void
+  stopDragging(id: string): void,
+  enterDroppable(id: string): void,
+  leaveDroppable(id: string): void
 }
 
 export const DragDropContext = React.createContext<Maybe<DragDropContextState>>(

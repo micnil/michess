@@ -33,6 +33,7 @@ const ChessboardView: React.FC<Props> = ({ size = 500, orientation }) => {
         {squarePositions.map((pos, i) => {
           return (
             <Square
+              coordinate={SQUARE_COORDINATES[i]}
               key={i}
               position={pos}
               size={squareSize}

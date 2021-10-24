@@ -1,13 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Color } from '../common-types/Color';
+import { Coordinate } from '../common-types/Coordinate';
+import { useDrop } from './hooks/useDrop';
 import { Position } from './Position';
-
-type Props = {
-  color: Color;
-  position: Position;
-  size: number;
-};
 
 type RectProps = {
   color: Color;
@@ -16,6 +12,14 @@ const StyledRect = styled.rect<RectProps>`
   fill: ${({ color }) => (color === 'white' ? '#ecdab9' : '#c5a076')};
 `;
 
-export const Square: React.FC<Props> = ({ color, position, size }) => {
-  return <StyledRect {...position} color={color} width={size} height={size} />;
+type Props = {
+  coordinate: Coordinate
+  color: Color;
+  position: Position;
+  size: number;
+};
+
+export const Square: React.FC<Props> = ({ coordinate, color, position, size }) => {
+  const {register} = useDrop({ id: coordinate})
+  return <StyledRect {...position} color={color} width={size} height={size} ref={register} />;
 };

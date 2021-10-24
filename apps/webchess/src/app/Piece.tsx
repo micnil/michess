@@ -27,14 +27,15 @@ export const Piece: React.FC<Props> = ({
 }) => {
   const [idSuffix] = useState(() => randomString(5));
   const colorPrefix = color === Color.Black ? 'b' : 'w';
-  const pieceAndColor = colorPrefix + piece
+  const pieceAndColor = colorPrefix + piece;
   const id = pieceAndColor + '-' + idSuffix;
-  const { register, position } = useDrag({ initialPosition, id });
+  const { register, position, isDragging } = useDrag({ initialPosition, id });
 
   return (
     <use
       ref={register}
       href={`${pieceSprite}#${pieceAndColor}`}
+      style={{ pointerEvents: isDragging ? 'none' : 'auto' }}
       transform={`translate(${position.x} ${position.y}) scale(${scaling} ${scaling})`}
     />
   );
