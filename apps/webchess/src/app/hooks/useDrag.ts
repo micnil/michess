@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
+import { useDragDropContext } from '../drag-drop/useDragDropContext';
 import { Position } from '../Position';
 
 type Drag = {
@@ -7,29 +8,44 @@ type Drag = {
 };
 
 type Options = {
+  id: string;
   initialPosition: Position;
 };
 
-export const useDrag = ({ initialPosition }: Options): Drag => {
+export const useDrag = ({ id, initialPosition }: Options): Drag => {
   const elementRef = useRef<Element | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [position, setPosition] = useState<Position>(initialPosition);
+  const { state, setDraggable, updatePosition, startDragging, stopDragging } =
+    useDragDropContext();
+
+  useEffect(() => {
+    setDraggable(id, initialPosition);
+  }, [setDraggable, id, initialPosition]);
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
-      if (isDragging && elementRef.current) {
-        setPosition((pos) => ({ x: pos.x + e.movementX, y: pos.y + e.movementY }));
+      if (state.draggingId === id && elementRef.current) {
+        updatePosition(id, (pos) => ({
+          x: pos.x + e.movementX,
+          y: pos.y + e.movementY,
+        }));
       }
     },
-    [isDragging]
+    [id, state.draggingId, updatePosition]
   );
 
-  const handleMouseDown = useCallback((_: Event) => {
-    setIsDragging(true);
-  }, []);
-  const handleMouseUp = useCallback((_: Event) => {
-    setIsDragging(false);
-  }, []);
+  const handleMouseDown = useCallback(
+    (_: Event) => {
+      startDragging(id);
+    },
+    [id, startDragging]
+  );
+
+  const handleMouseUp = useCallback(
+    (_: Event) => {
+      stopDragging(id);
+    },
+    [id, stopDragging]
+  );
 
   useEffect(() => {
     window.addEventListener('mousemove', handleMouseMove);
@@ -51,6 +67,6 @@ export const useDrag = ({ initialPosition }: Options): Drag => {
 
   return {
     register,
-    position,
+    position: state.draggables[id]?.position ?? initialPosition,
   };
 };
