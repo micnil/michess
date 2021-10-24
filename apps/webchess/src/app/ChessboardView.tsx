@@ -4,17 +4,11 @@ import { Color } from '../common-types/Color';
 import { Piece } from './Piece';
 import { SQUARE_COORDINATES } from '../common-types/Coordinate';
 import { useChessboardContext } from './context/useChessboardContext';
-
-type SquareProps = {
-  side: Color;
-};
-const Square = styled.rect<SquareProps>`
-  fill: ${(props) => (props.side === 'white' ? '#ecdab9' : '#c5a076')};
-`;
+import { Square } from './Square';
 
 const Board = styled.svg`
   overflow: visible;
-`
+`;
 const Squares = styled.g``;
 const Pieces = styled.g``;
 
@@ -40,11 +34,9 @@ const ChessboardView: React.FC<Props> = ({ size = 500, orientation }) => {
           return (
             <Square
               key={i}
-              x={pos.x}
-              y={pos.y}
-              width={squareSize}
-              height={squareSize}
-              side={((9 * i) & 8) === 0 ? Color.White : Color.Black}
+              position={pos}
+              size={squareSize}
+              color={((9 * i) & 8) === 0 ? Color.White : Color.Black}
             />
           );
         })}
