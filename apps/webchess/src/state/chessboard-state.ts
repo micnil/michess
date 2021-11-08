@@ -1,66 +1,44 @@
 import { BoardState } from '../common-types/BoardState';
-import { SquareState } from '../common-types/SquareState';
-import { boardStateFromFen } from '../fen/boardStateFromFen';
+import { ColoredPieceType } from '../common-types/ColoredPieceType';
 import { updateItem } from '../util/immutability';
+import { BoardSquare } from './BoardSquare';
 
 type MovePayload = {
   fromIndex: number;
   toIndex: number;
 };
 
-type Action = {
-  type: 'MOVE';
-  payload: MovePayload;
-};
-
-const emptySquare = (): SquareState => {
-  return {
-    isEmpty: true,
-  };
-};
-
 const movePiece = (board: BoardState, move: MovePayload): BoardState => {
-  const squareState = board.squares[move.fromIndex];
-  if (squareState.isEmpty) {
+  const fromSquare = BoardSquare(board.squares[move.fromIndex]);
+  const toSquare = BoardSquare(board.squares[move.fromIndex]);
+  const fromSquareValue = fromSquare.value();
+  if (fromSquareValue.isEmpty) {
     console.warn('attempted to move an empty square');
     return board;
   }
-  const squaresLiftedPiece = updateItem(board.squares, {
+  const movedPiece = fromSquareValue;
+  const squaresWithLiftedPiece = updateItem(board.squares, {
     index: move.fromIndex,
-    item: emptySquare(),
+    item: fromSquare.clear().value(),
   });
-  const squaresWithMovedPiece = updateItem(squaresLiftedPiece, {
+  const squaresWithMovedPiece = updateItem(squaresWithLiftedPiece, {
     index: move.toIndex,
-    item: {
-      isEmpty: false,
-      color: squareState.color,
-      piece: squareState.piece,
-    },
+    item: toSquare
+      .setPiece(ColoredPieceType.from(movedPiece.color, movedPiece.piece))
+      .value(),
   });
   return {
     squares: squaresWithMovedPiece,
   };
 };
 
-const createBoardState = (fen: string): BoardState => {
-  return boardStateFromFen(fen);
+type Chessboard = {
+  movePiece(movePayload: MovePayload): Chessboard;
 };
 
-export const ChessBoard = (board: BoardState) => {
+export const ChessBoard = (board: BoardState): Chessboard => {
   return {
     movePiece: (movePayload: MovePayload) =>
       ChessBoard(movePiece(board, movePayload)),
   };
 };
-
-const reducer = (board: BoardState, action: Action) => {
-  switch (action.type) {
-    case 'MOVE':
-    default:
-      return board;
-  }
-};
-// TODO:
-// Create chainable methods on boardstate
-// board.move(from, to).move()
-// or maybe not...

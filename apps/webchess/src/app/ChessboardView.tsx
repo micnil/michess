@@ -30,12 +30,12 @@ const ChessboardView: React.FC<Props> = ({ size = 500, orientation }) => {
   return (
     <Board width={size} height={size}>
       <Squares>
-        {squarePositions.map((pos, i) => {
+        {boardState.squares.map((_, i) => {
           return (
             <Square
               coordinate={SQUARE_COORDINATES[i]}
               key={i}
-              position={pos}
+              position={squarePositions[i]}
               size={squareSize}
               color={((9 * i) & 8) === 0 ? Color.White : Color.Black}
             />
