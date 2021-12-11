@@ -1,27 +1,9 @@
 import React, { useCallback, useState } from 'react';
 import { Maybe } from '../../common-types/Maybe';
-import { Position } from '../types/Position';
 import {
   DragDropContext,
   DragDropState,
-  UpdatePositionCb,
 } from './DragDropContext';
-
-const updateDraggable = (
-  state: DragDropState,
-  id: string,
-  position: Position
-): DragDropState => {
-  return {
-    ...state,
-    draggables: {
-      ...state.draggables,
-      [id]: {
-        position,
-      },
-    },
-  };
-};
 
 const updateDraggingId = (
   state: DragDropState,
@@ -39,25 +21,11 @@ const updateOverDroppableId = (
   overDroppableId: id,
 });
 
-const getPosition = (state: DragDropState, id: string) =>
-  state.draggables[id].position;
-
 export const DragDropContextProvider: React.FC = ({ children }) => {
   const [dragDropState, setDragDropState] = useState<DragDropState>({
-    draggables: {},
     draggingId: undefined,
     overDroppableId: undefined,
   });
-
-  const setDraggable = useCallback((id: string, position: Position) => {
-    setDragDropState((prevState) => updateDraggable(prevState, id, position));
-  }, []);
-
-  const updatePosition = useCallback((id: string, cb: UpdatePositionCb) => {
-    setDragDropState((prevState) =>
-      updateDraggable(prevState, id, cb(getPosition(prevState, id)))
-    );
-  }, []);
 
   const startDragging = useCallback((id: string) => {
     setDragDropState((prevState) => updateDraggingId(prevState, id));
@@ -93,8 +61,6 @@ export const DragDropContextProvider: React.FC = ({ children }) => {
     <DragDropContext.Provider
       value={{
         state: dragDropState,
-        setDraggable,
-        updatePosition,
         startDragging,
         stopDragging,
         enterDroppable,

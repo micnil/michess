@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDragDropContext } from '../drag-drop/useDragDropContext';
 import { Position } from '../types/Position';
 
@@ -15,23 +15,19 @@ type Options = {
 
 export const useDrag = ({ id, initialPosition }: Options): Drag => {
   const elementRef = useRef<Element | null>(null);
-  const { state, setDraggable, updatePosition, startDragging, stopDragging } =
-    useDragDropContext();
-
-  useEffect(() => {
-    setDraggable(id, initialPosition);
-  }, [setDraggable, id, initialPosition]);
+  const [position, setPosition] = useState<Position>(initialPosition);
+  const { state, startDragging, stopDragging } = useDragDropContext();
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
       if (state.draggingId === id && elementRef.current) {
-        updatePosition(id, (pos) => ({
+        setPosition((pos) => ({
           x: pos.x + e.movementX,
           y: pos.y + e.movementY,
         }));
       }
     },
-    [id, state.draggingId, updatePosition]
+    [id, state.draggingId]
   );
 
   const handleMouseDown = useCallback(
@@ -69,6 +65,6 @@ export const useDrag = ({ id, initialPosition }: Options): Drag => {
   return {
     register,
     isDragging: state.draggingId === id,
-    position: state.draggables[id]?.position ?? initialPosition,
+    position: position,
   };
 };
