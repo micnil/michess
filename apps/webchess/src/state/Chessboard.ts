@@ -32,13 +32,13 @@ const movePiece = (board: BoardState, move: MovePayload): BoardState => {
   };
 };
 
-type Chessboard = {
-  movePiece(movePayload: MovePayload): Chessboard;
+interface IChessboard {
+  movePiece(movePayload: MovePayload): IChessboard;
 };
 
-export const ChessBoard = (board: BoardState): Chessboard => {
+export const Chessboard = (board: BoardState): IChessboard => {
   return {
     movePiece: (movePayload: MovePayload) =>
-      ChessBoard(movePiece(board, movePayload)),
+      Chessboard(movePiece(board, movePayload)),
   };
 };
