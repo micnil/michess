@@ -1,9 +1,8 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Maybe } from '../../common-types/Maybe';
 import { Position } from '../Position';
 import {
   DragDropContext,
-  DragDropContextState,
   DragDropState,
   UpdatePositionCb,
 } from './DragDropContext';
@@ -47,7 +46,7 @@ export const DragDropContextProvider: React.FC = ({ children }) => {
   const [dragDropState, setDragDropState] = useState<DragDropState>({
     draggables: {},
     draggingId: undefined,
-    overDroppableId: undefined
+    overDroppableId: undefined,
   });
 
   const setDraggable = useCallback((id: string, position: Position) => {
@@ -73,7 +72,9 @@ export const DragDropContextProvider: React.FC = ({ children }) => {
   }, []);
 
   const leaveDroppable = useCallback((id: string) => {
-    setDragDropState((prevState) => updateOverDroppableId(prevState, undefined));
+    setDragDropState((prevState) =>
+      updateOverDroppableId(prevState, undefined)
+    );
   }, []);
 
   // Logging
@@ -97,7 +98,7 @@ export const DragDropContextProvider: React.FC = ({ children }) => {
         startDragging,
         stopDragging,
         enterDroppable,
-        leaveDroppable
+        leaveDroppable,
       }}
     >
       {children}
