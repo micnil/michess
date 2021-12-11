@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Color } from '../common-types/Color';
 import { Coordinate } from '../common-types/Coordinate';
-import { useDrop } from './hooks/useDrop';
+import { useDrop } from './drag-drop/hooks/useDrop';
 import { Position } from './types/Position';
 
 type RectProps = {

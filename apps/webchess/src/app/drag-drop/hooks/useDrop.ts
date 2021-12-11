@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { useDragDropContext } from '../drag-drop/useDragDropContext';
+import { useDragDropContext } from './useDragDropContext';
 
 type Drop = {
   register(ref: Element | null): void;

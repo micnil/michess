@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { DragDropContext, DragDropContextState } from './DragDropContext';
+import { DragDropContext, DragDropContextState } from '../DragDropContext';
 
 export const useDragDropContext = (): DragDropContextState => {
   const context = useContext(DragDropContext);
