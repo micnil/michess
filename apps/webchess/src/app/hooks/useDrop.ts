@@ -21,7 +21,7 @@ export const useDrop = ({ id }: Options): Drop => {
   );
 
   const handleMouseLeave = useCallback(
-    (evt: Event) => {
+    (_: Event) => {
       leaveDroppable(id);
     },
     [id, leaveDroppable]
