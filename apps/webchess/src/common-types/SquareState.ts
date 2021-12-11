@@ -1,5 +1,5 @@
-import { Color } from "./Color";
-import { PieceType } from "./PieceType";
+import { Color } from './Color';
+import { PieceType } from './PieceType';
 
 export type SquareState =
   | {

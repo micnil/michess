@@ -13,13 +13,26 @@ const StyledRect = styled.rect<RectProps>`
 `;
 
 type Props = {
-  coordinate: Coordinate
+  coordinate: Coordinate;
   color: Color;
   position: Position;
   size: number;
 };
 
-export const Square: React.FC<Props> = ({ coordinate, color, position, size }) => {
-  const {register} = useDrop({ id: coordinate})
-  return <StyledRect {...position} color={color} width={size} height={size} ref={register} />;
+export const Square: React.FC<Props> = ({
+  coordinate,
+  color,
+  position,
+  size,
+}) => {
+  const { register } = useDrop({ id: coordinate });
+  return (
+    <StyledRect
+      {...position}
+      color={color}
+      width={size}
+      height={size}
+      ref={register}
+    />
+  );
 };

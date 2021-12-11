@@ -34,7 +34,7 @@ const movePiece = (board: BoardState, move: MovePayload): BoardState => {
 
 interface IChessboard {
   movePiece(movePayload: MovePayload): IChessboard;
-};
+}
 
 export const Chessboard = (board: BoardState): IChessboard => {
   return {

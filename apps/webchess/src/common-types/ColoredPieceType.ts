@@ -1,5 +1,5 @@
-import { Color } from "./Color";
-import { PieceType } from "./PieceType";
+import { Color } from './Color';
+import { PieceType } from './PieceType';
 
 export type ColoredPieceType =
   | 'wk'
@@ -16,7 +16,7 @@ export type ColoredPieceType =
   | 'bp';
 
 const whitePieceFrom = (piece: PieceType): ColoredPieceType => {
-  switch(piece) {
+  switch (piece) {
     case PieceType.King:
       return 'wk';
     case PieceType.Knight:
@@ -30,10 +30,10 @@ const whitePieceFrom = (piece: PieceType): ColoredPieceType => {
     case PieceType.Pawn:
       return 'wp';
   }
-} 
+};
 
 const blackPieceFrom = (piece: PieceType): ColoredPieceType => {
-  switch(piece) {
+  switch (piece) {
     case PieceType.King:
       return 'bk';
     case PieceType.Knight:
@@ -47,18 +47,17 @@ const blackPieceFrom = (piece: PieceType): ColoredPieceType => {
     case PieceType.Pawn:
       return 'bp';
   }
-} 
-
+};
 
 export const from = (color: Color, piece: PieceType): ColoredPieceType => {
-  switch(color) {
+  switch (color) {
     case Color.Black:
       return blackPieceFrom(piece);
     case Color.White:
       return whitePieceFrom(piece);
   }
-}
+};
 
 export const ColoredPieceType = {
-  from
-}
+  from,
+};

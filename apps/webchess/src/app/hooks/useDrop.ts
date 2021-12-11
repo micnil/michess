@@ -27,11 +27,14 @@ export const useDrop = ({ id }: Options): Drop => {
     [id, leaveDroppable]
   );
 
-  const handleMouseUp = useCallback((_: Event) => {
-    if(state.overDroppableId === id) {
-      console.log('dropped on ', id)
-    }
-  }, [id, state.overDroppableId]);
+  const handleMouseUp = useCallback(
+    (_: Event) => {
+      if (state.overDroppableId === id) {
+        console.log('dropped on ', id);
+      }
+    },
+    [id, state.overDroppableId]
+  );
 
   useEffect(() => {
     window.addEventListener('mouseup', handleMouseUp);
