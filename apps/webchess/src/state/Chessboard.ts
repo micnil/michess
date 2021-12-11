@@ -24,7 +24,7 @@ const movePiece = (board: BoardState, move: MovePayload): BoardState => {
   const squaresWithMovedPiece = updateItem(squaresWithLiftedPiece, {
     index: move.toIndex,
     item: toSquare
-      .setPiece(ColoredPieceType.from(movedPiece.color, movedPiece.piece))
+      .setPiece(ColoredPieceType.fromPiece(movedPiece.piece))
       .value(),
   });
   return {

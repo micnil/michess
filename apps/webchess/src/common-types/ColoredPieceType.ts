@@ -1,4 +1,5 @@
 import { Color } from './Color';
+import { Piece } from './Piece';
 import { PieceType } from './PieceType';
 
 export type ColoredPieceType =
@@ -49,15 +50,15 @@ const blackPieceFrom = (piece: PieceType): ColoredPieceType => {
   }
 };
 
-export const from = (color: Color, piece: PieceType): ColoredPieceType => {
-  switch (color) {
+export const fromPiece = (piece: Piece): ColoredPieceType => {
+  switch (piece.color) {
     case Color.Black:
-      return blackPieceFrom(piece);
+      return blackPieceFrom(piece.type);
     case Color.White:
-      return whitePieceFrom(piece);
+      return whitePieceFrom(piece.type);
   }
 };
 
 export const ColoredPieceType = {
-  from,
+  fromPiece,
 };

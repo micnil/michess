@@ -6,6 +6,7 @@ import { SquareState } from '../common-types/SquareState';
 import { parseFenParts } from './parseFenParts';
 import { FenPiecePlacementPart } from './types/Fen';
 import { FenValidationError } from './types/FenValidationError';
+import { createPiece } from '../common-types/Piece';
 
 const charToPieceType = (char: string): PieceType => {
   return char.toLowerCase() as PieceType;
@@ -18,12 +19,11 @@ const emptySquaresFromNumber = (number: number): SquareState[] => {
 };
 
 const pieceSquareFromLetter = (char: string): SquareState => {
-  const piece = charToPieceType(char);
+  const pieceType = charToPieceType(char);
   const color = char === char.toLowerCase() ? Color.Black : Color.White;
   return {
     isEmpty: false,
-    piece,
-    color,
+    piece: createPiece(pieceType, color),
   };
 };
 

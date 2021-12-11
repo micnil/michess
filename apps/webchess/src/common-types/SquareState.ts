@@ -1,5 +1,4 @@
-import { Color } from './Color';
-import { PieceType } from './PieceType';
+import { Piece } from './Piece';
 
 export type SquareState =
   | {
@@ -7,6 +6,5 @@ export type SquareState =
     }
   | {
       isEmpty: false;
-      piece: PieceType;
-      color: Color;
+      piece: Piece;
     };

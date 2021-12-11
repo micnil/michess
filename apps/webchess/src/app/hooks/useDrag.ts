@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useDragDropContext } from '../drag-drop/useDragDropContext';
-import { Position } from '../Position';
+import { Position } from '../types/Position';
 
 type Drag = {
   register(ref: Element | null): void;

@@ -1,66 +1,55 @@
 import { Color } from '../../common-types/Color';
+import { createPiece } from '../../common-types/Piece';
 import { PieceType } from '../../common-types/PieceType';
 import { SquareState } from '../../common-types/SquareState';
 
 export const empty: SquareState = { isEmpty: true };
 export const K: SquareState = {
   isEmpty: false,
-  piece: PieceType.King,
-  color: Color.White,
+  piece: createPiece(PieceType.King, Color.White)
 };
 export const Q: SquareState = {
   isEmpty: false,
-  piece: PieceType.Queen,
-  color: Color.White,
+  piece: createPiece(PieceType.Queen, Color.White)
 };
 export const R: SquareState = {
   isEmpty: false,
-  piece: PieceType.Rook,
-  color: Color.White,
+  piece: createPiece(PieceType.Rook, Color.White)
 };
 export const B: SquareState = {
   isEmpty: false,
-  piece: PieceType.Bishop,
-  color: Color.White,
+  piece: createPiece(PieceType.Bishop, Color.White)
 };
 export const N: SquareState = {
   isEmpty: false,
-  piece: PieceType.Knight,
-  color: Color.White,
+  piece: createPiece(PieceType.Knight, Color.White)
 };
 export const P: SquareState = {
   isEmpty: false,
-  piece: PieceType.Pawn,
-  color: Color.White,
+  piece: createPiece(PieceType.Pawn, Color.White)
 };
 
 export const k: SquareState = {
   isEmpty: false,
-  piece: PieceType.King,
-  color: Color.Black,
+  piece: createPiece(PieceType.King, Color.Black)
 };
 export const q: SquareState = {
   isEmpty: false,
-  piece: PieceType.Queen,
-  color: Color.Black,
+  piece: createPiece(PieceType.Queen, Color.Black)
 };
 export const r: SquareState = {
   isEmpty: false,
-  piece: PieceType.Rook,
-  color: Color.Black,
+  piece: createPiece(PieceType.Rook, Color.Black)
 };
 export const b: SquareState = {
   isEmpty: false,
-  piece: PieceType.Bishop,
-  color: Color.Black,
+  piece: createPiece(PieceType.Bishop, Color.Black)
 };
 export const n: SquareState = {
   isEmpty: false,
-  piece: PieceType.Knight,
-  color: Color.Black,
+  piece: createPiece(PieceType.Knight, Color.Black)
 };
 export const p: SquareState = {
   isEmpty: false,
-  piece: PieceType.Pawn,
-  color: Color.Black,
+  piece: createPiece(PieceType.Pawn, Color.Black)
 };

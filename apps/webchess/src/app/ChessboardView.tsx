@@ -1,10 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Color } from '../common-types/Color';
-import { Piece } from './Piece';
+import { PieceView } from './PieceView';
 import { SQUARE_COORDINATES } from '../common-types/Coordinate';
 import { useChessboardContext } from './context/useChessboardContext';
-import { Square } from './Square';
+import { SquareView } from './SquareView';
 
 const Board = styled.svg`
   overflow: visible;
@@ -32,7 +32,7 @@ const ChessboardView: React.FC<Props> = ({ size = 500, orientation }) => {
       <Squares>
         {boardState.squares.map((_, i) => {
           return (
-            <Square
+            <SquareView
               coordinate={SQUARE_COORDINATES[i]}
               key={i}
               position={squarePositions[i]}
@@ -48,9 +48,8 @@ const ChessboardView: React.FC<Props> = ({ size = 500, orientation }) => {
             return undefined;
           } else {
             return (
-              <Piece
+              <PieceView
                 key={i}
-                color={squareState.color}
                 piece={squareState.piece}
                 position={squarePositions[i]}
                 scaling={pieceScaling}

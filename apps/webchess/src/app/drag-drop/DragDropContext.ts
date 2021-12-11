@@ -1,6 +1,6 @@
 import React from 'react';
 import { Maybe } from '../../common-types/Maybe';
-import { Position } from '../Position';
+import { Position } from '../types/Position';
 
 export type UpdatePositionCb = (pos: Position) => Position;
 export type DragDropState = {

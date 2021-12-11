@@ -11,7 +11,7 @@ export enum PieceType {
 
 export const AllPieceTypeValues = Object.values(PieceType);
 
-export const pieceFromColoredPiece = (
+export const pieceTypeFromColoredPiece = (
   coloredPiece: ColoredPieceType
 ): PieceType => {
   const pieceLetter = coloredPiece[coloredPiece.length - 1];

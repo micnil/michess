@@ -1,7 +1,8 @@
 import { colorFromColoredPiece } from '../common-types/Color';
 import { ColoredPieceType } from '../common-types/ColoredPieceType';
 import { Maybe } from '../common-types/Maybe';
-import { pieceFromColoredPiece } from '../common-types/PieceType';
+import { createPiece } from '../common-types/Piece';
+import { pieceTypeFromColoredPiece } from '../common-types/PieceType';
 import { SquareState } from '../common-types/SquareState';
 
 type BoardSquare = {
@@ -22,8 +23,10 @@ const clear = (): BoardSquare => BoardSquare(emptySquare());
 const setPiece = (coloredPiece: ColoredPieceType): BoardSquare =>
   BoardSquare({
     isEmpty: false,
-    color: colorFromColoredPiece(coloredPiece),
-    piece: pieceFromColoredPiece(coloredPiece),
+    piece: createPiece(
+      pieceTypeFromColoredPiece(coloredPiece),
+      colorFromColoredPiece(coloredPiece)
+    ),
   });
 
 export const BoardSquare = (squareState: SquareState): BoardSquare => {
@@ -32,7 +35,7 @@ export const BoardSquare = (squareState: SquareState): BoardSquare => {
     getColoredPieceType: () =>
       squareState.isEmpty
         ? undefined
-        : ColoredPieceType.from(squareState.color, squareState.piece),
+        : ColoredPieceType.fromPiece(squareState.piece),
     clear,
     setPiece,
   };

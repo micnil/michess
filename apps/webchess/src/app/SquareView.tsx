@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Color } from '../common-types/Color';
 import { Coordinate } from '../common-types/Coordinate';
 import { useDrop } from './hooks/useDrop';
-import { Position } from './Position';
+import { Position } from './types/Position';
 
 type RectProps = {
   color: Color;
@@ -19,7 +19,7 @@ type Props = {
   size: number;
 };
 
-export const Square: React.FC<Props> = ({
+export const SquareView: React.FC<Props> = ({
   coordinate,
   color,
   position,
