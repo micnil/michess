@@ -1,30 +1,46 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useDragDropContext } from './useDragDropContext';
+import { useCallback, useEffect, useRef } from 'react';
 import { Position } from '../../types/Position';
+import { useDragDropContext } from './useDragDropContext';
 
 type Drag = {
   register(ref: Element | null): void;
-  position: Position;
   isDragging: boolean;
 };
 
 type Options = {
   id: string;
-  initialPosition: Position;
 };
 
-export const useDrag = ({ id, initialPosition }: Options): Drag => {
-  const elementRef = useRef<Element | null>(null);
-  const [position, setPosition] = useState<Position>(initialPosition);
+const getMousePosition = (svg: SVGSVGElement, evt: MouseEvent): Position => {
+  const ctm = svg.getScreenCTM();
+  if (!ctm) throw new Error('No Current Transformation Matrix (CTM) found');
+  return {
+    x: (evt.clientX - ctm.e) / ctm.a,
+    y: (evt.clientY - ctm.f) / ctm.d,
+  };
+};
+
+export const useDrag = ({ id }: Options): Drag => {
+  const elementRef = useRef<SVGGraphicsElement | null>(null);
   const { state, startDragging, stopDragging } = useDragDropContext();
 
   const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
+    (evt: MouseEvent) => {
       if (state.draggingId === id && elementRef.current) {
-        setPosition((pos) => ({
-          x: pos.x + e.movementX,
-          y: pos.y + e.movementY,
-        }));
+        const svg = elementRef.current?.ownerSVGElement;
+        if (!svg) {
+          throw new Error('Must register svg elements');
+        }
+        const mousePos = getMousePosition(svg, evt);
+        const transformList = elementRef.current?.transform.baseVal;
+        const rect = elementRef.current.getClientRects()[0];
+        const elemWidth = rect.width;
+        const elemHeight = rect.height;
+        const svgTransform = transformList?.getItem(0);
+        svgTransform.setTranslate(
+          mousePos.x - elemWidth / 2,
+          mousePos.y - elemHeight / 2
+        );
       }
     },
     [id, state.draggingId]
@@ -53,7 +69,7 @@ export const useDrag = ({ id, initialPosition }: Options): Drag => {
     };
   }, [handleMouseMove, handleMouseUp]);
 
-  const register = (element: Element | null) => {
+  const register = (element: SVGGraphicsElement | null) => {
     if (element) {
       element.addEventListener('mousedown', handleMouseDown);
     } else {
@@ -65,6 +81,5 @@ export const useDrag = ({ id, initialPosition }: Options): Drag => {
   return {
     register,
     isDragging: state.draggingId === id,
-    position: position,
   };
 };

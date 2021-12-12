@@ -17,11 +17,8 @@ type Props = {
   orientation: Color;
 };
 
-const DEFAULT_SPRITE_SIZE = 40;
-
 const ChessboardView: React.FC<Props> = ({ size = 500, orientation }) => {
   const squareSize = size / 8;
-  const pieceScaling = squareSize / DEFAULT_SPRITE_SIZE;
   const squarePositions = SQUARE_COORDINATES.map((coord, i) => ({
     x: (i % 8) * squareSize,
     y: Math.floor(i / 8) * squareSize,
@@ -52,7 +49,7 @@ const ChessboardView: React.FC<Props> = ({ size = 500, orientation }) => {
                 key={i}
                 piece={squareState.piece}
                 position={squarePositions[i]}
-                scaling={pieceScaling}
+                squareSize={squareSize}
               />
             );
           }

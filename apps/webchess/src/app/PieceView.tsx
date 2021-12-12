@@ -5,29 +5,36 @@ import { useDrag } from './drag-drop/hooks/useDrag';
 import { Piece } from '../common-types/Piece';
 import { ColoredPieceType } from '../common-types/ColoredPieceType';
 
+const DEFAULT_SPRITE_SIZE = 40;
+
 type Props = {
   piece: Piece;
+  squareSize: number;
   position: Position;
-  scaling: number;
 };
 
 export const PieceView: React.FC<Props> = ({
   piece,
   position: initialPosition,
-  scaling,
+  squareSize,
 }) => {
+  const scaling = squareSize / DEFAULT_SPRITE_SIZE;
   const pieceAndColor = ColoredPieceType.fromPiece(piece);
-  const { register, position, isDragging } = useDrag({
-    initialPosition,
+  const { register, isDragging } = useDrag({
     id: piece.id,
   });
 
   return (
-    <use
+    <g
       ref={register}
-      href={`${pieceSprite}#${pieceAndColor}`}
-      style={{ pointerEvents: isDragging ? 'none' : 'auto' }}
-      transform={`translate(${position.x} ${position.y}) scale(${scaling} ${scaling})`}
-    />
+      transform={`translate(${initialPosition.x} ${initialPosition.y})`}
+    >
+      <use
+        href={`${pieceSprite}#${pieceAndColor}`}
+        style={{ pointerEvents: isDragging ? 'none' : 'auto' }}
+        transform={`scale(${scaling} ${scaling})`}
+      />
+      <rect width={squareSize} height={squareSize} fill="#ffffff00" />
+    </g>
   );
 };
