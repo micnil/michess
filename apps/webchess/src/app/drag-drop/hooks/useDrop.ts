@@ -11,7 +11,7 @@ type Options = {
   onDrop?: Callback;
 };
 
-export const useDrop = ({ id }: Options): Drop => {
+export const useDrop = ({ id, onDrop }: Options): Drop => {
   const elementRef = useRef<Element | null>(null);
   const { state, enterDroppable, leaveDroppable } = useDragDropContext();
 
@@ -33,6 +33,7 @@ export const useDrop = ({ id }: Options): Drop => {
     (_: Event) => {
       if (state.overDroppableId === id) {
         console.log('dropped on ', id);
+        onDrop?.()
       }
     },
     [id, state.overDroppableId]
