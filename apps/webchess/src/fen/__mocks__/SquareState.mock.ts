@@ -1,7 +1,7 @@
-import { Color } from '../../common-types/Color';
-import { createPiece } from '../../common-types/Piece';
-import { PieceType } from '../../common-types/PieceType';
-import { SquareState } from '../../common-types/SquareState';
+import { Color } from '../../chess-types/Color';
+import { createPiece } from '../../chess-types/Piece';
+import { PieceType } from '../../chess-types/PieceType';
+import { SquareState } from '../../chess-types/SquareState';
 
 export const empty: SquareState = { isEmpty: true };
 export const K: SquareState = {

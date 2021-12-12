@@ -1,9 +1,9 @@
-import { colorFromColoredPiece } from '../common-types/Color';
-import { ColoredPieceType } from '../common-types/ColoredPieceType';
-import { Maybe } from '../common-types/Maybe';
-import { createPiece } from '../common-types/Piece';
-import { pieceTypeFromColoredPiece } from '../common-types/PieceType';
-import { SquareState } from '../common-types/SquareState';
+import { colorFromColoredPiece } from '../chess-types/Color';
+import { ColoredPieceType } from '../chess-types/ColoredPieceType';
+import { Maybe } from '../util/types/Maybe';
+import { createPiece } from '../chess-types/Piece';
+import { pieceTypeFromColoredPiece } from '../chess-types/PieceType';
+import { SquareState } from '../chess-types/SquareState';
 
 type BoardSquare = {
   value(): SquareState;

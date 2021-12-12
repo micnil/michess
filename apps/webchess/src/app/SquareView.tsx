@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Color } from '../common-types/Color';
-import { Coordinate } from '../common-types/Coordinate';
+import { Color } from '../chess-types/Color';
+import { Coordinate } from '../chess-types/Coordinate';
 import { useDrop } from './drag-drop/hooks/useDrop';
-import { Position } from './types/Position';
+import { Position } from '../util/types/Position';
 
 type RectProps = {
   color: Color;

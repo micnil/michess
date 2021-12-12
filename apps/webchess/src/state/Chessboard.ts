@@ -1,5 +1,5 @@
-import { BoardState } from '../common-types/BoardState';
-import { ColoredPieceType } from '../common-types/ColoredPieceType';
+import { BoardState } from '../chess-types/BoardState';
+import { ColoredPieceType } from '../chess-types/ColoredPieceType';
 import { updateItem } from '../util/immutability';
 import { BoardSquare } from './BoardSquare';
 

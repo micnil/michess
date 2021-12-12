@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
+import { Callback } from '../../../util/types/Callback';
 import { useDragDropContext } from './useDragDropContext';
 
 type Drop = {
@@ -7,6 +8,7 @@ type Drop = {
 
 type Options = {
   id: string;
+  onDrop?: Callback;
 };
 
 export const useDrop = ({ id }: Options): Drop => {

@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { BoardState } from '../../common-types/BoardState';
+import { BoardState } from '../../chess-types/BoardState';
 import { ChessboardContext } from './ChessboardContext';
 
 export const useChessboardContext = (): BoardState => {

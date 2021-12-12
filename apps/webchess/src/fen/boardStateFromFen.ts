@@ -1,12 +1,12 @@
-import { Color } from '../common-types/Color';
-import { PieceType } from '../common-types/PieceType';
-import { BoardSquares } from '../common-types/BoardSquares';
-import { BoardState } from '../common-types/BoardState';
-import { SquareState } from '../common-types/SquareState';
+import { Color } from '../chess-types/Color';
+import { PieceType } from '../chess-types/PieceType';
+import { BoardSquares } from '../chess-types/BoardSquares';
+import { BoardState } from '../chess-types/BoardState';
+import { SquareState } from '../chess-types/SquareState';
 import { parseFenParts } from './parseFenParts';
 import { FenPiecePlacementPart } from './types/Fen';
 import { FenValidationError } from './types/FenValidationError';
-import { createPiece } from '../common-types/Piece';
+import { createPiece } from '../chess-types/Piece';
 
 const charToPieceType = (char: string): PieceType => {
   return char.toLowerCase() as PieceType;

@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Color } from '../common-types/Color';
+import { Color } from '../chess-types/Color';
 import { PieceView } from './PieceView';
-import { SQUARE_COORDINATES } from '../common-types/Coordinate';
+import { SQUARE_COORDINATES } from '../chess-types/Coordinate';
 import { useChessboardContext } from './context/useChessboardContext';
 import { SquareView } from './SquareView';
 

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { Position } from '../../types/Position';
+import { Position } from '../../../util/types/Position';
 import { useDragDropContext } from './useDragDropContext';
 
 type Drag = {

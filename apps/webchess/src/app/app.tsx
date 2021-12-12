@@ -1,5 +1,5 @@
 import ChessboardView from './ChessboardView';
-import { Color } from '../common-types/Color';
+import { Color } from '../chess-types/Color';
 import { ChessboardContextProvider } from './context/ChessboardContextProvider';
 import { DragDropContextProvider } from './drag-drop/DragDropContextProvider';
 

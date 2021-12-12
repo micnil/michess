@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BoardState } from '../../common-types/BoardState';
+import { BoardState } from '../../chess-types/BoardState';
 import { boardStateFromFen } from '../../fen/boardStateFromFen';
 import { ChessboardContext } from './ChessboardContext';
 

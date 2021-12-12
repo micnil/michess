@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Maybe } from '../../common-types/Maybe';
+import { Maybe } from '../../util/types/Maybe';
 import {
   DragDropContext,
   DragDropState,
