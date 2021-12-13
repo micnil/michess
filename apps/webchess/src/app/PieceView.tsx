@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Position } from '../util/types/Position';
 import pieceSprite from '../assets/chessboard-sprite-staunty.svg';
 import { useDrag } from './drag-drop/hooks/useDrag';
@@ -23,15 +23,15 @@ export const PieceView: React.FC<Props> = ({
   const { register, isDragging } = useDrag({
     id: piece.id,
   });
-
+  useEffect(() => console.log(isDragging), [isDragging])
   return (
     <g
       ref={register}
       transform={`translate(${initialPosition.x} ${initialPosition.y})`}
+      
     >
       <use
         href={`${pieceSprite}#${pieceAndColor}`}
-        style={{ pointerEvents: isDragging ? 'none' : 'auto' }}
         transform={`scale(${scaling} ${scaling})`}
       />
       <rect width={squareSize} height={squareSize} fill="#ffffff00" />

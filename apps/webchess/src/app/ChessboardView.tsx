@@ -5,6 +5,7 @@ import { PieceView } from './PieceView';
 import { SQUARE_COORDINATES } from '../chess-types/Coordinate';
 import { useChessboardContext } from './context/useChessboardContext';
 import { SquareView } from './SquareView';
+import { useDragDropContext } from './drag-drop/hooks/useDragDropContext';
 
 const Board = styled.svg`
   overflow: visible;
@@ -23,7 +24,7 @@ const ChessboardView: React.FC<Props> = ({ size = 500, orientation }) => {
     x: (i % 8) * squareSize,
     y: Math.floor(i / 8) * squareSize,
   }));
-  const boardState = useChessboardContext();
+  const { boardState } = useChessboardContext();
   return (
     <Board width={size} height={size}>
       <Squares>

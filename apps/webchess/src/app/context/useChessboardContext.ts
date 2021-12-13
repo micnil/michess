@@ -1,8 +1,7 @@
 import { useContext } from 'react';
-import { BoardState } from '../../chess-types/BoardState';
-import { ChessboardContext } from './ChessboardContext';
+import { ChessboardContext, ChessboardContextState } from './ChessboardContext';
 
-export const useChessboardContext = (): BoardState => {
+export const useChessboardContext = (): ChessboardContextState => {
   const context = useContext(ChessboardContext);
   if (!context) {
     throw new Error('Must be used from child of ChessboardContext');

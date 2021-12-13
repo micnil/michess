@@ -48,6 +48,7 @@ export const useDrag = ({ id }: Options): Drag => {
 
   const handleMouseDown = useCallback(
     (_: Event) => {
+      console.log('startDragging')
       startDragging(id);
     },
     [id, startDragging]
@@ -77,7 +78,7 @@ export const useDrag = ({ id }: Options): Drag => {
     }
     elementRef.current = element;
   };
-
+  
   return {
     register,
     isDragging: state.draggingId === id,

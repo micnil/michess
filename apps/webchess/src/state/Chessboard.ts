@@ -4,13 +4,16 @@ import { updateItem } from '../util/immutability';
 import { BoardSquare } from './BoardSquare';
 
 type MovePayload = {
-  fromIndex: number;
+  pieceId: string;
   toIndex: number;
 };
 
 const movePiece = (board: BoardState, move: MovePayload): BoardState => {
-  const fromSquare = BoardSquare(board.squares[move.fromIndex]);
-  const toSquare = BoardSquare(board.squares[move.fromIndex]);
+  const fromSquareIndex = board.squares.findIndex((square) =>
+    square.isEmpty ? false : square.piece.id === move.pieceId
+  );
+  const fromSquare = BoardSquare(board.squares[fromSquareIndex]);
+  const toSquare = BoardSquare(board.squares[move.toIndex]);
   const fromSquareValue = fromSquare.value();
   if (fromSquareValue.isEmpty) {
     console.warn('attempted to move an empty square');
@@ -18,7 +21,7 @@ const movePiece = (board: BoardState, move: MovePayload): BoardState => {
   }
   const movedPiece = fromSquareValue;
   const squaresWithLiftedPiece = updateItem(board.squares, {
-    index: move.fromIndex,
+    index: fromSquareIndex,
     item: fromSquare.clear().value(),
   });
   const squaresWithMovedPiece = updateItem(squaresWithLiftedPiece, {
@@ -34,11 +37,13 @@ const movePiece = (board: BoardState, move: MovePayload): BoardState => {
 
 interface IChessboard {
   movePiece(movePayload: MovePayload): IChessboard;
+  getState(): BoardState;
 }
 
 export const Chessboard = (board: BoardState): IChessboard => {
   return {
     movePiece: (movePayload: MovePayload) =>
       Chessboard(movePiece(board, movePayload)),
+    getState: () => board,
   };
 };

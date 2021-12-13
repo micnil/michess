@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { Callback } from '../../../util/types/Callback';
 import { useDragDropContext } from './useDragDropContext';
 
 type Drop = {
@@ -8,7 +7,7 @@ type Drop = {
 
 type Options = {
   id: string;
-  onDrop?: Callback;
+  onDrop?: (id: string) => void;
 };
 
 export const useDrop = ({ id, onDrop }: Options): Drop => {
@@ -16,7 +15,8 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
   const { state, enterDroppable, leaveDroppable } = useDragDropContext();
 
   const handleMouseEnter = useCallback(
-    (evt: Event) => {
+    (_: Event) => {
+      console.log('enter ', id)
       enterDroppable(id);
     },
     [enterDroppable, id]
@@ -24,6 +24,7 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
 
   const handleMouseLeave = useCallback(
     (_: Event) => {
+      console.log('leave ', id)
       leaveDroppable(id);
     },
     [id, leaveDroppable]
@@ -31,12 +32,13 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
 
   const handleMouseUp = useCallback(
     (_: Event) => {
-      if (state.overDroppableId === id) {
+      console.log(state.draggingId, ' ', state.overDroppableId)
+      if (state.overDroppableId === id && state.draggingId) {
         console.log('dropped on ', id);
-        onDrop?.()
+        onDrop?.(state.draggingId);
       }
     },
-    [id, state.overDroppableId]
+    [id, onDrop, state.draggingId, state.overDroppableId]
   );
 
   useEffect(() => {
@@ -48,11 +50,11 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
 
   const register = (element: Element | null) => {
     if (element) {
-      element.addEventListener('mouseenter', handleMouseEnter);
-      element.addEventListener('mouseleave', handleMouseLeave);
+      element.addEventListener('mouseover', handleMouseEnter);
+      element.addEventListener('mouseout', handleMouseLeave);
     } else {
-      elementRef.current?.removeEventListener('mouseenter', handleMouseEnter);
-      elementRef.current?.removeEventListener('mouseleave', handleMouseLeave);
+      elementRef.current?.removeEventListener('mouseover', handleMouseEnter);
+      elementRef.current?.removeEventListener('mouseout', handleMouseLeave);
     }
     elementRef.current = element;
   };
