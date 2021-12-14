@@ -1,19 +1,21 @@
 import { BoardState } from '../chess-types/BoardState';
-import { ColoredPieceType } from '../chess-types/ColoredPieceType';
+import { Coordinate, SQUARE_COORDINATES } from '../chess-types/Coordinate';
 import { updateItem } from '../util/immutability';
 import { BoardSquare } from './BoardSquare';
 
 type MovePayload = {
   pieceId: string;
-  toIndex: number;
+  coordinate: Coordinate;
 };
 
 const movePiece = (board: BoardState, move: MovePayload): BoardState => {
+  const toIndex = SQUARE_COORDINATES.indexOf(move.coordinate);
   const fromSquareIndex = board.squares.findIndex((square) =>
     square.isEmpty ? false : square.piece.id === move.pieceId
   );
+  console.log({move, fromSquareIndex, toIndex})
   const fromSquare = BoardSquare(board.squares[fromSquareIndex]);
-  const toSquare = BoardSquare(board.squares[move.toIndex]);
+  const toSquare = BoardSquare(board.squares[toIndex]);
   const fromSquareValue = fromSquare.value();
   if (fromSquareValue.isEmpty) {
     console.warn('attempted to move an empty square');
@@ -25,11 +27,12 @@ const movePiece = (board: BoardState, move: MovePayload): BoardState => {
     item: fromSquare.clear().value(),
   });
   const squaresWithMovedPiece = updateItem(squaresWithLiftedPiece, {
-    index: move.toIndex,
+    index: toIndex,
     item: toSquare
-      .setPiece(ColoredPieceType.fromPiece(movedPiece.piece))
+      .setPiece(movedPiece.piece)
       .value(),
   });
+  console.log({ squaresWithMovedPiece });
   return {
     squares: squaresWithMovedPiece,
   };

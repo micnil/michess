@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { BoardState } from '../../chess-types/BoardState';
+import { Coordinate } from '../../chess-types/Coordinate';
 import { boardStateFromFen } from '../../fen/boardStateFromFen';
 import { Chessboard } from '../../state/Chessboard';
 import { ChessboardContext } from './ChessboardContext';
@@ -11,12 +12,12 @@ export const ChessboardContextProvider: React.FC = ({ children }) => {
     )
   );
 
-  const movePiece = useCallback((pieceId: string, toIndex: number) => {
+  const movePiece = useCallback((pieceId: string, coordinate: Coordinate) => {
     setBoardState((boardState) => {
       return Chessboard(boardState)
         .movePiece({
           pieceId,
-          toIndex,
+          coordinate,
         })
         .getState();
     });

@@ -1,14 +1,12 @@
-import { colorFromColoredPiece } from '../chess-types/Color';
 import { ColoredPieceType } from '../chess-types/ColoredPieceType';
 import { Maybe } from '../util/types/Maybe';
-import { createPiece } from '../chess-types/Piece';
-import { pieceTypeFromColoredPiece } from '../chess-types/PieceType';
+import { Piece } from '../chess-types/Piece';
 import { SquareState } from '../chess-types/SquareState';
 
 type BoardSquare = {
   value(): SquareState;
   clear(): BoardSquare;
-  setPiece(coloredPiece: ColoredPieceType): BoardSquare;
+  setPiece(piece: Piece): BoardSquare;
   getColoredPieceType(): Maybe<ColoredPieceType>;
 };
 
@@ -20,13 +18,10 @@ const emptySquare = (): SquareState => {
 
 const clear = (): BoardSquare => BoardSquare(emptySquare());
 
-const setPiece = (coloredPiece: ColoredPieceType): BoardSquare =>
+const setPiece = (piece: Piece): BoardSquare =>
   BoardSquare({
     isEmpty: false,
-    piece: createPiece(
-      pieceTypeFromColoredPiece(coloredPiece),
-      colorFromColoredPiece(coloredPiece)
-    ),
+    piece: piece,
   });
 
 export const BoardSquare = (squareState: SquareState): BoardSquare => {

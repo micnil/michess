@@ -15,7 +15,6 @@ const StyledRect = styled.rect<RectProps>`
 `;
 
 type Props = {
-  key: number;
   coordinate: Coordinate;
   color: Color;
   position: Position;
@@ -26,13 +25,13 @@ export const SquareView: React.FC<Props> = ({
   coordinate,
   color,
   position,
-  size,
-  key,
+  size
 }) => {
   const { movePiece } = useChessboardContext();
 
   const handleDrop = (pieceId: string) => {
-    movePiece(pieceId, key);
+    console.log(`moving ${pieceId} to coordinate ${coordinate}`)
+    movePiece(pieceId, coordinate);
   };
 
   const { register } = useDrop({ id: coordinate, onDrop: handleDrop });

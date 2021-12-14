@@ -47,7 +47,7 @@ const ChessboardView: React.FC<Props> = ({ size = 500, orientation }) => {
           } else {
             return (
               <PieceView
-                key={i}
+                key={squareState.piece.id}
                 piece={squareState.piece}
                 position={squarePositions[i]}
                 squareSize={squareSize}

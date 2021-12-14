@@ -20,10 +20,10 @@ export const PieceView: React.FC<Props> = ({
 }) => {
   const scaling = squareSize / DEFAULT_SPRITE_SIZE;
   const pieceAndColor = ColoredPieceType.fromPiece(piece);
-  const { register, isDragging } = useDrag({
+  const { register } = useDrag({
     id: piece.id,
   });
-  useEffect(() => console.log(isDragging), [isDragging])
+
   return (
     <g
       ref={register}
