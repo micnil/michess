@@ -25,6 +25,11 @@ const ChessboardView: React.FC<Props> = ({ size = 500, orientation }) => {
     y: Math.floor(i / 8) * squareSize,
   }));
   const { boardState } = useChessboardContext();
+  const { state } = useDragDropContext();
+  const draggedPieceIndex = boardState.squares.findIndex((squareState) =>
+    squareState.isEmpty ? false : state.draggingId === squareState.piece.id
+  );
+  const draggedFromSquare = draggedPieceIndex!==-1 ? boardState.squares[draggedPieceIndex] : undefined;
   return (
     <Board width={size} height={size}>
       <Squares>
@@ -44,6 +49,8 @@ const ChessboardView: React.FC<Props> = ({ size = 500, orientation }) => {
         {boardState.squares.map((squareState, i) => {
           if (squareState.isEmpty) {
             return undefined;
+          } else if (state.draggingId === squareState.piece.id) {
+            return undefined;
           } else {
             return (
               <PieceView
@@ -55,6 +62,13 @@ const ChessboardView: React.FC<Props> = ({ size = 500, orientation }) => {
             );
           }
         })}
+        {draggedFromSquare && !draggedFromSquare.isEmpty &&  (
+          <PieceView
+            piece={draggedFromSquare.piece}
+            position={squarePositions[draggedPieceIndex]}
+            squareSize={squareSize}
+          />
+        )}
       </Pieces>
     </Board>
   );

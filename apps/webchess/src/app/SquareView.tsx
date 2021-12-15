@@ -14,6 +14,20 @@ const StyledRect = styled.rect<RectProps>`
   pointer-events: all;
 `;
 
+type OverlayRectProps = {
+  highlight: boolean;
+};
+const StyledOverlayRect = styled.rect<OverlayRectProps>`
+  fill: ${({ highlight }) =>
+    highlight ? 'rgba(20,85,30,0.5)' : 'rgba(20,85,30,0.0)'};
+  pointer-events: all;
+`;
+// type BackgroundRectProps = {}
+// const PieceBackgroundRect = styled.rect<BackgroundRectProps>`
+// fill: ${({ color }) => (color === 'white' ? '#ecdab9' : '#c5a076')};
+// pointer-events: all;
+// `;
+//rgba(20,85,30,0.5)
 type Props = {
   coordinate: Coordinate;
   color: Color;
@@ -25,23 +39,34 @@ export const SquareView: React.FC<Props> = ({
   coordinate,
   color,
   position,
-  size
+  size,
 }) => {
   const { movePiece } = useChessboardContext();
 
   const handleDrop = (pieceId: string) => {
-    console.log(`moving ${pieceId} to coordinate ${coordinate}`)
+    console.debug(`moving ${pieceId} to coordinate ${coordinate}`);
     movePiece(pieceId, coordinate);
   };
 
-  const { register } = useDrop({ id: coordinate, onDrop: handleDrop });
+  const { register, isHovering } = useDrop({
+    id: coordinate,
+    onDrop: handleDrop,
+  });
   return (
-    <StyledRect
-      {...position}
-      color={color}
-      width={size}
-      height={size}
-      ref={register}
-    />
+    <>
+      <StyledRect
+        {...position}
+        color={color}
+        width={size}
+        height={size}
+        ref={register}
+      />
+      <StyledOverlayRect
+        {...position}
+        width={size}
+        height={size}
+        highlight={isHovering}
+      />
+    </>
   );
 };

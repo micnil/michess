@@ -5,6 +5,7 @@ import { assertDefined } from '../../../util/assertDefined';
 
 type Drop = {
   register(ref: Element | null): void;
+  isHovering: boolean;
 };
 
 type Options = {
@@ -43,7 +44,7 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
       const elementDomRect = elementRef.current.getBoundingClientRect();
 
       if (positionWithinDomRect(mousePos, elementDomRect)) {
-        console.log('dragging from: ', id);
+        console.debug('dragging from: ', id);
       }
     },
     [id]
@@ -52,11 +53,12 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
   const handleMouseUp = useCallback(
     (_: MouseEvent) => {
       if (state.overDroppableId === id && state.draggingId) {
-        console.log('dropped on ', id);
+        console.debug('dropped on ', id);
+        leaveDroppable(id);
         onDrop?.(state.draggingId);
       }
     },
-    [id, onDrop, state.draggingId, state.overDroppableId]
+    [id, leaveDroppable, onDrop, state.draggingId, state.overDroppableId]
   );
 
   const handleMouseMove = useCallback(
@@ -72,12 +74,12 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
       if (state.overDroppableId === id && state.draggingId) {
         if (!mouseEventWithinElement(evt, elementRef.current)) {
           leaveDroppable(id);
-          console.log('leaving: ', id)
+          console.debug('leaving: ', id)
         }
       } else if (state.draggingId) {
         if (mouseEventWithinElement(evt, elementRef.current)) {
           enterDroppable(id);
-          console.log('entering: ', id)
+          console.debug('entering: ', id)
         }
       }
     },
@@ -122,5 +124,6 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
 
   return {
     register,
+    isHovering: state.overDroppableId === id
   };
 };

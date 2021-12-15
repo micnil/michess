@@ -13,7 +13,7 @@ const movePiece = (board: BoardState, move: MovePayload): BoardState => {
   const fromSquareIndex = board.squares.findIndex((square) =>
     square.isEmpty ? false : square.piece.id === move.pieceId
   );
-  console.log({move, fromSquareIndex, toIndex})
+  console.debug({move, fromSquareIndex, toIndex})
   const fromSquare = BoardSquare(board.squares[fromSquareIndex]);
   const toSquare = BoardSquare(board.squares[toIndex]);
   const fromSquareValue = fromSquare.value();
@@ -32,7 +32,7 @@ const movePiece = (board: BoardState, move: MovePayload): BoardState => {
       .setPiece(movedPiece.piece)
       .value(),
   });
-  console.log({ squaresWithMovedPiece });
+  console.debug({ squaresWithMovedPiece });
   return {
     squares: squaresWithMovedPiece,
   };
