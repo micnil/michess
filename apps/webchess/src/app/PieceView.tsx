@@ -1,9 +1,8 @@
 import React from 'react';
 import pieceSprite from '../assets/chessboard-sprite-staunty.svg';
-import { Piece } from '../chess-types/Piece';
-import { ColoredPieceType } from '../chess-types/ColoredPieceType';
 import { Position } from '@michess/common-utils';
 import { useDrag } from '@michess/react-dnd';
+import { ColoredPieceType, Piece } from '@michess/core-models';
 
 const DEFAULT_SPRITE_SIZE = 40;
 

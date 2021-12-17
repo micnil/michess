@@ -1,6 +1,6 @@
+import { Color } from '@michess/core-models';
 import { DragDropContextProvider } from '@michess/react-dnd';
 import ChessboardView from './ChessboardView';
-import { Color } from '../chess-types/Color';
 import { ChessboardContextProvider } from './context/ChessboardContextProvider';
 
 export function App() {

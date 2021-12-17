@@ -1,7 +1,5 @@
 import { Maybe } from '@michess/common-utils';
-import { ColoredPieceType } from '../chess-types/ColoredPieceType';
-import { Piece } from '../chess-types/Piece';
-import { SquareState } from '../chess-types/SquareState';
+import { ColoredPieceType, Piece, SquareState } from '@michess/core-models';
 
 type BoardSquare = {
   value(): SquareState;

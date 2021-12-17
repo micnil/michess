@@ -1,11 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Color } from '../chess-types/Color';
+import { Color, SQUARE_COORDINATES } from '@michess/core-models';
+import { useDragDropContext } from '@michess/react-dnd';
 import { PieceView } from './PieceView';
-import { SQUARE_COORDINATES } from '../chess-types/Coordinate';
 import { useChessboardContext } from './context/useChessboardContext';
 import { SquareView } from './SquareView';
-import { useDragDropContext } from '@michess/react-dnd';
 
 const Board = styled.svg`
   overflow: visible;

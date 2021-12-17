@@ -1,5 +1,6 @@
 
-import { BoardSquares } from '../../chess-types/BoardSquares';
+
+import { BoardSquares } from '@michess/core-models';
 import { B, b, empty, K, k, N, n, P, p, Q, q, r, R } from './SquareState.mock';
 
 // prettier-ignore

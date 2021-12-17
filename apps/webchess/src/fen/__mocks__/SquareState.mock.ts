@@ -1,7 +1,4 @@
-import { Color } from '../../chess-types/Color';
-import { createPiece } from '../../chess-types/Piece';
-import { PieceType } from '../../chess-types/PieceType';
-import { SquareState } from '../../chess-types/SquareState';
+import { Color, createPiece, PieceType, SquareState } from "@michess/core-models";
 
 export const empty: SquareState = { isEmpty: true };
 export const K: SquareState = {

@@ -1,19 +1,14 @@
-import { Color } from '../chess-types/Color';
-import { PieceType } from '../chess-types/PieceType';
-import { BoardSquares } from '../chess-types/BoardSquares';
-import { BoardState } from '../chess-types/BoardState';
-import { SquareState } from '../chess-types/SquareState';
+import { BoardSquares, BoardState, Color, createPiece, PieceType, SquareState } from '@michess/core-models';
 import { parseFenParts } from './parseFenParts';
 import { FenPiecePlacementPart } from './types/Fen';
 import { FenValidationError } from './types/FenValidationError';
-import { createPiece } from '../chess-types/Piece';
 
 const charToPieceType = (char: string): PieceType => {
   return char.toLowerCase() as PieceType;
 };
 
 const emptySquaresFromNumber = (number: number): SquareState[] => {
-  return [...Array(number)].map((x) => ({
+  return [...Array(number)].map(() => ({
     isEmpty: true,
   }));
 };
