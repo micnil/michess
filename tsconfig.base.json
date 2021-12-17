@@ -14,7 +14,10 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@michess/common-utils": ["libs/common-utils/src/index.ts"],
+      "@michess/react-dnd": ["libs/react-dnd/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

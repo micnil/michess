@@ -1,6 +1,51 @@
 {
   "version": 2,
   "projects": {
+    "common-utils": {
+      "root": "libs/common-utils",
+      "sourceRoot": "libs/common-utils/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["libs/common-utils/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/common-utils"],
+          "options": {
+            "jestConfig": "libs/common-utils/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      },
+      "tags": []
+    },
+    "react-dnd": {
+      "root": "libs/react-dnd",
+      "sourceRoot": "libs/react-dnd/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["libs/react-dnd/**/*.{ts,tsx,js,jsx}"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/react-dnd"],
+          "options": {
+            "jestConfig": "libs/react-dnd/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "webchess": {
       "root": "apps/webchess",
       "sourceRoot": "apps/webchess/src",
@@ -105,25 +150,5 @@
         }
       }
     }
-  },
-  "cli": {
-    "defaultCollection": "@nrwl/react"
-  },
-  "generators": {
-    "@nrwl/react": {
-      "application": {
-        "style": "styled-components",
-        "linter": "eslint",
-        "babel": true
-      },
-      "component": {
-        "style": "styled-components"
-      },
-      "library": {
-        "style": "styled-components",
-        "linter": "eslint"
-      }
-    }
-  },
-  "defaultProject": "webchess"
+  }
 }

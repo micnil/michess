@@ -27,6 +27,9 @@
     ]
   },
   "projects": {
+    "react-dnd": {
+      "tags": []
+    },
     "webchess": {
       "tags": []
     },
@@ -34,5 +37,25 @@
       "tags": [],
       "implicitDependencies": ["webchess"]
     }
-  }
+  },
+  "cli": {
+    "defaultCollection": "@nrwl/react"
+  },
+  "generators": {
+    "@nrwl/react": {
+      "application": {
+        "style": "styled-components",
+        "linter": "eslint",
+        "babel": true
+      },
+      "component": {
+        "style": "styled-components"
+      },
+      "library": {
+        "style": "styled-components",
+        "linter": "eslint"
+      }
+    }
+  },
+  "defaultProject": "webchess"
 }
