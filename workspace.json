@@ -24,6 +24,29 @@
       },
       "tags": []
     },
+    "core-fen": {
+      "root": "libs/core-fen",
+      "sourceRoot": "libs/core-fen/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["libs/core-fen/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/core-fen"],
+          "options": {
+            "jestConfig": "libs/core-fen/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      },
+      "tags": []
+    },
     "core-models": {
       "root": "libs/core-models",
       "sourceRoot": "libs/core-models/src",
