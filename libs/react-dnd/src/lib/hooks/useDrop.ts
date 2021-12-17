@@ -73,12 +73,12 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
       if (state.overDroppableId === id && state.draggingId) {
         if (!mouseEventWithinElement(evt, elementRef.current)) {
           leaveDroppable(id);
-          console.debug('leaving: ', id)
+          console.debug('leaving: ', id);
         }
       } else if (state.draggingId) {
         if (mouseEventWithinElement(evt, elementRef.current)) {
           enterDroppable(id);
-          console.debug('entering: ', id)
+          console.debug('entering: ', id);
         }
       }
     },
@@ -123,6 +123,6 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
 
   return {
     register,
-    isHovering: state.overDroppableId === id
+    isHovering: state.overDroppableId === id,
   };
 };

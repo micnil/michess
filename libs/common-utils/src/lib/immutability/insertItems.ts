@@ -1,4 +1,4 @@
-import { ArrayAction } from "./ArrayAction";
+import { ArrayAction } from './ArrayAction';
 
 export const insertItem = <T>(array: T[], action: ArrayAction<T>) => {
   return [

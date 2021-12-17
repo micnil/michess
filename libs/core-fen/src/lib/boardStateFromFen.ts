@@ -1,4 +1,11 @@
-import { BoardSquares, BoardState, Color, createPiece, PieceType, SquareState } from '@michess/core-models';
+import {
+  BoardSquares,
+  BoardState,
+  Color,
+  createPiece,
+  PieceType,
+  SquareState,
+} from '@michess/core-models';
 import { parseFenParts } from './parseFenParts';
 import { FenPiecePlacementPart } from './types/Fen';
 import { FenValidationError } from './types/FenValidationError';

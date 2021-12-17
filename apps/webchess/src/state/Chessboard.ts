@@ -1,5 +1,9 @@
 import { updateItem } from '@michess/common-utils';
-import { BoardState, Coordinate, SQUARE_COORDINATES } from '@michess/core-models';
+import {
+  BoardState,
+  Coordinate,
+  SQUARE_COORDINATES,
+} from '@michess/core-models';
 import { BoardSquare } from './BoardSquare';
 
 type MovePayload = {
@@ -12,7 +16,7 @@ const movePiece = (board: BoardState, move: MovePayload): BoardState => {
   const fromSquareIndex = board.squares.findIndex((square) =>
     square.isEmpty ? false : square.piece.id === move.pieceId
   );
-  console.debug({move, fromSquareIndex, toIndex})
+  console.debug({ move, fromSquareIndex, toIndex });
   const fromSquare = BoardSquare(board.squares[fromSquareIndex]);
   const toSquare = BoardSquare(board.squares[toIndex]);
   const fromSquareValue = fromSquare.value();
@@ -27,9 +31,7 @@ const movePiece = (board: BoardState, move: MovePayload): BoardState => {
   });
   const squaresWithMovedPiece = updateItem(squaresWithLiftedPiece, {
     index: toIndex,
-    item: toSquare
-      .setPiece(movedPiece.piece)
-      .value(),
+    item: toSquare.setPiece(movedPiece.piece).value(),
   });
   console.debug({ squaresWithMovedPiece });
   return {

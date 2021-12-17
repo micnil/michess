@@ -1,4 +1,3 @@
-
 import { randomString } from '@michess/common-utils';
 import { Color } from './Color';
 import { PieceType } from './PieceType';

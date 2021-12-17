@@ -1,9 +1,6 @@
 import { Maybe } from '@michess/common-utils';
 import React, { useCallback, useState } from 'react';
-import {
-  DragDropContext,
-  DragDropState,
-} from './DragDropContext';
+import { DragDropContext, DragDropState } from './DragDropContext';
 
 const updateDraggingId = (
   state: DragDropState,

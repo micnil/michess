@@ -27,7 +27,6 @@ export const PieceView: React.FC<Props> = ({
     <g
       ref={register}
       transform={`translate(${initialPosition.x} ${initialPosition.y})`}
-      
     >
       <use
         href={`${pieceSprite}#${pieceAndColor}`}
