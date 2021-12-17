@@ -24,6 +24,29 @@
       },
       "tags": []
     },
+    "core-models": {
+      "root": "libs/core-models",
+      "sourceRoot": "libs/core-models/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["libs/core-models/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/core-models"],
+          "options": {
+            "jestConfig": "libs/core-models/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      },
+      "tags": []
+    },
     "react-dnd": {
       "root": "libs/react-dnd",
       "sourceRoot": "libs/react-dnd/src",
