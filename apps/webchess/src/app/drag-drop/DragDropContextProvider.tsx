@@ -1,5 +1,5 @@
+import { Maybe } from '@michess/common-utils';
 import React, { useCallback, useState } from 'react';
-import { Maybe } from '../../util/types/Maybe';
 import {
   DragDropContext,
   DragDropState,

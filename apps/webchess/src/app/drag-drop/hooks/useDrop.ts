@@ -1,7 +1,6 @@
-import { Position } from '../../../util/types/Position';
 import { useCallback, useEffect, useRef } from 'react';
 import { useDragDropContext } from './useDragDropContext';
-import { assertDefined } from '../../../util/assertDefined';
+import { assertDefined, Position } from '@michess/common-utils';
 
 type Drop = {
   register(ref: Element | null): void;

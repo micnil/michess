@@ -3,8 +3,8 @@ import styled from 'styled-components';
 import { Color } from '../chess-types/Color';
 import { Coordinate } from '../chess-types/Coordinate';
 import { useDrop } from './drag-drop/hooks/useDrop';
-import { Position } from '../util/types/Position';
 import { useChessboardContext } from './context/useChessboardContext';
+import { Position } from '@michess/common-utils';
 
 type RectProps = {
   color: Color;
@@ -22,12 +22,7 @@ const StyledOverlayRect = styled.rect<OverlayRectProps>`
     highlight ? 'rgba(20,85,30,0.5)' : 'rgba(20,85,30,0.0)'};
   pointer-events: all;
 `;
-// type BackgroundRectProps = {}
-// const PieceBackgroundRect = styled.rect<BackgroundRectProps>`
-// fill: ${({ color }) => (color === 'white' ? '#ecdab9' : '#c5a076')};
-// pointer-events: all;
-// `;
-//rgba(20,85,30,0.5)
+
 type Props = {
   coordinate: Coordinate;
   color: Color;

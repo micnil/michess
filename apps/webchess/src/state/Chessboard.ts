@@ -1,6 +1,6 @@
+import { updateItem } from '@michess/common-utils';
 import { BoardState } from '../chess-types/BoardState';
 import { Coordinate, SQUARE_COORDINATES } from '../chess-types/Coordinate';
-import { updateItem } from '../util/immutability';
 import { BoardSquare } from './BoardSquare';
 
 type MovePayload = {

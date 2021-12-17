@@ -1,5 +1,5 @@
+import { Maybe } from '@michess/common-utils';
 import { ColoredPieceType } from '../chess-types/ColoredPieceType';
-import { Maybe } from '../util/types/Maybe';
 import { Piece } from '../chess-types/Piece';
 import { SquareState } from '../chess-types/SquareState';
 

@@ -3,5 +3,5 @@ const charset =
 
 export const randomString = (length: number): string =>
   [...Array(length)]
-    .map((_) => charset[Math.floor(Math.random() * charset.length)])
+    .map(() => charset[Math.floor(Math.random() * charset.length)])
     .join('');

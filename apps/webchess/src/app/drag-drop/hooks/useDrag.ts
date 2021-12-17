@@ -1,5 +1,5 @@
+import { Position } from '@michess/common-utils';
 import { useCallback, useEffect, useRef } from 'react';
-import { Position } from '../../../util/types/Position';
 import { useDragDropContext } from './useDragDropContext';
 
 type Drag = {

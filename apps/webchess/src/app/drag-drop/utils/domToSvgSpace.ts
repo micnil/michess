@@ -1,4 +1,5 @@
-import { Position } from '../../../util/types/Position';
+import { Position } from "@michess/common-utils";
+
 
 export const domToSvgSpace = (
   svg: SVGSVGElement,
