@@ -1,10 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Position } from '@michess/common-utils';
+import { useDrop } from '@michess/react-dnd';
 import { Color } from '../chess-types/Color';
 import { Coordinate } from '../chess-types/Coordinate';
-import { useDrop } from './drag-drop/hooks/useDrop';
 import { useChessboardContext } from './context/useChessboardContext';
-import { Position } from '@michess/common-utils';
 
 type RectProps = {
   color: Color;

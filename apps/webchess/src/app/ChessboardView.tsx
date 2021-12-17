@@ -5,7 +5,7 @@ import { PieceView } from './PieceView';
 import { SQUARE_COORDINATES } from '../chess-types/Coordinate';
 import { useChessboardContext } from './context/useChessboardContext';
 import { SquareView } from './SquareView';
-import { useDragDropContext } from './drag-drop/hooks/useDragDropContext';
+import { useDragDropContext } from '@michess/react-dnd';
 
 const Board = styled.svg`
   overflow: visible;
