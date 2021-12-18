@@ -1,17 +1,10 @@
-import { Color } from '@michess/core-models';
-import { DragDropContextProvider } from '@michess/react-dnd';
-import ChessboardView from './ChessboardView';
-import { ChessboardContextProvider } from './context/ChessboardContextProvider';
+import { Chessboard } from './Chessboard';
 
 export function App() {
   return (
     <main>
       <h1>Welcome to webchess!</h1>
-      <ChessboardContextProvider orientation={Color.Black}>
-        <DragDropContextProvider>
-          <ChessboardView size={500} />
-        </DragDropContextProvider>
-      </ChessboardContextProvider>
+      <Chessboard orientation={'white'} size={500} />
     </main>
   );
 }
