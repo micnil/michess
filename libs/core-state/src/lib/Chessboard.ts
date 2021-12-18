@@ -12,13 +12,13 @@ const movePiece = (board: BoardState, move: MovePayload): BoardState => {
     move.coordinate
   );
   const fromSquareIndex = board.squares.findIndex((square) =>
-    square.isEmpty === true ? false : square.piece.id === move.pieceId
+    square.isEmpty ? false : square.piece.id === move.pieceId
   );
   console.debug({ move, fromSquareIndex, toIndex });
   const fromSquare = BoardSquare(board.squares[fromSquareIndex]);
   const toSquare = BoardSquare(board.squares[toIndex]);
   const fromSquareValue = fromSquare.value();
-  if (fromSquareValue.isEmpty === true) {
+  if (fromSquareValue.isEmpty) {
     console.warn('attempted to move an empty square');
     return board;
   }
