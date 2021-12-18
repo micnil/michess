@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Color, SQUARE_COORDINATES } from '@michess/core-models';
+import { Color, Coordinate } from '@michess/core-models';
 import { useDragDropContext } from '@michess/react-dnd';
 import { PieceView } from './PieceView';
 import { useChessboardContext } from './context/useChessboardContext';
@@ -14,17 +14,19 @@ const Pieces = styled.g``;
 
 type Props = {
   size: number;
-  orientation: Color;
 };
 
-const ChessboardView: React.FC<Props> = ({ size = 500, orientation }) => {
-  const squareSize = size / 8;
-  const squarePositions = SQUARE_COORDINATES.map((coord, i) => ({
-    x: (i % 8) * squareSize,
-    y: Math.floor(i / 8) * squareSize,
-  }));
+const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
   const { boardState } = useChessboardContext();
   const { state } = useDragDropContext();
+  const squareSize = size / 8;
+  const squareCoordinates = Coordinate.getCoordinates(boardState.orientation);
+  const squarePositions = squareCoordinates.map(
+    (coord, i) => ({
+      x: (i % 8) * squareSize,
+      y: Math.floor(i / 8) * squareSize,
+    })
+  );
   const draggedPieceIndex = boardState.squares.findIndex((squareState) =>
     squareState.isEmpty ? false : state.draggingId === squareState.piece.id
   );
@@ -38,7 +40,7 @@ const ChessboardView: React.FC<Props> = ({ size = 500, orientation }) => {
         {boardState.squares.map((_, i) => {
           return (
             <SquareView
-              coordinate={SQUARE_COORDINATES[i]}
+              coordinate={squareCoordinates[i]}
               key={i}
               position={squarePositions[i]}
               size={squareSize}

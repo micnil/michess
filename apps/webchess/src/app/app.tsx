@@ -7,9 +7,9 @@ export function App() {
   return (
     <main>
       <h1>Welcome to webchess!</h1>
-      <ChessboardContextProvider>
+      <ChessboardContextProvider orientation={Color.Black}>
         <DragDropContextProvider>
-          <ChessboardView size={500} orientation={Color.White} />
+          <ChessboardView size={500} />
         </DragDropContextProvider>
       </ChessboardContextProvider>
     </main>

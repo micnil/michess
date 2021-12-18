@@ -7,7 +7,7 @@ import {
   SquareState,
 } from '@michess/core-models';
 import { parseFenParts } from './parseFenParts';
-import { FenPiecePlacementPart } from './types/Fen';
+import { FenPiecePlacementPart, FenStr } from './types/Fen';
 import { FenValidationError } from './types/FenValidationError';
 
 const charToPieceType = (char: string): PieceType => {
@@ -52,10 +52,11 @@ const boardSquaresFromFenPiecePlacement = (
   }
 };
 
-export const boardStateFromFen = (fen: string): BoardState => {
+export const boardStateFromFen = (fen: FenStr): BoardState => {
   const fenParts = parseFenParts(fen);
 
   return {
     squares: boardSquaresFromFenPiecePlacement(fenParts.piecePlacement),
+    orientation: Color.White
   };
 };
