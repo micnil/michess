@@ -18,6 +18,7 @@
       "@michess/common-utils": ["libs/common-utils/src/index.ts"],
       "@michess/core-fen": ["libs/core-fen/src/index.ts"],
       "@michess/core-models": ["libs/core-models/src/index.ts"],
+      "@michess/core-state": ["libs/core-state/src/index.ts"],
       "@michess/react-chessboard": ["libs/react-chessboard/src/index.ts"],
       "@michess/react-dnd": ["libs/react-dnd/src/index.ts"]
     }

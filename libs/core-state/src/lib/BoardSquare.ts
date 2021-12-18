@@ -26,7 +26,7 @@ export const BoardSquare = (squareState: SquareState): BoardSquare => {
   return {
     value: () => squareState,
     getColoredPieceType: () =>
-      squareState.isEmpty
+      squareState.isEmpty === true
         ? undefined
         : ColoredPieceType.fromPiece(squareState.piece),
     clear,

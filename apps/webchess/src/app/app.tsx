@@ -1,4 +1,4 @@
-import { Chessboard } from './Chessboard';
+import { Chessboard } from '@michess/react-chessboard';
 
 export function App() {
   return (

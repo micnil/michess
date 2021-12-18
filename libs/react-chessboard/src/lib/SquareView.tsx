@@ -2,8 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import { Position } from '@michess/common-utils';
 import { useDrop } from '@michess/react-dnd';
-import { useChessboardContext } from './context/useChessboardContext';
 import { Color, Coordinate } from '@michess/core-models';
+import { useChessboardContext } from './context/useChessboardContext';
 
 type RectProps = {
   color: Color;

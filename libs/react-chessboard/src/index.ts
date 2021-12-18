@@ -1,1 +1,1 @@
-export * from './lib/react-chessboard';
+export * from './lib/Chessboard';

@@ -1,7 +1,7 @@
 import { boardStateFromFen, FenStr } from '@michess/core-fen';
 import { BoardState, Color, Coordinate } from '@michess/core-models';
+import { Chessboard } from '@michess/core-state';
 import React, { useCallback, useState } from 'react';
-import { Chessboard } from '../../state/Chessboard';
 import { ChessboardContext } from './ChessboardContext';
 
 type Props = {
