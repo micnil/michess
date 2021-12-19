@@ -1,3 +1,4 @@
+import { Maybe } from '@michess/common-utils';
 import {
   BoardSquares,
   BoardState,
@@ -11,6 +12,7 @@ import {
 import { parseFenParts } from './parseFenParts';
 import {
   FenCastlingAbilityPart,
+  FenEnPassantTargetSquarePart,
   FenPiecePlacementPart,
   FenSideToMovePart,
   FenStr,
@@ -87,13 +89,23 @@ const castlingAbilityFromFen = (
   return new Set(list);
 };
 
+const enPassantCoordinateFromFenStr = (
+  fenEnPassantTargetSquare: FenEnPassantTargetSquarePart
+): Maybe<Coordinate> => {
+  if (fenEnPassantTargetSquare === '-') {
+    return undefined;
+  } else {
+    return fenEnPassantTargetSquare as Coordinate;
+  }
+};
+
 export const boardStateFromFen = (fen: FenStr): BoardState => {
   const fenParts = parseFenParts(fen);
 
   return {
     squares: boardSquaresFromFenPiecePlacement(fenParts.piecePlacement),
     orientation: Color.White,
-    enPassant: fenParts.enPassantTargetSquare as Coordinate,
+    enPassant: enPassantCoordinateFromFenStr(fenParts.enPassantTargetSquare),
     turn: sideToMoveToColor(fenParts.sideToMove),
     castlingAbility: castlingAbilityFromFen(fenParts.castlingAbility),
   };

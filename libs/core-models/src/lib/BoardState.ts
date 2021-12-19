@@ -6,7 +6,7 @@ import { Color } from './Color';
 export type BoardState = {
   squares: BoardSquares;
   orientation: Color;
-  enPassant: Coordinate;
+  enPassant?: Coordinate;
   turn: Color;
   castlingAbility: Set<CastlingAbility>;
 };
