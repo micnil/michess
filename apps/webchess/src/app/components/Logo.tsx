@@ -11,5 +11,10 @@ const Container = styled.div`
 `;
 
 export const Logo: FC = () => {
-  return <Container><Icon width={48} height={48} style={{marginRight: '0.3em'}}/>michess</Container>;
+  return (
+    <Container>
+      <Icon width={48} height={48} style={{ marginRight: '0.3em' }} />
+      michess
+    </Container>
+  );
 };
