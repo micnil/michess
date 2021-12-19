@@ -34,13 +34,14 @@ const movePiece = (board: BoardState, move: MovePayload): BoardState => {
   });
   console.debug({ squaresWithMovedPiece });
   return {
+    ...board,
     squares: squaresWithMovedPiece,
-    orientation: board.orientation,
   };
 };
 
 const setOrientation = (board: BoardState, orientation: Color): BoardState => {
   return {
+    ...board,
     squares: [...board.squares].reverse(),
     orientation,
   };

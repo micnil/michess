@@ -1,13 +1,20 @@
 import {
   BoardSquares,
   BoardState,
+  CastlingAbility,
   Color,
+  Coordinate,
   createPiece,
   PieceType,
   SquareState,
 } from '@michess/core-models';
 import { parseFenParts } from './parseFenParts';
-import { FenPiecePlacementPart, FenStr } from './types/Fen';
+import {
+  FenCastlingAbilityPart,
+  FenPiecePlacementPart,
+  FenSideToMovePart,
+  FenStr,
+} from './types/Fen';
 import { FenValidationError } from './types/FenValidationError';
 
 const charToPieceType = (char: string): PieceType => {
@@ -52,11 +59,42 @@ const boardSquaresFromFenPiecePlacement = (
   }
 };
 
+const sideToMoveToColor = (sideToMove: FenSideToMovePart): Color => {
+  return sideToMove === 'w' ? Color.White : Color.Black;
+};
+
+const charToCastlingAbility = (char: string): CastlingAbility => {
+  switch (char) {
+    case 'k':
+      return CastlingAbility.BlackKing;
+    case 'q':
+      return CastlingAbility.BlackQueen;
+    case 'Q':
+      return CastlingAbility.WhiteQueen;
+    case 'K':
+      return CastlingAbility.WhiteKing;
+    default:
+      throw new FenValidationError('FenCastlingAbilityPart');
+  }
+};
+
+const castlingAbilityFromFen = (
+  fenCastlingAbility: FenCastlingAbilityPart
+): Set<CastlingAbility> => {
+  const list: CastlingAbility[] = [...fenCastlingAbility].map(
+    charToCastlingAbility
+  );
+  return new Set(list);
+};
+
 export const boardStateFromFen = (fen: FenStr): BoardState => {
   const fenParts = parseFenParts(fen);
 
   return {
     squares: boardSquaresFromFenPiecePlacement(fenParts.piecePlacement),
-    orientation: Color.White
+    orientation: Color.White,
+    enPassant: fenParts.enPassantTargetSquare as Coordinate,
+    turn: sideToMoveToColor(fenParts.sideToMove),
+    castlingAbility: castlingAbilityFromFen(fenParts.castlingAbility),
   };
 };

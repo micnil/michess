@@ -6,3 +6,4 @@ export * from './lib/Coordinate';
 export * from './lib/Piece';
 export * from './lib/PieceType';
 export * from './lib/SquareState';
+export * from './lib/CastlingSide';
