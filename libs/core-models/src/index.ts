@@ -5,4 +5,4 @@ export * from './lib/ColoredPieceType';
 export * from './lib/Coordinate';
 export * from './lib/Piece';
 export * from './lib/PieceType';
-export { SquareState } from './lib/SquareState';
+export * from './lib/SquareState';
