@@ -70,6 +70,29 @@
       },
       "tags": []
     },
+    "core-rules": {
+      "root": "libs/core-rules",
+      "sourceRoot": "libs/core-rules/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["libs/core-rules/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/core-rules"],
+          "options": {
+            "jestConfig": "libs/core-rules/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      },
+      "tags": []
+    },
     "core-state": {
       "root": "libs/core-state",
       "sourceRoot": "libs/core-state/src",
