@@ -1,6 +1,6 @@
 import { boardStateFromFen, FenStr } from '@michess/core-fen';
-import { BoardState, Color, Coordinate } from '@michess/core-models';
-import { Chessboard } from '@michess/core-state';
+import { Color } from '@michess/core-models';
+import { Chessboard, IChessboard, MovePayload } from '@michess/core-state';
 import React, { useCallback, useState } from 'react';
 import { ChessboardContext } from './ChessboardContext';
 
@@ -14,25 +14,18 @@ export const ChessboardContextProvider: React.FC<Props> = ({
   orientation = Color.White,
   startingFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 }) => {
-  const [boardState, setBoardState] = useState<BoardState>(() =>
-    Chessboard(boardStateFromFen(startingFen))
-      .setOrientation(orientation)
-      .getState()
+  const [chessboard, setChessboard] = useState<IChessboard>(() =>
+    Chessboard(boardStateFromFen(startingFen)).setOrientation(orientation)
   );
 
-  const movePiece = useCallback((pieceId: string, coordinate: Coordinate) => {
-    setBoardState((boardState) => {
-      return Chessboard(boardState)
-        .movePiece({
-          pieceId,
-          coordinate,
-        })
-        .getState();
+  const movePiece = useCallback((payload: MovePayload) => {
+    setChessboard((prevChessboard) => {
+      return prevChessboard.movePiece(payload);
     });
   }, []);
 
   return (
-    <ChessboardContext.Provider value={{ boardState, movePiece }}>
+    <ChessboardContext.Provider value={{ chessboard, movePiece }}>
       {children}
     </ChessboardContext.Provider>
   );

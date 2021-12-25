@@ -1,9 +1,9 @@
-import { BoardState, Coordinate } from '@michess/core-models';
+import { IReadOnlyChessboard, MovePayload } from '@michess/core-state';
 import React from 'react';
 
 export type ChessboardContextState = {
-  boardState: BoardState;
-  movePiece: (pieceId: string, coordinate: Coordinate) => void;
+  chessboard: IReadOnlyChessboard;
+  movePiece: (payload: MovePayload) => void;
 };
 
 export const ChessboardContext = React.createContext<

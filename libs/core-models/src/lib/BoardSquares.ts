@@ -1,3 +1,4 @@
-import { SquareState } from './SquareState';
+import { Coordinate } from './Coordinate';
+import { Piece } from './Piece';
 
-export type BoardSquares = SquareState[];
+export type BoardSquares = Partial<Record<Coordinate, Piece>>;

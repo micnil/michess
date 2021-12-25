@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Color, Coordinate } from '@michess/core-models';
+import { Color, ColoredPieceType, Coordinate } from '@michess/core-models';
 import { useDragDropContext } from '@michess/react-dnd';
 import { PieceView } from './PieceView';
 import { useChessboardContext } from './context/useChessboardContext';
@@ -17,59 +17,69 @@ type Props = {
 };
 
 const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
-  const { boardState } = useChessboardContext();
+  const { chessboard } = useChessboardContext();
   const { state } = useDragDropContext();
   const squareSize = size / 8;
-  const squareCoordinates = Coordinate.getCoordinates(boardState.orientation);
-  const squarePositions = squareCoordinates.map(
-    (coord, i) => ({
-      x: (i % 8) * squareSize,
-      y: Math.floor(i / 8) * squareSize,
-    })
-  );
-  const draggedPieceIndex = boardState.squares.findIndex((squareState) =>
-    squareState.isEmpty ? false : state.draggingId === squareState.piece.id
-  );
-  const draggedFromSquare =
-    draggedPieceIndex !== -1
-      ? boardState.squares[draggedPieceIndex]
-      : undefined;
+  const squareCoordinates = chessboard.getCoordinates();
+  const squarePositions = squareCoordinates.map((coord, i) => ({
+    x: (i % 8) * squareSize,
+    y: Math.floor(i / 8) * squareSize,
+  }));
+  // const draggedPieceIndex = boardState.squares.findIndex((squareState) =>
+  //   squareState.isEmpty ? false : state.draggingId === squareState.piece.id
+  // );
+  // const draggedFromSquare =
+  //   draggedPieceIndex !== -1
+  //     ? boardState.squares[draggedPieceIndex]
+  //     : undefined;
+  const draggedFromSquare = state.draggingId
+    ? chessboard.getSquare(state.draggingId as Coordinate)
+    : undefined;
+
+  const boardState = chessboard.getState();
   return (
     <Board width={size} height={size}>
       <Squares>
-        {boardState.squares.map((_, i) => {
+        {squareCoordinates.map((coord, i) => {
           return (
             <SquareView
-              coordinate={squareCoordinates[i]}
-              key={i}
+              coordinate={coord}
+              key={coord}
               position={squarePositions[i]}
               size={squareSize}
-              color={((9 * i) & 8) === 0 ? Color.White : Color.Black}
+              color={((9 * i) & 8) === 0 ? Color.White : Color.Black} // Todo: Expose in model
             />
           );
         })}
       </Squares>
       <Pieces>
-        {boardState.squares.map((squareState, i) => {
-          if (squareState.isEmpty) {
-            return undefined;
-          } else if (state.draggingId === squareState.piece.id) {
+        {Object.entries(boardState.squares).map(([coord, piece]) => {
+          const pieceId = piece.type + coord;
+          if (state.draggingId === pieceId) {
             return undefined;
           } else {
             return (
               <PieceView
-                key={squareState.piece.id}
-                piece={squareState.piece}
-                position={squarePositions[i]}
+                key={pieceId}
+                coord={coord as Coordinate}
+                piece={piece}
+                position={
+                  squarePositions[chessboard.getIndex(coord as Coordinate)]
+                }
                 squareSize={squareSize}
               />
             );
           }
         })}
-        {draggedFromSquare && !draggedFromSquare.isEmpty && (
+        {draggedFromSquare && draggedFromSquare.piece && state.draggingId && (
           <PieceView
             piece={draggedFromSquare.piece}
-            position={squarePositions[draggedPieceIndex]}
+            coord={draggedFromSquare.coord}
+            position={
+              squarePositions[
+                chessboard.getIndex(state.draggingId as Coordinate)
+              ]
+            }
             squareSize={squareSize}
           />
         )}

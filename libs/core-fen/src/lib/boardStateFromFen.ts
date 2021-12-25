@@ -6,9 +6,10 @@ import {
   Color,
   Coordinate,
   createPiece,
+  Piece,
   PieceType,
-  SquareState,
 } from '@michess/core-models';
+import { coordIterator } from './coordIterator';
 import { parseFenParts } from './parseFenParts';
 import {
   FenCastlingAbilityPart,
@@ -19,43 +20,52 @@ import {
 } from './types/Fen';
 import { FenValidationError } from './types/FenValidationError';
 
+type PiecePlacement = {
+  coord: Coordinate;
+  piece: Piece;
+};
 const charToPieceType = (char: string): PieceType => {
   return char.toLowerCase() as PieceType;
 };
 
-const emptySquaresFromNumber = (number: number): SquareState[] => {
-  return [...Array(number)].map(() => ({
-    isEmpty: true,
-  }));
-};
-
-const pieceSquareFromLetter = (char: string): SquareState => {
+const pieceSquareFromLetter = (
+  char: string,
+  coord: Coordinate
+): PiecePlacement => {
   const pieceType = charToPieceType(char);
   const color = char === char.toLowerCase() ? Color.Black : Color.White;
   return {
-    isEmpty: false,
     piece: createPiece(pieceType, color),
+    coord,
   };
-};
-
-const fenCharToBoardSquares = (fenChar: string): SquareState[] => {
-  if (Number.isInteger(parseInt(fenChar))) {
-    return emptySquaresFromNumber(parseInt(fenChar));
-  } else {
-    return [pieceSquareFromLetter(fenChar)];
-  }
 };
 
 const boardSquaresFromFenPiecePlacement = (
   piecePlacementPart: FenPiecePlacementPart
 ): BoardSquares => {
-  const squares = piecePlacementPart
+  const coordIter = coordIterator();
+  const piecePlacements = piecePlacementPart
     .replace(/\//g, '') // remove forward slashed
-    .split('') // to array
-    .flatMap(fenCharToBoardSquares);
+    .split('')
+    .flatMap((fenChar): PiecePlacement[] => {
+      const fenInteger = parseInt(fenChar);
+      if (Number.isInteger(fenInteger)) {
+        coordIter.next(fenInteger);
+        return [];
+      } else {
+        const piecePlacement = [
+          pieceSquareFromLetter(fenChar, coordIter.get()),
+        ];
+        coordIter.next(1);
+        return piecePlacement;
+      }
+    });
 
-  if (squares.length === 64) {
-    return squares;
+  if (coordIter.isFinished()) {
+    return piecePlacements.reduce(
+      (acc, curr) => ({ ...acc, [curr.coord]: curr.piece }),
+      {} as BoardSquares
+    );
   } else {
     throw new FenValidationError('SquaresMissing');
   }
@@ -83,10 +93,14 @@ const charToCastlingAbility = (char: string): CastlingAbility => {
 const castlingAbilityFromFen = (
   fenCastlingAbility: FenCastlingAbilityPart
 ): Set<CastlingAbility> => {
-  const list: CastlingAbility[] = [...fenCastlingAbility].map(
-    charToCastlingAbility
-  );
-  return new Set(list);
+  if (fenCastlingAbility === '-') {
+    return new Set();
+  } else {
+    const list: CastlingAbility[] = [...fenCastlingAbility].map(
+      charToCastlingAbility
+    );
+    return new Set(list);
+  }
 };
 
 const enPassantCoordinateFromFenStr = (

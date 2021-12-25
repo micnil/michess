@@ -1,6 +1,5 @@
-import { CastlingAbility, Color } from '@michess/core-models';
+import { CastlingAbility, Color, emptyBoard, startingBoard } from '@michess/core-models';
 import { boardStateFromFen } from '../boardStateFromFen';
-import { emptyBoard, startingBoard } from '../__mocks__/BoardSquares.mock';
 
 describe('boardStateFromFen', () => {
   it('creates an empty board state', () => {
@@ -8,12 +7,14 @@ describe('boardStateFromFen', () => {
     const boardState = boardStateFromFen(emptyBoardFen);
 
     expect(boardState.squares).toEqual(emptyBoard);
-    expect(boardState.castlingAbility.keys()).toEqual([
-      CastlingAbility.WhiteKing,
-      CastlingAbility.WhiteQueen,
-      CastlingAbility.BlackKing,
-      CastlingAbility.BlackQueen,
-    ]);
+    expect(boardState.castlingAbility).toEqual(
+      new Set([
+        CastlingAbility.WhiteKing,
+        CastlingAbility.WhiteQueen,
+        CastlingAbility.BlackKing,
+        CastlingAbility.BlackQueen,
+      ])
+    );
     expect(boardState.enPassant).toBeUndefined();
     expect(boardState.turn).toEqual(Color.White);
   });
@@ -24,12 +25,14 @@ describe('boardStateFromFen', () => {
     const boardState = boardStateFromFen(startingFen);
 
     expect(boardState.squares).toEqual(startingBoard);
-    expect(boardState.castlingAbility.keys()).toEqual([
-      CastlingAbility.WhiteKing,
-      CastlingAbility.WhiteQueen,
-      CastlingAbility.BlackKing,
-      CastlingAbility.BlackQueen,
-    ]);
+    expect(boardState.castlingAbility).toEqual(
+      new Set([
+        CastlingAbility.WhiteKing,
+        CastlingAbility.WhiteQueen,
+        CastlingAbility.BlackKing,
+        CastlingAbility.BlackQueen,
+      ])
+    );
     expect(boardState.enPassant).toBeUndefined();
     expect(boardState.turn).toEqual(Color.White);
   });

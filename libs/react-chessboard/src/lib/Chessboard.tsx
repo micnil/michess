@@ -10,7 +10,9 @@ type Props = {
 };
 export const Chessboard: FC<Props> = ({ orientation, size }) => {
   return (
-    <ChessboardContextProvider orientation={Color.Black}>
+    <ChessboardContextProvider
+      orientation={orientation === 'white' ? Color.White : Color.Black}
+    >
       <DragDropContextProvider>
         <ChessboardView size={size} />
       </DragDropContextProvider>

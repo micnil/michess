@@ -2,7 +2,7 @@ import React from 'react';
 import pieceSprite from '../assets/chessboard-sprite-staunty.svg';
 import { Position } from '@michess/common-utils';
 import { useDrag } from '@michess/react-dnd';
-import { ColoredPieceType, Piece } from '@michess/core-models';
+import { ColoredPieceType, Coordinate, Piece } from '@michess/core-models';
 
 const DEFAULT_SPRITE_SIZE = 40;
 
@@ -10,17 +10,19 @@ type Props = {
   piece: Piece;
   squareSize: number;
   position: Position;
+  coord: Coordinate;
 };
 
 export const PieceView: React.FC<Props> = ({
   piece,
   position: initialPosition,
   squareSize,
+  coord,
 }) => {
   const scaling = squareSize / DEFAULT_SPRITE_SIZE;
   const pieceAndColor = ColoredPieceType.fromPiece(piece);
   const { register } = useDrag({
-    id: piece.id,
+    id: coord,
   });
 
   return (

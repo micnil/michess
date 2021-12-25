@@ -37,9 +37,9 @@ export const SquareView: React.FC<Props> = ({
 }) => {
   const { movePiece } = useChessboardContext();
 
-  const handleDrop = (pieceId: string) => {
-    console.debug(`moving ${pieceId} to coordinate ${coordinate}`);
-    movePiece(pieceId, coordinate);
+  const handleDrop = (draggableId: string) => {
+    console.debug(`moving from ${draggableId} to coordinate ${coordinate}`);
+    movePiece({ from: draggableId as Coordinate, to: coordinate });
   };
 
   const { register, isHovering } = useDrop({

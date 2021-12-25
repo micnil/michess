@@ -7,3 +7,7 @@ export * from './lib/Piece';
 export * from './lib/PieceType';
 export * from './lib/SquareState';
 export * from './lib/CastlingSide';
+export * from './lib/BoardCoordinates';
+export * from './lib/mocks/BoardSquares.mock';
+export * from './lib/mocks/Piece.mock';
+export * from './lib/mocks/BoardState.mock';

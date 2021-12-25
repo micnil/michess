@@ -53,7 +53,7 @@ export function App() {
       <AppLayout>
         <Logo />
         <Main>
-          <Chessboard orientation={'white'} size={500} />
+          <Chessboard orientation={'black'} size={500} />
         </Main>
       </AppLayout>
     </>

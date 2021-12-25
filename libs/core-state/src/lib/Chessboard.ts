@@ -1,38 +1,34 @@
-import { updateItem } from '@michess/common-utils';
-import { BoardState, Color, Coordinate } from '@michess/core-models';
-import { BoardSquare } from './BoardSquare';
-
-type MovePayload = {
-  pieceId: string;
-  coordinate: Coordinate;
-};
+import {
+  BoardCoordinates,
+  BoardState,
+  Color,
+  Coordinate,
+  SquareState,
+} from '@michess/core-models';
+import { IChessboard } from './model/IChessboard';
+import { MovePayload } from './model/MovePayload';
 
 const movePiece = (board: BoardState, move: MovePayload): BoardState => {
-  const toIndex = Coordinate.getCoordinates(board.orientation).indexOf(
-    move.coordinate
-  );
-  const fromSquareIndex = board.squares.findIndex((square) =>
-    square.isEmpty ? false : square.piece.id === move.pieceId
-  );
-  console.debug({ move, fromSquareIndex, toIndex });
-  const fromSquare = BoardSquare(board.squares[fromSquareIndex]);
-  const toSquare = BoardSquare(board.squares[toIndex]);
-  const fromSquareValue = fromSquare.value();
-  if (fromSquareValue.isEmpty) {
+  const toIndex = coordToIndex(board, move.to);
+  const fromIndex = coordToIndex(board, move.from);
+
+  console.debug({ move, fromIndex, toIndex });
+  const fromSquare = getSquare(board, move.from);
+  const toSquare = getSquare(board, move.to);
+
+  if (!fromSquare.piece) {
     console.warn('attempted to move an empty square');
     return board;
   }
 
-  const movedPiece = fromSquareValue;
-  const squaresWithLiftedPiece = updateItem(board.squares, {
-    index: fromSquareIndex,
-    item: fromSquare.clear().value(),
-  });
-  const squaresWithMovedPiece = updateItem(squaresWithLiftedPiece, {
-    index: toIndex,
-    item: toSquare.setPiece(movedPiece.piece).value(),
-  });
-  console.debug({ squaresWithMovedPiece });
+  const movedPiece = fromSquare.piece;
+  const squaresCopy = { ...board.squares };
+  delete squaresCopy[fromSquare.coord];
+  const squaresWithMovedPiece = {
+    ...squaresCopy,
+    [toSquare.coord]: movedPiece,
+  };
+
   return {
     ...board,
     squares: squaresWithMovedPiece,
@@ -42,19 +38,31 @@ const movePiece = (board: BoardState, move: MovePayload): BoardState => {
 const setOrientation = (board: BoardState, orientation: Color): BoardState => {
   return {
     ...board,
-    squares: [...board.squares].reverse(),
     orientation,
   };
 };
 
-interface IChessboard {
-  movePiece(movePayload: MovePayload): IChessboard;
-  setOrientation(orientation: Color): IChessboard;
-  getState(): BoardState;
-}
+const coordToIndex = (board: BoardState, coord: Coordinate): number => {
+  const file = coord.charCodeAt(0) - 97;
+  const rank = coord.charCodeAt(1) - 49;
+  const whiteIndex = file + (7 - rank) * 8;
+  const index =
+    board.orientation === Color.White ? whiteIndex : 63 - whiteIndex;
+  return index;
+};
+
+const getSquare = (board: BoardState, coord: Coordinate): SquareState => {
+  return {
+    coord,
+    piece: board.squares[coord],
+  };
+};
 
 export const Chessboard = (board: BoardState): IChessboard => {
   return {
+    getIndex: (coord) => coordToIndex(board, coord),
+    getSquare: (coord) => getSquare(board, coord),
+    getCoordinates: () => BoardCoordinates.getCoordinates(board.orientation),
     movePiece: (movePayload: MovePayload) =>
       Chessboard(movePiece(board, movePayload)),
     setOrientation: (orientation: Color) =>

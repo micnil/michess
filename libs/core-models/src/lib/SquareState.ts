@@ -1,10 +1,8 @@
+
+import { Coordinate } from './Coordinate';
 import { Piece } from './Piece';
 
-export type SquareState =
-  | {
-      isEmpty: true;
-    }
-  | {
-      isEmpty: false;
-      piece: Piece;
-    };
+export type SquareState = {
+  coord: Coordinate;
+  piece?: Piece;
+};
