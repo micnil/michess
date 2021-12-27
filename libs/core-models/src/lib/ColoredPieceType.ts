@@ -58,6 +58,6 @@ export const fromPiece = (piece: Piece): ColoredPieceType => {
   }
 };
 
-export const ColoredPieceType = {
+export const ColoredPieceType = Object.freeze({
   fromPiece,
-};
+});

@@ -1,4 +1,5 @@
-import { BoardSquares } from '@michess/core-models';
+
+import { BoardSquares } from '../BoardSquares';
 import { B, b, K, k, N, n, P, p, Q, q, r, R } from './Piece.mock';
 
 export const emptyBoard: BoardSquares = {};

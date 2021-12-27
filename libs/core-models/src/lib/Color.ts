@@ -2,8 +2,8 @@ import { ColoredPieceType } from './ColoredPieceType';
 
 export type Color = 'white' | 'black';
 
-export const Color = {
-  colorFromColoredPiece: (coloredPiece: ColoredPieceType): Color => {
+export const Color = Object.freeze({
+  fromColoredPiece: (coloredPiece: ColoredPieceType): Color => {
     if (coloredPiece.startsWith('w')) {
       return 'white';
     } else if (coloredPiece.startsWith('b')) {
@@ -12,4 +12,4 @@ export const Color = {
       throw new Error(`Unrecognized colored piece: ${coloredPiece}`);
     }
   },
-};
+});
