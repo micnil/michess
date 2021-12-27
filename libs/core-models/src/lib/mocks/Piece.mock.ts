@@ -1,4 +1,6 @@
-import { Color, createPiece, PieceType } from '@michess/core-models';
+import { Color } from '../Color';
+import { createPiece } from '../Piece';
+import { PieceType } from '../PieceType';
 
 export const K = createPiece(PieceType.King, Color.White);
 export const Q = createPiece(PieceType.Queen, Color.White);
