@@ -1,4 +1,5 @@
-import { BoardState, Piece, PieceType } from '@michess/core-models';
+import { PiecePlacement, PieceType } from '@michess/core-models';
+import { IChessboard } from '@michess/core-state';
 
 const DIAGONAL_OFFSETS = [7, -7, 9, -9];
 const VERTICAL_OFFSETS = [8, -8];
@@ -14,10 +15,10 @@ type Move = {
 const withinBoard = (index: number): boolean => 0 <= index && index <= 63;
 
 const getSlidingMoves = (
-  boardState: BoardState,
-  index: number,
-  piece: Piece
+  chessboard: IChessboard,
+  { piece, coord }: PiecePlacement
 ): Move[] => {
+  const index = chessboard.getIndex(coord);
   const moveOffsets =
     piece.type === PieceType.Bishop
       ? DIAGONAL_OFFSETS
@@ -34,12 +35,14 @@ const getSlidingMoves = (
       withinBoard(nextIndex);
       nextIndex = nextIndex + offset
     ) {
-      const currSquare = boardState.squares[nextIndex];
+      const currSquare = chessboard.getSquare(
+        chessboard.getCoordinates()[nextIndex]
+      );
       const move: Move = {
         start: index,
         target: nextIndex,
       };
-      if (currSquare.isEmpty) {
+      if (!currSquare.piece) {
         moves.push(move);
       } else if (currSquare.piece.color !== piece.color) {
         moves.push(move);
@@ -53,39 +56,35 @@ const getSlidingMoves = (
 };
 
 const getMovesForQueen = (
-  boardState: BoardState,
-  index: number,
-  piece: Piece
+  chessboard: IChessboard,
+  piecePlacement: PiecePlacement
 ): Move[] => {
-  return getSlidingMoves(boardState, index, piece);
+  return getSlidingMoves(chessboard, piecePlacement);
 };
 
 const getMovesForBishop = (
-  boardState: BoardState,
-  index: number,
-  piece: Piece
+  chessboard: IChessboard,
+  piecePlacement: PiecePlacement
 ): Move[] => {
-  return getSlidingMoves(boardState, index, piece);
+  return getSlidingMoves(chessboard, piecePlacement);
 };
 
 const getMovesForRook = (
-  boardState: BoardState,
-  index: number,
-  piece: Piece
+  chessboard: IChessboard,
+  piecePlacement: PiecePlacement
 ): Move[] => {
-  return getSlidingMoves(boardState, index, piece);
+  return getSlidingMoves(chessboard, piecePlacement);
 };
 
 const getMovesFromSquare = (
-  boardState: BoardState,
-  index: number,
-  piece: Piece
+  chessboard: IChessboard,
+  piecePlacement: PiecePlacement
 ): Move[] => {
-  switch (piece.type) {
+  switch (piecePlacement.piece.type) {
     case PieceType.Queen:
-      return getMovesForQueen(boardState, index, piece);
+      return getMovesForQueen(chessboard, piecePlacement);
     case PieceType.Rook:
-      return getMovesForRook(boardState, index, piece);
+      return getMovesForRook(chessboard, piecePlacement);
     case PieceType.Pawn:
       return [];
     case PieceType.Knight:
@@ -93,19 +92,15 @@ const getMovesFromSquare = (
     case PieceType.King:
       return [];
     case PieceType.Bishop:
-      return getMovesForBishop(boardState, index, piece);
+      return getMovesForBishop(chessboard, piecePlacement);
     default:
-      throw new Error(`Invalid piece type: ${piece.type}`);
+      throw new Error(`Invalid piece type: ${piecePlacement.piece.type}`);
   }
 };
 
-const getMoves = (boardState: BoardState): Move[] => {
-  return boardState.squares.flatMap((square, squareIndex) => {
-    if (square.isEmpty) {
-      return [];
-    } else {
-      return getMovesFromSquare(boardState, squareIndex, square.piece);
-    }
+const getMoves = (chessboard: IChessboard): Move[] => {
+  return chessboard.getPiecePlacements().flatMap((piecePlacement) => {
+    return getMovesFromSquare(chessboard, piecePlacement);
   });
 };
 
@@ -113,8 +108,8 @@ interface IRules {
   getMoves(): Move[];
 }
 
-export const Rules = (boardState: BoardState): IRules => {
+export const Rules = (chessboard: IChessboard): IRules => {
   return {
-    getMoves: () => getMoves(boardState),
+    getMoves: () => getMoves(chessboard),
   };
 };

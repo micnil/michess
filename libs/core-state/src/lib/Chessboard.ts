@@ -3,6 +3,7 @@ import {
   BoardState,
   Color,
   Coordinate,
+  PiecePlacement,
   SquareState,
 } from '@michess/core-models';
 import { IChessboard } from './model/IChessboard';
@@ -51,6 +52,13 @@ const coordToIndex = (board: BoardState, coord: Coordinate): number => {
   return index;
 };
 
+const getPiecePlacements = (board: BoardState): PiecePlacement[] => {
+  return Object.entries(board.squares).map(([coord, piece]) => ({
+    coord: coord as Coordinate,
+    piece,
+  }));
+};
+
 const getSquare = (board: BoardState, coord: Coordinate): SquareState => {
   return {
     coord,
@@ -63,6 +71,7 @@ export const Chessboard = (board: BoardState): IChessboard => {
     getIndex: (coord) => coordToIndex(board, coord),
     getSquare: (coord) => getSquare(board, coord),
     getCoordinates: () => BoardCoordinates.getCoordinates(board.orientation),
+    getPiecePlacements: () => getPiecePlacements(board),
     movePiece: (movePayload: MovePayload) =>
       Chessboard(movePiece(board, movePayload)),
     setOrientation: (orientation: Color) =>

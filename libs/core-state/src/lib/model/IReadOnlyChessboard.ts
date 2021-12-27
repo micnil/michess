@@ -2,6 +2,7 @@ import {
   BoardCoordinates,
   BoardState,
   Coordinate,
+  PiecePlacement,
   SquareState,
 } from '@michess/core-models';
 
@@ -10,4 +11,5 @@ export interface IReadOnlyChessboard {
   getSquare(coord: Coordinate): SquareState;
   getCoordinates(): BoardCoordinates;
   getState(): BoardState;
+  getPiecePlacements(): PiecePlacement[]
 }
