@@ -1,4 +1,4 @@
-import { CastlingAbility, Color, emptyBoard, startingBoard } from '@michess/core-models';
+import { CastlingAbility, emptyBoard, startingBoard } from '@michess/core-models';
 import { boardStateFromFen } from '../boardStateFromFen';
 
 describe('boardStateFromFen', () => {
@@ -16,7 +16,7 @@ describe('boardStateFromFen', () => {
       ])
     );
     expect(boardState.enPassant).toBeUndefined();
-    expect(boardState.turn).toEqual(Color.White);
+    expect(boardState.turn).toEqual('white');
   });
   it('creates the start board state', () => {
     const startingFen =
@@ -34,6 +34,6 @@ describe('boardStateFromFen', () => {
       ])
     );
     expect(boardState.enPassant).toBeUndefined();
-    expect(boardState.turn).toEqual(Color.White);
+    expect(boardState.turn).toEqual('white');
   });
 });

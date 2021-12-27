@@ -1,4 +1,3 @@
-import { Color } from '../Color';
 import { createPiece } from '../Piece';
 import { PieceType } from '../PieceType';
 
