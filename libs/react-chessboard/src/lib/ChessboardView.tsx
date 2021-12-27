@@ -25,13 +25,7 @@ const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
     x: (i % 8) * squareSize,
     y: Math.floor(i / 8) * squareSize,
   }));
-  // const draggedPieceIndex = boardState.squares.findIndex((squareState) =>
-  //   squareState.isEmpty ? false : state.draggingId === squareState.piece.id
-  // );
-  // const draggedFromSquare =
-  //   draggedPieceIndex !== -1
-  //     ? boardState.squares[draggedPieceIndex]
-  //     : undefined;
+
   const draggedFromSquare = state.draggingId
     ? chessboard.getSquare(state.draggingId as Coordinate)
     : undefined;
