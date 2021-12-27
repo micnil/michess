@@ -43,10 +43,11 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
       const elementDomRect = elementRef.current.getBoundingClientRect();
 
       if (positionWithinDomRect(mousePos, elementDomRect)) {
+        enterDroppable(id);
         console.debug('dragging from: ', id);
       }
     },
-    [id]
+    [enterDroppable, id]
   );
 
   const handleMouseUp = useCallback(
