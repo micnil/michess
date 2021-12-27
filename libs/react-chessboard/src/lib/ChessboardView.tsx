@@ -48,7 +48,7 @@ const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
       </Squares>
       <Pieces>
         {Object.entries(boardState.squares).map(([coord, piece]) => {
-          const pieceId = piece.type + coord;
+          const pieceId = coord;
           if (state.draggingId === pieceId) {
             return undefined;
           } else {

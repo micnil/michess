@@ -47,7 +47,7 @@ export const useDrag = ({ id }: Options): Drag => {
   );
 
   const handleMouseDown = useCallback(
-    (_: Event) => {
+    (_: MouseEvent) => {
       console.debug('startDragging');
       startDragging(id);
     },
