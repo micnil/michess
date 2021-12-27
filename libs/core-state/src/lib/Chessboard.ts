@@ -70,7 +70,7 @@ export const Chessboard = (board: BoardState): IChessboard => {
   return {
     getIndex: (coord) => coordToIndex(board, coord),
     getSquare: (coord) => getSquare(board, coord),
-    getCoordinates: () => BoardCoordinates.getCoordinates(board.orientation),
+    getCoordinates: () => BoardCoordinates.fromOrientation(board.orientation),
     getPiecePlacements: () => getPiecePlacements(board),
     movePiece: (movePayload: MovePayload) =>
       Chessboard(movePiece(board, movePayload)),
