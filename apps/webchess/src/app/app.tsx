@@ -35,7 +35,11 @@ const AppLayout = styled.div`
   display: grid;
   grid-template-rows: 50px auto;
   height: 100%;
-  background: linear-gradient(142deg, rgba(255,255,255,1) 15%, rgba(215,215,215,1) 100%);
+  background: linear-gradient(
+    142deg,
+    rgba(255, 255, 255, 1) 15%,
+    rgba(215, 215, 215, 1) 100%
+  );
 `;
 
 const Main = styled.main`

@@ -10,9 +10,7 @@ type Props = {
 };
 export const Chessboard: FC<Props> = ({ orientation, size }) => {
   return (
-    <ChessboardContextProvider
-      orientation={orientation}
-    >
+    <ChessboardContextProvider orientation={orientation}>
       <DragDropContextProvider>
         <ChessboardView size={size} />
       </DragDropContextProvider>

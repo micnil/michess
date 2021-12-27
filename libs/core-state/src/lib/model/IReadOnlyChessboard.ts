@@ -11,5 +11,5 @@ export interface IReadOnlyChessboard {
   getSquare(coord: Coordinate): SquareState;
   getCoordinates(): BoardCoordinates;
   getState(): BoardState;
-  getPiecePlacements(): PiecePlacement[]
+  getPiecePlacements(): PiecePlacement[];
 }

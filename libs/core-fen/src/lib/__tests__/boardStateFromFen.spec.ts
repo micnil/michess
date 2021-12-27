@@ -1,4 +1,8 @@
-import { CastlingAbility, emptyBoard, startingBoard } from '@michess/core-models';
+import {
+  CastlingAbility,
+  emptyBoard,
+  startingBoard,
+} from '@michess/core-models';
 import { boardStateFromFen } from '../boardStateFromFen';
 
 describe('boardStateFromFen', () => {

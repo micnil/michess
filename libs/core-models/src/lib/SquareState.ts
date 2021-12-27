@@ -1,4 +1,3 @@
-
 import { Coordinate } from './Coordinate';
 import { Piece } from './Piece';
 
