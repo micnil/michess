@@ -5,13 +5,13 @@ import ChessboardView from './ChessboardView';
 import { ChessboardContextProvider } from './context/ChessboardContextProvider';
 
 type Props = {
-  orientation: 'black' | 'white';
+  orientation: Color;
   size: number;
 };
 export const Chessboard: FC<Props> = ({ orientation, size }) => {
   return (
     <ChessboardContextProvider
-      orientation={orientation === 'white' ? Color.White : Color.Black}
+      orientation={orientation}
     >
       <DragDropContextProvider>
         <ChessboardView size={size} />

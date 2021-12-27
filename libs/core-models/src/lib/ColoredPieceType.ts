@@ -52,9 +52,9 @@ const blackPieceFrom = (piece: PieceType): ColoredPieceType => {
 
 export const fromPiece = (piece: Piece): ColoredPieceType => {
   switch (piece.color) {
-    case Color.Black:
+    case 'black':
       return blackPieceFrom(piece.type);
-    case Color.White:
+    case 'white':
       return whitePieceFrom(piece.type);
   }
 };

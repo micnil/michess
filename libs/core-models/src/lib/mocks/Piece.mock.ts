@@ -2,16 +2,16 @@ import { Color } from '../Color';
 import { createPiece } from '../Piece';
 import { PieceType } from '../PieceType';
 
-export const K = createPiece(PieceType.King, Color.White);
-export const Q = createPiece(PieceType.Queen, Color.White);
-export const R = createPiece(PieceType.Rook, Color.White);
-export const B = createPiece(PieceType.Bishop, Color.White);
-export const N = createPiece(PieceType.Knight, Color.White);
-export const P = createPiece(PieceType.Pawn, Color.White);
+export const K = createPiece(PieceType.King, 'white');
+export const Q = createPiece(PieceType.Queen, 'white');
+export const R = createPiece(PieceType.Rook, 'white');
+export const B = createPiece(PieceType.Bishop, 'white');
+export const N = createPiece(PieceType.Knight, 'white');
+export const P = createPiece(PieceType.Pawn, 'white');
 
-export const k = createPiece(PieceType.King, Color.Black);
-export const q = createPiece(PieceType.Queen, Color.Black);
-export const r = createPiece(PieceType.Rook, Color.Black);
-export const b = createPiece(PieceType.Bishop, Color.Black);
-export const n = createPiece(PieceType.Knight, Color.Black);
-export const p = createPiece(PieceType.Pawn, Color.Black);
+export const k = createPiece(PieceType.King, 'black');
+export const q = createPiece(PieceType.Queen, 'black');
+export const r = createPiece(PieceType.Rook, 'black');
+export const b = createPiece(PieceType.Bishop, 'black');
+export const n = createPiece(PieceType.Knight, 'black');
+export const p = createPiece(PieceType.Pawn, 'black');

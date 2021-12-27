@@ -1,8 +1,8 @@
 import { counter } from '@michess/common-utils';
-import { BoardCoordinates, Color, Coordinate } from '@michess/core-models';
+import { BoardCoordinates, Coordinate } from '@michess/core-models';
 import { FenValidationError } from './types/FenValidationError';
 
-const whiteCoordinates = BoardCoordinates.fromOrientation(Color.White);
+const whiteCoordinates = BoardCoordinates.fromOrientation('white');
 
 type CoordIterator = {
   get(): Coordinate;

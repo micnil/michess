@@ -48,7 +48,7 @@ const coordToIndex = (board: BoardState, coord: Coordinate): number => {
   const rank = coord.charCodeAt(1) - 49;
   const whiteIndex = file + (7 - rank) * 8;
   const index =
-    board.orientation === Color.White ? whiteIndex : 63 - whiteIndex;
+    board.orientation === 'white' ? whiteIndex : 63 - whiteIndex;
   return index;
 };
 

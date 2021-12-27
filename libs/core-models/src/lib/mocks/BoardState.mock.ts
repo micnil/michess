@@ -1,6 +1,5 @@
 import { BoardState } from '../BoardState';
 import { CastlingAbility } from '../CastlingSide';
-import { Color } from '../Color';
 import { startingBoard } from './BoardSquares.mock';
 
 export const boardStateMock: BoardState = {
@@ -11,8 +10,8 @@ export const boardStateMock: BoardState = {
     CastlingAbility.WhiteKing,
     CastlingAbility.WhiteQueen,
   ]),
-  orientation: Color.White,
-  turn: Color.White,
+  orientation: 'white',
+  turn: 'white',
 };
 
 export const createBoardStateMock = (

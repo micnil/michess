@@ -11,7 +11,7 @@ export type BoardCoordinates = WhiteSideCoordinates | BlackSideCoordinates;
 
 export const BoardCoordinates = {
   fromOrientation: (orientation: Color): BoardCoordinates =>
-    orientation === Color.White
+    orientation === 'white'
       ? SQUARE_COORDINATES_WHITE
       : SQUARE_COORDINATES_BLACK,
 };

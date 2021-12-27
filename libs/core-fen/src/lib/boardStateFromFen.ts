@@ -33,7 +33,7 @@ const pieceSquareFromLetter = (
   coord: Coordinate
 ): PiecePlacement => {
   const pieceType = charToPieceType(char);
-  const color = char === char.toLowerCase() ? Color.Black : Color.White;
+  const color = char === char.toLowerCase() ? 'black' : 'white';
   return {
     piece: createPiece(pieceType, color),
     coord,
@@ -72,7 +72,7 @@ const boardSquaresFromFenPiecePlacement = (
 };
 
 const sideToMoveToColor = (sideToMove: FenSideToMovePart): Color => {
-  return sideToMove === 'w' ? Color.White : Color.Black;
+  return sideToMove === 'w' ? 'white' : 'black';
 };
 
 const charToCastlingAbility = (char: string): CastlingAbility => {
@@ -118,7 +118,7 @@ export const boardStateFromFen = (fen: FenStr): BoardState => {
 
   return {
     squares: boardSquaresFromFenPiecePlacement(fenParts.piecePlacement),
-    orientation: Color.White,
+    orientation: 'white',
     enPassant: enPassantCoordinateFromFenStr(fenParts.enPassantTargetSquare),
     turn: sideToMoveToColor(fenParts.sideToMove),
     castlingAbility: castlingAbilityFromFen(fenParts.castlingAbility),

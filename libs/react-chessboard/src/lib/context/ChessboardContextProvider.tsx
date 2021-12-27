@@ -11,7 +11,7 @@ type Props = {
 
 export const ChessboardContextProvider: React.FC<Props> = ({
   children,
-  orientation = Color.White,
+  orientation = 'white',
   startingFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 }) => {
   const [chessboard, setChessboard] = useState<IChessboard>(() =>

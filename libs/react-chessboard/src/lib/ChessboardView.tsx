@@ -41,7 +41,7 @@ const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
               key={coord}
               position={squarePositions[i]}
               size={squareSize}
-              color={((9 * i) & 8) === 0 ? Color.White : Color.Black} // Todo: Expose in model
+              color={((9 * i) & 8) === 0 ? 'white' : 'black'} // Todo: Expose in model
             />
           );
         })}
