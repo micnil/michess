@@ -1,8 +1,7 @@
-import { Maybe, takeWhile } from '@michess/common-utils';
+import { takeWhile } from '@michess/common-utils';
 import {
   PiecePlacement,
   PieceType,
-  SquareState,
 } from '@michess/core-models';
 import { IChessboard } from '@michess/core-state';
 
@@ -27,32 +26,6 @@ type Move = {
 };
 
 const withinBoard = (index: number): boolean => 0 <= index && index <= 63;
-
-const isOutOfBoundsOrBlocked = (
-  chessboard: IChessboard,
-  index: number
-): boolean => {
-  if (withinBoard(index)) {
-    const square = chessboard.getSquare(chessboard.getCoordinates()[index]);
-    return square.piece?.color === chessboard.getState().turn;
-  } else {
-    return false;
-  }
-};
-
-const getSquareFromOffset = (
-  chessboard: IChessboard,
-  from: number,
-  offset: number
-): Maybe<SquareState> => {
-  const squareIndex = from + offset;
-  if (withinBoard(squareIndex)) {
-    return chessboard.getSquare(chessboard.getCoordinates()[squareIndex]);
-  }
-};
-
-type Conditional = () => boolean;
-type NextIteratee<T> = (prev: T) => T;
 
 const unfoldDirection = (
   startIndex: number,
