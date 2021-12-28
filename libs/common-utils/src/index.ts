@@ -7,3 +7,5 @@ export * from './lib/types/Callback';
 export * from './lib/types/Maybe';
 export * from './lib/types/Position';
 export * from './lib/counter';
+export * from './lib/unfold';
+export * from './lib/takeWhile';
