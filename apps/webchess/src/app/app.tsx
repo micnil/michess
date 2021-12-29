@@ -10,25 +10,13 @@ const GlobalStyle = createGlobalStyle`
   }
 
   body {
-    /* margin: 0;
-    padding: 0; */
     height: 100vh;
     width: 100vw;
-    /* box-sizing: border-box; */
-
   }
 
   #root {
     height: 100%;
   }
-`;
-
-const Container = styled.div`
-  height: 100%;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 `;
 
 const AppLayout = styled.div`
