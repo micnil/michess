@@ -1,9 +1,6 @@
-import { Maybe } from '@michess/common-utils';
 import {
   PiecePlacements,
   BoardState,
-  CastlingAbility,
-  Color,
   Coordinate,
   createPiece,
   Piece,
@@ -11,13 +8,7 @@ import {
 } from '@michess/core-models';
 import { coordIterator } from './coordIterator';
 import { parseFenParts } from './parseFenParts';
-import {
-  FenCastlingAbilityPart,
-  FenEnPassantTargetSquarePart,
-  FenPiecePlacementPart,
-  FenSideToMovePart,
-  FenStr,
-} from './types/Fen';
+import { FenPiecePlacementPart, FenStr } from './types/Fen';
 import { FenValidationError } from './types/FenValidationError';
 
 type PiecePlacement = {
@@ -71,56 +62,11 @@ const piecePlacementsFromFenPiecePlacement = (
   }
 };
 
-const sideToMoveToColor = (sideToMove: FenSideToMovePart): Color => {
-  return sideToMove === 'w' ? 'white' : 'black';
-};
-
-const charToCastlingAbility = (char: string): CastlingAbility => {
-  switch (char) {
-    case 'k':
-      return CastlingAbility.BlackKing;
-    case 'q':
-      return CastlingAbility.BlackQueen;
-    case 'Q':
-      return CastlingAbility.WhiteQueen;
-    case 'K':
-      return CastlingAbility.WhiteKing;
-    default:
-      throw new FenValidationError('FenCastlingAbilityPart');
-  }
-};
-
-const castlingAbilityFromFen = (
-  fenCastlingAbility: FenCastlingAbilityPart
-): Set<CastlingAbility> => {
-  if (fenCastlingAbility === '-') {
-    return new Set();
-  } else {
-    const list: CastlingAbility[] = [...fenCastlingAbility].map(
-      charToCastlingAbility
-    );
-    return new Set(list);
-  }
-};
-
-const enPassantCoordinateFromFenStr = (
-  fenEnPassantTargetSquare: FenEnPassantTargetSquarePart
-): Maybe<Coordinate> => {
-  if (fenEnPassantTargetSquare === '-') {
-    return undefined;
-  } else {
-    return fenEnPassantTargetSquare as Coordinate;
-  }
-};
-
 export const boardStateFromFen = (fen: FenStr): BoardState => {
   const fenParts = parseFenParts(fen);
 
   return {
-    squares: piecePlacementsFromFenPiecePlacement(fenParts.piecePlacement),
+    pieces: piecePlacementsFromFenPiecePlacement(fenParts.piecePlacement),
     orientation: 'white',
-    enPassant: enPassantCoordinateFromFenStr(fenParts.enPassantTargetSquare),
-    turn: sideToMoveToColor(fenParts.sideToMove),
-    castlingAbility: castlingAbilityFromFen(fenParts.castlingAbility),
   };
 };

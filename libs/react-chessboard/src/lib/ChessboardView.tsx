@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Color, ColoredPieceType, Coordinate } from '@michess/core-models';
+import { Coordinate } from '@michess/core-models';
 import { useDragDropContext } from '@michess/react-dnd';
 import { PieceView } from './PieceView';
 import { useChessboardContext } from './context/useChessboardContext';
@@ -47,7 +47,7 @@ const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
         })}
       </Squares>
       <Pieces>
-        {Object.entries(boardState.squares).map(([coord, piece]) => {
+        {Object.entries(boardState.pieces).map(([coord, piece]) => {
           const pieceId = coord;
           if (state.draggingId === pieceId) {
             return undefined;

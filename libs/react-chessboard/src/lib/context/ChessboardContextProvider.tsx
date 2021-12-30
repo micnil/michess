@@ -1,5 +1,5 @@
 import { boardStateFromFen, FenStr } from '@michess/core-fen';
-import { Color } from '@michess/core-models';
+import { Color, PiecePlacements } from '@michess/core-models';
 import { Chessboard, IChessboard, MovePayload } from '@michess/core-state';
 import React, { useCallback, useState } from 'react';
 import { ChessboardContext } from './ChessboardContext';
@@ -7,6 +7,7 @@ import { ChessboardContext } from './ChessboardContext';
 type Props = {
   orientation?: Color;
   startingFen?: FenStr;
+  piecePlacements?: PiecePlacements;
 };
 
 export const ChessboardContextProvider: React.FC<Props> = ({
