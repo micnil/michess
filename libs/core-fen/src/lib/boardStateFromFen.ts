@@ -1,6 +1,6 @@
 import { Maybe } from '@michess/common-utils';
 import {
-  BoardSquares,
+  PiecePlacements,
   BoardState,
   CastlingAbility,
   Color,
@@ -40,9 +40,9 @@ const pieceSquareFromLetter = (
   };
 };
 
-const boardSquaresFromFenPiecePlacement = (
+const piecePlacementsFromFenPiecePlacement = (
   piecePlacementPart: FenPiecePlacementPart
-): BoardSquares => {
+): PiecePlacements => {
   const coordIter = coordIterator();
   const piecePlacements = piecePlacementPart
     .replace(/\//g, '') // remove forward slashed
@@ -64,7 +64,7 @@ const boardSquaresFromFenPiecePlacement = (
   if (coordIter.isFinished()) {
     return piecePlacements.reduce(
       (acc, curr) => ({ ...acc, [curr.coord]: curr.piece }),
-      {} as BoardSquares
+      {} as PiecePlacements
     );
   } else {
     throw new FenValidationError('SquaresMissing');
@@ -117,7 +117,7 @@ export const boardStateFromFen = (fen: FenStr): BoardState => {
   const fenParts = parseFenParts(fen);
 
   return {
-    squares: boardSquaresFromFenPiecePlacement(fenParts.piecePlacement),
+    squares: piecePlacementsFromFenPiecePlacement(fenParts.piecePlacement),
     orientation: 'white',
     enPassant: enPassantCoordinateFromFenStr(fenParts.enPassantTargetSquare),
     turn: sideToMoveToColor(fenParts.sideToMove),

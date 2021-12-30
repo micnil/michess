@@ -1,10 +1,10 @@
 import { Coordinate } from '..';
-import { BoardSquares } from './BoardSquares';
+import { PiecePlacements } from './PiecePlacements';
 import { CastlingAbility } from './CastlingSide';
 import { Color } from './Color';
 
 export type BoardState = {
-  squares: BoardSquares;
+  squares: PiecePlacements;
   orientation: Color;
   enPassant?: Coordinate;
   turn: Color;

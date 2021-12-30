@@ -1,10 +1,10 @@
 
-import { BoardSquares } from '../BoardSquares';
+import { PiecePlacements } from '../PiecePlacements';
 import { B, b, K, k, N, n, P, p, Q, q, r, R } from './Piece.mock';
 
-export const emptyBoard: BoardSquares = {};
+export const emptyBoard: PiecePlacements = {};
 
-export const startingBoard: BoardSquares = {
+export const startingBoard: PiecePlacements = {
   a1: R,
   b1: N,
   c1: B,

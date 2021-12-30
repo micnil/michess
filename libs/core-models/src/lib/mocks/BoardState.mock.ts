@@ -1,6 +1,6 @@
 import { BoardState } from '../BoardState';
 import { CastlingAbility } from '../CastlingSide';
-import { startingBoard } from './BoardSquares.mock';
+import { startingBoard } from './PiecePlacements.mock';
 
 export const boardStateMock: BoardState = {
   squares: startingBoard,

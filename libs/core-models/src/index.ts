@@ -1,4 +1,4 @@
-export * from './lib/BoardSquares';
+export * from './lib/PiecePlacements';
 export * from './lib/BoardState';
 export * from './lib/Color';
 export * from './lib/ColoredPieceType';
@@ -9,6 +9,6 @@ export * from './lib/SquareState';
 export * from './lib/CastlingSide';
 export * from './lib/BoardCoordinates';
 export * from './lib/PiecePlacement';
-export * from './lib/mocks/BoardSquares.mock';
+export * from './lib/mocks/PiecePlacements.mock';
 export * from './lib/mocks/Piece.mock';
 export * from './lib/mocks/BoardState.mock';
