@@ -42,18 +42,6 @@ export const DragDropContextProvider: React.FC = ({ children }) => {
     );
   }, []);
 
-  // Logging
-  // useEffect(() => {
-  //   if (dragDropState.draggingId) {
-  //     console.log({
-  //       id: dragDropState.draggingId,
-  //       ...dragDropState.draggables[dragDropState.draggingId],
-  //     });
-  //   } else {
-  //     console.log(dragDropState.draggables);
-  //   }
-  // }, [dragDropState]);
-
   return (
     <DragDropContext.Provider
       value={{
