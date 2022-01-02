@@ -1,8 +1,14 @@
 import { ColoredPieceType } from './ColoredPieceType';
 
-export type Color = 'white' | 'black';
+const ColorEnum = {
+  White: 'white',
+  Black: 'black'
+}
+
+export type Color = typeof ColorEnum[keyof typeof ColorEnum];
 
 export const Color = Object.freeze({
+  ...ColorEnum,
   fromColoredPiece: (coloredPiece: ColoredPieceType): Color => {
     if (coloredPiece.startsWith('w')) {
       return 'white';
