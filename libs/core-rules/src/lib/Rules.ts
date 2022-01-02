@@ -8,6 +8,8 @@ const HORIZONTAL_OFFSETS = [1, -1];
 const ADJECENT_OFFSETS = [...VERTICAL_OFFSETS, ...HORIZONTAL_OFFSETS];
 const NEIGHBORING_OFFSETS = [...ADJECENT_OFFSETS, ...DIAGONAL_OFFSETS];
 
+const KNIGHT_JUMP_OFFSETS = [15, 17, -17, -15, 10, -6, 6, -10];
+
 // type MoveTemp = {
 //   from: number;
 //   to: number;
@@ -24,14 +26,20 @@ type Move = {
 
 const withinBoard = (index: number): boolean => 0 <= index && index <= 63;
 
-const isNeighbors = (startIndex: number, nextIndex: number) => {
+const chebyshevDistance = (startIndex: number, nextIndex: number) => {
   const startFile = startIndex % 8;
   const nextFile = nextIndex % 8;
   const startRank = (startIndex - startFile) / 8;
   const nextRank = (nextIndex - nextFile) / 8;
-  return (
-    Math.abs(startRank - nextRank) <= 1 && Math.abs(startFile - nextFile) <= 1
+
+  return Math.max(
+    Math.abs(startRank - nextRank),
+    Math.abs(startFile - nextFile)
   );
+};
+
+const isNeighbors = (startIndex: number, nextIndex: number) => {
+  return chebyshevDistance(startIndex, nextIndex) <= 1;
 };
 
 const unfoldDirection = (
@@ -139,6 +147,32 @@ const getMovesForKing = (
   return moves;
 };
 
+const getMovesForKnight = (
+  chessboard: IChessGame,
+  { coord, piece }: PiecePlacement
+): Move[] => {
+  const index = chessboard.getIndex(coord);
+  const moveOffsets = KNIGHT_JUMP_OFFSETS;
+  const coordinates = chessboard.getCoordinates();
+
+  const squares = moveOffsets
+    .map((offset) => index + offset)
+    .filter(
+      (nextIndex) =>
+        withinBoard(nextIndex) && chebyshevDistance(index, nextIndex) <= 2
+    )
+    .map((index) => chessboard.getSquare(coordinates[index]))
+    .filter((square) => square.piece?.color !== piece.color);
+
+  const moves: Move[] = squares.map((square) => ({
+    start: index,
+    target: chessboard.getIndex(square.coord),
+    capture: !!square.piece,
+  }));
+
+  return moves;
+};
+
 const getMovesFromSquare = (
   chessboard: IChessGame,
   piecePlacement: PiecePlacement
@@ -151,7 +185,7 @@ const getMovesFromSquare = (
     case PieceType.Pawn:
       return [];
     case PieceType.Knight:
-      return [];
+      return getMovesForKnight(chessboard, piecePlacement);
     case PieceType.King:
       return getMovesForKing(chessboard, piecePlacement);
     case PieceType.Bishop:
