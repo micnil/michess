@@ -1,5 +1,5 @@
 import { takeWhile } from '@michess/common-utils';
-import { PiecePlacement, PieceType } from '@michess/core-models';
+import { Color, PiecePlacement, PieceType } from '@michess/core-models';
 import { IChessGame } from '@michess/core-state';
 
 const DIAGONAL_OFFSETS = [7, -7, 9, -9];
@@ -172,6 +172,48 @@ const getMovesForKnight = (
 
   return moves;
 };
+const getMovesForPawn = (
+  chessboard: IChessGame,
+  { coord, piece }: PiecePlacement
+) => {
+  const index = chessboard.getIndex(coord);
+  const coordinates = chessboard.getCoordinates();
+
+  const direction = piece.color === Color.White ? -1 : +1;
+
+  const startRank = piece.color === Color.White ? 6 : 1;
+  const offset = 8;
+  const offsetx2 = 16;
+
+  const currentRank = (index - (index % 8)) / 8;
+
+  const moves: Move[] = [];
+  if (
+    !chessboard.getSquare(coordinates[index + direction * offset]).piece &&
+    withinBoard(index + direction * offset)
+  ) {
+    moves.push({
+      start: index,
+      target: index + direction * offset,
+      capture: false,
+    });
+  }
+
+  if (
+    currentRank === startRank &&
+    !chessboard.getSquare(coordinates[index + direction * offsetx2]).piece &&
+    !chessboard.getSquare(coordinates[index + direction * offset]).piece &&
+    withinBoard(index + direction * offsetx2)
+  ) {
+    moves.push({
+      start: index,
+      target: index + direction * offsetx2,
+      capture: false,
+    });
+  }
+  
+  return moves;
+};
 
 const getMovesFromSquare = (
   chessboard: IChessGame,
@@ -183,7 +225,7 @@ const getMovesFromSquare = (
     case PieceType.Rook:
       return getMovesForRook(chessboard, piecePlacement);
     case PieceType.Pawn:
-      return [];
+      return getMovesForPawn(chessboard, piecePlacement);
     case PieceType.Knight:
       return getMovesForKnight(chessboard, piecePlacement);
     case PieceType.King:
