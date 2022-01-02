@@ -1,6 +1,7 @@
 import { takeWhile } from '@michess/common-utils';
 import { Color, PiecePlacement, PieceType } from '@michess/core-models';
 import { IChessGame } from './model/IChessGame';
+import { Move } from './model/Move';
 
 const DIAGONAL_OFFSETS = [7, -7, 9, -9];
 const VERTICAL_OFFSETS = [8, -8];
@@ -17,12 +18,6 @@ const KNIGHT_JUMP_OFFSETS = [15, 17, -17, -15, 10, -6, 6, -10];
 //   promotion?: Pick<PieceType, 'q' | 'r' | 'b' | 'n'>;
 //   castle:  Pick<PieceType, 'q' | 'k'>;
 // }
-
-type Move = {
-  start: number;
-  target: number;
-  capture: boolean;
-};
 
 const withinBoard = (index: number): boolean => 0 <= index && index <= 63;
 
