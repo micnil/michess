@@ -1,5 +1,5 @@
 import { Chessboard as ChessboardView } from '@michess/react-chessboard';
-import { Chessboard, ChessGame } from '@michess/core-state';
+import { ChessGame } from '@michess/core-state';
 import { gameStateFromFen } from '@michess/core-fen';
 import { useState } from 'react';
 import styled from 'styled-components';
@@ -45,8 +45,8 @@ const Main = styled.main`
 export function App() {
   const [chessGame, setChessGame] = useState(() =>
     ChessGame(
-      gameStateFromFen('rnbqkbnr/8/r1N1Q1R1/8/8/8/8/RNBQKBNR w KQkq - 0 1')
-    )
+      gameStateFromFen('rnbqkbnr/ppp5/r1N1Q1R1/8/8/8/PPP5/RNBQKBNR w KQkq - 0 1')
+    ).setOrientation('white')
   );
 
   return (
