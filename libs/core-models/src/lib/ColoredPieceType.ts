@@ -55,6 +55,8 @@ export const fromPiece = (piece: Piece): ColoredPieceType => {
       return blackPieceFrom(piece.type);
     case 'white':
       return whitePieceFrom(piece.type);
+    default:
+      throw new Error(`Unsupported color: ${piece.color}`);
   }
 };
 
