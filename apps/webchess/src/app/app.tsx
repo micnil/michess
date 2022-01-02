@@ -45,7 +45,7 @@ const Main = styled.main`
 export function App() {
   const [chessGame, setChessGame] = useState(() =>
     ChessGame(
-      gameStateFromFen('rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w KQkq - 0 1')
+      gameStateFromFen('rnbqkbnr/8/r1N1Q1R1/8/8/8/8/RNBQKBNR w KQkq - 0 1')
     )
   );
 

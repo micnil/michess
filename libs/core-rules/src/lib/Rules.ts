@@ -24,15 +24,25 @@ type Move = {
 
 const withinBoard = (index: number): boolean => 0 <= index && index <= 63;
 
+const isNeighbors = (startIndex: number, nextIndex: number) => {
+  const startFile = startIndex % 8;
+  const nextFile = nextIndex % 8;
+  const startRank = (startIndex - startFile) / 8;
+  const nextRank = (nextIndex - nextFile) / 8;
+  return (
+    Math.abs(startRank - nextRank) <= 1 && Math.abs(startFile - nextFile) <= 1
+  );
+};
+
 const unfoldDirection = (
   startIndex: number,
   directionOffset: number
 ): number[] => {
   const indexes: number[] = [];
   for (
-    let nextIndex = startIndex + directionOffset;
-    withinBoard(nextIndex);
-    nextIndex = nextIndex + directionOffset
+    let currentIndex = startIndex, nextIndex = startIndex + directionOffset;
+    withinBoard(nextIndex) && isNeighbors(currentIndex, nextIndex);
+    currentIndex = nextIndex, nextIndex = nextIndex + directionOffset
   ) {
     indexes.push(nextIndex);
   }
@@ -58,10 +68,20 @@ const getSlidingMoves = (
     const potentialTargetSqaures = unfoldDirection(index, offset).map((index) =>
       chessboard.getSquare(coordinates[index])
     );
-    return takeWhile(
-      potentialTargetSqaures,
-      (square) => square.piece?.color !== piece.color
-    );
+    return takeWhile(potentialTargetSqaures, (square, index) => {
+      const squareNotOccupiedWithSameColoredPiece =
+        square.piece?.color !== piece.color;
+
+      const previousSquare =
+        index !== 0 ? potentialTargetSqaures[index - 1] : undefined;
+      const previousSquareNotOccupiedWithDifferentColoredPiece =
+        !!previousSquare?.piece && previousSquare?.piece?.color !== piece.color;
+
+      return (
+        squareNotOccupiedWithSameColoredPiece &&
+        !previousSquareNotOccupiedWithDifferentColoredPiece
+      );
+    });
   });
 
   const moves: Move[] = squares.map((square) => ({
@@ -104,7 +124,9 @@ const getMovesForKing = (
 
   const squares = moveOffsets
     .map((offset) => index + offset)
-    .filter(withinBoard)
+    .filter(
+      (nextIndex) => withinBoard(nextIndex) && isNeighbors(index, nextIndex)
+    )
     .map((index) => chessboard.getSquare(coordinates[index]))
     .filter((square) => square.piece?.color !== piece.color);
 
