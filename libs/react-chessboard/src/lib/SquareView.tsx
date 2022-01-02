@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Position } from '@michess/common-utils';
-import { useDrop } from '@michess/react-dnd';
+import { useDragDropContext, useDrop } from '@michess/react-dnd';
 import { Color, Coordinate } from '@michess/core-models';
 import { useChessboardContext } from './context/useChessboardContext';
 
@@ -15,10 +15,15 @@ const StyledRect = styled.rect<RectProps>`
 
 type OverlayRectProps = {
   highlight: boolean;
+  color: 'green' | 'yellow';
 };
 const StyledOverlayRect = styled.rect<OverlayRectProps>`
-  fill: ${({ highlight }) =>
-    highlight ? 'rgba(20,85,30,0.5)' : 'rgba(20,85,30,0.0)'};
+  fill: ${({ highlight, color }) =>
+    highlight
+      ? color === 'green'
+        ? 'rgba(20,85,30,0.5)'
+        : 'rgba(254,254,51,0.2)'
+      : 'rgba(20,85,30,0.0)'};
   pointer-events: all;
 `;
 
@@ -35,17 +40,28 @@ export const SquareView: React.FC<Props> = ({
   position,
   size,
 }) => {
-  const { movePiece } = useChessboardContext();
-
+  const { movePiece, moveOptionsMap } = useChessboardContext();
   const handleDrop = (draggableId: string) => {
-    console.debug(`moving from ${draggableId} to coordinate ${coordinate}`);
-    movePiece({ from: draggableId as Coordinate, to: coordinate });
+    if (canMoveHere) {
+      console.debug(`moving from ${draggableId} to coordinate ${coordinate}`);
+      movePiece({ from: draggableId as Coordinate, to: coordinate });
+    }
   };
 
+  const { state } = useDragDropContext();
   const { register, isHovering } = useDrop({
     id: coordinate,
     onDrop: handleDrop,
   });
+
+  const moveOptions = state.draggingId
+    ? moveOptionsMap[state.draggingId as Coordinate]
+    : undefined;
+  const canMoveHere = moveOptions
+    ? moveOptions.some((moveOption) => moveOption.to === coordinate)
+    : true;
+  const higlightSquare = (!!moveOptions && canMoveHere) || (isHovering && canMoveHere);
+
   return (
     <>
       <StyledRect
@@ -59,7 +75,8 @@ export const SquareView: React.FC<Props> = ({
         {...position}
         width={size}
         height={size}
-        highlight={isHovering}
+        highlight={higlightSquare}
+        color={isHovering ? 'green' : 'yellow'}
       />
     </>
   );

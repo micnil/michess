@@ -38,7 +38,7 @@ export const ChessboardContextProvider: React.FC<Props> = ({
       return prevChessboard.movePiece(payload);
     });
   }, []);
-
+  
   return (
     <ChessboardContext.Provider
       value={{

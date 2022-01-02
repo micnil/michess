@@ -1,7 +1,11 @@
-import { Chessboard } from '@michess/react-chessboard';
+import { Chessboard as ChessboardView } from '@michess/react-chessboard';
+import { Chessboard, ChessGame } from '@michess/core-state';
+import { gameStateFromFen } from '@michess/core-fen';
+import { useState } from 'react';
 import styled from 'styled-components';
 import { createGlobalStyle } from 'styled-components';
 import { Logo } from './components/Logo';
+import { Rules } from '@michess/core-rules';
 
 const GlobalStyle = createGlobalStyle`
   html, body {
@@ -39,13 +43,29 @@ const Main = styled.main`
 `;
 
 export function App() {
+  const [chessGame, setChessGame] = useState(() =>
+    ChessGame(
+      gameStateFromFen('rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w KQkq - 0 1')
+    )
+  );
+
   return (
     <>
       <GlobalStyle />
       <AppLayout>
         <Logo />
         <Main>
-          <Chessboard orientation={'black'} size={500} />
+          <ChessboardView
+            orientation={chessGame.getState().orientation}
+            size={500}
+            piecePlacements={chessGame.getState().pieces}
+            moveOptions={Rules(chessGame)
+              .getMoves()
+              .map((move) => ({
+                from: chessGame.getCoordinates()[move.start],
+                to: chessGame.getCoordinates()[move.target],
+              }))}
+          />
         </Main>
       </AppLayout>
     </>

@@ -1,9 +1,6 @@
 import { takeWhile } from '@michess/common-utils';
-import {
-  PiecePlacement,
-  PieceType,
-} from '@michess/core-models';
-import { IChessboard } from '@michess/core-state';
+import { PiecePlacement, PieceType } from '@michess/core-models';
+import { IChessGame } from '@michess/core-state';
 
 const DIAGONAL_OFFSETS = [7, -7, 9, -9];
 const VERTICAL_OFFSETS = [8, -8];
@@ -43,7 +40,7 @@ const unfoldDirection = (
 };
 
 const getSlidingMoves = (
-  chessboard: IChessboard,
+  chessboard: IChessGame,
   { piece, coord }: PiecePlacement
 ): Move[] => {
   const index = chessboard.getIndex(coord);
@@ -63,7 +60,7 @@ const getSlidingMoves = (
     );
     return takeWhile(
       potentialTargetSqaures,
-      (square) => square.piece?.color === chessboard.getState().turn
+      (square) => square.piece?.color !== piece.color
     );
   });
 
@@ -77,29 +74,29 @@ const getSlidingMoves = (
 };
 
 const getMovesForQueen = (
-  chessboard: IChessboard,
+  chessboard: IChessGame,
   piecePlacement: PiecePlacement
 ): Move[] => {
   return getSlidingMoves(chessboard, piecePlacement);
 };
 
 const getMovesForBishop = (
-  chessboard: IChessboard,
+  chessboard: IChessGame,
   piecePlacement: PiecePlacement
 ): Move[] => {
   return getSlidingMoves(chessboard, piecePlacement);
 };
 
 const getMovesForRook = (
-  chessboard: IChessboard,
+  chessboard: IChessGame,
   piecePlacement: PiecePlacement
 ): Move[] => {
   return getSlidingMoves(chessboard, piecePlacement);
 };
 
 const getMovesForKing = (
-  chessboard: IChessboard,
-  { coord }: PiecePlacement
+  chessboard: IChessGame,
+  { coord, piece }: PiecePlacement
 ): Move[] => {
   const index = chessboard.getIndex(coord);
   const moveOffsets = NEIGHBORING_OFFSETS;
@@ -109,7 +106,7 @@ const getMovesForKing = (
     .map((offset) => index + offset)
     .filter(withinBoard)
     .map((index) => chessboard.getSquare(coordinates[index]))
-    .filter((square) => square.piece?.color === chessboard.getState().turn);
+    .filter((square) => square.piece?.color !== piece.color);
 
   const moves: Move[] = squares.map((square) => ({
     start: index,
@@ -121,7 +118,7 @@ const getMovesForKing = (
 };
 
 const getMovesFromSquare = (
-  chessboard: IChessboard,
+  chessboard: IChessGame,
   piecePlacement: PiecePlacement
 ): Move[] => {
   switch (piecePlacement.piece.type) {
@@ -142,7 +139,7 @@ const getMovesFromSquare = (
   }
 };
 
-const getMoves = (chessboard: IChessboard): Move[] => {
+const getMoves = (chessboard: IChessGame): Move[] => {
   return chessboard.getPiecePlacements().flatMap((piecePlacement) => {
     return getMovesFromSquare(chessboard, piecePlacement);
   });
@@ -152,7 +149,7 @@ interface IRules {
   getMoves(): Move[];
 }
 
-export const Rules = (chessboard: IChessboard): IRules => {
+export const Rules = (chessboard: IChessGame): IRules => {
   return {
     getMoves: () => getMoves(chessboard),
   };
