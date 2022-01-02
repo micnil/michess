@@ -1,6 +1,6 @@
 import { takeWhile } from '@michess/common-utils';
 import { Color, PiecePlacement, PieceType } from '@michess/core-models';
-import { IChessGame } from '@michess/core-state';
+import { IChessGame } from './model/IChessGame';
 
 const DIAGONAL_OFFSETS = [7, -7, 9, -9];
 const VERTICAL_OFFSETS = [8, -8];
@@ -211,7 +211,7 @@ const getMovesForPawn = (
       capture: false,
     });
   }
-  
+
   return moves;
 };
 

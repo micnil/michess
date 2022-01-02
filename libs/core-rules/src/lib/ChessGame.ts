@@ -1,5 +1,5 @@
 import { Color, GameState } from '@michess/core-models';
-import { Chessboard } from './Chessboard';
+import { Chessboard } from '@michess/core-state';
 import { IChessGame } from './model/IChessGame';
 
 export const ChessGame = (board: GameState): IChessGame => {
