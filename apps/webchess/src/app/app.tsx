@@ -4,7 +4,8 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import { createGlobalStyle } from 'styled-components';
 import { Logo } from './components/Logo';
-import { ChessGame, Rules } from '@michess/core-rules';
+import { ChessGame, IChessGame, Move, Rules } from '@michess/core-rules';
+import { MovePayload } from '@michess/core-state';
 
 const GlobalStyle = createGlobalStyle`
   html, body {
@@ -41,6 +42,17 @@ const Main = styled.main`
   align-items: center;
 `;
 
+const uiMoveToCoreMove = (
+  chess: IChessGame,
+  movePayload: MovePayload
+): Move => {
+  return {
+    start: chess.getIndex(movePayload.from),
+    target: chess.getIndex(movePayload.to),
+    capture: false,
+  };
+};
+
 export function App() {
   const [chessGame, setChessGame] = useState(() =>
     ChessGame(
@@ -60,6 +72,11 @@ export function App() {
             orientation={chessGame.getState().orientation}
             size={500}
             piecePlacements={chessGame.getState().pieces}
+            onMove={(move) => {
+              setChessGame(
+                Rules(chessGame).makeMove(uiMoveToCoreMove(chessGame, move))
+              );
+            }}
             moveOptions={Rules(chessGame)
               .getMoves()
               .map((move) => ({

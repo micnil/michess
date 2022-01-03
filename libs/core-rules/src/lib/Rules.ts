@@ -1,7 +1,13 @@
 import { takeWhile } from '@michess/common-utils';
-import { Color, PiecePlacement, PieceType } from '@michess/core-models';
+import {
+  Color,
+  PiecePlacement,
+  PiecePlacements,
+  PieceType,
+} from '@michess/core-models';
 import { IChessGame } from './model/IChessGame';
 import { Move } from './model/Move';
+import { ChessGame } from './ChessGame';
 
 const DIAGONAL_OFFSETS = [7, -7, 9, -9];
 const VERTICAL_OFFSETS = [8, -8];
@@ -238,12 +244,34 @@ const getMoves = (chessboard: IChessGame): Move[] => {
   });
 };
 
+const makeMove = (chessboard: IChessGame, move: Move): IChessGame => {
+  const chessGameState = chessboard.getState();
+  const coordinates = chessboard.getCoordinates();
+
+  const fromCoord = coordinates[move.start];
+  const toCoord = coordinates[move.target];
+
+  const pieceToMove = chessGameState.pieces[fromCoord];
+  const newPiecePlacements: PiecePlacements = {
+    ...chessGameState.pieces,
+    [toCoord]: pieceToMove,
+  };
+  delete newPiecePlacements[fromCoord];
+
+  return ChessGame({
+    ...chessGameState,
+    pieces: newPiecePlacements,
+  });
+};
+
 interface IRules {
   getMoves(): Move[];
+  makeMove(move: Move): IChessGame;
 }
 
 export const Rules = (chessboard: IChessGame): IRules => {
   return {
     getMoves: () => getMoves(chessboard),
+    makeMove: (move) => makeMove(chessboard, move),
   };
 };
