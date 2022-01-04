@@ -44,7 +44,7 @@ export const ChessboardContextProvider: React.FC<Props> = ({
       value={{
         chessboard: contextChessboard,
         movePiece,
-        moveOptionsMap: MoveOptionsMap.fromMoveOptions(moveOptions),
+        moveOptionsMap: moveOptions ? MoveOptionsMap.fromMoveOptions(moveOptions): undefined,
       }}
     >
       {children}

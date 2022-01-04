@@ -4,7 +4,7 @@ import { MoveOptionsMap } from '../model/MoveOptionsMap';
 
 export type ChessboardContextState = {
   chessboard: IReadOnlyChessboard;
-  moveOptionsMap: MoveOptionsMap;
+  moveOptionsMap?: MoveOptionsMap;
   movePiece: (payload: MovePayload) => void;
 };
 

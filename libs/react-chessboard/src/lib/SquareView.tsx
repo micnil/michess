@@ -1,9 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Position } from '@michess/common-utils';
+import { Maybe, Position } from '@michess/common-utils';
 import { useDragDropContext, useDrop } from '@michess/react-dnd';
 import { Color, Coordinate } from '@michess/core-models';
 import { useChessboardContext } from './context/useChessboardContext';
+import { MoveOptions } from './model/MoveOptions';
+import { useMoveOptions } from './hooks/useMoveOptions';
 
 type RectProps = {
   color: Color;
@@ -34,13 +36,19 @@ type Props = {
   size: number;
 };
 
+const canMoveTo = (moveOptions: Maybe<MoveOptions>, toCoord: Coordinate) => {
+  return moveOptions
+    ? moveOptions.some((moveOption) => moveOption.to === toCoord)
+    : true;
+};
+
 export const SquareView: React.FC<Props> = ({
   coordinate,
   color,
   position,
   size,
 }) => {
-  const { movePiece, moveOptionsMap } = useChessboardContext();
+  const { movePiece } = useChessboardContext();
   const handleDrop = (draggableId: string) => {
     if (canMoveHere) {
       console.debug(`moving from ${draggableId} to coordinate ${coordinate}`);
@@ -54,13 +62,11 @@ export const SquareView: React.FC<Props> = ({
     onDrop: handleDrop,
   });
 
-  const moveOptions = state.draggingId
-    ? moveOptionsMap[state.draggingId as Coordinate]
-    : undefined;
-  const canMoveHere = moveOptions
-    ? moveOptions.some((moveOption) => moveOption.to === coordinate)
-    : true;
-  const higlightSquare = (!!moveOptions && canMoveHere) || (isHovering && canMoveHere);
+  const moveOptions = useMoveOptions(state.draggingId as Coordinate);
+
+  const canMoveHere = canMoveTo(moveOptions, coordinate);
+  const higlightSquare =
+    (!!moveOptions && canMoveHere) || (isHovering && canMoveHere);
 
   return (
     <>
