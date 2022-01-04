@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import styled from 'styled-components';
-import { ReactComponent as Icon } from '../../assets/knightv1.svg';
+import { ReactComponent as Icon } from '../../assets/knightv2.svg';
 
 const Container = styled.div`
   padding: 1rem;
