@@ -1,11 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Maybe, Position } from '@michess/common-utils';
+import { Position } from '@michess/common-utils';
 import { useDragDropContext, useDrop } from '@michess/react-dnd';
 import { Color, Coordinate } from '@michess/core-models';
 import { useChessboardContext } from './context/useChessboardContext';
-import { MoveOptions } from './model/MoveOptions';
 import { useMoveOptions } from './hooks/useMoveOptions';
+import { canMoveTo } from './move/canMoveTo';
 
 type RectProps = {
   color: Color;
@@ -34,12 +34,6 @@ type Props = {
   color: Color;
   position: Position;
   size: number;
-};
-
-const canMoveTo = (moveOptions: Maybe<MoveOptions>, toCoord: Coordinate) => {
-  return moveOptions
-    ? moveOptions.some((moveOption) => moveOption.to === toCoord)
-    : true;
 };
 
 export const SquareView: React.FC<Props> = ({

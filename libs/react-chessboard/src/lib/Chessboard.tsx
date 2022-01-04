@@ -4,7 +4,7 @@ import { DragDropContextProvider } from '@michess/react-dnd';
 import { FC } from 'react';
 import ChessboardView from './ChessboardView';
 import { ChessboardContextProvider } from './context/ChessboardContextProvider';
-import { MoveOptions } from './model/MoveOptions';
+import { MoveOptions } from './move/model/MoveOptions';
 
 type Props<TMoveMeta = unknown> = {
   orientation?: Color;

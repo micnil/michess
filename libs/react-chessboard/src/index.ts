@@ -1,2 +1,2 @@
 export * from './lib/Chessboard';
-export * from './lib/model/MoveOptions';
+export * from './lib/move/model/MoveOptions';

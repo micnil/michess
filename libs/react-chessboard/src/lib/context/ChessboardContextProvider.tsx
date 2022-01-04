@@ -2,8 +2,8 @@ import { boardStateFromFen, FenStr } from '@michess/core-fen';
 import { Color, PiecePlacements } from '@michess/core-models';
 import { Chessboard, IChessboard, MovePayload } from '@michess/core-state';
 import React, { useCallback, useRef, useState } from 'react';
-import { MoveOptions } from '../model/MoveOptions';
-import { MoveOptionsMap } from '../model/MoveOptionsMap';
+import { MoveOptions } from '../move/model/MoveOptions';
+import { MoveOptionsMap } from '../move/model/MoveOptionsMap';
 import { ChessboardContext } from './ChessboardContext';
 
 type Props<TMoveMeta = unknown> = {
