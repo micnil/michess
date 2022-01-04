@@ -18,17 +18,12 @@ type Props = {
 
 const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
   const { chessboard } = useChessboardContext();
-  const { state } = useDragDropContext();
   const squareSize = size / 8;
   const squareCoordinates = chessboard.getCoordinates();
   const squarePositions = squareCoordinates.map((_, i) => ({
     x: (i % 8) * squareSize,
     y: Math.floor(i / 8) * squareSize,
   }));
-
-  const draggedFromSquare = state.draggingId
-    ? chessboard.getSquare(state.draggingId as Coordinate)
-    : undefined;
 
   const boardState = chessboard.getState();
   return (
@@ -49,34 +44,18 @@ const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
       <Pieces>
         {Object.entries(boardState.pieces).map(([coord, piece]) => {
           const pieceId = coord;
-          if (state.draggingId === pieceId) {
-            return undefined;
-          } else {
-            return (
-              <PieceView
-                key={pieceId}
-                coord={coord as Coordinate}
-                piece={piece}
-                position={
-                  squarePositions[chessboard.getIndex(coord as Coordinate)]
-                }
-                squareSize={squareSize}
-              />
-            );
-          }
+          return (
+            <PieceView
+              key={pieceId}
+              coord={coord as Coordinate}
+              piece={piece}
+              position={
+                squarePositions[chessboard.getIndex(coord as Coordinate)]
+              }
+              squareSize={squareSize}
+            />
+          );
         })}
-        {draggedFromSquare && draggedFromSquare.piece && state.draggingId && (
-          <PieceView
-            piece={draggedFromSquare.piece}
-            coord={draggedFromSquare.coord}
-            position={
-              squarePositions[
-                chessboard.getIndex(state.draggingId as Coordinate)
-              ]
-            }
-            squareSize={squareSize}
-          />
-        )}
       </Pieces>
     </Board>
   );

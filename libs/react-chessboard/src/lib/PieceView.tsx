@@ -21,20 +21,38 @@ export const PieceView: React.FC<Props> = ({
 }) => {
   const scaling = squareSize / DEFAULT_SPRITE_SIZE;
   const pieceAndColor = ColoredPieceType.fromPiece(piece);
-  const { register } = useDrag({
+  const { register, registerPreview, isDragging } = useDrag({
     id: coord,
   });
 
   return (
-    <g
-      ref={register}
-      transform={`translate(${initialPosition.x} ${initialPosition.y})`}
-    >
-      <use
-        href={`${pieceSprite}#${pieceAndColor}`}
-        transform={`scale(${scaling} ${scaling})`}
-      />
-      <rect width={squareSize} height={squareSize} fill="#ffffff00" />
-    </g>
+    <>
+      <g
+        ref={register}
+        transform={`translate(${initialPosition.x} ${initialPosition.y})`}
+      >
+        <use
+          href={`${pieceSprite}#${pieceAndColor}`}
+          transform={`scale(${scaling} ${scaling})`}
+        />
+        <rect
+          width={squareSize}
+          height={squareSize}
+          fill={isDragging ? '#ffffff60' : '#ffffff00'}
+        />
+      </g>
+      {isDragging && (
+        <g
+          ref={registerPreview}
+          transform={`translate(${initialPosition.x} ${initialPosition.y})`}
+        >
+          <use
+            href={`${pieceSprite}#${pieceAndColor}`}
+            transform={`scale(${scaling} ${scaling})`}
+          />
+          <rect width={squareSize} height={squareSize} fill="#ffffff00" />
+        </g>
+      )}
+    </>
   );
 };

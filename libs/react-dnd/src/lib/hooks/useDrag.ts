@@ -5,6 +5,7 @@ import { useDragDropContext } from './useDragDropContext';
 
 type Drag = {
   register(ref: Element | null): void;
+  registerPreview(ref: Element | null): void;
   isDragging: boolean;
 };
 
@@ -29,13 +30,14 @@ const setTranslate = (
 };
 
 export const useDrag = ({ id }: Options): Drag => {
-  const elementRef = useRef<SVGGraphicsElement | null>(null);
+  const dragRef = useRef<SVGGraphicsElement | null>(null);
+  const previewRef = useRef<SVGGraphicsElement | null>(null);
   const { state, startDragging, stopDragging } = useDragDropContext();
 
   const handleMouseMove = useCallback(
     (evt: MouseEvent) => {
-      if (state.draggingId === id && elementRef.current) {
-        const element = elementRef.current;
+      if (state.draggingId === id && previewRef.current) {
+        const element = previewRef.current;
         assertDefined(element, 'No elements registered 1');
         const svg = element.ownerSVGElement;
         assertDefined(svg, 'Must register svg elements');
@@ -78,13 +80,18 @@ export const useDrag = ({ id }: Options): Drag => {
     if (element) {
       element.addEventListener('mousedown', handleMouseDown);
     } else {
-      elementRef.current?.removeEventListener('mousedown', handleMouseDown);
+      dragRef.current?.removeEventListener('mousedown', handleMouseDown);
     }
-    elementRef.current = element;
+    dragRef.current = element;
   }, [handleMouseDown]);
+
+  const registerPreview = useCallback((element: SVGGraphicsElement | null) => {
+    previewRef.current = element;
+  }, []);
 
   return {
     register,
+    registerPreview,
     isDragging: state.draggingId === id,
   };
 };
