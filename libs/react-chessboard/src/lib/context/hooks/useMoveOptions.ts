@@ -1,7 +1,7 @@
 import { Maybe } from '@michess/common-utils';
 import { Coordinate } from '@michess/core-models';
-import { useChessboardContext } from '../context/useChessboardContext';
-import { MoveOptions } from '../move/model/MoveOptions';
+import { useChessboardContext } from './useChessboardContext';
+import { MoveOptions } from '../../move/model/MoveOptions';
 
 export const useMoveOptions = (
   coord: Maybe<Coordinate>

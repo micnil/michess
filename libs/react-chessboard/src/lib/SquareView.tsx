@@ -3,8 +3,8 @@ import styled from 'styled-components';
 import { Position } from '@michess/common-utils';
 import { useDragDropContext, useDrop } from '@michess/react-dnd';
 import { Color, Coordinate } from '@michess/core-models';
-import { useChessboardContext } from './context/useChessboardContext';
-import { useMoveOptions } from './hooks/useMoveOptions';
+import { useChessboardContext } from './context/hooks/useChessboardContext';
+import { useMoveOptions } from './context/hooks/useMoveOptions';
 import { canMoveTo } from './move/canMoveTo';
 
 type RectProps = {

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Coordinate } from '@michess/core-models';
 import { useDragDropContext } from '@michess/react-dnd';
 import { PieceView } from './PieceView';
-import { useChessboardContext } from './context/useChessboardContext';
+import { useChessboardContext } from './context/hooks/useChessboardContext';
 import { SquareView } from './SquareView';
 
 const Board = styled.svg`
@@ -21,7 +21,7 @@ const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
   const { state } = useDragDropContext();
   const squareSize = size / 8;
   const squareCoordinates = chessboard.getCoordinates();
-  const squarePositions = squareCoordinates.map((coord, i) => ({
+  const squarePositions = squareCoordinates.map((_, i) => ({
     x: (i % 8) * squareSize,
     y: Math.floor(i / 8) * squareSize,
   }));
