@@ -1,5 +1,6 @@
-import { Position } from '@michess/common-utils';
+import { assertDefined, Position } from '@michess/common-utils';
 import { useCallback, useEffect, useRef } from 'react';
+import { getMousePosition } from '../utils/getMousePosition';
 import { useDragDropContext } from './useDragDropContext';
 
 type Drag = {
@@ -11,13 +12,20 @@ type Options = {
   id: string;
 };
 
-const getMousePosition = (svg: SVGSVGElement, evt: MouseEvent): Position => {
-  const ctm = svg.getScreenCTM();
-  if (!ctm) throw new Error('No Current Transformation Matrix (CTM) found');
-  return {
-    x: (evt.clientX - ctm.e) / ctm.a,
-    y: (evt.clientY - ctm.f) / ctm.d,
-  };
+const setTranslate = (
+  element: SVGGraphicsElement,
+  mousePos: Position
+): void => {
+  const transformList = element?.transform.baseVal;
+  
+  const rect = element.getClientRects()[0];
+  const elemWidth = rect.width;
+  const elemHeight = rect.height;
+  const svgTransform = transformList?.getItem(0);
+  svgTransform.setTranslate(
+    mousePos.x - elemWidth / 2,
+    mousePos.y - elemHeight / 2
+  );
 };
 
 export const useDrag = ({ id }: Options): Drag => {
@@ -27,20 +35,13 @@ export const useDrag = ({ id }: Options): Drag => {
   const handleMouseMove = useCallback(
     (evt: MouseEvent) => {
       if (state.draggingId === id && elementRef.current) {
-        const svg = elementRef.current?.ownerSVGElement;
-        if (!svg) {
-          throw new Error('Must register svg elements');
-        }
+        const element = elementRef.current;
+        assertDefined(element, 'No elements registered 1');
+        const svg = element.ownerSVGElement;
+        assertDefined(svg, 'Must register svg elements');
+
         const mousePos = getMousePosition(svg, evt);
-        const transformList = elementRef.current?.transform.baseVal;
-        const rect = elementRef.current.getClientRects()[0];
-        const elemWidth = rect.width;
-        const elemHeight = rect.height;
-        const svgTransform = transformList?.getItem(0);
-        svgTransform.setTranslate(
-          mousePos.x - elemWidth / 2,
-          mousePos.y - elemHeight / 2
-        );
+        setTranslate(element, mousePos);
       }
     },
     [id, state.draggingId]
@@ -73,14 +74,14 @@ export const useDrag = ({ id }: Options): Drag => {
     };
   }, [handleMouseMove, handleMouseUp]);
 
-  const register = (element: SVGGraphicsElement | null) => {
+  const register = useCallback((element: SVGGraphicsElement | null) => {
     if (element) {
       element.addEventListener('mousedown', handleMouseDown);
     } else {
       elementRef.current?.removeEventListener('mousedown', handleMouseDown);
     }
     elementRef.current = element;
-  };
+  }, [handleMouseDown]);
 
   return {
     register,
