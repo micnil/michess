@@ -248,6 +248,10 @@ const makeMove = (chessboard: IChessGame, move: Move): IChessGame => {
   const chessGameState = chessboard.getState();
   const coordinates = chessboard.getCoordinates();
 
+  if (move.start == move.target) {
+    return chessboard;
+  }
+
   const fromCoord = coordinates[move.start];
   const toCoord = coordinates[move.target];
 
