@@ -38,13 +38,15 @@ export const ChessboardContextProvider: React.FC<Props> = ({
       return prevChessboard.movePiece(payload);
     });
   }, []);
-  
+
   return (
     <ChessboardContext.Provider
       value={{
         chessboard: contextChessboard,
         movePiece,
-        moveOptionsMap: moveOptions ? MoveOptionsMap.fromMoveOptions(moveOptions): undefined,
+        moveOptionsMap: moveOptions
+          ? MoveOptionsMap.fromMoveOptions(moveOptions)
+          : undefined,
       }}
     >
       {children}

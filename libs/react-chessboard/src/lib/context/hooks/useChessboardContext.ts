@@ -1,5 +1,8 @@
 import { useContext } from 'react';
-import { ChessboardContext, ChessboardContextState } from '../ChessboardContext';
+import {
+  ChessboardContext,
+  ChessboardContextState,
+} from '../ChessboardContext';
 
 export const useChessboardContext = (): ChessboardContextState => {
   const context = useContext(ChessboardContext);

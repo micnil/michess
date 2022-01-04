@@ -1,5 +1,10 @@
 import { Maybe } from '@michess/common-utils';
-import { CastlingAbility, Color, Coordinate, GameState } from '@michess/core-models';
+import {
+  CastlingAbility,
+  Color,
+  Coordinate,
+  GameState,
+} from '@michess/core-models';
 import { boardStateFromFen } from './boardStateFromFen';
 import { parseFenParts } from './parseFenParts';
 import {

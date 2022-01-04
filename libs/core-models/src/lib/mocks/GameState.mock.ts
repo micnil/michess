@@ -1,6 +1,6 @@
 import { CastlingAbility } from '../CastlingSide';
 import { GameState } from '../GameState';
-import { boardStateMock } from './BoardState.mock'
+import { boardStateMock } from './BoardState.mock';
 
 export const gameStateMock: GameState = {
   ...boardStateMock,

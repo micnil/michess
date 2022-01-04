@@ -1,4 +1,3 @@
-
 import { PiecePlacements } from '../PiecePlacements';
 import { B, b, K, k, N, n, P, p, Q, q, r, R } from './Piece.mock';
 
