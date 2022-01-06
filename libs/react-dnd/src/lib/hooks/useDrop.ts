@@ -27,6 +27,8 @@ const mouseEventWithinElement = (evt: MouseEvent, element: SVGElement) => {
 
 export const useDrop = ({ id, onDrop }: Options): Drop => {
   const elementRef = useRef<SVGGraphicsElement>();
+  const onDropRef = useRef(onDrop);
+  onDropRef.current = onDrop;
   const { state, enterDroppable, leaveDroppable } = useDragDropContext();
 
   const handleMouseDown = useCallback(
@@ -50,15 +52,16 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
     [enterDroppable, id]
   );
 
+  const isOverMe = state.overDroppableId === id;
   const handleMouseUp = useCallback(
     (_: MouseEvent) => {
-      if (state.overDroppableId === id && state.draggingId) {
+      if (isOverMe && state.draggingId) {
         console.debug('dropped on ', id);
         leaveDroppable(id);
-        onDrop?.(state.draggingId);
+        onDropRef.current?.(state.draggingId);
       }
     },
-    [id, leaveDroppable, onDrop, state.draggingId, state.overDroppableId]
+    [id, leaveDroppable, state.draggingId, isOverMe]
   );
 
   const handleMouseMove = useCallback(
@@ -71,7 +74,7 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
       if (!svg) {
         throw new Error('Must register svg elements');
       }
-      if (state.overDroppableId === id && state.draggingId) {
+      if (isOverMe && state.draggingId) {
         if (!mouseEventWithinElement(evt, elementRef.current)) {
           leaveDroppable(id);
           console.debug('leaving: ', id);
@@ -83,44 +86,34 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
         }
       }
     },
-    [
-      enterDroppable,
-      id,
-      leaveDroppable,
-      state.draggingId,
-      state.overDroppableId,
-    ]
+    [enterDroppable, id, isOverMe, leaveDroppable, state.draggingId]
   );
 
-  useEffect(() => {
-    window.addEventListener('mouseup', handleMouseUp);
-    return () => {
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [handleMouseUp]);
-
-  const register = (element: SVGGraphicsElement | null) => {
-    if (element) {
-      element.ownerSVGElement?.addEventListener('mousedown', handleMouseDown);
-      element.ownerSVGElement?.addEventListener('mousemove', handleMouseMove);
-      element.ownerDocument.addEventListener('mouseup', handleMouseUp);
-      elementRef.current = element;
-    } else {
-      elementRef.current?.ownerSVGElement?.removeEventListener(
-        'mousedown',
-        handleMouseDown
-      );
-      elementRef.current?.ownerSVGElement?.removeEventListener(
-        'mousemove',
-        handleMouseMove
-      );
-      elementRef.current?.ownerDocument?.removeEventListener(
-        'mouseup',
-        handleMouseUp
-      );
-      elementRef.current = undefined;
-    }
-  };
+  const register = useCallback(
+    (element: SVGGraphicsElement | null) => {
+      if (element) {
+        element.ownerSVGElement?.addEventListener('mousedown', handleMouseDown);
+        element.ownerSVGElement?.addEventListener('mousemove', handleMouseMove);
+        element.ownerDocument.addEventListener('mouseup', handleMouseUp);
+        elementRef.current = element;
+      } else {
+        elementRef.current?.ownerSVGElement?.removeEventListener(
+          'mousedown',
+          handleMouseDown
+        );
+        elementRef.current?.ownerSVGElement?.removeEventListener(
+          'mousemove',
+          handleMouseMove
+        );
+        elementRef.current?.ownerDocument?.removeEventListener(
+          'mouseup',
+          handleMouseUp
+        );
+        elementRef.current = undefined;
+      }
+    },
+    [handleMouseDown, handleMouseMove, handleMouseUp]
+  );
 
   return {
     register,
