@@ -13,8 +13,8 @@ export const gameStateMock: GameState = {
   turn: 'white',
 };
 
-export const createBoardStateMock = (
-  partialGameState: Partial<GameState>
+export const createGameStateMock = (
+  partialGameState?: Partial<GameState>
 ): GameState => ({
   ...gameStateMock,
   ...partialGameState,

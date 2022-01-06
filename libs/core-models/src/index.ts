@@ -13,3 +13,4 @@ export * from './lib/PiecePlacement';
 export * from './lib/mocks/PiecePlacements.mock';
 export * from './lib/mocks/Piece.mock';
 export * from './lib/mocks/BoardState.mock';
+export * from './lib/mocks/GameState.mock';
