@@ -3,6 +3,7 @@ import { Position } from '@michess/common-utils';
 import { useDrag } from '@michess/react-dnd';
 import { ColoredPieceType, Coordinate, Piece } from '@michess/core-models';
 import pieceSprite from '../assets/chessboard-sprite-staunty.svg';
+import styled from 'styled-components';
 
 const DEFAULT_SPRITE_SIZE = 40;
 
@@ -12,6 +13,10 @@ type Props = {
   position: Position;
   coord: Coordinate;
 };
+
+const StyledGroup = styled.g`
+  cursor: pointer;
+`
 
 export const PieceView: React.FC<Props> = ({
   piece,
@@ -27,7 +32,7 @@ export const PieceView: React.FC<Props> = ({
 
   return (
     <>
-      <g
+      <StyledGroup
         ref={register}
         transform={`translate(${initialPosition.x} ${initialPosition.y})`}
       >
@@ -40,9 +45,9 @@ export const PieceView: React.FC<Props> = ({
           height={squareSize}
           fill={isDragging ? '#ffffff60' : '#ffffff00'}
         />
-      </g>
+      </StyledGroup>
       {isDragging && (
-        <g
+        <StyledGroup
           ref={registerPreview}
           transform={`translate(${initialPosition.x} ${initialPosition.y})`}
         >
@@ -51,7 +56,7 @@ export const PieceView: React.FC<Props> = ({
             transform={`scale(${scaling} ${scaling})`}
           />
           <rect width={squareSize} height={squareSize} fill="#ffffff00" />
-        </g>
+        </StyledGroup>
       )}
     </>
   );
