@@ -1,6 +1,7 @@
 import { Maybe } from '@michess/common-utils';
 import React, { useCallback, useState } from 'react';
 import { DragDropContext, DragDropState } from './DragDropContext';
+import { useMousePosRef } from './hooks/useMousePosRef';
 
 const updateDraggingId = (
   state: DragDropState,
@@ -19,9 +20,11 @@ const updateOverDroppableId = (
 });
 
 export const DragDropContextProvider: React.FC = ({ children }) => {
+  const mousePosRef = useMousePosRef();
   const [dragDropState, setDragDropState] = useState<DragDropState>({
     draggingId: undefined,
     overDroppableId: undefined,
+    mousePosRef,
   });
 
   const startDragging = useCallback((id: string) => {

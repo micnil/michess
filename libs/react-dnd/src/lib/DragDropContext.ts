@@ -1,10 +1,11 @@
 import { Maybe, Position } from '@michess/common-utils';
-import React from 'react';
+import React, { MutableRefObject } from 'react';
 
 export type UpdatePositionCb = (pos: Position) => Position;
 export type DragDropState = {
   overDroppableId: Maybe<string>;
   draggingId: Maybe<string>;
+  mousePosRef: MutableRefObject<Position>;
 };
 
 export type DragDropContextState = {

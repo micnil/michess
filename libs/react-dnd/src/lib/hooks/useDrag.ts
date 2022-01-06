@@ -1,6 +1,6 @@
 import { assertDefined, Position } from '@michess/common-utils';
 import { useCallback, useEffect, useRef } from 'react';
-import { getMousePosition } from '../utils/getMousePosition';
+import { clientToSvgPosition } from '../utils/clientToSvgPosition';
 import { useDragDropContext } from './useDragDropContext';
 
 type Drag = {
@@ -18,7 +18,7 @@ const setTranslate = (
   mousePos: Position
 ): void => {
   const transformList = element?.transform.baseVal;
-  
+
   const rect = element.getClientRects()[0];
   const elemWidth = rect.width;
   const elemHeight = rect.height;
@@ -33,20 +33,21 @@ export const useDrag = ({ id }: Options): Drag => {
   const dragRef = useRef<SVGGraphicsElement | null>(null);
   const previewRef = useRef<SVGGraphicsElement | null>(null);
   const { state, startDragging, stopDragging } = useDragDropContext();
+  const { mousePosRef, draggingId } = state;
 
   const handleMouseMove = useCallback(
-    (evt: MouseEvent) => {
-      if (state.draggingId === id && previewRef.current) {
+    (_: MouseEvent) => {
+      if (draggingId === id && previewRef.current) {
         const element = previewRef.current;
         assertDefined(element, 'No elements registered 1');
         const svg = element.ownerSVGElement;
         assertDefined(svg, 'Must register svg elements');
 
-        const mousePos = getMousePosition(svg, evt);
+        const mousePos = clientToSvgPosition(svg, mousePosRef.current);
         setTranslate(element, mousePos);
       }
     },
-    [id, state.draggingId]
+    [draggingId, id, mousePosRef]
   );
 
   const handleMouseDown = useCallback(
@@ -59,39 +60,59 @@ export const useDrag = ({ id }: Options): Drag => {
 
   const handleMouseUp = useCallback(
     (_: Event) => {
-      if (state.draggingId === id) {
+      if (draggingId === id) {
         console.debug('stopDragging: ', id);
         stopDragging(id);
       }
     },
-    [id, state.draggingId, stopDragging]
+    [id, draggingId, stopDragging]
   );
 
   useEffect(() => {
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
-    return () => {
+    const unregister = () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [handleMouseMove, handleMouseUp]);
-
-  const register = useCallback((element: SVGGraphicsElement | null) => {
-    if (element) {
-      element.addEventListener('mousedown', handleMouseDown);
+    if (draggingId === id) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
     } else {
-      dragRef.current?.removeEventListener('mousedown', handleMouseDown);
+      unregister();
     }
-    dragRef.current = element;
-  }, [handleMouseDown]);
+    return unregister;
+  }, [draggingId, handleMouseMove, handleMouseUp, id]);
 
-  const registerPreview = useCallback((element: SVGGraphicsElement | null) => {
-    previewRef.current = element;
-  }, []);
+  const register = useCallback(
+    (element: SVGGraphicsElement | null) => {
+      if (element) {
+        element.addEventListener('mousedown', handleMouseDown);
+      } else {
+        dragRef.current?.removeEventListener('mousedown', handleMouseDown);
+      }
+      dragRef.current = element;
+    },
+    [handleMouseDown]
+  );
+
+  const registerPreview = useCallback(
+    (element: SVGGraphicsElement | null) => {
+      previewRef.current = element;
+      if (draggingId === id && previewRef.current) {
+        const element = previewRef.current;
+        assertDefined(element, 'No elements registered 2');
+        const svg = element.ownerSVGElement;
+        assertDefined(svg, 'Must register svg elements');
+
+        const mousePos = clientToSvgPosition(svg, mousePosRef.current);
+        setTranslate(element, mousePos);
+      }
+    },
+    [draggingId, id, mousePosRef]
+  );
 
   return {
     register,
     registerPreview,
-    isDragging: state.draggingId === id,
+    isDragging: draggingId === id,
   };
 };
