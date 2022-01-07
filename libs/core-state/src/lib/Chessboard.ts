@@ -10,10 +10,7 @@ import { IChessboard } from './model/IChessboard';
 import { MovePayload } from './model/MovePayload';
 
 const movePiece = (board: BoardState, move: MovePayload): BoardState => {
-  const toIndex = coordToIndex(board, move.to);
-  const fromIndex = coordToIndex(board, move.from);
-
-  console.debug({ move, fromIndex, toIndex });
+  console.debug({ move });
   const fromSquare = getSquare(board, move.from);
   const toSquare = getSquare(board, move.to);
 
