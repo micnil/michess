@@ -237,10 +237,13 @@ const getMovesFromSquare = (
   }
 };
 
-const getMoves = (chessboard: IChessboard): Move[] => {
-  return chessboard.getPiecePlacements().flatMap((piecePlacement) => {
-    return getMovesFromSquare(chessboard, piecePlacement);
-  });
+const getMoves = (chessboard: IChessboard, turn: Color): Move[] => {
+  return chessboard
+    .getPiecePlacements()
+    .filter((piecePlacement) => piecePlacement.piece.color === turn)
+    .flatMap((piecePlacement) => {
+      return getMovesFromSquare(chessboard, piecePlacement);
+    });
 };
 
 interface IRules {
@@ -250,6 +253,6 @@ interface IRules {
 export const Rules = (gameState: GameState): IRules => {
   const chessboard = Chessboard(gameState);
   return {
-    getMoves: () => getMoves(chessboard),
+    getMoves: () => getMoves(chessboard, gameState.turn),
   };
 };
