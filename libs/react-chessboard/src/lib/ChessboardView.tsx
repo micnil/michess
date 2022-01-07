@@ -4,6 +4,7 @@ import { Coordinate } from '@michess/core-models';
 import { PieceView } from './PieceView';
 import { useChessboardContext } from './context/hooks/useChessboardContext';
 import { SquareView } from './SquareView';
+import { useDragDropContext } from '@michess/react-dnd';
 
 const Board = styled.svg`
   overflow: visible;
@@ -17,6 +18,7 @@ type Props = {
 
 const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
   const { chessboard } = useChessboardContext();
+  const { state } = useDragDropContext();
   const squareSize = size / 8;
   const squareCoordinates = chessboard.getCoordinates();
   const squarePositions = squareCoordinates.map((_, i) => ({
@@ -56,6 +58,7 @@ const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
           );
         })}
       </Pieces>
+      {state.draggingId && <use href={`#${state.draggingId}`} />}
     </Board>
   );
 };

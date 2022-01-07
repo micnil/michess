@@ -48,6 +48,7 @@ export const PieceView: React.FC<Props> = ({
       </StyledGroup>
       {isDragging && (
         <StyledGroup
+          id={coord}
           ref={registerPreview}
           transform={`translate(${initialPosition.x} ${initialPosition.y})`}
         >
