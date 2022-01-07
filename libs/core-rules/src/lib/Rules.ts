@@ -1,13 +1,12 @@
 import { takeWhile } from '@michess/common-utils';
 import {
   Color,
+  GameState,
   PiecePlacement,
-  PiecePlacements,
   PieceType,
 } from '@michess/core-models';
-import { IChessGame } from './model/IChessGame';
 import { Move } from './model/Move';
-import { ChessGame } from './ChessGame';
+import { Chessboard, IChessboard } from '@michess/core-state';
 
 const DIAGONAL_OFFSETS = [7, -7, 9, -9];
 const VERTICAL_OFFSETS = [8, -8];
@@ -59,7 +58,7 @@ const unfoldDirection = (
 };
 
 const getSlidingMoves = (
-  chessboard: IChessGame,
+  chessboard: IChessboard,
   { piece, coord }: PiecePlacement
 ): Move[] => {
   const index = chessboard.getIndex(coord);
@@ -103,28 +102,28 @@ const getSlidingMoves = (
 };
 
 const getMovesForQueen = (
-  chessboard: IChessGame,
+  chessboard: IChessboard,
   piecePlacement: PiecePlacement
 ): Move[] => {
   return getSlidingMoves(chessboard, piecePlacement);
 };
 
 const getMovesForBishop = (
-  chessboard: IChessGame,
+  chessboard: IChessboard,
   piecePlacement: PiecePlacement
 ): Move[] => {
   return getSlidingMoves(chessboard, piecePlacement);
 };
 
 const getMovesForRook = (
-  chessboard: IChessGame,
+  chessboard: IChessboard,
   piecePlacement: PiecePlacement
 ): Move[] => {
   return getSlidingMoves(chessboard, piecePlacement);
 };
 
 const getMovesForKing = (
-  chessboard: IChessGame,
+  chessboard: IChessboard,
   { coord, piece }: PiecePlacement
 ): Move[] => {
   const index = chessboard.getIndex(coord);
@@ -149,7 +148,7 @@ const getMovesForKing = (
 };
 
 const getMovesForKnight = (
-  chessboard: IChessGame,
+  chessboard: IChessboard,
   { coord, piece }: PiecePlacement
 ): Move[] => {
   const index = chessboard.getIndex(coord);
@@ -174,7 +173,7 @@ const getMovesForKnight = (
   return moves;
 };
 const getMovesForPawn = (
-  chessboard: IChessGame,
+  chessboard: IChessboard,
   { coord, piece }: PiecePlacement
 ) => {
   const index = chessboard.getIndex(coord);
@@ -217,7 +216,7 @@ const getMovesForPawn = (
 };
 
 const getMovesFromSquare = (
-  chessboard: IChessGame,
+  chessboard: IChessboard,
   piecePlacement: PiecePlacement
 ): Move[] => {
   switch (piecePlacement.piece.type) {
@@ -238,44 +237,19 @@ const getMovesFromSquare = (
   }
 };
 
-const getMoves = (chessboard: IChessGame): Move[] => {
+const getMoves = (chessboard: IChessboard): Move[] => {
   return chessboard.getPiecePlacements().flatMap((piecePlacement) => {
     return getMovesFromSquare(chessboard, piecePlacement);
   });
 };
 
-const makeMove = (chessboard: IChessGame, move: Move): IChessGame => {
-  const chessGameState = chessboard.getState();
-  const coordinates = chessboard.getCoordinates();
-
-  if (move.start == move.target) {
-    return chessboard;
-  }
-
-  const fromCoord = coordinates[move.start];
-  const toCoord = coordinates[move.target];
-
-  const pieceToMove = chessGameState.pieces[fromCoord];
-  const newPiecePlacements: PiecePlacements = {
-    ...chessGameState.pieces,
-    [toCoord]: pieceToMove,
-  };
-  delete newPiecePlacements[fromCoord];
-
-  return ChessGame({
-    ...chessGameState,
-    pieces: newPiecePlacements,
-  });
-};
-
 interface IRules {
   getMoves(): Move[];
-  makeMove(move: Move): IChessGame;
 }
 
-export const Rules = (chessboard: IChessGame): IRules => {
+export const Rules = (gameState: GameState): IRules => {
+  const chessboard = Chessboard(gameState);
   return {
     getMoves: () => getMoves(chessboard),
-    makeMove: (move) => makeMove(chessboard, move),
   };
 };

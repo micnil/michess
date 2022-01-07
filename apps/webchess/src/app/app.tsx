@@ -74,15 +74,13 @@ export function App() {
             piecePlacements={chessGame.getState().pieces}
             onMove={(move) => {
               setChessGame(
-                Rules(chessGame).makeMove(uiMoveToCoreMove(chessGame, move))
+                chessGame.makeMove(uiMoveToCoreMove(chessGame, move))
               );
             }}
-            moveOptions={Rules(chessGame)
-              .getMoves()
-              .map((move) => ({
-                from: chessGame.getCoordinates()[move.start],
-                to: chessGame.getCoordinates()[move.target],
-              }))}
+            moveOptions={chessGame.getMoves().map((move) => ({
+              from: chessGame.getCoordinates()[move.start],
+              to: chessGame.getCoordinates()[move.target],
+            }))}
           />
         </Main>
       </AppLayout>
