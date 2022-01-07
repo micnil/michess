@@ -7,7 +7,7 @@ export * from './lib/Coordinate';
 export * from './lib/Piece';
 export * from './lib/PieceType';
 export * from './lib/SquareState';
-export * from './lib/CastlingSide';
+export * from './lib/CastlingAbility';
 export * from './lib/BoardCoordinates';
 export * from './lib/PiecePlacement';
 export * from './lib/mocks/PiecePlacements.mock';

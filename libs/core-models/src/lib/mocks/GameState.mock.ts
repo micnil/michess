@@ -1,4 +1,4 @@
-import { CastlingAbility } from '../CastlingSide';
+import { CastlingAbility } from '../CastlingAbility';
 import { GameState } from '../GameState';
 import { boardStateMock } from './BoardState.mock';
 

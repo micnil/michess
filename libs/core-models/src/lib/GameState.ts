@@ -1,5 +1,5 @@
 import { BoardState } from './BoardState';
-import { CastlingAbility } from './CastlingSide';
+import { CastlingAbility } from './CastlingAbility';
 import { Color } from './Color';
 import { Coordinate } from './Coordinate';
 
