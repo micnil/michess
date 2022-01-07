@@ -30,6 +30,7 @@ describe('Rules', () => {
           pieces: {
             c3: p,
           },
+          turn: Color.Black,
         })
       );
 
@@ -69,16 +70,14 @@ describe('Rules', () => {
       ]);
     });
 
-    it('can capture en passant', () => {
+    it('can capture right as white', () => {
       const rules = Rules(
         createGameStateMock({
           pieces: {
             c5: P,
-            d5: p
+            d6: p,
           },
-          enPassant: 'd6',
-          turn: Color.White
-        }),
+        })
       );
 
       const moves = rules.getMoves();
@@ -90,11 +89,39 @@ describe('Rules', () => {
           target: 18,
         } as Move,
         {
-          capture: false,
+          capture: true,
           start: 26,
           target: 19,
         } as Move,
       ]);
-    })
+    });
+
+    it('can capture en passant', () => {
+      const rules = Rules(
+        createGameStateMock({
+          pieces: {
+            c5: P,
+            d5: p,
+          },
+          enPassant: 'd6',
+          turn: Color.White,
+        })
+      );
+
+      const moves = rules.getMoves();
+
+      expect(moves).toEqual([
+        {
+          capture: false,
+          start: 26,
+          target: 18,
+        } as Move,
+        {
+          capture: true,
+          start: 26,
+          target: 19,
+        } as Move,
+      ]);
+    });
   });
 });

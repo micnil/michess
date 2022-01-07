@@ -172,6 +172,48 @@ const getMovesForKnight = (
 
   return moves;
 };
+// const getMovesForPawn = (
+//   chessboard: IChessboard,
+//   { coord, piece }: PiecePlacement
+// ) => {
+//   const index = chessboard.getIndex(coord);
+//   const coordinates = chessboard.getCoordinates();
+
+//   const direction = piece.color === Color.White ? -1 : +1;
+
+//   const startRank = piece.color === Color.White ? 6 : 1;
+//   const offset = 8;
+//   const offsetx2 = 16;
+
+//   const currentRank = (index - (index % 8)) / 8;
+
+//   const moves: Move[] = [];
+//   if (
+//     !chessboard.getSquare(coordinates[index + direction * offset]).piece &&
+//     withinBoard(index + direction * offset)
+//   ) {
+//     moves.push({
+//       start: index,
+//       target: index + direction * offset,
+//       capture: false,
+//     });
+//   }
+
+//   if (
+//     currentRank === startRank &&
+//     !chessboard.getSquare(coordinates[index + direction * offsetx2]).piece &&
+//     !chessboard.getSquare(coordinates[index + direction * offset]).piece &&
+//     withinBoard(index + direction * offsetx2)
+//   ) {
+//     moves.push({
+//       start: index,
+//       target: index + direction * offsetx2,
+//       capture: false,
+//     });
+//   }
+
+//   return moves;
+// };
 const getMovesForPawn = (
   chessboard: IChessboard,
   { coord, piece }: PiecePlacement
@@ -180,35 +222,63 @@ const getMovesForPawn = (
   const coordinates = chessboard.getCoordinates();
 
   const direction = piece.color === Color.White ? -1 : +1;
-
   const startRank = piece.color === Color.White ? 6 : 1;
-  const offset = 8;
-  const offsetx2 = 16;
+
+  const oneStepIndex = index + direction * 8;
+  const oneStepSquare = withinBoard(oneStepIndex)
+    ? chessboard.getSquare(coordinates[oneStepIndex])
+    : undefined;
+
+  const twoStepIndex = index + direction * 16;
+  const twoStepSquare = withinBoard(twoStepIndex)
+    ? chessboard.getSquare(coordinates[twoStepIndex])
+    : undefined;
+
+  const captureIndex1 = index + direction * 7;
+  const captureSquare1 =
+    withinBoard(captureIndex1) && isNeighbors(index, captureIndex1)
+      ? chessboard.getSquare(coordinates[captureIndex1])
+      : undefined;
+
+  const captureIndex2 = index + direction * 9;
+  const captureSquare2 =
+    withinBoard(captureIndex2) && isNeighbors(index, captureIndex2)
+      ? chessboard.getSquare(coordinates[captureIndex2])
+      : undefined;
 
   const currentRank = (index - (index % 8)) / 8;
+  const isStartPosition = currentRank === startRank;
 
   const moves: Move[] = [];
-  if (
-    !chessboard.getSquare(coordinates[index + direction * offset]).piece &&
-    withinBoard(index + direction * offset)
-  ) {
+  if (!oneStepSquare?.piece) {
     moves.push({
       start: index,
-      target: index + direction * offset,
+      target: oneStepIndex,
       capture: false,
     });
   }
 
-  if (
-    currentRank === startRank &&
-    !chessboard.getSquare(coordinates[index + direction * offsetx2]).piece &&
-    !chessboard.getSquare(coordinates[index + direction * offset]).piece &&
-    withinBoard(index + direction * offsetx2)
-  ) {
+  if (isStartPosition && !oneStepSquare?.piece && !twoStepSquare?.piece) {
     moves.push({
       start: index,
-      target: index + direction * offsetx2,
+      target: twoStepIndex,
       capture: false,
+    });
+  }
+
+  if (captureSquare1?.piece && captureSquare1.piece.color !== piece.color) {
+    moves.push({
+      start: index,
+      target: captureIndex1,
+      capture: true,
+    });
+  }
+
+  if (captureSquare2?.piece && captureSquare2.piece.color !== piece.color) {
+    moves.push({
+      start: index,
+      target: captureIndex2,
+      capture: true,
     });
   }
 
