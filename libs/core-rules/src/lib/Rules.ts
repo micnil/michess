@@ -172,48 +172,7 @@ const getMovesForKnight = (
 
   return moves;
 };
-// const getMovesForPawn = (
-//   chessboard: IChessboard,
-//   { coord, piece }: PiecePlacement
-// ) => {
-//   const index = chessboard.getIndex(coord);
-//   const coordinates = chessboard.getCoordinates();
 
-//   const direction = piece.color === Color.White ? -1 : +1;
-
-//   const startRank = piece.color === Color.White ? 6 : 1;
-//   const offset = 8;
-//   const offsetx2 = 16;
-
-//   const currentRank = (index - (index % 8)) / 8;
-
-//   const moves: Move[] = [];
-//   if (
-//     !chessboard.getSquare(coordinates[index + direction * offset]).piece &&
-//     withinBoard(index + direction * offset)
-//   ) {
-//     moves.push({
-//       start: index,
-//       target: index + direction * offset,
-//       capture: false,
-//     });
-//   }
-
-//   if (
-//     currentRank === startRank &&
-//     !chessboard.getSquare(coordinates[index + direction * offsetx2]).piece &&
-//     !chessboard.getSquare(coordinates[index + direction * offset]).piece &&
-//     withinBoard(index + direction * offsetx2)
-//   ) {
-//     moves.push({
-//       start: index,
-//       target: index + direction * offsetx2,
-//       capture: false,
-//     });
-//   }
-
-//   return moves;
-// };
 const getMovesForPawn = (
   chessboard: IChessboard,
   { coord, piece }: PiecePlacement
