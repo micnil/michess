@@ -1,5 +1,6 @@
 import { Color, GameState, PiecePlacements } from '@michess/core-models';
 import { Chessboard } from '@michess/core-state';
+import { generateMoves } from './generateMoves';
 import { IChessGame } from './model/IChessGame';
 import { Move } from './model/Move';
 import { Rules } from './Rules';
@@ -41,7 +42,7 @@ export const ChessGame = (gameState: GameState): IChessGame => {
         ...gameState,
         ...chessboard.setOrientation(orientation).getState(),
       }),
-    getMoves: () => rules.getMoves(),
+    getMoves: () => generateMoves(rules),
     makeMove: (move) => ChessGame(makeMove(gameState, move)),
   };
 };

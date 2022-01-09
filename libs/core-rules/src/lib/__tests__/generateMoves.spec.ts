@@ -1,8 +1,9 @@
 import { Color, createGameStateMock, p, P } from '@michess/core-models';
 import { Move } from '../model/Move';
 import { Rules } from '../Rules';
+import { generateMoves } from '../generateMoves';
 
-describe('Rules', () => {
+describe('generateMoves', () => {
   describe('pawn', () => {
     it('can move 1 square forward as white', () => {
       const rules = Rules(
@@ -13,7 +14,7 @@ describe('Rules', () => {
         })
       );
 
-      const moves = rules.getMoves();
+      const moves = generateMoves(rules);
 
       expect(moves).toEqual([
         {
@@ -34,7 +35,7 @@ describe('Rules', () => {
         })
       );
 
-      const moves = rules.getMoves();
+      const moves = generateMoves(rules);
 
       expect(moves).toEqual([
         {
@@ -54,7 +55,7 @@ describe('Rules', () => {
         })
       );
 
-      const moves = rules.getMoves();
+      const moves = generateMoves(rules);
 
       expect(moves).toEqual([
         {
@@ -80,7 +81,7 @@ describe('Rules', () => {
         })
       );
 
-      const moves = rules.getMoves();
+      const moves = generateMoves(rules);
 
       expect(moves).toEqual([
         {
@@ -108,7 +109,7 @@ describe('Rules', () => {
         })
       );
 
-      const moves = rules.getMoves();
+      const moves = generateMoves(rules);
 
       expect(moves).toEqual([
         {
