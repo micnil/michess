@@ -8,9 +8,9 @@ function CustomApp({ Component, pageProps }: AppProps) {
       <Head>
         <title>Welcome to web-chess!</title>
       </Head>
-      <main className="app">
+      <div className='container flex flex-col min-h-screen mx-auto px-4'>
         <Component {...pageProps} />
-      </main>
+      </div>
     </>
   );
 }
