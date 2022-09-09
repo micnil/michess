@@ -1,5 +1,6 @@
-module.exports = {
-  displayName: 'core-models',
+/* eslint-disable */
+export default {
+  displayName: 'core-rules',
   preset: '../../jest.preset.js',
   globals: {
     'ts-jest': {
@@ -11,5 +12,5 @@ module.exports = {
     '^.+\\.[tj]sx?$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../coverage/libs/core-models',
+  coverageDirectory: '../../coverage/libs/core-rules',
 };

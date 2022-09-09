@@ -1,5 +1,6 @@
-module.exports = {
-  displayName: 'core-fen',
+/* eslint-disable */
+export default {
+  displayName: 'core-state',
   preset: '../../jest.preset.js',
   globals: {
     'ts-jest': {
@@ -11,5 +12,5 @@ module.exports = {
     '^.+\\.[tj]sx?$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../coverage/libs/core-fen',
+  coverageDirectory: '../../coverage/libs/core-state',
 };
