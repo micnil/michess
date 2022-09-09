@@ -161,9 +161,9 @@
         }
       }
     },
-    "web-chess": {
-      "root": "apps/web-chess",
-      "sourceRoot": "apps/web-chess",
+    "web-chess-temp": {
+      "root": "apps/web-chess-temp",
+      "sourceRoot": "apps/web-chess-temp",
       "projectType": "application",
       "targets": {
         "build": {
@@ -171,29 +171,29 @@
           "outputs": ["{options.outputPath}"],
           "defaultConfiguration": "production",
           "options": {
-            "root": "apps/web-chess",
-            "outputPath": "dist/apps/web-chess"
+            "root": "apps/web-chess-temp",
+            "outputPath": "dist/apps/web-chess-temp"
           },
           "configurations": {
             "production": {},
             "development": {
-              "outputPath": "apps/web-chess"
+              "outputPath": "apps/web-chess-temp"
             }
           }
         },
         "serve": {
           "executor": "@nrwl/next:server",
           "options": {
-            "buildTarget": "web-chess:build",
+            "buildTarget": "web-chess-temp:build",
             "dev": true
           },
           "configurations": {
             "production": {
-              "buildTarget": "web-chess:build:production",
+              "buildTarget": "web-chess-temp:build:production",
               "dev": false
             },
             "development": {
-              "buildTarget": "web-chess:build:development",
+              "buildTarget": "web-chess-temp:build:development",
               "dev": true
             }
           },
@@ -202,14 +202,14 @@
         "export": {
           "executor": "@nrwl/next:export",
           "options": {
-            "buildTarget": "web-chess:build:production"
+            "buildTarget": "web-chess-temp:build:production"
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/web-chess"],
+          "outputs": ["coverage/apps/web-chess-temp"],
           "options": {
-            "jestConfig": "apps/web-chess/jest.config.ts",
+            "jestConfig": "apps/web-chess-temp/jest.config.ts",
             "passWithNoTests": true
           }
         },
@@ -217,39 +217,11 @@
           "executor": "@nrwl/linter:eslint",
           "outputs": ["{options.outputFile}"],
           "options": {
-            "lintFilePatterns": ["apps/web-chess/**/*.{ts,tsx,js,jsx}"]
+            "lintFilePatterns": ["apps/web-chess-temp/**/*.{ts,tsx,js,jsx}"]
           }
         }
       },
       "tags": []
-    },
-    "web-chess-e2e": {
-      "root": "apps/web-chess-e2e",
-      "sourceRoot": "apps/web-chess-e2e/src",
-      "projectType": "application",
-      "targets": {
-        "e2e": {
-          "executor": "@nrwl/cypress:cypress",
-          "options": {
-            "cypressConfig": "apps/web-chess-e2e/cypress.json",
-            "devServerTarget": "web-chess:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "web-chess:serve:production"
-            }
-          }
-        },
-        "lint": {
-          "executor": "@nrwl/linter:eslint",
-          "outputs": ["{options.outputFile}"],
-          "options": {
-            "lintFilePatterns": ["apps/web-chess-e2e/**/*.{js,ts}"]
-          }
-        }
-      },
-      "tags": [],
-      "implicitDependencies": ["web-chess"]
     },
     "webchess": {
       "root": "apps/webchess",

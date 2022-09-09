@@ -1,5 +1,5 @@
-import { FC } from "react";
-import Image from 'next/image'
+import { FC } from 'react';
+import Image from 'next/image';
 
 export const Logo: FC = () => {
   return (
@@ -8,4 +8,4 @@ export const Logo: FC = () => {
       <span className="text-xl ">michess</span>
     </div>
   );
-}
+};

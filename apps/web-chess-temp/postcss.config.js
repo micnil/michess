@@ -3,4 +3,4 @@ module.exports = {
     tailwindcss: { config: './apps/web-chess/tailwind.config.js' },
     autoprefixer: {},
   },
-}
+};

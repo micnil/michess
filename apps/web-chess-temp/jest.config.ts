@@ -1,11 +1,11 @@
 /* eslint-disable */
 export default {
-  displayName: 'web-chess',
+  displayName: 'web-chess-temp',
   preset: '../../jest.preset.js',
   transform: {
     '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': '@nrwl/react/plugins/jest',
     '^.+\\.[tj]sx?$': ['babel-jest', { presets: ['@nrwl/next/babel'] }],
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../coverage/apps/web-chess',
+  coverageDirectory: '../../coverage/apps/web-chess-temp',
 };
