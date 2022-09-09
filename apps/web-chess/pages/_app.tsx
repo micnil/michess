@@ -1,5 +1,6 @@
 import { AppProps } from 'next/app';
 import Head from 'next/head';
+import { Container } from '../lib/components/Container';
 import './styles.css';
 
 function CustomApp({ Component, pageProps }: AppProps) {
@@ -8,9 +9,9 @@ function CustomApp({ Component, pageProps }: AppProps) {
       <Head>
         <title>Welcome to web-chess!</title>
       </Head>
-      <main className="app">
+      <Container as="main">
         <Component {...pageProps} />
-      </main>
+      </Container>
     </>
   );
 }

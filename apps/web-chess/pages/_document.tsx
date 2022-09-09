@@ -1,11 +1,8 @@
 /* eslint-disable react/display-name */
 import Document, {
-  Html,
-  Head,
-  Main,
-  NextScript,
   DocumentContext,
-  DocumentInitialProps,
+  DocumentInitialProps, Head, Html, Main,
+  NextScript
 } from 'next/document';
 import { ServerStyleSheet } from 'styled-components';
 
