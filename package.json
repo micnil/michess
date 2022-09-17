@@ -14,9 +14,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-is": "18.2.0",
-    "regenerator-runtime": "0.13.9",
-    "styled-components": "5.3.5",
-    "tslib": "^2.3.1"
+    "styled-components": "5.3.5"
   },
   "devDependencies": {
     "@angular-devkit/schematics": "^14.2.2",
@@ -28,7 +26,6 @@
     "@nrwl/next": "14.7.2",
     "@nrwl/node": "14.7.2",
     "@nrwl/react": "14.7.2",
-    "@nrwl/web": "14.7.2",
     "@nrwl/workspace": "14.7.2",
     "@testing-library/react": "13.3.0",
     "@types/jest": "28.1.8",
@@ -39,9 +36,8 @@
     "@types/styled-components": "5.1.26",
     "@typescript-eslint/eslint-plugin": "5.33.1",
     "@typescript-eslint/parser": "5.33.1",
-    "autoprefixer": "10.4.8",
     "babel-jest": "28.1.3",
-    "babel-plugin-styled-components": "2.0.2",
+    "babel-plugin-styled-components": "2.0.7",
     "cypress": "^9.2.1",
     "eslint": "8.15.0",
     "eslint-config-next": "12.2.5",
@@ -54,12 +50,12 @@
     "jest": "28.1.3",
     "jest-environment-jsdom": "28.1.1",
     "nx": "14.7.2",
-    "postcss": "8.4.16",
-    "prettier": "2.6.2",
+    "prettier": "2.7.1",
     "react-test-renderer": "18.2.0",
-    "tailwindcss": "3.1.8",
+    "regenerator-runtime": "0.13.9",
     "ts-jest": "28.0.8",
     "ts-node": "10.9.1",
+    "tslib": "^2.3.1",
     "typescript": "4.7.4"
   }
 }
