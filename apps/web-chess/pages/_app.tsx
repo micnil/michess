@@ -1,6 +1,11 @@
 import { AppProps } from 'next/app';
 import Head from 'next/head';
-import { Container } from '../lib/components/Container';
+import { FooterArea } from '../lib/components/layout/FooterArea';
+import { HeaderArea } from '../lib/components/layout/HeaderArea';
+import { MainArea } from '../lib/components/layout/MainArea';
+import { PageLayout } from '../lib/components/layout/PageLayout';
+import { Logo } from '../lib/components/Logo';
+import { Navbar } from '../lib/components/Navbar';
 import './styles.css';
 
 function CustomApp({ Component, pageProps }: AppProps) {
@@ -9,9 +14,17 @@ function CustomApp({ Component, pageProps }: AppProps) {
       <Head>
         <title>Welcome to web-chess!</title>
       </Head>
-      <Container as="main">
-        <Component {...pageProps} />
-      </Container>
+      <PageLayout>
+        <HeaderArea>
+          <Navbar>
+            <Logo />
+          </Navbar>
+        </HeaderArea>
+        <MainArea>
+          <Component {...pageProps} />
+        </MainArea>
+        <FooterArea></FooterArea>
+      </PageLayout>
     </>
   );
 }
