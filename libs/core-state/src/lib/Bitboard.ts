@@ -14,11 +14,33 @@ const setIndex = (board: bigint, index: number): bigint => {
   return board | (1n << BigInt(index));
 };
 
-export const Bitboard = () => {
-  const board = 0n;
+const isCoordSet = (board: bigint, coord: Coordinate): boolean => {
+  return isIndexSet(board, coordToIndex(coord));
+};
+
+const isIndexSet = (board: bigint, index: number): boolean => {
+  return !!(board & (1n << BigInt(index)));
+};
+
+const clearIndex = (board: bigint, index: number): bigint => {
+  return board & ~(1n << BigInt(index));
+};
+
+const clearCoord = (board: bigint, coord: Coordinate): bigint => {
+  return clearIndex(board, coordToIndex(coord));
+};
+
+export const Bitboard = (initialBoard?: bigint) => {
+  const board = initialBoard ?? 0n;
 
   return {
-    setCoord: (coord: Coordinate) => setCoord(board, coord),
-    setIndex: (index: number) => setIndex(board, index),
+    setCoord: (coord: Coordinate) => Bitboard(setCoord(board, coord)),
+    setIndex: (index: number) => Bitboard(setIndex(board, index)),
+    clearCoord: (coord: Coordinate) => Bitboard(clearCoord(board, coord)),
+    clearIndex: (index: number) => Bitboard(clearIndex(board, index)),
+    isCoordSet: (coord: Coordinate) => isCoordSet(board, coord),
+    isIndexSet: (index: number) => isIndexSet(board, index),
+    isEmpty: () => !board,
+    getBitboardState: () => board,
   };
 };

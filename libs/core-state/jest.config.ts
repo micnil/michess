@@ -2,11 +2,8 @@
 export default {
   displayName: 'core-state',
   preset: '../../jest.preset.js',
-  globals: {
-    'ts-jest': {
-      tsconfig: '<rootDir>/tsconfig.spec.json',
-    },
-  },
+  /* Need maxWorkers to make serializing bigint work for some reason*/
+  maxWorkers: 1,
   testEnvironment: 'node',
   transform: {
     '^.+\\.[tj]sx?$': 'ts-jest',
