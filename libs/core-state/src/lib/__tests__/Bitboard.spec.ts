@@ -21,10 +21,19 @@ describe('Bitboard', () => {
     expect(testBoard.isIndexSet(63)).toBe(true);
   });
 
-  it('can unset a bit by index', () => {
+  it('can clear a bit by index', () => {
     const bit31SetBoard = Bitboard(2147483648n);
 
     const emptyBitboard = bit31SetBoard.clearIndex(31);
+
+    expect(emptyBitboard.getBitboardState()).toBe(0n);
+    expect(emptyBitboard.isEmpty()).toBeTruthy();
+  });
+
+  it('can clear bit by coordinate', () => {
+    const bit31SetBoard = Bitboard(2147483648n);
+
+    const emptyBitboard = bit31SetBoard.clearCoord('h5');
 
     expect(emptyBitboard.getBitboardState()).toBe(0n);
     expect(emptyBitboard.isEmpty()).toBeTruthy();
