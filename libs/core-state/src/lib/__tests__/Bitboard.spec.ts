@@ -73,4 +73,22 @@ describe('Bitboard', () => {
     expect(testBoard.isCoordSet('a2')).toBeFalsy();
     expect(testBoard.isCoordSet('d5')).toBeFalsy();
   });
+
+  it('can scan forward to find the least significant bit index', () => {
+    const bit31SetBoard = Bitboard(2147483648n);
+
+    expect(bit31SetBoard.scanForward()).toBe(31);
+  });
+
+  it('can scan forward to find the least significant bit index', () => {
+    const bit_31_45_50_board = Bitboard(1161086426415104n);
+
+    expect(bit_31_45_50_board.scanForward()).toBe(31);
+  });
+
+  it('can count the amount of bits', () => {
+    const bit_31_45_50_board = Bitboard(1161086426415104n);
+
+    expect(bit_31_45_50_board.countBits()).toBe(3);
+  });
 });
