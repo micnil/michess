@@ -14,7 +14,11 @@ const countBits = (board: bigint): number => {
 };
 
 const scanForward = (board: bigint): number => {
-  return countBits((board & -board) - 1n);
+  if (board === 0n) {
+    return -1;
+  } else {
+    return countBits((board & -board) - 1n);
+  }
 };
 
 const coordToIndex = (coord: Coordinate): number => {
