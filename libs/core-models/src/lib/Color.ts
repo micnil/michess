@@ -3,7 +3,7 @@ import { ColoredPieceType } from './ColoredPieceType';
 const ColorEnum = {
   White: 'white',
   Black: 'black',
-};
+} as const;
 
 export type Color = typeof ColorEnum[keyof typeof ColorEnum];
 

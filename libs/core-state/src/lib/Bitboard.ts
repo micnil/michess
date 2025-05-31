@@ -35,6 +35,10 @@ const setIndex = (board: bigint, index: number): bigint => {
   return board | (1n << BigInt(index));
 };
 
+const invert = (board: bigint): bigint => {
+  return ~board & ((1n << 64n) - 1n);
+};
+
 const isCoordSet = (board: bigint, coord: Coordinate): boolean => {
   return isIndexSet(board, coordToIndex(coord));
 };
@@ -62,6 +66,8 @@ export type Bitboard = {
   isIndexSet: (index: number) => boolean;
   isEmpty: () => boolean;
   getBitboardState: () => bigint;
+  union: (other: Bitboard) => Bitboard;
+  invert: () => Bitboard;
 };
 
 export const Bitboard = (initialBoard?: bigint): Bitboard => {
@@ -78,5 +84,7 @@ export const Bitboard = (initialBoard?: bigint): Bitboard => {
     isIndexSet: (index: number) => isIndexSet(board, index),
     isEmpty: () => !board,
     getBitboardState: () => board,
+    union: (other: Bitboard) => Bitboard(board | other.getBitboardState()),
+    invert: () => Bitboard(invert(board)),
   };
 };
