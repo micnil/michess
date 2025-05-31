@@ -1,5 +1,5 @@
 import { PiecePlacements } from '@michess/core-models';
-import { ChessBitboard } from './ChessBitboard';
+import { ChessBitboard } from '../ChessBitboard';
 
 describe('ChessBitboard', () => {
   describe('getPieceAt', () => {
