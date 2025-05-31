@@ -55,6 +55,20 @@ const clearCoord = (board: bigint, coord: Coordinate): bigint => {
   return clearIndex(board, coordToIndex(coord));
 };
 
+const bitboardToString = (board: bigint): string => {
+  let result = '';
+  for (let rank = 0; rank < 8; rank++) {
+    let row = `${8 - rank}  `;
+    for (let file = 0; file < 8; file++) {
+      const index = file + rank * 8;
+      row += isIndexSet(board, index) ? '1 ' : '. ';
+    }
+    result += row.trimEnd() + '\n';
+  }
+  result += '   a b c d e f g h';
+  return result.trimEnd();
+};
+
 export type Bitboard = {
   countBits: () => number;
   scanForward: () => number;
@@ -68,6 +82,7 @@ export type Bitboard = {
   getBitboardState: () => bigint;
   union: (other: Bitboard) => Bitboard;
   invert: () => Bitboard;
+  toString: () => string;
 };
 
 export const Bitboard = (initialBoard?: bigint): Bitboard => {
@@ -86,5 +101,6 @@ export const Bitboard = (initialBoard?: bigint): Bitboard => {
     getBitboardState: () => board,
     union: (other: Bitboard) => Bitboard(board | other.getBitboardState()),
     invert: () => Bitboard(invert(board)),
+    toString: () => bitboardToString(board),
   };
 };

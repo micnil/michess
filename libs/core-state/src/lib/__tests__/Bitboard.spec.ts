@@ -91,4 +91,35 @@ describe('Bitboard', () => {
 
     expect(bit_31_45_50_board.countBits()).toBe(3);
   });
+
+  describe('toString', () => {
+    it('prints an empty board', () => {
+      const bb = Bitboard();
+      expect(bb.toString()).toBe(
+        '8  . . . . . . . .\n' +
+          '7  . . . . . . . .\n' +
+          '6  . . . . . . . .\n' +
+          '5  . . . . . . . .\n' +
+          '4  . . . . . . . .\n' +
+          '3  . . . . . . . .\n' +
+          '2  . . . . . . . .\n' +
+          '1  . . . . . . . .' +
+          '   a b c d e f g h\n'
+      );
+    });
+    it('prints a board with a single bit set', () => {
+      const bb = Bitboard().setCoord('e4');
+      expect(bb.toString()).toBe(
+        '8  . . . . . . . .\n' +
+          '7  . . . . . . . .\n' +
+          '6  . . . . . . . .\n' +
+          '5  . . . . . . . .\n' +
+          '4  . . . . 1 . . .\n' +
+          '3  . . . . . . . .\n' +
+          '2  . . . . . . . .\n' +
+          '1  . . . . . . . .' +
+          '   a b c d e f g h\n'
+      );
+    });
+  });
 });
