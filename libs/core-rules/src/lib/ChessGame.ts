@@ -26,6 +26,7 @@ const makeMove = (gameState: GameState, move: Move): GameState => {
 
   return {
     ...gameState,
+    turn: gameState.turn === Color.White ? Color.Black : Color.White,
     pieces: newPiecePlacements,
   };
 };
