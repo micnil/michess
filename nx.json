@@ -63,5 +63,5 @@
   },
   "parallel": 1,
   "useInferencePlugins": false,
-  "defaultBase": "master"
+  "defaultBase": "main"
 }

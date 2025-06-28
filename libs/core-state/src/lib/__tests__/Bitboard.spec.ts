@@ -103,8 +103,8 @@ describe('Bitboard', () => {
           '4  . . . . . . . .\n' +
           '3  . . . . . . . .\n' +
           '2  . . . . . . . .\n' +
-          '1  . . . . . . . .' +
-          '   a b c d e f g h\n'
+          '1  . . . . . . . .\n' +
+          '   a b c d e f g h'
       );
     });
     it('prints a board with a single bit set', () => {
@@ -117,8 +117,8 @@ describe('Bitboard', () => {
           '4  . . . . 1 . . .\n' +
           '3  . . . . . . . .\n' +
           '2  . . . . . . . .\n' +
-          '1  . . . . . . . .' +
-          '   a b c d e f g h\n'
+          '1  . . . . . . . .\n' +
+          '   a b c d e f g h'
       );
     });
   });
