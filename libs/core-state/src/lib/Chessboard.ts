@@ -1,7 +1,6 @@
 import {
   BoardCoordinates,
   BoardState,
-  Color,
   Coordinate,
   PiecePlacement,
   SquareState,
@@ -33,18 +32,10 @@ const movePiece = (board: BoardState, move: MovePayload): BoardState => {
   };
 };
 
-const setOrientation = (board: BoardState, orientation: Color): BoardState => {
-  return {
-    ...board,
-    orientation,
-  };
-};
-
 const coordToIndex = (board: BoardState, coord: Coordinate): number => {
   const file = coord.charCodeAt(0) - 97;
   const rank = coord.charCodeAt(1) - 49;
-  const whiteIndex = file + (7 - rank) * 8;
-  const index = board.orientation === 'white' ? whiteIndex : 63 - whiteIndex;
+  const index = file + (7 - rank) * 8;
   return index;
 };
 
@@ -66,12 +57,10 @@ export const Chessboard = (board: BoardState): IChessboard => {
   return {
     getIndex: (coord) => coordToIndex(board, coord),
     getSquare: (coord) => getSquare(board, coord),
-    getCoordinates: () => BoardCoordinates.fromOrientation(board.orientation),
+    getCoordinates: () => BoardCoordinates.createWhite(),
     getPiecePlacements: () => getPiecePlacements(board),
     movePiece: (movePayload: MovePayload) =>
       Chessboard(movePiece(board, movePayload)),
-    setOrientation: (orientation: Color) =>
-      Chessboard(setOrientation(board, orientation)),
     getState: () => board,
   };
 };

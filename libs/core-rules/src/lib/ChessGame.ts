@@ -38,11 +38,6 @@ export const ChessGame = (gameState: GameState): IChessGame => {
   return {
     ...chessboard,
     getState: () => gameState,
-    setOrientation: (orientation: Color) =>
-      ChessGame({
-        ...gameState,
-        ...chessboard.setOrientation(orientation).getState(),
-      }),
     getMoves: () => generateMoves(rules),
     makeMove: (move) => ChessGame(makeMove(gameState, move)),
   };

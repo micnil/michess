@@ -9,9 +9,10 @@ type BlackSideCoordinates = typeof SQUARE_COORDINATES_BLACK;
 
 export type BoardCoordinates = WhiteSideCoordinates | BlackSideCoordinates;
 
+const fromOrientation = (orientation: Color): BoardCoordinates =>
+  orientation === 'white' ? SQUARE_COORDINATES_WHITE : SQUARE_COORDINATES_BLACK;
+
 export const BoardCoordinates = {
-  fromOrientation: (orientation: Color): BoardCoordinates =>
-    orientation === 'white'
-      ? SQUARE_COORDINATES_WHITE
-      : SQUARE_COORDINATES_BLACK,
+  createWhite: (): BoardCoordinates => fromOrientation('white'),
+  fromOrientation,
 };

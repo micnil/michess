@@ -21,7 +21,7 @@ export const ChessGameContainer = () => {
       gameStateFromFen(
         'rnbqkbnr/ppp5/r1N1Q1R1/8/8/8/PPP5/RNBQKBNR w KQkq - 0 1'
       )
-    ).setOrientation('white')
+    )
   );
 
   return (

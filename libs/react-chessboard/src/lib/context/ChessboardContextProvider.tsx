@@ -24,7 +24,7 @@ export const ChessboardContextProvider: React.FC<Props> = ({
   moveOptions,
 }) => {
   const [chessboard, setChessboard] = useState<IChessboard>(() =>
-    Chessboard(boardStateFromFen(startingFen)).setOrientation(orientation)
+    Chessboard(boardStateFromFen(startingFen))
   );
   const onMoveRef = useRef(onMove);
   onMoveRef.current = onMove;
