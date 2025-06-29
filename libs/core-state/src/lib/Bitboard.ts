@@ -55,6 +55,23 @@ const clearCoord = (board: bigint, coord: Coordinate): bigint => {
   return clearIndex(board, coordToIndex(coord));
 };
 
+const getLowestSetBit = (board: bigint): bigint => {
+  return board & -board;
+};
+
+const getHighestSetBit = (board: bigint): bigint => {
+  if (board === 0n) return 0n;
+  let b = board;
+  // Shift right until only the highest bit remains
+  b |= b >> 1n;
+  b |= b >> 2n;
+  b |= b >> 4n;
+  b |= b >> 8n;
+  b |= b >> 16n;
+  b |= b >> 32n;
+  return b & ~(b >> 1n);
+};
+
 const bitboardToString = (board: bigint): string => {
   let result = '';
   for (let rank = 0; rank < 8; rank++) {
@@ -83,6 +100,8 @@ export type Bitboard = {
   union: (other: Bitboard) => Bitboard;
   invert: () => Bitboard;
   toString: () => string;
+  getLowestSetBit: () => bigint;
+  getHighestSetBit: () => bigint;
 };
 
 export const Bitboard = (initialBoard?: bigint): Bitboard => {
@@ -102,5 +121,7 @@ export const Bitboard = (initialBoard?: bigint): Bitboard => {
     union: (other: Bitboard) => Bitboard(board | other.getBitboardState()),
     invert: () => Bitboard(invert(board)),
     toString: () => bitboardToString(board),
+    getLowestSetBit: () => getLowestSetBit(board),
+    getHighestSetBit: () => getHighestSetBit(board),
   };
 };
