@@ -1,9 +1,8 @@
 import { Color, GameState, PiecePlacements } from '@michess/core-models';
 import { Chessboard } from '@michess/core-state';
-import { generateMoves } from './generateMoves';
 import { IChessGame } from './model/IChessGame';
 import { Move } from './model/Move';
-import { Rules } from './Rules';
+import { MoveGenerator } from './MoveGenerator';
 
 const makeMove = (gameState: GameState, move: Move): GameState => {
   const chessboard = Chessboard(gameState);
@@ -33,12 +32,12 @@ const makeMove = (gameState: GameState, move: Move): GameState => {
 
 export const ChessGame = (gameState: GameState): IChessGame => {
   const chessboard = Chessboard(gameState);
-  const rules = Rules(gameState);
+  const moveGenerator = MoveGenerator(gameState);
 
   return {
     ...chessboard,
     getState: () => gameState,
-    getMoves: () => generateMoves(rules),
+    getMoves: () => moveGenerator.generateMoves().moves,
     makeMove: (move) => ChessGame(makeMove(gameState, move)),
   };
 };

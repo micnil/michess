@@ -13,10 +13,11 @@ import { Bitboard } from './Bitboard';
  * For example, white pawns, black knights, etc.
  */
 export type ChessBitboard = {
-  bitboards: {
-    [color in Color]: {
-      [piece in PieceType]: Bitboard;
-    };
+  white: {
+    [piece in PieceType]: Bitboard;
+  };
+  black: {
+    [piece in PieceType]: Bitboard;
   };
   occupied: Bitboard;
   empty: Bitboard;
@@ -63,7 +64,7 @@ export function ChessBitboard(placements?: PiecePlacements): ChessBitboard {
   const empty = occupiedBoard.invert();
 
   return {
-    bitboards,
+    ...bitboards,
     occupied: occupiedBoard,
     empty,
     getPieceAt: (coord: Coordinate): Maybe<Piece> => {

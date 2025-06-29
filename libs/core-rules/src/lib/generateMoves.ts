@@ -1,12 +1,7 @@
 import { takeWhile } from '@michess/common-utils';
-import {
-  Color,
-  PiecePlacement,
-  PieceType,
-} from '@michess/core-models';
+import { Color, PiecePlacement, PieceType } from '@michess/core-models';
 import { Move } from './model/Move';
-import { IChessboard } from '@michess/core-state';
-import { IRules } from './model/IRules';
+import { MoveGeneratorContext } from './model/MoveGeneratorContext';
 
 const DIAGONAL_OFFSETS = [7, -7, 9, -9];
 const VERTICAL_OFFSETS = [8, -8];
@@ -58,9 +53,10 @@ const unfoldDirection = (
 };
 
 const getSlidingMoves = (
-  chessboard: IChessboard,
+  context: MoveGeneratorContext,
   { piece, coord }: PiecePlacement
 ): Move[] => {
+  const chessboard = context.board;
   const index = chessboard.getIndex(coord);
   const coordinates = chessboard.getCoordinates();
   const moveOffsets =
@@ -102,30 +98,31 @@ const getSlidingMoves = (
 };
 
 const getMovesForQueen = (
-  chessboard: IChessboard,
+  context: MoveGeneratorContext,
   piecePlacement: PiecePlacement
 ): Move[] => {
-  return getSlidingMoves(chessboard, piecePlacement);
+  return getSlidingMoves(context, piecePlacement);
 };
 
 const getMovesForBishop = (
-  chessboard: IChessboard,
+  context: MoveGeneratorContext,
   piecePlacement: PiecePlacement
 ): Move[] => {
-  return getSlidingMoves(chessboard, piecePlacement);
+  return getSlidingMoves(context, piecePlacement);
 };
 
 const getMovesForRook = (
-  chessboard: IChessboard,
+  context: MoveGeneratorContext,
   piecePlacement: PiecePlacement
 ): Move[] => {
-  return getSlidingMoves(chessboard, piecePlacement);
+  return getSlidingMoves(context, piecePlacement);
 };
 
 const getMovesForKing = (
-  chessboard: IChessboard,
+  context: MoveGeneratorContext,
   { coord, piece }: PiecePlacement
 ): Move[] => {
+  const chessboard = context.board;
   const index = chessboard.getIndex(coord);
   const moveOffsets = NEIGHBORING_OFFSETS;
   const coordinates = chessboard.getCoordinates();
@@ -148,9 +145,10 @@ const getMovesForKing = (
 };
 
 const getMovesForKnight = (
-  chessboard: IChessboard,
+  context: MoveGeneratorContext,
   { coord, piece }: PiecePlacement
 ): Move[] => {
+  const chessboard = context.board;
   const index = chessboard.getIndex(coord);
   const moveOffsets = KNIGHT_JUMP_OFFSETS;
   const coordinates = chessboard.getCoordinates();
@@ -174,9 +172,10 @@ const getMovesForKnight = (
 };
 
 const getMovesForPawn = (
-  chessboard: IChessboard,
+  context: MoveGeneratorContext,
   { coord, piece }: PiecePlacement
 ) => {
+  const chessboard = context.board;
   const index = chessboard.getIndex(coord);
   const coordinates = chessboard.getCoordinates();
 
@@ -245,32 +244,32 @@ const getMovesForPawn = (
 };
 
 const getMovesFromSquare = (
-  chessboard: IChessboard,
+  context: MoveGeneratorContext,
   piecePlacement: PiecePlacement
 ): Move[] => {
   switch (piecePlacement.piece.type) {
     case PieceType.Queen:
-      return getMovesForQueen(chessboard, piecePlacement);
+      return getMovesForQueen(context, piecePlacement);
     case PieceType.Rook:
-      return getMovesForRook(chessboard, piecePlacement);
+      return getMovesForRook(context, piecePlacement);
     case PieceType.Pawn:
-      return getMovesForPawn(chessboard, piecePlacement);
+      return getMovesForPawn(context, piecePlacement);
     case PieceType.Knight:
-      return getMovesForKnight(chessboard, piecePlacement);
+      return getMovesForKnight(context, piecePlacement);
     case PieceType.King:
-      return getMovesForKing(chessboard, piecePlacement);
+      return getMovesForKing(context, piecePlacement);
     case PieceType.Bishop:
-      return getMovesForBishop(chessboard, piecePlacement);
+      return getMovesForBishop(context, piecePlacement);
     default:
       throw new Error(`Invalid piece type: ${piecePlacement.piece.type}`);
   }
 };
 
-export const generateMoves = (rules: IRules): Move[] => {
-  return rules.board
+export const generateMoves = (context: MoveGeneratorContext): Move[] => {
+  return context.board
     .getPiecePlacements()
-    .filter((piecePlacement) => rules.isTurn(piecePlacement.piece.color))
+    .filter((piecePlacement) => context.isTurn(piecePlacement.piece.color))
     .flatMap((piecePlacement) => {
-      return getMovesFromSquare(rules.board, piecePlacement);
+      return getMovesFromSquare(context, piecePlacement);
     });
 };
