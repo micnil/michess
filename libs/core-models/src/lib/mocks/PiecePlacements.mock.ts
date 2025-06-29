@@ -1,9 +1,9 @@
 import { PiecePlacements } from '../PiecePlacements';
 import { B, b, K, k, N, n, P, p, Q, q, r, R } from './Piece.mock';
 
-export const emptyBoard: PiecePlacements = {};
+const emptyBoard: PiecePlacements = {};
 
-export const startingBoard: PiecePlacements = {
+const startingBoard: PiecePlacements = {
   a1: R,
   b1: N,
   c1: B,
@@ -36,4 +36,9 @@ export const startingBoard: PiecePlacements = {
   f7: p,
   g7: p,
   h7: p,
+};
+
+export const PiecePlacementsMock = {
+  startingBoard,
+  emptyBoard,
 };

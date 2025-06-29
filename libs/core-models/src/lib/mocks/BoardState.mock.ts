@@ -1,8 +1,8 @@
 import { BoardState } from '../BoardState';
-import { startingBoard } from './PiecePlacements.mock';
+import { PiecePlacementsMock } from './PiecePlacements.mock';
 
 export const boardStateMock: BoardState = {
-  pieces: startingBoard,
+  pieces: PiecePlacementsMock.startingBoard,
   orientation: 'white',
 };
 

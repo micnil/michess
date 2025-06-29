@@ -19,6 +19,8 @@ export type ChessBitboard = {
   black: {
     [piece in PieceType]: Bitboard;
   };
+  whiteOccupied: Bitboard;
+  blackOccupied: Bitboard;
   occupied: Bitboard;
   empty: Bitboard;
   getPieceAt: (coord: Coordinate) => Maybe<Piece>;
@@ -57,15 +59,22 @@ export function ChessBitboard(placements?: PiecePlacements): ChessBitboard {
     }
   }
 
-  // Calculate occupied and empty bitboards
-  const occupiedBoard = Object.values(bitboards)
-    .flatMap((colorObj) => Object.values(colorObj))
-    .reduce((acc, bb) => acc.union(bb), Bitboard());
+  const whiteOccupied = Object.values(bitboards.white).reduce(
+    (acc, bb) => acc.union(bb),
+    Bitboard()
+  );
+  const blackOccupied = Object.values(bitboards.black).reduce(
+    (acc, bb) => acc.union(bb),
+    Bitboard()
+  );
+  const occupiedBoard = whiteOccupied.union(blackOccupied);
   const empty = occupiedBoard.invert();
 
   return {
     ...bitboards,
     occupied: occupiedBoard,
+    whiteOccupied,
+    blackOccupied,
     empty,
     getPieceAt: (coord: Coordinate): Maybe<Piece> => {
       for (const color of colors) {

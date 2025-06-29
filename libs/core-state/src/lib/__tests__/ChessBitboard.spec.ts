@@ -1,4 +1,4 @@
-import { PiecePlacements } from '@michess/core-models';
+import { PiecePlacements, PiecePlacementsMock } from '@michess/core-models';
 import { ChessBitboard } from '../ChessBitboard';
 
 describe('ChessBitboard', () => {
@@ -22,6 +22,75 @@ describe('ChessBitboard', () => {
       const bitboard = ChessBitboard(placements);
       expect(bitboard.getPieceAt('a1')).toBeUndefined();
       expect(bitboard.getPieceAt('d5')).toEqual({ color: 'black', type: 'n' });
+    });
+  });
+
+  describe('occupancy', () => {
+    it('calculates occupied bitboards for starting position', () => {
+      const bitboard = ChessBitboard(PiecePlacementsMock.startingBoard);
+      expect(bitboard.occupied.toString()).toBe(
+        '' +
+          '8  1 1 1 1 1 1 1 1\n' +
+          '7  1 1 1 1 1 1 1 1\n' +
+          '6  . . . . . . . .\n' +
+          '5  . . . . . . . .\n' +
+          '4  . . . . . . . .\n' +
+          '3  . . . . . . . .\n' +
+          '2  1 1 1 1 1 1 1 1\n' +
+          '1  1 1 1 1 1 1 1 1\n' +
+          '   a b c d e f g h'
+      );
+    });
+
+    it('calculates white occupied bitboard for starting position', () => {
+      const bitboard = ChessBitboard(PiecePlacementsMock.startingBoard);
+      expect(bitboard.whiteOccupied.toString()).toBe(
+        '' +
+          '8  . . . . . . . .\n' +
+          '7  . . . . . . . .\n' +
+          '6  . . . . . . . .\n' +
+          '5  . . . . . . . .\n' +
+          '4  . . . . . . . .\n' +
+          '3  . . . . . . . .\n' +
+          '2  1 1 1 1 1 1 1 1\n' +
+          '1  1 1 1 1 1 1 1 1\n' +
+          '   a b c d e f g h'
+      );
+    });
+
+    it('calculates black occupied bitboard for starting position', () => {
+      const bitboard = ChessBitboard(PiecePlacementsMock.startingBoard);
+      expect(bitboard.blackOccupied.toString()).toBe(
+        '' +
+          '8  1 1 1 1 1 1 1 1\n' +
+          '7  1 1 1 1 1 1 1 1\n' +
+          '6  . . . . . . . .\n' +
+          '5  . . . . . . . .\n' +
+          '4  . . . . . . . .\n' +
+          '3  . . . . . . . .\n' +
+          '2  . . . . . . . .\n' +
+          '1  . . . . . . . .\n' +
+          '   a b c d e f g h'
+      );
+    });
+
+    it('handles empty board correctly', () => {
+      const bitboard = ChessBitboard();
+      expect(bitboard.whiteOccupied.isEmpty()).toBe(true);
+      expect(bitboard.blackOccupied.isEmpty()).toBe(true);
+      expect(bitboard.occupied.isEmpty()).toBe(true);
+      expect(bitboard.occupied.toString()).toBe(
+        '' +
+          '8  . . . . . . . .\n' +
+          '7  . . . . . . . .\n' +
+          '6  . . . . . . . .\n' +
+          '5  . . . . . . . .\n' +
+          '4  . . . . . . . .\n' +
+          '3  . . . . . . . .\n' +
+          '2  . . . . . . . .\n' +
+          '1  . . . . . . . .\n' +
+          '   a b c d e f g h'
+      );
     });
   });
 });
