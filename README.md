@@ -4,19 +4,17 @@ This project was generated using [Nx](https://nx.dev).
 
 <p style="text-align: center;"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="450"></p>
 
-
 ## Getting started
 
-Run `yarn`
+Run `pnpm`
 
-Run `yarn nx serve webchess`
+Run `pnpm nx serve webchess`
 
 ## Running unit tests
 
-Run `yarn nx test <lib_name/app_name>` to execute the unit tests via [Jest](https://jestjs.io).
+Run `pnpm nx test <lib_name/app_name>` to execute the unit tests via [Jest](https://jestjs.io).
 
 Run `nx affected:test` to execute the unit tests affected by a change.
-
 
 ## Further help
 
