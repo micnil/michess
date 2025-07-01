@@ -8,10 +8,6 @@ import {
 } from '@michess/core-models';
 import { Bitboard } from './Bitboard';
 
-/**
- * ChessBitboard represents the board state using bitboards for each piece type and color.
- * For example, white pawns, black knights, etc.
- */
 export type ChessBitboard = {
   white: {
     [piece in PieceType]: Bitboard;
