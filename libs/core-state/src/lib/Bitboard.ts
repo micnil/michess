@@ -13,11 +13,16 @@ const countBits = (board: bigint): number => {
   return count32(left32) + count32(right32);
 };
 
+/**
+ * Returns the index (0-63) of the least significant set bit.
+ * Returns -1 if board is 0n.
+ */
 const scanForward = (board: bigint): number => {
   if (board === 0n) {
     return -1;
   } else {
-    return countBits((board & -board) - 1n);
+    const lsb = getLowestSetBit(board);
+    return countBits(lsb - 1n);
   }
 };
 
@@ -72,6 +77,18 @@ const getHighestSetBit = (board: bigint): bigint => {
   return b & ~(b >> 1n);
 };
 
+const getIndices = (board: bigint): number[] => {
+  const indices: number[] = [];
+  let b = board;
+  while (b !== 0n) {
+    const lsb = getLowestSetBit(b);
+    const idx = countBits(lsb - 1n);
+    indices.push(idx);
+    b = b & ~lsb;
+  }
+  return indices;
+};
+
 const bitboardToString = (board: bigint): string => {
   let result = '';
   for (let rank = 0; rank < 8; rank++) {
@@ -102,6 +119,7 @@ export type Bitboard = {
   toString: () => string;
   getLowestSetBit: () => bigint;
   getHighestSetBit: () => bigint;
+  getIndices: () => number[];
 };
 
 export const Bitboard = (initialBoard?: bigint): Bitboard => {
@@ -123,5 +141,6 @@ export const Bitboard = (initialBoard?: bigint): Bitboard => {
     toString: () => bitboardToString(board),
     getLowestSetBit: () => getLowestSetBit(board),
     getHighestSetBit: () => getHighestSetBit(board),
+    getIndices: () => getIndices(board),
   };
 };

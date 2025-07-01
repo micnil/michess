@@ -158,4 +158,20 @@ describe('Bitboard', () => {
       );
     });
   });
+
+  describe('getIndices', () => {
+    it('returns all set bit indices in order from LSB to MSB', () => {
+      // 0b1001001000 (bits 3, 6, 9 set)
+      const board = Bitboard(584n);
+      expect(board.getIndices()).toEqual([3, 6, 9]);
+    });
+
+    it('returns an empty array for an empty board', () => {
+      expect(Bitboard(0n).getIndices()).toEqual([]);
+    });
+
+    it('returns a single index for a single set bit', () => {
+      expect(Bitboard(1n << 42n).getIndices()).toEqual([42]);
+    });
+  });
 });
