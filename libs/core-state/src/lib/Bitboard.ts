@@ -115,6 +115,7 @@ export type Bitboard = {
   isEmpty: () => boolean;
   getBitboardState: () => bigint;
   union: (other: Bitboard) => Bitboard;
+  exclude: (other: Bitboard) => Bitboard;
   invert: () => Bitboard;
   toString: () => string;
   getLowestSetBit: () => bigint;
@@ -138,6 +139,7 @@ export const Bitboard = (initialBoard?: bigint): Bitboard => {
     getBitboardState: () => board,
     union: (other: Bitboard) => Bitboard(board | other.getBitboardState()),
     invert: () => Bitboard(invert(board)),
+    exclude: (other: Bitboard) => Bitboard(board & ~other.getBitboardState()),
     toString: () => bitboardToString(board),
     getLowestSetBit: () => getLowestSetBit(board),
     getHighestSetBit: () => getHighestSetBit(board),

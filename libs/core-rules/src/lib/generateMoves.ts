@@ -1,7 +1,14 @@
 import { takeWhile } from '@michess/common-utils';
-import { Color, PiecePlacement, PieceType } from '@michess/core-models';
+import {
+  Color,
+  Coordinate,
+  PiecePlacement,
+  PieceType,
+} from '@michess/core-models';
 import { Move } from './model/Move';
 import { MoveGeneratorContext } from './model/MoveGeneratorContext';
+import { SQUARE_COORDINATES_WHITE } from 'libs/core-models/src/lib/constants/board';
+import { Bitboard } from '@michess/core-state';
 
 const DIAGONAL_OFFSETS = [7, -7, 9, -9];
 const VERTICAL_OFFSETS = [8, -8];
@@ -32,6 +39,19 @@ const chebyshevDistance = (startIndex: number, nextIndex: number) => {
     Math.abs(startFile - nextFile)
   );
 };
+
+const KNIGHT_ATTACKS: Record<Coordinate, Bitboard> = Object.fromEntries(
+  SQUARE_COORDINATES_WHITE.map((coord, index) => {
+    const attacks = KNIGHT_JUMP_OFFSETS.map((offset) => index + offset)
+      .filter(
+        (targetIndex) =>
+          withinBoard(targetIndex) && chebyshevDistance(index, targetIndex) <= 2
+      )
+      .reduce((acc, targetIndex) => acc.setIndex(targetIndex), Bitboard());
+
+    return [coord, attacks];
+  })
+) as Record<Coordinate, Bitboard>;
 
 const isNeighbors = (startIndex: number, nextIndex: number) => {
   return chebyshevDistance(startIndex, nextIndex) <= 1;
@@ -150,22 +170,21 @@ const getMovesForKnight = (
 ): Move[] => {
   const chessboard = context.board;
   const index = chessboard.getIndex(coord);
-  const moveOffsets = KNIGHT_JUMP_OFFSETS;
-  const coordinates = chessboard.getCoordinates();
 
-  const squares = moveOffsets
-    .map((offset) => index + offset)
-    .filter(
-      (nextIndex) =>
-        withinBoard(nextIndex) && chebyshevDistance(index, nextIndex) <= 2
-    )
-    .map((index) => chessboard.getSquare(coordinates[index]))
-    .filter((square) => square.piece?.color !== piece.color);
+  const ownPieceOccupancy =
+    piece.color === 'white'
+      ? context.bitboards.whiteOccupied
+      : context.bitboards.blackOccupied;
+  const opponentPieceOccupancy =
+    piece.color === 'white'
+      ? context.bitboards.blackOccupied
+      : context.bitboards.whiteOccupied;
+  const legalKnightMoves = KNIGHT_ATTACKS[coord].exclude(ownPieceOccupancy);
 
-  const moves: Move[] = squares.map((square) => ({
+  const moves: Move[] = legalKnightMoves.getIndices().map((squareIndex) => ({
     start: index,
-    target: chessboard.getIndex(square.coord),
-    capture: !!square.piece,
+    target: squareIndex,
+    capture: opponentPieceOccupancy.isIndexSet(squareIndex),
   }));
 
   return moves;
