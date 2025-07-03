@@ -2,7 +2,6 @@ import {
   BoardCoordinates,
   Color,
   Coordinate,
-  Piece,
   PiecePlacement,
   PieceType,
 } from '@michess/core-models';
@@ -75,12 +74,12 @@ const unfoldDirection = (
   return indexes;
 };
 
-type RayByDirection = Record<DirectionOffset, Bitboard>;
-type SlidingRaysByCoordinate = Record<Coordinate, RayByDirection>;
+type BitboardByDirection = Record<DirectionOffset, Bitboard>;
+type DirectionalBitboardsByCoordinate = Record<Coordinate, BitboardByDirection>;
 
-const SLIDER_ATTACKS: SlidingRaysByCoordinate = Object.fromEntries(
+const SLIDER_ATTACKS: DirectionalBitboardsByCoordinate = Object.fromEntries(
   BoardCoordinates.createWhite().map((coord, index) => {
-    const attacks: RayByDirection = {
+    const attacks: BitboardByDirection = {
       [DirectionOffset.N]: Bitboard().setIndices(
         unfoldDirection(index, DirectionOffset.N)
       ),
@@ -109,7 +108,7 @@ const SLIDER_ATTACKS: SlidingRaysByCoordinate = Object.fromEntries(
 
     return [coord, attacks];
   })
-) as SlidingRaysByCoordinate;
+) as DirectionalBitboardsByCoordinate;
 
 const KNIGHT_ATTACKS: Record<Coordinate, Bitboard> = Object.fromEntries(
   BoardCoordinates.createWhite().map((coord, index) => {
@@ -119,6 +118,19 @@ const KNIGHT_ATTACKS: Record<Coordinate, Bitboard> = Object.fromEntries(
           withinBoard(targetIndex) && chebyshevDistance(index, targetIndex) <= 2
       )
       .reduce((acc, targetIndex) => acc.setIndex(targetIndex), Bitboard());
+
+    return [coord, attacks];
+  })
+) as Record<Coordinate, Bitboard>;
+
+const KING_ATTACKS: Record<Coordinate, Bitboard> = Object.fromEntries(
+  BoardCoordinates.createWhite().map((coord, index) => {
+    const attacks = NEIGHBORING_OFFSETS.reduce((attackBitboard, offset) => {
+      const target = index + offset;
+      return withinBoard(target) && isNeighbors(index, target)
+        ? attackBitboard.setIndex(target)
+        : attackBitboard;
+    }, Bitboard());
 
     return [coord, attacks];
   })
@@ -212,26 +224,14 @@ const getMovesForKing = (
   context: MoveGeneratorContext,
   { coord, piece }: PiecePlacement
 ): Move[] => {
-  const chessboard = context.board;
-  const index = chessboard.getIndex(coord);
-  const moveOffsets = NEIGHBORING_OFFSETS;
-  const coordinates = chessboard.getCoordinates();
+  const ownOccupancy =
+    piece.color === 'white'
+      ? context.bitboards.whiteOccupied
+      : context.bitboards.blackOccupied;
+  const kingAttacks = KING_ATTACKS[coord];
+  const legalKingMoves = kingAttacks.exclude(ownOccupancy);
 
-  const squares = moveOffsets
-    .map((offset) => index + offset)
-    .filter(
-      (nextIndex) => withinBoard(nextIndex) && isNeighbors(index, nextIndex)
-    )
-    .map((index) => chessboard.getSquare(coordinates[index]))
-    .filter((square) => square.piece?.color !== piece.color);
-
-  const moves: Move[] = squares.map((square) => ({
-    start: index,
-    target: chessboard.getIndex(square.coord),
-    capture: !!square.piece,
-  }));
-
-  return moves;
+  return movesFromBitboard(context, { coord, piece }, legalKingMoves);
 };
 
 const getMovesForKnight = (
