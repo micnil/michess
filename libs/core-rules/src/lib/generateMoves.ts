@@ -149,7 +149,6 @@ const getSlidingMoves = (
 ): Move[] => {
   const chessboard = context.board;
   const index = chessboard.getIndex(coord);
-  const coordinates = chessboard.getCoordinates();
   const moveOffsets =
     piece.type === PieceType.Bishop
       ? DIAGONAL_OFFSETS
