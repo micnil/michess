@@ -55,6 +55,24 @@ const chebyshevDistance = (startIndex: number, nextIndex: number) => {
     Math.abs(startFile - nextFile)
   );
 };
+const isNeighbors = (startIndex: number, nextIndex: number) => {
+  return chebyshevDistance(startIndex, nextIndex) <= 1;
+};
+
+const unfoldDirection = (
+  startIndex: number,
+  directionOffset: number
+): number[] => {
+  const indexes: number[] = [];
+  for (
+    let currentIndex = startIndex, nextIndex = startIndex + directionOffset;
+    withinBoard(nextIndex) && isNeighbors(currentIndex, nextIndex);
+    currentIndex = nextIndex, nextIndex = nextIndex + directionOffset
+  ) {
+    indexes.push(nextIndex);
+  }
+  return indexes;
+};
 
 type RayByDirection = Record<
   'N' | 'S' | 'E' | 'W' | 'NE' | 'SE' | 'NW' | 'SW',
@@ -91,25 +109,6 @@ const KNIGHT_ATTACKS: Record<Coordinate, Bitboard> = Object.fromEntries(
     return [coord, attacks];
   })
 ) as Record<Coordinate, Bitboard>;
-
-const isNeighbors = (startIndex: number, nextIndex: number) => {
-  return chebyshevDistance(startIndex, nextIndex) <= 1;
-};
-
-const unfoldDirection = (
-  startIndex: number,
-  directionOffset: number
-): number[] => {
-  const indexes: number[] = [];
-  for (
-    let currentIndex = startIndex, nextIndex = startIndex + directionOffset;
-    withinBoard(nextIndex) && isNeighbors(currentIndex, nextIndex);
-    currentIndex = nextIndex, nextIndex = nextIndex + directionOffset
-  ) {
-    indexes.push(nextIndex);
-  }
-  return indexes;
-};
 
 const getSlidingMoves = (
   context: MoveGeneratorContext,
