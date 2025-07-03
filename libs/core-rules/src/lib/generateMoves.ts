@@ -2,6 +2,7 @@ import {
   BoardCoordinates,
   Color,
   Coordinate,
+  Piece,
   PiecePlacement,
   PieceType,
 } from '@michess/core-models';
@@ -143,6 +144,23 @@ const getRayAttacks = (
   }
 };
 
+const movesFromBitboard = (
+  context: MoveGeneratorContext,
+  { piece, coord }: PiecePlacement,
+  legalMoves: Bitboard
+): Move[] => {
+  const startIndex = context.board.getIndex(coord);
+  const opponentOccupancy =
+    piece.color === 'white'
+      ? context.bitboards.blackOccupied
+      : context.bitboards.whiteOccupied;
+  return legalMoves.getIndices().map((targetIndex) => ({
+    start: startIndex,
+    target: targetIndex,
+    capture: opponentOccupancy.isIndexSet(targetIndex),
+  }));
+};
+
 const getSlidingMoves = (
   context: MoveGeneratorContext,
   { piece, coord }: PiecePlacement
@@ -158,10 +176,6 @@ const getSlidingMoves = (
       ? NEIGHBORING_OFFSETS
       : [];
 
-  const opponentOccupancy =
-    piece.color === 'white'
-      ? context.bitboards.blackOccupied
-      : context.bitboards.whiteOccupied;
   const ownOccupancy =
     piece.color === 'white'
       ? context.bitboards.whiteOccupied
@@ -172,13 +186,7 @@ const getSlidingMoves = (
   }, Bitboard());
   const legalMoves = attacks.exclude(ownOccupancy);
 
-  const moves: Move[] = legalMoves.getIndices().map((squareIndex) => ({
-    start: index,
-    target: squareIndex,
-    capture: opponentOccupancy.isIndexSet(squareIndex),
-  }));
-
-  return moves;
+  return movesFromBitboard(context, { piece, coord }, legalMoves);
 };
 
 const getMovesForQueen = (
@@ -232,26 +240,13 @@ const getMovesForKnight = (
   context: MoveGeneratorContext,
   { coord, piece }: PiecePlacement
 ): Move[] => {
-  const chessboard = context.board;
-  const index = chessboard.getIndex(coord);
-
   const ownOccupancy =
     piece.color === 'white'
       ? context.bitboards.whiteOccupied
       : context.bitboards.blackOccupied;
-  const opponentOccupancy =
-    piece.color === 'white'
-      ? context.bitboards.blackOccupied
-      : context.bitboards.whiteOccupied;
   const legalKnightMoves = KNIGHT_ATTACKS[coord].exclude(ownOccupancy);
 
-  const moves: Move[] = legalKnightMoves.getIndices().map((squareIndex) => ({
-    start: index,
-    target: squareIndex,
-    capture: opponentOccupancy.isIndexSet(squareIndex),
-  }));
-
-  return moves;
+  return movesFromBitboard(context, { piece, coord }, legalKnightMoves);
 };
 
 const getMovesForPawn = (
