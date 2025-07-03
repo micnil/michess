@@ -23,10 +23,20 @@ const makeMove = (gameState: GameState, move: Move): GameState => {
   };
   delete newPiecePlacements[fromCoord];
 
+  if (move.enPassant && gameState.enPassant) {
+    delete newPiecePlacements[gameState.enPassant];
+  }
+
   return {
     ...gameState,
     turn: gameState.turn === Color.White ? Color.Black : Color.White,
     pieces: newPiecePlacements,
+    // Update enPassant if the move is a double pawn advance
+    // TODO: only set if a enPassant move is posssible.
+    enPassant:
+      pieceToMove?.type === 'p' && Math.abs(move.start - move.target) === 16
+        ? coordinates[move.target + (gameState.turn === Color.White ? -8 : 8)]
+        : undefined,
   };
 };
 
