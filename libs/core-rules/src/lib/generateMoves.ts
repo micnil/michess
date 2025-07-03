@@ -1,5 +1,6 @@
 import { takeWhile } from '@michess/common-utils';
 import {
+  BoardCoordinates,
   Color,
   Coordinate,
   PiecePlacement,
@@ -7,7 +8,7 @@ import {
 } from '@michess/core-models';
 import { Move } from './model/Move';
 import { MoveGeneratorContext } from './model/MoveGeneratorContext';
-import { SQUARE_COORDINATES_WHITE } from 'libs/core-models/src/lib/constants/board';
+
 import { Bitboard } from '@michess/core-state';
 
 enum DirectionOffsets {
@@ -81,7 +82,7 @@ type RayByDirection = Record<
 type SlidingRaysByCoordinate = Record<Coordinate, RayByDirection>;
 
 const SLIDER_ATTACKS: SlidingRaysByCoordinate = Object.fromEntries(
-  SQUARE_COORDINATES_WHITE.map((coord, index) => {
+  BoardCoordinates.createWhite().map((coord, index) => {
     const attacks: RayByDirection = {
       N: Bitboard().setIndices(unfoldDirection(index, DirectionOffsets.N)),
       S: Bitboard().setIndices(unfoldDirection(index, DirectionOffsets.S)),
@@ -98,7 +99,7 @@ const SLIDER_ATTACKS: SlidingRaysByCoordinate = Object.fromEntries(
 ) as SlidingRaysByCoordinate;
 
 const KNIGHT_ATTACKS: Record<Coordinate, Bitboard> = Object.fromEntries(
-  SQUARE_COORDINATES_WHITE.map((coord, index) => {
+  BoardCoordinates.createWhite().map((coord, index) => {
     const attacks = KNIGHT_JUMP_OFFSETS.map((offset) => index + offset)
       .filter(
         (targetIndex) =>
@@ -209,20 +210,20 @@ const getMovesForKnight = (
   const chessboard = context.board;
   const index = chessboard.getIndex(coord);
 
-  const ownPieceOccupancy =
+  const ownOccupancy =
     piece.color === 'white'
       ? context.bitboards.whiteOccupied
       : context.bitboards.blackOccupied;
-  const opponentPieceOccupancy =
+  const opponentOccupancy =
     piece.color === 'white'
       ? context.bitboards.blackOccupied
       : context.bitboards.whiteOccupied;
-  const legalKnightMoves = KNIGHT_ATTACKS[coord].exclude(ownPieceOccupancy);
+  const legalKnightMoves = KNIGHT_ATTACKS[coord].exclude(ownOccupancy);
 
   const moves: Move[] = legalKnightMoves.getIndices().map((squareIndex) => ({
     start: index,
     target: squareIndex,
-    capture: opponentPieceOccupancy.isIndexSet(squareIndex),
+    capture: opponentOccupancy.isIndexSet(squareIndex),
   }));
 
   return moves;

@@ -126,4 +126,197 @@ describe('generateMoves', () => {
       ]);
     });
   });
+
+  describe('queen', () => {
+    it('can move in all directions from center', () => {
+      // Board:
+      // 8  . . . . . . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . . . . . . . .
+      // 4  . . . Q . . . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . . . . .
+      //    a b c d e f g h
+      const context = MoveGeneratorContext.from(
+        createGameStateMock({
+          pieces: {
+            d4: { type: 'q', color: Color.White },
+          },
+        })
+      );
+      const moves = generateMoves(context);
+
+      expect(moves.length).toBe(27); // 7+7+7+6 (horizontal, vertical, diagonals)
+      expect(moves).toEqual(
+        expect.arrayContaining([
+          { start: 35, target: 27, capture: false }, // up
+          { start: 35, target: 43, capture: false }, // down
+          { start: 35, target: 34, capture: false }, // left
+          { start: 35, target: 36, capture: false }, // right
+          { start: 35, target: 28, capture: false }, // up-right
+          { start: 35, target: 42, capture: false }, // down-left
+        ])
+      );
+    });
+
+    it('cannot move through blocking pieces', () => {
+      // Board:
+      // 8  . . . . . . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . . . p . . . .
+      // 4  . . . Q . . . .
+      // 3  . . . P . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . . . . .
+      //    a b c d e f g h
+      const context = MoveGeneratorContext.from(
+        createGameStateMock({
+          pieces: {
+            d4: { type: 'q', color: Color.White },
+            d3: { type: 'p', color: Color.White },
+            d5: { type: 'p', color: Color.Black },
+          },
+        })
+      );
+
+      const moves = generateMoves(context);
+
+      // Can capture d5, but not move past it; cannot move to d3 (own piece)
+      expect(moves).toEqual(
+        expect.arrayContaining([
+          { start: 35, target: 27, capture: true }, // capture black pawn at d5
+        ])
+      );
+      expect(moves).not.toEqual(
+        expect.arrayContaining([
+          { start: 35, target: 19, capture: false }, // cannot move past d5
+          { start: 35, target: 43, capture: false }, // cannot move to d3 (own piece)
+        ])
+      );
+    });
+
+    it('can capture diagonally', () => {
+      // Board:
+      // 8  . . . . . . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . . . . p . . .
+      // 4  . . . Q . . . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . . . . .
+      //    a b c d e f g h
+      const context = MoveGeneratorContext.from(
+        createGameStateMock({
+          pieces: {
+            d4: { type: 'q', color: Color.White },
+            e5: { type: 'p', color: Color.Black },
+          },
+        })
+      );
+      const moves = generateMoves(context);
+      expect(moves).toEqual(
+        expect.arrayContaining([
+          { start: 35, target: 28, capture: true }, // capture on e5
+        ])
+      );
+    });
+  });
+
+  describe('knight', () => {
+    it('can move in L-shape from center', () => {
+      // Board:
+      // 8  . . . . . . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . . . . . . . .
+      // 4  . . . N . . . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . . . . .
+      //    a b c d e f g h
+      const context = MoveGeneratorContext.from(
+        createGameStateMock({
+          pieces: {
+            d4: { type: 'n', color: Color.White },
+          },
+        })
+      );
+      const moves = generateMoves(context);
+      expect(moves).toEqual(
+        expect.arrayContaining([
+          { start: 35, target: 18, capture: false }, // b5
+          { start: 35, target: 20, capture: false }, // b3
+          { start: 35, target: 25, capture: false }, // c6
+          { start: 35, target: 29, capture: false }, // e6
+          { start: 35, target: 41, capture: false }, // c2
+          { start: 35, target: 45, capture: false }, // e2
+          { start: 35, target: 50, capture: false }, // f3
+          { start: 35, target: 52, capture: false }, // f5
+        ])
+      );
+    });
+
+    it('can capture enemy pieces', () => {
+      // Board:
+      // 8  . . . . . . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . p . . . p . .
+      // 4  . . . N . . . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . . . . .
+      //    a b c d e f g h
+      const context = MoveGeneratorContext.from(
+        createGameStateMock({
+          pieces: {
+            d4: { type: 'n', color: Color.White },
+            b5: { type: 'p', color: Color.Black },
+            f5: { type: 'p', color: Color.Black },
+          },
+        })
+      );
+      const moves = generateMoves(context);
+      expect(moves).toEqual(
+        expect.arrayContaining([
+          { start: 35, target: 25, capture: true }, // capture on b5
+          { start: 35, target: 29, capture: true }, // capture on f5
+        ])
+      );
+    });
+
+    it('cannot move to squares occupied by own pieces', () => {
+      // Board:
+      // 8  . . . . . . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . P . . . Q . .
+      // 4  . . . N . . . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . . . . .
+      //    a b c d e f g h
+      const context = MoveGeneratorContext.from(
+        createGameStateMock({
+          pieces: {
+            d4: { type: 'n', color: Color.White },
+            b5: { type: 'p', color: Color.White },
+            f5: { type: 'q', color: Color.White },
+          },
+        })
+      );
+      const moves = generateMoves(context);
+      // Should not include moves to b5 or f5
+      expect(moves).not.toEqual(
+        expect.arrayContaining([
+          { start: 35, target: 25, capture: false }, // b5
+          { start: 35, target: 29, capture: false }, // f5
+        ])
+      );
+    });
+  });
 });
