@@ -99,6 +99,30 @@ describe('Bitboard', () => {
     });
   });
 
+  describe('scanBackward', () => {
+    it('returns -1 for an empty board', () => {
+      expect(Bitboard(0n).scanBackward()).toBe(-1);
+    });
+
+    it('returns the index of the only set bit', () => {
+      expect(Bitboard(1n << 42n).scanBackward()).toBe(42);
+    });
+
+    it('returns the index of the most significant set bit when multiple bits are set', () => {
+      // bits 3, 6, 9 set (0b1001001000)
+      expect(Bitboard(584n).scanBackward()).toBe(9);
+    });
+
+    it('returns 63 for the highest bit set', () => {
+      expect(Bitboard(1n << 63n).scanBackward()).toBe(63);
+    });
+
+    it('returns the correct index for a large number', () => {
+      // bits 31, 45, 50 set
+      expect(Bitboard(1161086426415104n).scanBackward()).toBe(50);
+    });
+  });
+
   describe('countBits', () => {
     it('can count the amount of bits', () => {
       const bit_31_45_50_board = Bitboard(1161086426415104n);

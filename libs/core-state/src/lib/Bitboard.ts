@@ -26,6 +26,19 @@ const scanForward = (board: bigint): number => {
   }
 };
 
+/**
+ * Returns the index (0-63) of the most significant set bit.
+ * Returns -1 if board is 0n.
+ */
+const scanBackward = (board: bigint): number => {
+  if (board === 0n) {
+    return -1;
+  } else {
+    const msb = getHighestSetBit(board);
+    return countBits(msb - 1n);
+  }
+};
+
 const coordToIndex = (coord: Coordinate): number => {
   const file = coord.charCodeAt(0) - 97;
   const rank = coord.charCodeAt(1) - 49;
@@ -110,6 +123,7 @@ const bitboardToString = (board: bigint): string => {
 export type Bitboard = {
   countBits: () => number;
   scanForward: () => number;
+  scanBackward: () => number;
   setCoord: (coord: Coordinate) => Bitboard;
   setIndex: (index: number) => Bitboard;
   setIndices: (indices: number[]) => Bitboard;
@@ -134,6 +148,7 @@ export const Bitboard = (initialBoard?: bigint): Bitboard => {
   return {
     countBits: () => countBits(board),
     scanForward: () => scanForward(board),
+    scanBackward: () => scanBackward(board),
     setCoord: (coord: Coordinate) => Bitboard(setCoord(board, coord)),
     setIndex: (index: number) => Bitboard(setIndex(board, index)),
     setIndices: (indices: number[]) => Bitboard(setIndices(board, indices)),
