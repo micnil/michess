@@ -319,4 +319,98 @@ describe('generateMoves', () => {
       );
     });
   });
+
+  describe('king', () => {
+    it('can move one square in any direction from center', () => {
+      // Board:
+      // 8  . . . . . . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . . . . . . . .
+      // 4  . . . K . . . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . . . . .
+      //    a b c d e f g h
+      const context = MoveGeneratorContext.from(
+        createGameStateMock({
+          pieces: {
+            d4: { type: 'k', color: Color.White },
+          },
+        })
+      );
+      const moves = generateMoves(context);
+      expect(moves).toEqual(
+        expect.arrayContaining<Move>([
+          { start: 35, target: 27, capture: false }, // up
+          { start: 35, target: 28, capture: false }, // up-right
+          { start: 35, target: 36, capture: false }, // right
+          { start: 35, target: 44, capture: false }, // down-right
+          { start: 35, target: 43, capture: false }, // down
+          { start: 35, target: 42, capture: false }, // down-left
+          { start: 35, target: 34, capture: false }, // left
+          { start: 35, target: 26, capture: false }, // up-left
+        ])
+      );
+    });
+
+    it('can capture enemy pieces', () => {
+      // Board:
+      // 8  . . . . . . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . . . . . . . .
+      // 4  . . . K p . . .
+      // 3  . . p . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . . . . .
+      //    a b c d e f g h
+      const context = MoveGeneratorContext.from(
+        createGameStateMock({
+          pieces: {
+            d4: { type: 'k', color: Color.White },
+            e4: { type: 'p', color: Color.Black },
+            c3: { type: 'p', color: Color.Black },
+          },
+        })
+      );
+      const moves = generateMoves(context);
+      expect(moves).toEqual(
+        expect.arrayContaining<Move>([
+          { start: 35, target: 36, capture: true }, // capture on e4
+          { start: 35, target: 42, capture: true }, // capture on c3
+        ])
+      );
+    });
+
+    it('cannot move to squares occupied by own pieces', () => {
+      // Board:
+      // 8  . . . . . . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . . . . . . . .
+      // 4  . . . K Q . . .
+      // 3  . . . . P . . .
+      // 2  . . . . . . . .
+      // 1  . . . . . . . .
+      //    a b c d e f g h
+      const context = MoveGeneratorContext.from(
+        createGameStateMock({
+          pieces: {
+            d4: { type: 'k', color: Color.White },
+            e4: { type: 'q', color: Color.White },
+            e3: { type: 'p', color: Color.White },
+          },
+        })
+      );
+      const moves = generateMoves(context);
+      // Should not include moves to e4 or e3
+      expect(moves).not.toEqual(
+        expect.arrayContaining<Move>([
+          { start: 35, target: 36, capture: false }, // e4
+          { start: 35, target: 44, capture: false }, // e3
+        ])
+      );
+    });
+  });
 });
