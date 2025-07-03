@@ -165,8 +165,6 @@ const getSlidingMoves = (
   context: MoveGeneratorContext,
   { piece, coord }: PiecePlacement
 ): Move[] => {
-  const chessboard = context.board;
-  const index = chessboard.getIndex(coord);
   const moveOffsets =
     piece.type === PieceType.Bishop
       ? DIAGONAL_OFFSETS
