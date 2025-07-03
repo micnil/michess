@@ -323,7 +323,6 @@ const getMovesForPawn = (
         start: index,
         target: enPassantIndex,
         capture: true,
-        enPassant: true,
       });
     }
   }

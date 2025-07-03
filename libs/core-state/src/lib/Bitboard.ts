@@ -39,14 +39,8 @@ const scanBackward = (board: bigint): number => {
   }
 };
 
-const coordToIndex = (coord: Coordinate): number => {
-  const file = coord.charCodeAt(0) - 97;
-  const rank = coord.charCodeAt(1) - 49;
-  return file + (7 - rank) * 8;
-};
-
 const setCoord = (board: bigint, coord: Coordinate): bigint => {
-  return setIndex(board, coordToIndex(coord));
+  return setIndex(board, Coordinate.toIndex(coord));
 };
 
 const setIndex = (board: bigint, index: number): bigint => {
@@ -62,7 +56,7 @@ const invert = (board: bigint): bigint => {
 };
 
 const isCoordSet = (board: bigint, coord: Coordinate): boolean => {
-  return isIndexSet(board, coordToIndex(coord));
+  return isIndexSet(board, Coordinate.toIndex(coord));
 };
 
 const isIndexSet = (board: bigint, index: number): boolean => {
@@ -74,7 +68,7 @@ const clearIndex = (board: bigint, index: number): bigint => {
 };
 
 const clearCoord = (board: bigint, coord: Coordinate): bigint => {
-  return clearIndex(board, coordToIndex(coord));
+  return clearIndex(board, Coordinate.toIndex(coord));
 };
 
 const getLowestSetBit = (board: bigint): bigint => {

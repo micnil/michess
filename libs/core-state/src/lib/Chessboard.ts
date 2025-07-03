@@ -32,13 +32,6 @@ const movePiece = (board: BoardState, move: MovePayload): BoardState => {
   };
 };
 
-const coordToIndex = (board: BoardState, coord: Coordinate): number => {
-  const file = coord.charCodeAt(0) - 97;
-  const rank = coord.charCodeAt(1) - 49;
-  const index = file + (7 - rank) * 8;
-  return index;
-};
-
 const getPiecePlacements = (board: BoardState): PiecePlacement[] => {
   return Object.entries(board.pieces).map(([coord, piece]) => ({
     coord: coord as Coordinate,
@@ -55,7 +48,7 @@ const getSquare = (board: BoardState, coord: Coordinate): SquareState => {
 
 export const Chessboard = (board: BoardState): IChessboard => {
   return {
-    getIndex: (coord) => coordToIndex(board, coord),
+    getIndex: (coord) => Coordinate.toIndex(coord),
     getSquare: (coord) => getSquare(board, coord),
     getCoordinates: () => BoardCoordinates.createWhite(),
     getPiecePlacements: () => getPiecePlacements(board),

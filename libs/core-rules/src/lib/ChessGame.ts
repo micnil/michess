@@ -1,8 +1,24 @@
-import { Color, GameState, PiecePlacements } from '@michess/core-models';
+import {
+  Color,
+  Coordinate,
+  GameState,
+  PiecePlacements,
+} from '@michess/core-models';
 import { Chessboard } from '@michess/core-state';
 import { IChessGame } from './model/IChessGame';
 import { Move } from './model/Move';
 import { MoveGenerator } from './MoveGenerator';
+
+const oneStepBackFromIndex = (index: number, color: Color): Coordinate => {
+  return Coordinate.fromIndex(color === Color.White ? index + 8 : index - 8);
+};
+const oneStepBackFromCoordinate = (
+  coord: Coordinate,
+  color: Color
+): Coordinate => {
+  const index = Coordinate.toIndex(coord);
+  return oneStepBackFromIndex(index, color);
+};
 
 const makeMove = (gameState: GameState, move: Move): GameState => {
   const chessboard = Chessboard(gameState);
@@ -23,8 +39,10 @@ const makeMove = (gameState: GameState, move: Move): GameState => {
   };
   delete newPiecePlacements[fromCoord];
 
-  if (move.enPassant && gameState.enPassant) {
-    delete newPiecePlacements[gameState.enPassant];
+  if (Coordinate.fromIndex(move.target) === gameState.enPassant) {
+    delete newPiecePlacements[
+      oneStepBackFromCoordinate(gameState.enPassant, gameState.turn)
+    ];
   }
 
   return {
@@ -35,7 +53,7 @@ const makeMove = (gameState: GameState, move: Move): GameState => {
     // TODO: only set if a enPassant move is posssible.
     enPassant:
       pieceToMove?.type === 'p' && Math.abs(move.start - move.target) === 16
-        ? coordinates[move.target + (gameState.turn === Color.White ? -8 : 8)]
+        ? oneStepBackFromIndex(move.target, gameState.turn)
         : undefined,
   };
 };
