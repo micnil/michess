@@ -120,6 +120,8 @@ const bitboardToString = (board: bigint): string => {
   return result.trimEnd();
 };
 
+const intersection = (a: bigint, b: bigint): bigint => a & b;
+
 export type Bitboard = {
   countBits: () => number;
   scanForward: () => number;
@@ -136,6 +138,7 @@ export type Bitboard = {
   union: (other: Bitboard) => Bitboard;
   exclude: (other: Bitboard) => Bitboard;
   invert: () => Bitboard;
+  intersection: (other: Bitboard) => Bitboard;
   toString: () => string;
   getLowestSetBit: () => bigint;
   getHighestSetBit: () => bigint;
@@ -161,6 +164,8 @@ export const Bitboard = (initialBoard?: bigint): Bitboard => {
     union: (other: Bitboard) => Bitboard(board | other.getBitboardState()),
     invert: () => Bitboard(invert(board)),
     exclude: (other: Bitboard) => Bitboard(board & ~other.getBitboardState()),
+    intersection: (other: Bitboard) =>
+      Bitboard(intersection(board, other.getBitboardState())),
     toString: () => bitboardToString(board),
     getLowestSetBit: () => getLowestSetBit(board),
     getHighestSetBit: () => getHighestSetBit(board),

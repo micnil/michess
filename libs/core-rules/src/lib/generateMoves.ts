@@ -1,4 +1,3 @@
-import { takeWhile } from '@michess/common-utils';
 import {
   BoardCoordinates,
   Color,
@@ -11,7 +10,7 @@ import { MoveGeneratorContext } from './model/MoveGeneratorContext';
 
 import { Bitboard } from '@michess/core-state';
 
-enum DirectionOffsets {
+enum DirectionOffset {
   N = -8,
   S = +8,
   E = +1,
@@ -23,13 +22,13 @@ enum DirectionOffsets {
 }
 
 const DIAGONAL_OFFSETS = [
-  DirectionOffsets.NE,
-  DirectionOffsets.NW,
-  DirectionOffsets.SE,
-  DirectionOffsets.SW,
+  DirectionOffset.NE,
+  DirectionOffset.NW,
+  DirectionOffset.SE,
+  DirectionOffset.SW,
 ];
-const VERTICAL_OFFSETS = [DirectionOffsets.N, DirectionOffsets.S];
-const HORIZONTAL_OFFSETS = [DirectionOffsets.E, DirectionOffsets.W];
+const VERTICAL_OFFSETS = [DirectionOffset.N, DirectionOffset.S];
+const HORIZONTAL_OFFSETS = [DirectionOffset.E, DirectionOffset.W];
 const ADJECENT_OFFSETS = [...VERTICAL_OFFSETS, ...HORIZONTAL_OFFSETS];
 const NEIGHBORING_OFFSETS = [...ADJECENT_OFFSETS, ...DIAGONAL_OFFSETS];
 
@@ -75,23 +74,36 @@ const unfoldDirection = (
   return indexes;
 };
 
-type RayByDirection = Record<
-  'N' | 'S' | 'E' | 'W' | 'NE' | 'SE' | 'NW' | 'SW',
-  Bitboard
->;
+type RayByDirection = Record<DirectionOffset, Bitboard>;
 type SlidingRaysByCoordinate = Record<Coordinate, RayByDirection>;
 
 const SLIDER_ATTACKS: SlidingRaysByCoordinate = Object.fromEntries(
   BoardCoordinates.createWhite().map((coord, index) => {
     const attacks: RayByDirection = {
-      N: Bitboard().setIndices(unfoldDirection(index, DirectionOffsets.N)),
-      S: Bitboard().setIndices(unfoldDirection(index, DirectionOffsets.S)),
-      E: Bitboard().setIndices(unfoldDirection(index, DirectionOffsets.E)),
-      W: Bitboard().setIndices(unfoldDirection(index, DirectionOffsets.W)),
-      NE: Bitboard().setIndices(unfoldDirection(index, DirectionOffsets.NE)),
-      SE: Bitboard().setIndices(unfoldDirection(index, DirectionOffsets.SE)),
-      NW: Bitboard().setIndices(unfoldDirection(index, DirectionOffsets.NW)),
-      SW: Bitboard().setIndices(unfoldDirection(index, DirectionOffsets.SW)),
+      [DirectionOffset.N]: Bitboard().setIndices(
+        unfoldDirection(index, DirectionOffset.N)
+      ),
+      [DirectionOffset.S]: Bitboard().setIndices(
+        unfoldDirection(index, DirectionOffset.S)
+      ),
+      [DirectionOffset.E]: Bitboard().setIndices(
+        unfoldDirection(index, DirectionOffset.E)
+      ),
+      [DirectionOffset.W]: Bitboard().setIndices(
+        unfoldDirection(index, DirectionOffset.W)
+      ),
+      [DirectionOffset.NE]: Bitboard().setIndices(
+        unfoldDirection(index, DirectionOffset.NE)
+      ),
+      [DirectionOffset.SE]: Bitboard().setIndices(
+        unfoldDirection(index, DirectionOffset.SE)
+      ),
+      [DirectionOffset.NW]: Bitboard().setIndices(
+        unfoldDirection(index, DirectionOffset.NW)
+      ),
+      [DirectionOffset.SW]: Bitboard().setIndices(
+        unfoldDirection(index, DirectionOffset.SW)
+      ),
     };
 
     return [coord, attacks];
@@ -111,6 +123,26 @@ const KNIGHT_ATTACKS: Record<Coordinate, Bitboard> = Object.fromEntries(
   })
 ) as Record<Coordinate, Bitboard>;
 
+const getRayAttacks = (
+  context: MoveGeneratorContext,
+  direction: DirectionOffset,
+  coord: Coordinate
+): Bitboard => {
+  const attacks = SLIDER_ATTACKS[coord][direction];
+  const blockers = attacks.intersection(context.bitboards.occupied);
+  if (!blockers.isEmpty()) {
+    const indexOfFirstBlocker =
+      direction > 0 ? blockers.scanForward() : blockers.scanBackward();
+    return attacks.exclude(
+      SLIDER_ATTACKS[context.board.getCoordinates()[indexOfFirstBlocker]][
+        direction
+      ]
+    );
+  } else {
+    return attacks;
+  }
+};
+
 const getSlidingMoves = (
   context: MoveGeneratorContext,
   { piece, coord }: PiecePlacement
@@ -127,30 +159,24 @@ const getSlidingMoves = (
       ? NEIGHBORING_OFFSETS
       : [];
 
-  const squares = moveOffsets.flatMap((offset) => {
-    const potentialTargetSqaures = unfoldDirection(index, offset).map((index) =>
-      chessboard.getSquare(coordinates[index])
-    );
-    return takeWhile(potentialTargetSqaures, (square, index) => {
-      const squareNotOccupiedWithSameColoredPiece =
-        square.piece?.color !== piece.color;
+  const opponentOccupancy =
+    piece.color === 'white'
+      ? context.bitboards.blackOccupied
+      : context.bitboards.whiteOccupied;
+  const ownOccupancy =
+    piece.color === 'white'
+      ? context.bitboards.whiteOccupied
+      : context.bitboards.blackOccupied;
 
-      const previousSquare =
-        index !== 0 ? potentialTargetSqaures[index - 1] : undefined;
-      const previousSquareNotOccupiedWithDifferentColoredPiece =
-        !!previousSquare?.piece && previousSquare?.piece?.color !== piece.color;
+  const attacks = moveOffsets.reduce((attacksBoard, direction) => {
+    return attacksBoard.union(getRayAttacks(context, direction, coord));
+  }, Bitboard());
+  const legalMoves = attacks.exclude(ownOccupancy);
 
-      return (
-        squareNotOccupiedWithSameColoredPiece &&
-        !previousSquareNotOccupiedWithDifferentColoredPiece
-      );
-    });
-  });
-
-  const moves: Move[] = squares.map((square) => ({
+  const moves: Move[] = legalMoves.getIndices().map((squareIndex) => ({
     start: index,
-    target: chessboard.getIndex(square.coord),
-    capture: !!square.piece,
+    target: squareIndex,
+    capture: opponentOccupancy.isIndexSet(squareIndex),
   }));
 
   return moves;

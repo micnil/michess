@@ -213,4 +213,27 @@ describe('Bitboard', () => {
       expect(Bitboard(1n << 42n).getIndices()).toEqual([42]);
     });
   });
+
+  describe('intersection', () => {
+    it('returns a bitboard with only the bits set in both boards', () => {
+      // 0b10110
+      const boardA = Bitboard().setIndex(1).setIndex(2).setIndex(4);
+      // 0b11010
+      const boardB = Bitboard().setIndex(1).setIndex(3).setIndex(4);
+
+      const intersection = boardA.intersection(boardB);
+      expect(intersection.getIndices()).toEqual([1, 4]);
+    });
+    it('returns an empty bitboard if no bits overlap', () => {
+      const boardA = Bitboard().setIndex(0).setIndex(2);
+      const boardB = Bitboard().setIndex(1).setIndex(3);
+      const intersection = boardA.intersection(boardB);
+      expect(intersection.isEmpty()).toBe(true);
+    });
+    it('returns the same board if intersected with itself', () => {
+      const board = Bitboard().setIndex(5).setIndex(10);
+      const intersection = board.intersection(board);
+      expect(intersection.getIndices()).toEqual([5, 10]);
+    });
+  });
 });
