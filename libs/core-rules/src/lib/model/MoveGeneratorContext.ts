@@ -1,10 +1,11 @@
-import { Color, GameState } from '@michess/core-models';
+import { Color, Coordinate, GameState } from '@michess/core-models';
 import { ChessBitboard, Chessboard, IChessboard } from '@michess/core-state';
 
 export type MoveGeneratorContext = {
   board: IChessboard;
   bitboards: ChessBitboard;
   isTurn(color: Color): boolean;
+  enPassantCoord?: Coordinate;
 };
 
 const from = (gameState: GameState): MoveGeneratorContext => {
@@ -13,6 +14,7 @@ const from = (gameState: GameState): MoveGeneratorContext => {
   return {
     board,
     bitboards: chessbitboards,
+    enPassantCoord: gameState.enPassant,
     isTurn: (color) => gameState.turn === color,
   };
 };

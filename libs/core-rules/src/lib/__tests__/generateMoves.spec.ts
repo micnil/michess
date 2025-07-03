@@ -97,8 +97,7 @@ describe('generateMoves', () => {
       ]);
     });
 
-    // TODO
-    it.skip('can capture en passant', () => {
+    it('can capture en passant', () => {
       const context = MoveGeneratorContext.from(
         createGameStateMock({
           pieces: {
@@ -122,6 +121,7 @@ describe('generateMoves', () => {
           capture: true,
           start: 26,
           target: 19,
+          enPassant: true,
         },
       ]);
     });

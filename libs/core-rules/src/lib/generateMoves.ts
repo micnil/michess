@@ -316,6 +316,18 @@ const getMovesForPawn = (
     });
   }
 
+  if (context.enPassantCoord) {
+    const enPassantIndex = chessboard.getIndex(context.enPassantCoord);
+    if (enPassantIndex === captureIndex1 || enPassantIndex === captureIndex2) {
+      moves.push({
+        start: index,
+        target: enPassantIndex,
+        capture: true,
+        enPassant: true,
+      });
+    }
+  }
+
   return moves;
 };
 
