@@ -10,9 +10,25 @@ import { MoveGeneratorContext } from './model/MoveGeneratorContext';
 import { SQUARE_COORDINATES_WHITE } from 'libs/core-models/src/lib/constants/board';
 import { Bitboard } from '@michess/core-state';
 
-const DIAGONAL_OFFSETS = [7, -7, 9, -9];
-const VERTICAL_OFFSETS = [8, -8];
-const HORIZONTAL_OFFSETS = [1, -1];
+enum DirectionOffsets {
+  N = -8,
+  S = +8,
+  E = +1,
+  W = -1,
+  NE = -7,
+  SE = +9,
+  NW = -9,
+  SW = +7,
+}
+
+const DIAGONAL_OFFSETS = [
+  DirectionOffsets.NE,
+  DirectionOffsets.NW,
+  DirectionOffsets.SE,
+  DirectionOffsets.SW,
+];
+const VERTICAL_OFFSETS = [DirectionOffsets.N, DirectionOffsets.S];
+const HORIZONTAL_OFFSETS = [DirectionOffsets.E, DirectionOffsets.W];
 const ADJECENT_OFFSETS = [...VERTICAL_OFFSETS, ...HORIZONTAL_OFFSETS];
 const NEIGHBORING_OFFSETS = [...ADJECENT_OFFSETS, ...DIAGONAL_OFFSETS];
 
@@ -39,6 +55,29 @@ const chebyshevDistance = (startIndex: number, nextIndex: number) => {
     Math.abs(startFile - nextFile)
   );
 };
+
+type RayByDirection = Record<
+  'N' | 'S' | 'E' | 'W' | 'NE' | 'SE' | 'NW' | 'SW',
+  Bitboard
+>;
+type SlidingRaysByCoordinate = Record<Coordinate, RayByDirection>;
+
+const SLIDER_ATTACKS: SlidingRaysByCoordinate = Object.fromEntries(
+  SQUARE_COORDINATES_WHITE.map((coord, index) => {
+    const attacks: RayByDirection = {
+      N: Bitboard().setIndices(unfoldDirection(index, DirectionOffsets.N)),
+      S: Bitboard().setIndices(unfoldDirection(index, DirectionOffsets.S)),
+      E: Bitboard().setIndices(unfoldDirection(index, DirectionOffsets.E)),
+      W: Bitboard().setIndices(unfoldDirection(index, DirectionOffsets.W)),
+      NE: Bitboard().setIndices(unfoldDirection(index, DirectionOffsets.NE)),
+      SE: Bitboard().setIndices(unfoldDirection(index, DirectionOffsets.SE)),
+      NW: Bitboard().setIndices(unfoldDirection(index, DirectionOffsets.NW)),
+      SW: Bitboard().setIndices(unfoldDirection(index, DirectionOffsets.SW)),
+    };
+
+    return [coord, attacks];
+  })
+) as SlidingRaysByCoordinate;
 
 const KNIGHT_ATTACKS: Record<Coordinate, Bitboard> = Object.fromEntries(
   SQUARE_COORDINATES_WHITE.map((coord, index) => {
