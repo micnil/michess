@@ -20,6 +20,8 @@ export type ChessBitboard = {
   occupied: Bitboard;
   empty: Bitboard;
   getPieceAt: (coord: Coordinate) => Maybe<Piece>;
+  getOwnOccupancy: (color: Color) => Bitboard;
+  getOpponentOccupancy: (color: Color) => Bitboard;
 };
 
 export function ChessBitboard(placements?: PiecePlacements): ChessBitboard {
@@ -82,5 +84,9 @@ export function ChessBitboard(placements?: PiecePlacements): ChessBitboard {
       }
       return undefined;
     },
+    getOwnOccupancy: (color: Color) =>
+      color === 'white' ? whiteOccupied : blackOccupied,
+    getOpponentOccupancy: (color: Color) =>
+      color === 'white' ? blackOccupied : whiteOccupied,
   };
 }

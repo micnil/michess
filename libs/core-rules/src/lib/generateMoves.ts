@@ -175,10 +175,7 @@ const movesFromBitboard = (
   legalMoves: Bitboard
 ): Move[] => {
   const startIndex = context.board.getIndex(coord);
-  const opponentOccupancy =
-    piece.color === 'white'
-      ? context.bitboards.blackOccupied
-      : context.bitboards.whiteOccupied;
+  const opponentOccupancy = context.bitboards.getOpponentOccupancy(piece.color);
   return legalMoves.getIndices().map((targetIndex) => ({
     start: startIndex,
     target: targetIndex,
@@ -199,10 +196,7 @@ const getSlidingMoves = (
       ? NEIGHBORING_OFFSETS
       : [];
 
-  const ownOccupancy =
-    piece.color === 'white'
-      ? context.bitboards.whiteOccupied
-      : context.bitboards.blackOccupied;
+  const ownOccupancy = context.bitboards.getOwnOccupancy(piece.color);
 
   const attacks = moveOffsets.reduce((attacksBoard, direction) => {
     return attacksBoard.union(getRayAttacks(context, direction, coord));
@@ -237,10 +231,7 @@ const getMovesForKing = (
   context: MoveGeneratorContext,
   { coord, piece }: PiecePlacement
 ): Move[] => {
-  const ownOccupancy =
-    piece.color === 'white'
-      ? context.bitboards.whiteOccupied
-      : context.bitboards.blackOccupied;
+  const ownOccupancy = context.bitboards.getOwnOccupancy(piece.color);
   const kingAttacks = KING_ATTACKS[coord];
   const legalKingMoves = kingAttacks.exclude(ownOccupancy);
 
@@ -251,10 +242,7 @@ const getMovesForKnight = (
   context: MoveGeneratorContext,
   { coord, piece }: PiecePlacement
 ): Move[] => {
-  const ownOccupancy =
-    piece.color === 'white'
-      ? context.bitboards.whiteOccupied
-      : context.bitboards.blackOccupied;
+  const ownOccupancy = context.bitboards.getOwnOccupancy(piece.color);
   const legalKnightMoves = KNIGHT_ATTACKS[coord].exclude(ownOccupancy);
 
   return movesFromBitboard(context, { piece, coord }, legalKnightMoves);
@@ -281,10 +269,7 @@ const getMovesForPawn = (
     ? chessboard.getSquare(coordinates[twoStepIndex])
     : undefined;
 
-  const opponentOccupied =
-    piece.color === Color.White
-      ? context.bitboards.blackOccupied
-      : context.bitboards.whiteOccupied;
+  const opponentOccupied = context.bitboards.getOpponentOccupancy(piece.color);
   const pawnAttacks =
     PAWN_ATTACKS[coord][piece.color].intersection(opponentOccupied);
   const attackMoves = pawnAttacks.getIndices().map((captureIndex) => ({
