@@ -34,14 +34,6 @@ const NEIGHBORING_OFFSETS = [...ADJECENT_OFFSETS, ...DIAGONAL_OFFSETS];
 
 const KNIGHT_JUMP_OFFSETS = [15, 17, -17, -15, 10, -6, 6, -10];
 
-// type MoveTemp = {
-//   from: number;
-//   to: number;
-//   capture: boolean;
-//   promotion?: Pick<PieceType, 'q' | 'r' | 'b' | 'n'>;
-//   castle:  Pick<PieceType, 'q' | 'k'>;
-// }
-
 const withinBoard = (index: number): boolean => 0 <= index && index <= 63;
 
 const chebyshevDistance = (startIndex: number, nextIndex: number) => {
@@ -135,6 +127,27 @@ const KING_ATTACKS: Record<Coordinate, Bitboard> = Object.fromEntries(
     return [coord, attacks];
   })
 ) as Record<Coordinate, Bitboard>;
+
+const PAWN_ATTACKS: Record<
+  Coordinate,
+  Record<Color, Bitboard>
+> = Object.fromEntries(
+  BoardCoordinates.createWhite().map((coord, index) => {
+    const whiteAttacks = [index - 7, index - 9].filter(
+      (targetIndex) =>
+        withinBoard(targetIndex) && isNeighbors(index, targetIndex)
+    );
+    const blackAttacks = [index + 7, index + 9].filter(
+      (targetIndex) =>
+        withinBoard(targetIndex) && isNeighbors(index, targetIndex)
+    );
+    const attacks: Record<Color, Bitboard> = {
+      white: Bitboard().setIndices(whiteAttacks),
+      black: Bitboard().setIndices(blackAttacks),
+    };
+    return [coord, attacks];
+  })
+) as Record<Coordinate, Record<Color, Bitboard>>;
 
 const getRayAttacks = (
   context: MoveGeneratorContext,
@@ -252,7 +265,7 @@ const getMovesForPawn = (
   { coord, piece }: PiecePlacement
 ) => {
   const chessboard = context.board;
-  const index = chessboard.getIndex(coord);
+  const index = Coordinate.toIndex(coord);
   const coordinates = chessboard.getCoordinates();
 
   const direction = piece.color === Color.White ? -1 : +1;
@@ -268,22 +281,22 @@ const getMovesForPawn = (
     ? chessboard.getSquare(coordinates[twoStepIndex])
     : undefined;
 
-  const captureIndex1 = index + direction * 7;
-  const captureSquare1 =
-    withinBoard(captureIndex1) && isNeighbors(index, captureIndex1)
-      ? chessboard.getSquare(coordinates[captureIndex1])
-      : undefined;
-
-  const captureIndex2 = index + direction * 9;
-  const captureSquare2 =
-    withinBoard(captureIndex2) && isNeighbors(index, captureIndex2)
-      ? chessboard.getSquare(coordinates[captureIndex2])
-      : undefined;
+  const opponentOccupied =
+    piece.color === Color.White
+      ? context.bitboards.blackOccupied
+      : context.bitboards.whiteOccupied;
+  const pawnAttacks =
+    PAWN_ATTACKS[coord][piece.color].intersection(opponentOccupied);
+  const attackMoves = pawnAttacks.getIndices().map((captureIndex) => ({
+    start: index,
+    target: captureIndex,
+    capture: true,
+  }));
 
   const currentRank = (index - (index % 8)) / 8;
   const isStartPosition = currentRank === startRank;
 
-  const moves: Move[] = [];
+  const moves: Move[] = attackMoves;
   if (!oneStepSquare?.piece) {
     moves.push({
       start: index,
@@ -300,25 +313,9 @@ const getMovesForPawn = (
     });
   }
 
-  if (captureSquare1?.piece && captureSquare1.piece.color !== piece.color) {
-    moves.push({
-      start: index,
-      target: captureIndex1,
-      capture: true,
-    });
-  }
-
-  if (captureSquare2?.piece && captureSquare2.piece.color !== piece.color) {
-    moves.push({
-      start: index,
-      target: captureIndex2,
-      capture: true,
-    });
-  }
-
   if (context.enPassantCoord) {
-    const enPassantIndex = chessboard.getIndex(context.enPassantCoord);
-    if (enPassantIndex === captureIndex1 || enPassantIndex === captureIndex2) {
+    const enPassantIndex = Coordinate.toIndex(context.enPassantCoord);
+    if (PAWN_ATTACKS[coord][piece.color].isIndexSet(enPassantIndex)) {
       moves.push({
         start: index,
         target: enPassantIndex,

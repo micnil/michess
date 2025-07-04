@@ -89,18 +89,20 @@ describe('generateMoves', () => {
 
       const moves = generateMoves(context);
 
-      expect(moves).toEqual<Move[]>([
-        {
-          capture: false,
-          start: Coordinate.toIndex('c5'),
-          target: Coordinate.toIndex('c6'),
-        },
-        {
-          capture: true,
-          start: Coordinate.toIndex('c5'),
-          target: Coordinate.toIndex('d6'),
-        },
-      ]);
+      expect(moves).toEqual(
+        expect.arrayContaining<Move>([
+          {
+            capture: false,
+            start: Coordinate.toIndex('c5'),
+            target: Coordinate.toIndex('c6'),
+          },
+          {
+            capture: true,
+            start: Coordinate.toIndex('c5'),
+            target: Coordinate.toIndex('d6'),
+          },
+        ])
+      );
     });
 
     it('can capture en passant', () => {
