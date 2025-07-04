@@ -1,4 +1,10 @@
-import { Color, createGameStateMock, p, P } from '@michess/core-models';
+import {
+  Color,
+  createGameStateMock,
+  p,
+  P,
+  Coordinate,
+} from '@michess/core-models';
 import { Move } from '../model/Move';
 import { generateMoves } from '../generateMoves';
 import { MoveGeneratorContext } from '../model/MoveGeneratorContext';
@@ -19,8 +25,8 @@ describe('generateMoves', () => {
       expect(moves).toEqual<Move[]>([
         {
           capture: false,
-          start: 42,
-          target: 34,
+          start: Coordinate.toIndex('c3'),
+          target: Coordinate.toIndex('c4'),
         },
       ]);
     });
@@ -40,8 +46,8 @@ describe('generateMoves', () => {
       expect(moves).toEqual<Move[]>([
         {
           capture: false,
-          start: 42,
-          target: 50,
+          start: Coordinate.toIndex('c3'),
+          target: Coordinate.toIndex('c2'),
         },
       ]);
     });
@@ -60,13 +66,13 @@ describe('generateMoves', () => {
       expect(moves).toEqual<Move[]>([
         {
           capture: false,
-          start: 50,
-          target: 42,
+          start: Coordinate.toIndex('c2'),
+          target: Coordinate.toIndex('c3'),
         },
         {
           capture: false,
-          start: 50,
-          target: 34,
+          start: Coordinate.toIndex('c2'),
+          target: Coordinate.toIndex('c4'),
         },
       ]);
     });
@@ -86,13 +92,13 @@ describe('generateMoves', () => {
       expect(moves).toEqual<Move[]>([
         {
           capture: false,
-          start: 26,
-          target: 18,
+          start: Coordinate.toIndex('c5'),
+          target: Coordinate.toIndex('c6'),
         },
         {
           capture: true,
-          start: 26,
-          target: 19,
+          start: Coordinate.toIndex('c5'),
+          target: Coordinate.toIndex('d6'),
         },
       ]);
     });
@@ -114,14 +120,14 @@ describe('generateMoves', () => {
       expect(moves).toEqual<Move[]>([
         {
           capture: false,
-          start: 26,
-          target: 18,
+          start: Coordinate.toIndex('c5'),
+          target: Coordinate.toIndex('c6'),
         },
         {
+          // en-passant capture
           capture: true,
-          start: 26,
-          target: 19,
-          enPassant: true,
+          start: Coordinate.toIndex('c5'),
+          target: Coordinate.toIndex('d6'),
         },
       ]);
     });
@@ -151,12 +157,36 @@ describe('generateMoves', () => {
       expect(moves.length).toBe(27); // 7+7+7+6 (horizontal, vertical, diagonals)
       expect(moves).toEqual(
         expect.arrayContaining([
-          { start: 35, target: 27, capture: false }, // up
-          { start: 35, target: 43, capture: false }, // down
-          { start: 35, target: 34, capture: false }, // left
-          { start: 35, target: 36, capture: false }, // right
-          { start: 35, target: 28, capture: false }, // up-right
-          { start: 35, target: 42, capture: false }, // down-left
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('d5'),
+            capture: false,
+          }, // up
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('d3'),
+            capture: false,
+          }, // down
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('c4'),
+            capture: false,
+          }, // left
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('e4'),
+            capture: false,
+          }, // right
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('e5'),
+            capture: false,
+          }, // up-right
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('c3'),
+            capture: false,
+          }, // down-left
         ])
       );
     });
@@ -187,13 +217,25 @@ describe('generateMoves', () => {
       // Can capture d5, but not move past it; cannot move to d3 (own piece)
       expect(moves).toEqual(
         expect.arrayContaining([
-          { start: 35, target: 27, capture: true }, // capture black pawn at d5
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('d5'),
+            capture: true,
+          }, // capture black pawn at d5
         ])
       );
       expect(moves).not.toEqual(
         expect.arrayContaining([
-          { start: 35, target: 19, capture: false }, // cannot move past d5
-          { start: 35, target: 43, capture: false }, // cannot move to d3 (own piece)
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('d6'),
+            capture: false,
+          }, // cannot move past d5
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('d3'),
+            capture: false,
+          }, // cannot move to d3 (own piece)
         ])
       );
     });
@@ -220,7 +262,11 @@ describe('generateMoves', () => {
       const moves = generateMoves(context);
       expect(moves).toEqual(
         expect.arrayContaining([
-          { start: 35, target: 28, capture: true }, // capture on e5
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('e5'),
+            capture: true,
+          }, // capture on e5
         ])
       );
     });
@@ -248,14 +294,46 @@ describe('generateMoves', () => {
       const moves = generateMoves(context);
       expect(moves).toEqual(
         expect.arrayContaining([
-          { start: 35, target: 18, capture: false }, // b5
-          { start: 35, target: 20, capture: false }, // b3
-          { start: 35, target: 25, capture: false }, // c6
-          { start: 35, target: 29, capture: false }, // e6
-          { start: 35, target: 41, capture: false }, // c2
-          { start: 35, target: 45, capture: false }, // e2
-          { start: 35, target: 50, capture: false }, // f3
-          { start: 35, target: 52, capture: false }, // f5
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('b5'),
+            capture: false,
+          }, // b5
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('b3'),
+            capture: false,
+          }, // b3
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('c6'),
+            capture: false,
+          }, // c6
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('e6'),
+            capture: false,
+          }, // e6
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('c2'),
+            capture: false,
+          }, // c2
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('e2'),
+            capture: false,
+          }, // e2
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('f3'),
+            capture: false,
+          }, // f3
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('f5'),
+            capture: false,
+          }, // f5
         ])
       );
     });
@@ -283,8 +361,16 @@ describe('generateMoves', () => {
       const moves = generateMoves(context);
       expect(moves).toEqual(
         expect.arrayContaining([
-          { start: 35, target: 25, capture: true }, // capture on b5
-          { start: 35, target: 29, capture: true }, // capture on f5
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('b5'),
+            capture: true,
+          }, // capture on b5
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('f5'),
+            capture: true,
+          }, // capture on f5
         ])
       );
     });
@@ -313,8 +399,16 @@ describe('generateMoves', () => {
       // Should not include moves to b5 or f5
       expect(moves).not.toEqual(
         expect.arrayContaining([
-          { start: 35, target: 25, capture: false }, // b5
-          { start: 35, target: 29, capture: false }, // f5
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('b5'),
+            capture: false,
+          }, // b5
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('f5'),
+            capture: false,
+          }, // f5
         ])
       );
     });
@@ -342,14 +436,46 @@ describe('generateMoves', () => {
       const moves = generateMoves(context);
       expect(moves).toEqual(
         expect.arrayContaining<Move>([
-          { start: 35, target: 27, capture: false }, // up
-          { start: 35, target: 28, capture: false }, // up-right
-          { start: 35, target: 36, capture: false }, // right
-          { start: 35, target: 44, capture: false }, // down-right
-          { start: 35, target: 43, capture: false }, // down
-          { start: 35, target: 42, capture: false }, // down-left
-          { start: 35, target: 34, capture: false }, // left
-          { start: 35, target: 26, capture: false }, // up-left
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('c5'),
+            capture: false,
+          }, // up
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('e5'),
+            capture: false,
+          }, // up-right
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('e4'),
+            capture: false,
+          }, // right
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('d5'),
+            capture: false,
+          }, // down-right
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('d3'),
+            capture: false,
+          }, // down
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('c3'),
+            capture: false,
+          }, // down-left
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('c4'),
+            capture: false,
+          }, // left
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('c5'),
+            capture: false,
+          }, // up-left
         ])
       );
     });
@@ -377,8 +503,16 @@ describe('generateMoves', () => {
       const moves = generateMoves(context);
       expect(moves).toEqual(
         expect.arrayContaining<Move>([
-          { start: 35, target: 36, capture: true }, // capture on e4
-          { start: 35, target: 42, capture: true }, // capture on c3
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('e4'),
+            capture: true,
+          }, // capture on e4
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('c3'),
+            capture: true,
+          }, // capture on c3
         ])
       );
     });
@@ -407,8 +541,16 @@ describe('generateMoves', () => {
       // Should not include moves to e4 or e3
       expect(moves).not.toEqual(
         expect.arrayContaining<Move>([
-          { start: 35, target: 36, capture: false }, // e4
-          { start: 35, target: 44, capture: false }, // e3
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('e4'),
+            capture: false,
+          }, // e4
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('e3'),
+            capture: false,
+          }, // e3
         ])
       );
     });
