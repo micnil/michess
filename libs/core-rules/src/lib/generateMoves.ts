@@ -36,7 +36,7 @@ const KNIGHT_JUMP_OFFSETS = [15, 17, -17, -15, 10, -6, 6, -10];
 
 const withinBoard = (index: number): boolean => 0 <= index && index <= 63;
 
-const chebyshevDistance = (startIndex: number, nextIndex: number) => {
+const chebyshevDistance = (startIndex: number, nextIndex: number): number => {
   const startFile = startIndex % 8;
   const nextFile = nextIndex % 8;
   const startRank = (startIndex - startFile) / 8;
@@ -47,7 +47,7 @@ const chebyshevDistance = (startIndex: number, nextIndex: number) => {
     Math.abs(startFile - nextFile)
   );
 };
-const isNeighbors = (startIndex: number, nextIndex: number) => {
+const isNeighbors = (startIndex: number, nextIndex: number): boolean => {
   return chebyshevDistance(startIndex, nextIndex) <= 1;
 };
 
@@ -251,7 +251,7 @@ const getMovesForKnight = (
 const getMovesForPawn = (
   context: MoveGeneratorContext,
   { coord, piece }: PiecePlacement
-) => {
+): Move[] => {
   const chessboard = context.board;
   const index = Coordinate.toIndex(coord);
   const coordinates = chessboard.getCoordinates();
