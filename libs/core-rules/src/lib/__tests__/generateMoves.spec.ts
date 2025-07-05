@@ -133,6 +133,130 @@ describe('generateMoves', () => {
         },
       ]);
     });
+
+    it('promotes when moving 1 step forward to 8th rank as white', () => {
+      const context = MoveGeneratorContext.from(
+        createGameStateMock({
+          pieces: {
+            e7: P,
+          },
+          turn: Color.White,
+        })
+      );
+      const moves = generateMoves(context);
+
+      expect(moves).toEqual(
+        expect.arrayContaining([
+          {
+            capture: false,
+            start: Coordinate.toIndex('e7'),
+            target: Coordinate.toIndex('e8'),
+            promotion: 'q',
+          },
+          {
+            capture: false,
+            start: Coordinate.toIndex('e7'),
+            target: Coordinate.toIndex('e8'),
+            promotion: 'r',
+          },
+          {
+            capture: false,
+            start: Coordinate.toIndex('e7'),
+            target: Coordinate.toIndex('e8'),
+            promotion: 'b',
+          },
+          {
+            capture: false,
+            start: Coordinate.toIndex('e7'),
+            target: Coordinate.toIndex('e8'),
+            promotion: 'n',
+          },
+        ])
+      );
+    });
+
+    it('promotes when moving 1 step forward to 1st rank as black', () => {
+      const context = MoveGeneratorContext.from(
+        createGameStateMock({
+          pieces: {
+            d2: p,
+          },
+          turn: Color.Black,
+        })
+      );
+      const moves = generateMoves(context);
+      // Should include promotion moves to d1
+      expect(moves).toEqual(
+        expect.arrayContaining([
+          {
+            capture: false,
+            start: Coordinate.toIndex('d2'),
+            target: Coordinate.toIndex('d1'),
+            promotion: 'q',
+          },
+          {
+            capture: false,
+            start: Coordinate.toIndex('d2'),
+            target: Coordinate.toIndex('d1'),
+            promotion: 'r',
+          },
+          {
+            capture: false,
+            start: Coordinate.toIndex('d2'),
+            target: Coordinate.toIndex('d1'),
+            promotion: 'b',
+          },
+          {
+            capture: false,
+            start: Coordinate.toIndex('d2'),
+            target: Coordinate.toIndex('d1'),
+            promotion: 'n',
+          },
+        ])
+      );
+    });
+
+    it('promotes with capture on 8th rank as white', () => {
+      const context = MoveGeneratorContext.from(
+        createGameStateMock({
+          pieces: {
+            g7: P,
+            h8: p,
+          },
+          turn: Color.White,
+        })
+      );
+      const moves = generateMoves(context);
+      // Should include promotion capture moves to h8
+      expect(moves).toEqual(
+        expect.arrayContaining([
+          {
+            capture: true,
+            start: Coordinate.toIndex('g7'),
+            target: Coordinate.toIndex('h8'),
+            promotion: 'q',
+          },
+          {
+            capture: true,
+            start: Coordinate.toIndex('g7'),
+            target: Coordinate.toIndex('h8'),
+            promotion: 'r',
+          },
+          {
+            capture: true,
+            start: Coordinate.toIndex('g7'),
+            target: Coordinate.toIndex('h8'),
+            promotion: 'b',
+          },
+          {
+            capture: true,
+            start: Coordinate.toIndex('g7'),
+            target: Coordinate.toIndex('h8'),
+            promotion: 'n',
+          },
+        ])
+      );
+    });
   });
 
   describe('queen', () => {

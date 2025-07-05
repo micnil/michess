@@ -248,6 +248,8 @@ const getMovesForKnight = (
   return movesFromBitboard(context, { piece, coord }, legalKnightMoves);
 };
 
+const getRank = (index: number) => 8 - Math.floor(index / 8);
+
 const getMovesForPawn = (
   context: MoveGeneratorContext,
   { coord, piece }: PiecePlacement
@@ -258,6 +260,7 @@ const getMovesForPawn = (
 
   const direction = piece.color === Color.White ? -1 : +1;
   const startRank = piece.color === Color.White ? 6 : 1;
+  const promotionRank = piece.color === Color.White ? 8 : 1;
 
   const oneStepIndex = index + direction * 8;
   const oneStepSquare = withinBoard(oneStepIndex)
@@ -272,22 +275,42 @@ const getMovesForPawn = (
   const opponentOccupied = context.bitboards.getOpponentOccupancy(piece.color);
   const pawnAttacks =
     PAWN_ATTACKS[coord][piece.color].intersection(opponentOccupied);
-  const attackMoves = pawnAttacks.getIndices().map((captureIndex) => ({
-    start: index,
-    target: captureIndex,
-    capture: true,
-  }));
+  const attackMoves = pawnAttacks.getIndices().flatMap((captureIndex) => {
+    const attackMove = {
+      start: index,
+      target: captureIndex,
+      capture: true,
+    };
+    const isPromotion = getRank(captureIndex) === promotionRank;
+    return isPromotion
+      ? PieceType.promotionValues.map((piece) => ({
+          ...attackMove,
+          promotion: piece,
+        }))
+      : [attackMove];
+  });
 
   const currentRank = (index - (index % 8)) / 8;
   const isStartPosition = currentRank === startRank;
 
   const moves: Move[] = attackMoves;
   if (!oneStepSquare?.piece) {
-    moves.push({
+    const move: Move = {
       start: index,
       target: oneStepIndex,
       capture: false,
-    });
+    };
+    const isPromotion = getRank(oneStepIndex) === promotionRank;
+    if (isPromotion) {
+      moves.push(
+        ...PieceType.promotionValues.map((piece) => ({
+          ...move,
+          promotion: piece,
+        }))
+      );
+    } else {
+      moves.push(move);
+    }
   }
 
   if (isStartPosition && !oneStepSquare?.piece && !twoStepSquare?.piece) {

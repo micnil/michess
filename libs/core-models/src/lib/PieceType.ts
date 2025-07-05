@@ -14,6 +14,12 @@ export type PieceType = typeof PieceTypeEnum[keyof typeof PieceTypeEnum];
 export const PieceType = Object.freeze({
   ...PieceTypeEnum,
   allValues: Object.values(PieceTypeEnum),
+  promotionValues: [
+    PieceTypeEnum.Queen,
+    PieceTypeEnum.Rook,
+    PieceTypeEnum.Bishop,
+    PieceTypeEnum.Knight,
+  ],
   fromColoredPiece: (coloredPiece: ColoredPieceType): PieceType => {
     const pieceLetter = coloredPiece[coloredPiece.length - 1];
     switch (pieceLetter) {
