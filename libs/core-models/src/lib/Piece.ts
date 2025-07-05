@@ -6,9 +6,13 @@ export type Piece = {
   color: Color;
 };
 
-export const createPiece = (type: PieceType, color: Color): Piece => {
+const from = (type: PieceType, color: Color): Piece => {
   return {
     type,
     color,
   };
+};
+
+export const Piece = {
+  from,
 };

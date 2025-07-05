@@ -2,7 +2,6 @@ import {
   PiecePlacements,
   BoardState,
   Coordinate,
-  createPiece,
   Piece,
   PieceType,
 } from '@michess/core-models';
@@ -26,7 +25,7 @@ const pieceSquareFromLetter = (
   const pieceType = charToPieceType(char);
   const color = char === char.toLowerCase() ? 'black' : 'white';
   return {
-    piece: createPiece(pieceType, color),
+    piece: Piece.from(pieceType, color),
     coord,
   };
 };

@@ -2,6 +2,7 @@ import {
   Color,
   Coordinate,
   GameState,
+  Piece,
   PiecePlacements,
 } from '@michess/core-models';
 import { Chessboard } from '@michess/core-state';
@@ -43,6 +44,10 @@ const makeMove = (gameState: GameState, move: Move): GameState => {
     delete newPiecePlacements[
       oneStepBackFromCoordinate(gameState.enPassant, gameState.turn)
     ];
+  }
+
+  if (move.promotion && pieceToMove) {
+    newPiecePlacements[toCoord] = Piece.from(move.promotion, pieceToMove.color);
   }
 
   return {

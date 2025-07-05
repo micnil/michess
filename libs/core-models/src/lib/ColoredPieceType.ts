@@ -49,7 +49,7 @@ const blackPieceFrom = (piece: PieceType): ColoredPieceType => {
   }
 };
 
-export const fromPiece = (piece: Piece): ColoredPieceType => {
+const fromPiece = (piece: Piece): ColoredPieceType => {
   switch (piece.color) {
     case 'black':
       return blackPieceFrom(piece.type);
