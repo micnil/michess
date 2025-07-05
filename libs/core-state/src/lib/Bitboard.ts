@@ -13,6 +13,25 @@ const countBits = (board: bigint): number => {
   return count32(left32) + count32(right32);
 };
 
+const between = (board: bigint, start: Coordinate, end: Coordinate): bigint => {
+  // https://www.chessprogramming.org/Square_Attacked_By#Pure_Calculation
+  const m1 = -1n;
+  const a2a7 = 0x0001010101010100n;
+  const b2g7 = 0x0040201008040200n;
+  const h1b7 = 0x0002040810204080n;
+  const startIndex = Coordinate.toIndex(start);
+  const endIndex = Coordinate.toIndex(end);
+  const btwn = (m1 << BigInt(startIndex)) ^ (m1 << BigInt(endIndex));
+  const file = (BigInt(endIndex) & 7n) - (BigInt(startIndex) & 7n);
+  const rank = ((BigInt(endIndex) | 7n) - BigInt(startIndex)) >> 3n;
+  let line = ((file & 7n) - 1n) & a2a7;
+  line += 2n * (((rank & 7n) - 1n) >> 58n);
+  line += (((rank - file) & 15n) - 1n) & b2g7;
+  line += (((rank + file) & 15n) - 1n) & h1b7;
+  line *= btwn & -btwn;
+  return board | BigInt.asUintN(64, line & btwn);
+};
+
 /**
  * Returns the index (0-63) of the least significant set bit.
  * Returns -1 if board is 0n.
@@ -130,6 +149,7 @@ export type Bitboard = {
   isEmpty: () => boolean;
   getBitboardState: () => bigint;
   union: (other: Bitboard) => Bitboard;
+  between: (start: Coordinate, end: Coordinate) => Bitboard;
   exclude: (other: Bitboard) => Bitboard;
   invert: () => Bitboard;
   intersection: (other: Bitboard) => Bitboard;
@@ -158,6 +178,8 @@ export const Bitboard = (initialBoard?: bigint): Bitboard => {
     union: (other: Bitboard) => Bitboard(board | other.getBitboardState()),
     invert: () => Bitboard(invert(board)),
     exclude: (other: Bitboard) => Bitboard(board & ~other.getBitboardState()),
+    between: (start: Coordinate, end: Coordinate) =>
+      Bitboard(between(board, start, end)),
     intersection: (other: Bitboard) =>
       Bitboard(intersection(board, other.getBitboardState())),
     toString: () => bitboardToString(board),

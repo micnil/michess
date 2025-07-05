@@ -1,4 +1,5 @@
 import { Bitboard } from '../Bitboard';
+import { Coordinate } from '@michess/core-models';
 
 describe('Bitboard', () => {
   describe('constructor', () => {
@@ -234,6 +235,44 @@ describe('Bitboard', () => {
       const board = Bitboard().setIndex(5).setIndex(10);
       const intersection = board.intersection(board);
       expect(intersection.getIndices()).toEqual([5, 10]);
+    });
+  });
+
+  describe('between', () => {
+    it('returns all squares between two coordinates on the same file', () => {
+      const bb = Bitboard().between('a1', 'a4');
+      const indices = bb.getIndices();
+      expect(indices.sort((a, b) => a - b)).toEqual([
+        Coordinate.toIndex('a3'),
+        Coordinate.toIndex('a2'),
+      ]);
+    });
+    it('returns all squares between two coordinates on the same rank', () => {
+      // between b2 and e2 should be c2, d2
+      const bb = Bitboard().between('b2', 'e2');
+      const indices = bb.getIndices();
+      expect(indices.sort((a, b) => a - b)).toEqual([
+        Coordinate.toIndex('c2'),
+        Coordinate.toIndex('d2'),
+      ]);
+    });
+    it('returns all squares between two coordinates on the same diagonal', () => {
+      // between c1 and f4 should be d2, e3
+      const bb = Bitboard().between('c1', 'f4');
+      const indices = bb.getIndices();
+      expect(indices.sort((a, b) => a - b)).toEqual([
+        Coordinate.toIndex('e3'),
+        Coordinate.toIndex('d2'),
+      ]);
+    });
+    it('returns an empty bitboard if not aligned', () => {
+      // between a1 and b3 is not a straight line
+      const bb = Bitboard().between('a1', 'b3');
+      expect(bb.isEmpty()).toBe(true);
+    });
+    it('returns an empty bitboard if from == to', () => {
+      const bb = Bitboard().between('d4', 'd4');
+      expect(bb.isEmpty()).toBe(true);
     });
   });
 });
