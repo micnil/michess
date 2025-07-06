@@ -1,5 +1,6 @@
 import { Maybe } from '@michess/common-utils';
 import {
+  CastlingAbility,
   Color,
   Coordinate,
   Piece,
@@ -14,6 +15,12 @@ export type ChessBitboard = {
   };
   black: {
     [piece in PieceType]: Bitboard;
+  };
+  castlingPaths: {
+    [ability in CastlingAbility]: Bitboard;
+  };
+  castlingKingPaths: {
+    [ability in CastlingAbility]: Bitboard;
   };
   whiteOccupied: Bitboard;
   blackOccupied: Bitboard;
@@ -68,12 +75,42 @@ export function ChessBitboard(placements?: PiecePlacements): ChessBitboard {
   const occupiedBoard = whiteOccupied.union(blackOccupied);
   const empty = occupiedBoard.invert();
 
+  const castlingKingPaths: { [ability in CastlingAbility]: Bitboard } = {
+    [CastlingAbility.WhiteKing]: Bitboard().between('e1', 'g1'),
+    [CastlingAbility.WhiteQueen]: Bitboard().between('e1', 'c1'),
+    [CastlingAbility.BlackKing]: Bitboard().between('e8', 'g8'),
+    [CastlingAbility.BlackQueen]: Bitboard().between('e8', 'c8'),
+  };
+  const castlingRookPaths: { [ability in CastlingAbility]: Bitboard } = {
+    [CastlingAbility.WhiteKing]: Bitboard().between('h1', 'f1'),
+    [CastlingAbility.WhiteQueen]: Bitboard().between('a1', 'd1'),
+    [CastlingAbility.BlackKing]: Bitboard().between('h8', 'f8'),
+    [CastlingAbility.BlackQueen]: Bitboard().between('a8', 'd8'),
+  };
+
   return {
     ...bitboards,
     occupied: occupiedBoard,
     whiteOccupied,
     blackOccupied,
     empty,
+    // Castling path for the king can not be in check for castling to be legal
+    castlingKingPaths,
+    // For castling path needs to be unoccipied for castling to be legal
+    castlingPaths: {
+      [CastlingAbility.WhiteKing]: castlingRookPaths[
+        CastlingAbility.WhiteKing
+      ].union(castlingKingPaths[CastlingAbility.WhiteKing]),
+      [CastlingAbility.WhiteQueen]: castlingRookPaths[
+        CastlingAbility.WhiteQueen
+      ].union(castlingKingPaths[CastlingAbility.WhiteQueen]),
+      [CastlingAbility.BlackKing]: castlingRookPaths[
+        CastlingAbility.BlackKing
+      ].union(castlingKingPaths[CastlingAbility.BlackKing]),
+      [CastlingAbility.BlackQueen]: castlingRookPaths[
+        CastlingAbility.BlackQueen
+      ].union(castlingKingPaths[CastlingAbility.BlackQueen]),
+    },
     getPieceAt: (coord: Coordinate): Maybe<Piece> => {
       for (const color of colors) {
         for (const pieceType of pieces) {

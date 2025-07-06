@@ -248,7 +248,6 @@ describe('Bitboard', () => {
       ]);
     });
     it('returns all squares between two coordinates on the same rank', () => {
-      // between b2 and e2 should be c2, d2
       const bb = Bitboard().between('b2', 'e2');
       const indices = bb.getIndices();
       expect(indices.sort((a, b) => a - b)).toEqual([
@@ -257,7 +256,6 @@ describe('Bitboard', () => {
       ]);
     });
     it('returns all squares between two coordinates on the same diagonal', () => {
-      // between c1 and f4 should be d2, e3
       const bb = Bitboard().between('c1', 'f4');
       const indices = bb.getIndices();
       expect(indices.sort((a, b) => a - b)).toEqual([
@@ -266,7 +264,6 @@ describe('Bitboard', () => {
       ]);
     });
     it('returns an empty bitboard if not aligned', () => {
-      // between a1 and b3 is not a straight line
       const bb = Bitboard().between('a1', 'b3');
       expect(bb.isEmpty()).toBe(true);
     });
