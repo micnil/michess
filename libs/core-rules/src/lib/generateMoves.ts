@@ -406,10 +406,45 @@ const getMovesFromSquare = (
 };
 
 export const generateMoves = (context: MoveGeneratorContext): Move[] => {
-  return context.board
+  const attackers = getAttackedSquares(
+    context,
+    context.isTurn(Color.White) ? Color.Black : Color.White
+  );
+  const moves = context.board
     .getPiecePlacements()
     .filter((piecePlacement) => context.isTurn(piecePlacement.piece.color))
     .flatMap((piecePlacement) => {
       return getMovesFromSquare(context, piecePlacement);
     });
+
+  // Castling moves
+  context.castlingRights.flatMap((right) => {
+    const castlingPaths = context.bitboards.castlingPaths[context.turn][right];
+    const castlingKingPaths =
+      context.bitboards.castlingKingPaths[context.turn][right];
+    const isCastlingPathClear = castlingPaths
+      .intersection(context.bitboards.occupied)
+      .isEmpty();
+    const isKingPathNotAttacked = castlingKingPaths
+      .intersection(attackers)
+      .isEmpty();
+    const isKingNotInCheck = context.bitboards[context.turn][PieceType.King]
+      .getLowestSetBit()
+      .intersection(attackers)
+      .isEmpty();
+    if (isCastlingPathClear && isKingPathNotAttacked && isKingNotInCheck) {
+      const kingIndex = context.bitboards[context.turn][PieceType.King]
+        .getLowestSetBit()
+        .value();
+      const rookIndex = castlingPaths.getLowestSetBit().value();
+      const targetIndex = right === 'KingSide' ? kingIndex + 2 : kingIndex - 2;
+      moves.push({
+        start: kingIndex,
+        target: Coordinate.toIndex(),
+        capture: false,
+        castling: right,
+      });
+    }
+  });
+  return moves;
 };

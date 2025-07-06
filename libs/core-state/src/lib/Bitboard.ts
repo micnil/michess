@@ -158,11 +158,12 @@ export type Bitboard = {
   invert: () => Bitboard;
   intersection: (other: Bitboard) => Bitboard;
   toString: () => string;
-  getLowestSetBit: () => bigint;
-  getHighestSetBit: () => bigint;
+  getLowestSetBit: () => Bitboard;
+  getHighestSetBit: () => Bitboard;
   getIndices: () => number[];
   getCoordinates: () => Coordinate[];
   leftShift: (shift: number) => Bitboard;
+  value: () => bigint;
 };
 
 export const Bitboard = (initialBoard?: bigint): Bitboard => {
@@ -189,12 +190,13 @@ export const Bitboard = (initialBoard?: bigint): Bitboard => {
     intersection: (other: Bitboard) =>
       Bitboard(intersection(board, other.getBitboardState())),
     toString: () => bitboardToString(board),
-    getLowestSetBit: () => getLowestSetBit(board),
-    getHighestSetBit: () => getHighestSetBit(board),
+    getLowestSetBit: () => Bitboard(getLowestSetBit(board)),
+    getHighestSetBit: () => Bitboard(getHighestSetBit(board)),
     getIndices: () => getIndices(board),
     getCoordinates: () => {
       return getIndices(board).map((index) => Coordinate.fromIndex(index));
     },
     leftShift: (shift: number) => Bitboard(leftShift(board, shift)),
+    value: () => board,
   };
 };

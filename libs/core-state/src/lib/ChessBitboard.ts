@@ -1,6 +1,7 @@
 import { Maybe } from '@michess/common-utils';
 import {
   CastlingAbility,
+  CastlingRights,
   Color,
   Coordinate,
   Piece,
@@ -17,10 +18,14 @@ export type ChessBitboard = {
     [piece in PieceType]: Bitboard;
   };
   castlingPaths: {
-    [ability in CastlingAbility]: Bitboard;
+    [color in Color]: {
+      [right in CastlingRights]: Bitboard;
+    };
   };
   castlingKingPaths: {
-    [ability in CastlingAbility]: Bitboard;
+    [color in Color]: {
+      [right in CastlingRights]: Bitboard;
+    };
   };
   whiteOccupied: Bitboard;
   blackOccupied: Bitboard;
@@ -95,21 +100,36 @@ export function ChessBitboard(placements?: PiecePlacements): ChessBitboard {
     blackOccupied,
     empty,
     // Castling path for the king can not be in check for castling to be legal
-    castlingKingPaths,
+    castlingKingPaths: {
+      [Color.White]: {
+        [CastlingRights.KingSide]: castlingKingPaths[CastlingAbility.WhiteKing],
+        [CastlingRights.QueenSide]:
+          castlingKingPaths[CastlingAbility.WhiteQueen],
+      },
+      [Color.Black]: {
+        [CastlingRights.KingSide]: castlingKingPaths[CastlingAbility.BlackKing],
+        [CastlingRights.QueenSide]:
+          castlingKingPaths[CastlingAbility.BlackQueen],
+      },
+    },
     // For castling path needs to be unoccipied for castling to be legal
     castlingPaths: {
-      [CastlingAbility.WhiteKing]: castlingRookPaths[
-        CastlingAbility.WhiteKing
-      ].union(castlingKingPaths[CastlingAbility.WhiteKing]),
-      [CastlingAbility.WhiteQueen]: castlingRookPaths[
-        CastlingAbility.WhiteQueen
-      ].union(castlingKingPaths[CastlingAbility.WhiteQueen]),
-      [CastlingAbility.BlackKing]: castlingRookPaths[
-        CastlingAbility.BlackKing
-      ].union(castlingKingPaths[CastlingAbility.BlackKing]),
-      [CastlingAbility.BlackQueen]: castlingRookPaths[
-        CastlingAbility.BlackQueen
-      ].union(castlingKingPaths[CastlingAbility.BlackQueen]),
+      [Color.White]: {
+        [CastlingRights.KingSide]: castlingRookPaths[
+          CastlingAbility.WhiteKing
+        ].union(castlingKingPaths[CastlingAbility.WhiteKing]),
+        [CastlingRights.QueenSide]: castlingRookPaths[
+          CastlingAbility.WhiteQueen
+        ].union(castlingKingPaths[CastlingAbility.WhiteQueen]),
+      },
+      [Color.Black]: {
+        [CastlingRights.KingSide]: castlingRookPaths[
+          CastlingAbility.BlackKing
+        ].union(castlingKingPaths[CastlingAbility.BlackKing]),
+        [CastlingRights.QueenSide]: castlingRookPaths[
+          CastlingAbility.BlackQueen
+        ].union(castlingKingPaths[CastlingAbility.BlackQueen]),
+      },
     },
     getPieceAt: (coord: Coordinate): Maybe<Piece> => {
       for (const color of colors) {

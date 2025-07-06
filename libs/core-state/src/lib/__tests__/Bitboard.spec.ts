@@ -135,15 +135,15 @@ describe('Bitboard', () => {
   describe('getLowestSetBit', () => {
     it('returns the lowest set bit when multiple bits are set', () => {
       const board = Bitboard(72n);
-      expect(board.getLowestSetBit()).toBe(8n); // 0b1000 (bit 3)
+      expect(board.getLowestSetBit().value()).toBe(8n); // 0b1000 (bit 3)
     });
 
     it('returns the bit itself when only one bit is set', () => {
-      expect(Bitboard(1024n).getLowestSetBit()).toBe(1024n);
+      expect(Bitboard(1024n).getLowestSetBit().value()).toBe(1024n);
     });
 
     it('returns 0n when no bits are set', () => {
-      expect(Bitboard(0n).getLowestSetBit()).toBe(0n);
+      expect(Bitboard(0n).getLowestSetBit().value()).toBe(0n);
     });
   });
 
@@ -151,20 +151,24 @@ describe('Bitboard', () => {
     it('returns the highest set bit when multiple bits are set', () => {
       // 0b1001000... (bits 3 and 6 set)
       const board = Bitboard(72n);
-      expect(board.getHighestSetBit()).toBe(64n); // 0b1000000 (bit 6)
+      expect(board.getHighestSetBit().value()).toBe(64n); // 0b1000000 (bit 6)
     });
 
     it('returns the bit itself when only one bit is set', () => {
-      expect(Bitboard(1024n).getHighestSetBit()).toBe(1024n);
+      expect(Bitboard(1024n).getHighestSetBit().value()).toBe(1024n);
     });
 
     it('returns 0n when no bits are set', () => {
-      expect(Bitboard(0n).getHighestSetBit()).toBe(0n);
+      expect(Bitboard(0n).getHighestSetBit().value()).toBe(0n);
     });
 
     it('returns the highest bit for a large number', () => {
       // 0b100...0 (bit 63 set)
-      expect(Bitboard(1n << 63n).getHighestSetBit()).toBe(1n << 63n);
+      expect(
+        Bitboard(1n << 63n)
+          .getHighestSetBit()
+          .value()
+      ).toBe(1n << 63n);
     });
   });
 
