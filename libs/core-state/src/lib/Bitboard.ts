@@ -135,6 +135,10 @@ const bitboardToString = (board: bigint): string => {
 
 const intersection = (a: bigint, b: bigint): bigint => a & b;
 
+const leftShift = (board: bigint, shift: number): bigint => {
+  return (board << BigInt(shift)) & ((1n << 64n) - 1n);
+};
+
 export type Bitboard = {
   countBits: () => number;
   scanForward: () => number;
@@ -157,6 +161,8 @@ export type Bitboard = {
   getLowestSetBit: () => bigint;
   getHighestSetBit: () => bigint;
   getIndices: () => number[];
+  getCoordinates: () => Coordinate[];
+  leftShift: (shift: number) => Bitboard;
 };
 
 export const Bitboard = (initialBoard?: bigint): Bitboard => {
@@ -186,5 +192,9 @@ export const Bitboard = (initialBoard?: bigint): Bitboard => {
     getLowestSetBit: () => getLowestSetBit(board),
     getHighestSetBit: () => getHighestSetBit(board),
     getIndices: () => getIndices(board),
+    getCoordinates: () => {
+      return getIndices(board).map((index) => Coordinate.fromIndex(index));
+    },
+    leftShift: (shift: number) => Bitboard(leftShift(board, shift)),
   };
 };

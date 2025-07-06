@@ -2,6 +2,7 @@ import {
   BoardCoordinates,
   Color,
   Coordinate,
+  Piece,
   PiecePlacement,
   PieceType,
 } from '@michess/core-models';
@@ -33,6 +34,8 @@ const ADJECENT_OFFSETS = [...VERTICAL_OFFSETS, ...HORIZONTAL_OFFSETS];
 const NEIGHBORING_OFFSETS = [...ADJECENT_OFFSETS, ...DIAGONAL_OFFSETS];
 
 const KNIGHT_JUMP_OFFSETS = [15, 17, -17, -15, 10, -6, 6, -10];
+const aFileBb = Bitboard().between('a1', 'a8');
+const hFileBb = Bitboard().between('h1', 'h8');
 
 const withinBoard = (index: number): boolean => 0 <= index && index <= 63;
 
@@ -183,10 +186,10 @@ const movesFromBitboard = (
   }));
 };
 
-const getSlidingMoves = (
+const getSlidingAttacks = (
   context: MoveGeneratorContext,
   { piece, coord }: PiecePlacement
-): Move[] => {
+): Bitboard => {
   const moveOffsets =
     piece.type === PieceType.Bishop
       ? DIAGONAL_OFFSETS
@@ -195,14 +198,18 @@ const getSlidingMoves = (
       : piece.type === PieceType.Queen
       ? NEIGHBORING_OFFSETS
       : [];
-
-  const ownOccupancy = context.bitboards.getOwnOccupancy(piece.color);
-
-  const attacks = moveOffsets.reduce((attacksBoard, direction) => {
+  return moveOffsets.reduce((attacksBoard, direction) => {
     return attacksBoard.union(getRayAttacks(context, direction, coord));
   }, Bitboard());
-  const legalMoves = attacks.exclude(ownOccupancy);
+};
 
+const getSlidingMoves = (
+  context: MoveGeneratorContext,
+  { piece, coord }: PiecePlacement
+): Move[] => {
+  const ownOccupancy = context.bitboards.getOwnOccupancy(piece.color);
+  const attacks = getSlidingAttacks(context, { piece, coord });
+  const legalMoves = attacks.exclude(ownOccupancy);
   return movesFromBitboard(context, { piece, coord }, legalMoves);
 };
 
@@ -333,6 +340,47 @@ const getMovesForPawn = (
   }
 
   return moves;
+};
+
+const getAttackedSquares = (
+  context: MoveGeneratorContext,
+  color: Color
+): Bitboard => {
+  const pieceBitboards = context.bitboards[color];
+  const knightAttacks = pieceBitboards[PieceType.Knight]
+    .getCoordinates()
+    .reduce((attacks, coordinate) => {
+      return attacks.union(KNIGHT_ATTACKS[coordinate]);
+    }, Bitboard());
+  const kingAttacks =
+    KING_ATTACKS[
+      Coordinate.fromIndex(pieceBitboards[PieceType.King].scanForward())
+    ];
+  const pawnAttacksWest = pieceBitboards[PieceType.Pawn]
+    .leftShift(7)
+    .exclude(aFileBb);
+  const pawnAttacksEast = pieceBitboards[PieceType.Pawn]
+    .leftShift(9)
+    .exclude(hFileBb);
+  const pawnAttacks = pawnAttacksWest.union(pawnAttacksEast);
+  const sliders = [PieceType.Bishop, PieceType.Rook, PieceType.Queen];
+  const sliderAttacks = sliders.reduce((attacks, piece) => {
+    const slidingPieceAttacks = pieceBitboards[piece]
+      .getCoordinates()
+      .reduce((attacks, coordinate) => {
+        return attacks.union(
+          getSlidingAttacks(context, {
+            piece: Piece.from(piece, color),
+            coord: coordinate,
+          })
+        );
+      }, Bitboard());
+    return attacks.union(slidingPieceAttacks);
+  }, Bitboard());
+  return knightAttacks
+    .union(kingAttacks)
+    .union(pawnAttacks)
+    .union(sliderAttacks);
 };
 
 const getMovesFromSquare = (
