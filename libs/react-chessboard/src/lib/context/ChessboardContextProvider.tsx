@@ -15,14 +15,14 @@ type Props<TMoveMeta = unknown> = {
   children: ReactNode;
 };
 
-export const ChessboardContextProvider: React.FC<Props> = ({
+export const ChessboardContextProvider = <TMoveMeta,>({
   children,
   orientation = 'white',
   startingFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
   onMove,
   piecePlacements,
   moveOptions,
-}) => {
+}: Props<TMoveMeta>) => {
   const [chessboard, setChessboard] = useState<IChessboard>(() =>
     Chessboard(boardStateFromFen(startingFen))
   );
@@ -33,7 +33,7 @@ export const ChessboardContextProvider: React.FC<Props> = ({
     ? Chessboard({ pieces: piecePlacements, orientation }) // Consumer owned
     : chessboard; // Internally owned
 
-  const movePiece = useCallback((payload: MovePayload) => {
+  const movePiece = useCallback((payload: MovePayload<TMoveMeta>) => {
     onMoveRef.current?.(payload);
     setChessboard((prevChessboard) => {
       return prevChessboard.movePiece(payload);
@@ -44,7 +44,7 @@ export const ChessboardContextProvider: React.FC<Props> = ({
     <ChessboardContext.Provider
       value={{
         chessboard: contextChessboard,
-        movePiece,
+        movePiece: movePiece as (payload: MovePayload<unknown>) => void,
         moveOptionsMap: moveOptions
           ? MoveOptionsMap.fromMoveOptions(moveOptions)
           : undefined,

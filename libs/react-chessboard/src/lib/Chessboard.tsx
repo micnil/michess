@@ -13,13 +13,13 @@ type Props<TMoveMeta = unknown> = {
   moveOptions?: MoveOptions<TMoveMeta>;
   onMove?: (move: MovePayload<TMoveMeta>) => void;
 };
-export const Chessboard: FC<Props> = ({
+export const Chessboard = <TMoveMeta,>({
   orientation,
   size = 500,
   moveOptions,
   piecePlacements,
   onMove,
-}) => {
+}: Props<TMoveMeta>) => {
   return (
     <ChessboardContextProvider
       orientation={orientation}

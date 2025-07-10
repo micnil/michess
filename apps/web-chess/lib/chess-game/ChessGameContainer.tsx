@@ -25,16 +25,18 @@ export const ChessGameContainer = () => {
   );
 
   return (
-    <ChessboardView
+    <ChessboardView<Move>
       orientation={chessGame.getState().orientation}
       size={500}
       piecePlacements={chessGame.getState().pieces}
-      onMove={(move) => {
-        setChessGame(chessGame.makeMove(uiMoveToCoreMove(chessGame, move)));
+      onMove={(movePayload) => {
+        console.log(movePayload);
+        setChessGame(chessGame.makeMove(movePayload.meta));
       }}
       moveOptions={chessGame.getMoves().map((move) => ({
         from: chessGame.getCoordinates()[move.start],
         to: chessGame.getCoordinates()[move.target],
+        meta: move,
       }))}
     />
   );

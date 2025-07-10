@@ -43,22 +43,22 @@ export const SquareView: React.FC<Props> = ({
   size,
 }) => {
   const { movePiece } = useChessboardContext();
+  const { state } = useDragDropContext();
+  const moveOptions = useMoveOptions(state.draggingId as Coordinate);
+  const canMoveHere = canMoveTo(moveOptions, coordinate);
   const handleDrop = (draggableId: string) => {
-    if (canMoveHere) {
-      console.debug(`moving from ${draggableId} to coordinate ${coordinate}`);
-      movePiece({ from: draggableId as Coordinate, to: coordinate });
+    const move = moveOptions?.find((option) => option.to === coordinate);
+    if (move) {
+      console.debug(`moving from ${draggableId} to coordinate ${move.to}`);
+      movePiece(move);
     }
   };
 
-  const { state } = useDragDropContext();
   const { register, isHovering } = useDrop({
     id: coordinate,
     onDrop: handleDrop,
   });
 
-  const moveOptions = useMoveOptions(state.draggingId as Coordinate);
-
-  const canMoveHere = canMoveTo(moveOptions, coordinate);
   const higlightSquare =
     (!!moveOptions && canMoveHere) || (isHovering && canMoveHere);
 
