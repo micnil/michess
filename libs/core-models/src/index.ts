@@ -10,7 +10,7 @@ export * from './lib/SquareState';
 export * from './lib/CastlingAbility';
 export * from './lib/BoardCoordinates';
 export * from './lib/PiecePlacement';
-export * from './lib/CastlingRights';
+export * from './lib/CastlingRight';
 export * from './lib/mocks/PiecePlacements.mock';
 export * from './lib/mocks/Piece.mock';
 export * from './lib/mocks/BoardState.mock';

@@ -1,5 +1,6 @@
 import {
   BoardCoordinates,
+  CastlingRight,
   Color,
   Coordinate,
   Piece,
@@ -10,6 +11,7 @@ import { Move } from './model/Move';
 import { MoveGeneratorContext } from './model/MoveGeneratorContext';
 
 import { Bitboard } from '@michess/core-state';
+import { isDefined, Maybe } from '@michess/common-utils';
 
 enum DirectionOffset {
   N = -8,
@@ -418,33 +420,38 @@ export const generateMoves = (context: MoveGeneratorContext): Move[] => {
     });
 
   // Castling moves
-  context.castlingRights.flatMap((right) => {
-    const castlingPaths = context.bitboards.castlingPaths[context.turn][right];
-    const castlingKingPaths =
-      context.bitboards.castlingKingPaths[context.turn][right];
-    const isCastlingPathClear = castlingPaths
-      .intersection(context.bitboards.occupied)
-      .isEmpty();
-    const isKingPathNotAttacked = castlingKingPaths
-      .intersection(attackers)
-      .isEmpty();
-    const isKingNotInCheck = context.bitboards[context.turn][PieceType.King]
-      .getLowestSetBit()
-      .intersection(attackers)
-      .isEmpty();
-    if (isCastlingPathClear && isKingPathNotAttacked && isKingNotInCheck) {
-      const kingIndex = context.bitboards[context.turn][PieceType.King]
+  const castlingMoves: Move[] = context.castlingRights
+    .map((right) => {
+      const castlingPath = context.bitboards.castlingPaths[context.turn][right];
+      const castlingKingPath =
+        context.bitboards.castlingKingPaths[context.turn][right];
+      const isCastlingPathClear = castlingPath
+        .intersection(context.bitboards.occupied)
+        .isEmpty();
+      const isKingPathNotAttacked = castlingKingPath
+        .intersection(attackers)
+        .isEmpty();
+      const isKingNotInCheck = context.bitboards[context.turn][PieceType.King]
         .getLowestSetBit()
-        .value();
-      const rookIndex = castlingPaths.getLowestSetBit().value();
-      const targetIndex = right === 'KingSide' ? kingIndex + 2 : kingIndex - 2;
-      moves.push({
-        start: kingIndex,
-        target: Coordinate.toIndex(),
-        capture: false,
-        castling: right,
-      });
-    }
-  });
+        .intersection(attackers)
+        .isEmpty();
+      if (isCastlingPathClear && isKingPathNotAttacked && isKingNotInCheck) {
+        const kingIndex =
+          context.bitboards[context.turn][PieceType.King].scanForward();
+        const targetIndex =
+          right === CastlingRight.KingSide ? kingIndex + 2 : kingIndex - 2;
+        return {
+          start: kingIndex,
+          target: targetIndex,
+          capture: false,
+          castling: right,
+        };
+      } else {
+        return undefined;
+      }
+    })
+    .filter(isDefined);
+
+  moves.push(...castlingMoves);
   return moves;
 };

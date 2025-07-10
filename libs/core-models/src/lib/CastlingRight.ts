@@ -1,4 +1,4 @@
-export enum CastlingRights {
+export enum CastlingRight {
   KingSide = 'KingSide',
   QueenSide = 'QueenSide',
 }

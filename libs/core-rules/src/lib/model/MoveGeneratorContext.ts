@@ -1,6 +1,6 @@
 import {
   CastlingAbility,
-  CastlingRights,
+  CastlingRight,
   Color,
   Coordinate,
   GameState,
@@ -13,7 +13,7 @@ export type MoveGeneratorContext = {
   turn: Color;
   isTurn(color: Color): boolean;
   enPassantCoord?: Coordinate;
-  castlingRights: CastlingRights[];
+  castlingRights: CastlingRight[];
 };
 
 const from = (gameState: GameState): MoveGeneratorContext => {

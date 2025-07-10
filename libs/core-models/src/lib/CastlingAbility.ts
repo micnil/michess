@@ -1,4 +1,4 @@
-import { CastlingRights } from './CastlingRights';
+import { CastlingRight } from './CastlingRight';
 import { Color } from './Color';
 
 const CastlingAbilityEnum = {
@@ -19,16 +19,16 @@ const BLACK_CASTLING_ABILITIES: CastlingAbility[] = [
   CastlingAbilityEnum.BlackKing,
   CastlingAbilityEnum.BlackQueen,
 ];
-const toCastingRights = (ability: CastlingAbility): CastlingRights => {
+const toCastingRights = (ability: CastlingAbility): CastlingRight => {
   switch (ability) {
     case CastlingAbilityEnum.WhiteKing:
-      return CastlingRights.KingSide;
+      return CastlingRight.KingSide;
     case CastlingAbilityEnum.WhiteQueen:
-      return CastlingRights.QueenSide;
+      return CastlingRight.QueenSide;
     case CastlingAbilityEnum.BlackKing:
-      return CastlingRights.KingSide;
+      return CastlingRight.KingSide;
     case CastlingAbilityEnum.BlackQueen:
-      return CastlingRights.QueenSide;
+      return CastlingRight.QueenSide;
     default:
       throw new Error(`Unknown castling ability: ${ability}`);
   }

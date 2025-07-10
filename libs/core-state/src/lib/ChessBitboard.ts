@@ -1,7 +1,7 @@
 import { Maybe } from '@michess/common-utils';
 import {
   CastlingAbility,
-  CastlingRights,
+  CastlingRight,
   Color,
   Coordinate,
   Piece,
@@ -19,12 +19,12 @@ export type ChessBitboard = {
   };
   castlingPaths: {
     [color in Color]: {
-      [right in CastlingRights]: Bitboard;
+      [right in CastlingRight]: Bitboard;
     };
   };
   castlingKingPaths: {
     [color in Color]: {
-      [right in CastlingRights]: Bitboard;
+      [right in CastlingRight]: Bitboard;
     };
   };
   whiteOccupied: Bitboard;
@@ -102,31 +102,31 @@ export function ChessBitboard(placements?: PiecePlacements): ChessBitboard {
     // Castling path for the king can not be in check for castling to be legal
     castlingKingPaths: {
       [Color.White]: {
-        [CastlingRights.KingSide]: castlingKingPaths[CastlingAbility.WhiteKing],
-        [CastlingRights.QueenSide]:
+        [CastlingRight.KingSide]: castlingKingPaths[CastlingAbility.WhiteKing],
+        [CastlingRight.QueenSide]:
           castlingKingPaths[CastlingAbility.WhiteQueen],
       },
       [Color.Black]: {
-        [CastlingRights.KingSide]: castlingKingPaths[CastlingAbility.BlackKing],
-        [CastlingRights.QueenSide]:
+        [CastlingRight.KingSide]: castlingKingPaths[CastlingAbility.BlackKing],
+        [CastlingRight.QueenSide]:
           castlingKingPaths[CastlingAbility.BlackQueen],
       },
     },
     // For castling path needs to be unoccipied for castling to be legal
     castlingPaths: {
       [Color.White]: {
-        [CastlingRights.KingSide]: castlingRookPaths[
+        [CastlingRight.KingSide]: castlingRookPaths[
           CastlingAbility.WhiteKing
         ].union(castlingKingPaths[CastlingAbility.WhiteKing]),
-        [CastlingRights.QueenSide]: castlingRookPaths[
+        [CastlingRight.QueenSide]: castlingRookPaths[
           CastlingAbility.WhiteQueen
         ].union(castlingKingPaths[CastlingAbility.WhiteQueen]),
       },
       [Color.Black]: {
-        [CastlingRights.KingSide]: castlingRookPaths[
+        [CastlingRight.KingSide]: castlingRookPaths[
           CastlingAbility.BlackKing
         ].union(castlingKingPaths[CastlingAbility.BlackKing]),
-        [CastlingRights.QueenSide]: castlingRookPaths[
+        [CastlingRight.QueenSide]: castlingRookPaths[
           CastlingAbility.BlackQueen
         ].union(castlingKingPaths[CastlingAbility.BlackQueen]),
       },
