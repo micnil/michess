@@ -357,7 +357,7 @@ const getAttackedSquares = (
   const kingAttacks =
     KING_ATTACKS[
       Coordinate.fromIndex(pieceBitboards[PieceType.King].scanForward())
-    ];
+    ] ?? Bitboard();
   const pawnAttacksWest = pieceBitboards[PieceType.Pawn]
     .leftShift(7)
     .exclude(aFileBb);
@@ -435,9 +435,14 @@ export const generateMoves = (context: MoveGeneratorContext): Move[] => {
         .getLowestSetBit()
         .intersection(attackers)
         .isEmpty();
-      if (isCastlingPathClear && isKingPathNotAttacked && isKingNotInCheck) {
-        const kingIndex =
-          context.bitboards[context.turn][PieceType.King].scanForward();
+      const kingIndex =
+        context.bitboards[context.turn][PieceType.King].scanForward();
+      if (
+        isCastlingPathClear &&
+        isKingPathNotAttacked &&
+        isKingNotInCheck &&
+        kingIndex !== -1
+      ) {
         const targetIndex =
           right === CastlingRight.KingSide ? kingIndex + 2 : kingIndex - 2;
         return {

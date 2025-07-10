@@ -554,6 +554,40 @@ describe('generateMoves', () => {
   });
 
   describe('king', () => {
+    it('can castle kingside as black', () => {
+      // Board:
+      // 8  . . . . k . . r
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . . . . . . . .
+      // 4  . . . . . . . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . K . . .
+      //    a b c d e f g h
+      const context = MoveGeneratorContext.from(
+        createGameStateMock({
+          pieces: {
+            e8: { type: PieceType.King, color: Color.Black },
+            h8: { type: PieceType.Rook, color: Color.Black },
+            e1: { type: PieceType.King, color: Color.White },
+          },
+          castlingAbility: new Set([CastlingAbility.BlackKing]),
+          turn: Color.Black,
+        })
+      );
+      const moves = generateMoves(context);
+      expect(moves).toEqual(
+        expect.arrayContaining<Move>([
+          {
+            start: Coordinate.toIndex('e8'),
+            target: Coordinate.toIndex('g8'),
+            capture: false,
+            castling: CastlingRight.KingSide,
+          },
+        ])
+      );
+    });
     it('can move one square in any direction from center', () => {
       // Board:
       // 8  . . . . . . . .
