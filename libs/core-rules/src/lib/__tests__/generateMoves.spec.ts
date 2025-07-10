@@ -1026,7 +1026,7 @@ describe('generateMoves', () => {
       // 7  . . . . . . . .
       // 6  . . . . . . . .
       // 5  . . . . . . . .
-      // 4  . . . . . . . .
+      // 4  . . b . . . . .
       // 3  . . . . . . . .
       // 2  . . . . . . . .
       // 1  . . . . K . . R
@@ -1038,6 +1038,44 @@ describe('generateMoves', () => {
             e1: { type: PieceType.King, color: Color.White },
             h1: { type: PieceType.Rook, color: Color.White },
             c4: { type: PieceType.Bishop, color: Color.Black },
+          },
+          castlingAbility: new Set([CastlingAbility.WhiteKing]),
+          turn: Color.White,
+        })
+      );
+
+      const moves = generateMoves(context);
+
+      expect(moves).not.toEqual(
+        expect.arrayContaining<Move>([
+          {
+            start: Coordinate.toIndex('e1'),
+            target: Coordinate.toIndex('g1'),
+            capture: false,
+            castling: CastlingRight.KingSide,
+          },
+        ])
+      );
+    });
+
+    it('cannot castle kingside as white if king would be in check after castling', () => {
+      // Board:
+      // 8  . . . . . . r .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . . . . . . . .
+      // 4  . . . . . . . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . K . . R
+      //    a b c d e f g h
+
+      const context = MoveGeneratorContext.from(
+        createGameStateMock({
+          pieces: {
+            e1: { type: PieceType.King, color: Color.White },
+            h1: { type: PieceType.Rook, color: Color.White },
+            g8: { type: PieceType.Rook, color: Color.Black },
           },
           castlingAbility: new Set([CastlingAbility.WhiteKing]),
           turn: Color.White,

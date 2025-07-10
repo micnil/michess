@@ -422,6 +422,10 @@ export const generateMoves = (context: MoveGeneratorContext): Move[] => {
   // Castling moves
   const castlingMoves: Move[] = context.castlingRights
     .map((right) => {
+      const kingIndex =
+        context.bitboards[context.turn][PieceType.King].scanForward();
+      const targetIndex =
+        right === CastlingRight.KingSide ? kingIndex + 2 : kingIndex - 2;
       const castlingPath = context.bitboards.castlingPaths[context.turn][right];
       const castlingKingPath =
         context.bitboards.castlingKingPaths[context.turn][right];
@@ -432,19 +436,15 @@ export const generateMoves = (context: MoveGeneratorContext): Move[] => {
         .intersection(attackers)
         .isEmpty();
       const isKingNotInCheck = context.bitboards[context.turn][PieceType.King]
-        .getLowestSetBit()
+        .setIndex(targetIndex)
         .intersection(attackers)
         .isEmpty();
-      const kingIndex =
-        context.bitboards[context.turn][PieceType.King].scanForward();
       if (
         isCastlingPathClear &&
         isKingPathNotAttacked &&
         isKingNotInCheck &&
         kingIndex !== -1
       ) {
-        const targetIndex =
-          right === CastlingRight.KingSide ? kingIndex + 2 : kingIndex - 2;
         return {
           start: kingIndex,
           target: targetIndex,
