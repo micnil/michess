@@ -37,6 +37,8 @@ const toCastingRights = (ability: CastlingAbility): CastlingRight => {
 export const CastlingAbility = Object.freeze({
   ...CastlingAbilityEnum,
   allValues: Object.values(CastlingAbilityEnum),
+  whiteValues: WHITE_CASTLING_ABILITIES,
+  blackValues: BLACK_CASTLING_ABILITIES,
   toCastlingRights: (color: Color, abilities: CastlingAbility[]) => {
     const relevantAbilitys = abilities.filter(
       (ability) =>
