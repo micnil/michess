@@ -4,6 +4,9 @@ import {
   p,
   P,
   Coordinate,
+  CastlingAbility,
+  CastlingRight,
+  PieceType,
 } from '@michess/core-models';
 import { Move } from '../model/Move';
 import { generateMoves } from '../generateMoves';
@@ -143,6 +146,7 @@ describe('generateMoves', () => {
           turn: Color.White,
         })
       );
+
       const moves = generateMoves(context);
 
       expect(moves).toEqual(
@@ -184,8 +188,9 @@ describe('generateMoves', () => {
           turn: Color.Black,
         })
       );
+
       const moves = generateMoves(context);
-      // Should include promotion moves to d1
+
       expect(moves).toEqual(
         expect.arrayContaining([
           {
@@ -226,8 +231,9 @@ describe('generateMoves', () => {
           turn: Color.White,
         })
       );
+
       const moves = generateMoves(context);
-      // Should include promotion capture moves to h8
+
       expect(moves).toEqual(
         expect.arrayContaining([
           {
@@ -347,7 +353,7 @@ describe('generateMoves', () => {
             start: Coordinate.toIndex('d4'),
             target: Coordinate.toIndex('d5'),
             capture: true,
-          }, // capture black pawn at d5
+          },
         ])
       );
       expect(moves).not.toEqual(
@@ -385,14 +391,16 @@ describe('generateMoves', () => {
           },
         })
       );
+
       const moves = generateMoves(context);
+
       expect(moves).toEqual(
         expect.arrayContaining([
           {
             start: Coordinate.toIndex('d4'),
             target: Coordinate.toIndex('e5'),
             capture: true,
-          }, // capture on e5
+          },
         ])
       );
     });
@@ -418,6 +426,7 @@ describe('generateMoves', () => {
         })
       );
       const moves = generateMoves(context);
+
       expect(moves).toEqual(
         expect.arrayContaining([
           {
@@ -484,19 +493,21 @@ describe('generateMoves', () => {
           },
         })
       );
+
       const moves = generateMoves(context);
+
       expect(moves).toEqual(
         expect.arrayContaining([
           {
             start: Coordinate.toIndex('d4'),
             target: Coordinate.toIndex('b5'),
             capture: true,
-          }, // capture on b5
+          },
           {
             start: Coordinate.toIndex('d4'),
             target: Coordinate.toIndex('f5'),
             capture: true,
-          }, // capture on f5
+          },
         ])
       );
     });
@@ -521,7 +532,9 @@ describe('generateMoves', () => {
           },
         })
       );
+
       const moves = generateMoves(context);
+
       // Should not include moves to b5 or f5
       expect(moves).not.toEqual(
         expect.arrayContaining([
@@ -529,12 +542,12 @@ describe('generateMoves', () => {
             start: Coordinate.toIndex('d4'),
             target: Coordinate.toIndex('b5'),
             capture: false,
-          }, // b5
+          },
           {
             start: Coordinate.toIndex('d4'),
             target: Coordinate.toIndex('f5'),
             capture: false,
-          }, // f5
+          },
         ])
       );
     });
@@ -559,7 +572,9 @@ describe('generateMoves', () => {
           },
         })
       );
+
       const moves = generateMoves(context);
+
       expect(moves).toEqual(
         expect.arrayContaining<Move>([
           {
@@ -626,19 +641,21 @@ describe('generateMoves', () => {
           },
         })
       );
+
       const moves = generateMoves(context);
+
       expect(moves).toEqual(
         expect.arrayContaining<Move>([
           {
             start: Coordinate.toIndex('d4'),
             target: Coordinate.toIndex('e4'),
             capture: true,
-          }, // capture on e4
+          },
           {
             start: Coordinate.toIndex('d4'),
             target: Coordinate.toIndex('c3'),
             capture: true,
-          }, // capture on c3
+          },
         ])
       );
     });
@@ -664,6 +681,7 @@ describe('generateMoves', () => {
         })
       );
       const moves = generateMoves(context);
+
       // Should not include moves to e4 or e3
       expect(moves).not.toEqual(
         expect.arrayContaining<Move>([
@@ -677,6 +695,231 @@ describe('generateMoves', () => {
             target: Coordinate.toIndex('e3'),
             capture: false,
           }, // e3
+        ])
+      );
+    });
+
+    it('can castle kingside as white', () => {
+      // Board:
+      // 8  . . . . . . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . . . . . . . .
+      // 4  . . . . . . . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . K . . R
+      //    a b c d e f g h
+      const context = MoveGeneratorContext.from(
+        createGameStateMock({
+          pieces: {
+            d8: { type: PieceType.King, color: Color.Black },
+            e1: { type: PieceType.King, color: Color.White },
+            h1: { type: PieceType.Rook, color: Color.White },
+          },
+          castlingAbility: new Set([CastlingAbility.WhiteKing]),
+          turn: Color.White,
+        })
+      );
+
+      const moves = generateMoves(context);
+
+      expect(moves).toEqual(
+        expect.arrayContaining<Move>([
+          {
+            start: Coordinate.toIndex('e1'),
+            target: Coordinate.toIndex('g1'),
+            capture: false,
+            castling: CastlingRight.KingSide,
+          },
+        ])
+      );
+    });
+
+    it('can castle queenside as white', () => {
+      // Board:
+      // 8  . . . . . . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . . . . . . . .
+      // 4  . . . . . . . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  R . . . K . . .
+      //    a b c d e f g h
+      const context = MoveGeneratorContext.from(
+        createGameStateMock({
+          pieces: {
+            d8: { type: PieceType.King, color: Color.Black },
+            e1: { type: PieceType.King, color: Color.White },
+            a1: { type: PieceType.Rook, color: Color.White },
+          },
+          castlingAbility: new Set([CastlingAbility.WhiteQueen]),
+          turn: Color.White,
+        })
+      );
+      const moves = generateMoves(context);
+
+      expect(moves).toEqual(
+        expect.arrayContaining<Move>([
+          {
+            start: Coordinate.toIndex('e1'),
+            target: Coordinate.toIndex('c1'),
+            capture: false,
+            castling: CastlingRight.QueenSide,
+          },
+        ])
+      );
+    });
+
+    it('cannot castle kingside as white if path is blocked', () => {
+      // Board:
+      // 8  . . . . . . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . . . . . . . .
+      // 4  . . . . . . . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . K . R R
+      //    a b c d e f g h
+      const context = MoveGeneratorContext.from(
+        createGameStateMock({
+          pieces: {
+            d8: { type: PieceType.King, color: Color.Black },
+            e1: { type: PieceType.King, color: Color.White },
+            f1: { type: PieceType.Rook, color: Color.White }, // blocks path
+            h1: { type: PieceType.Rook, color: Color.White },
+          },
+          castlingAbility: new Set([CastlingAbility.WhiteKing]),
+          turn: Color.White,
+        })
+      );
+      const moves = generateMoves(context);
+
+      expect(moves).not.toEqual(
+        expect.arrayContaining<Move>([
+          {
+            start: Coordinate.toIndex('e1'),
+            target: Coordinate.toIndex('g1'),
+            capture: false,
+            castling: CastlingRight.KingSide,
+          },
+        ])
+      );
+    });
+
+    it('cannot castle queenside as white if path is blocked', () => {
+      // Board:
+      // 8  . . . . . . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . . . . . . . .
+      // 4  . . . . . . . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  R N . . K . . .
+      //    a b c d e f g h
+      const context = MoveGeneratorContext.from(
+        createGameStateMock({
+          pieces: {
+            d8: { type: PieceType.King, color: Color.Black },
+            a1: { type: PieceType.Rook, color: Color.White },
+            b1: { type: PieceType.Knight, color: Color.White }, // blocks path
+            e1: { type: PieceType.King, color: Color.White },
+          },
+          castlingAbility: new Set([CastlingAbility.WhiteQueen]),
+          turn: Color.White,
+        })
+      );
+      const moves = generateMoves(context);
+
+      // Should NOT include castling move to c1
+      expect(moves).not.toEqual(
+        expect.arrayContaining<Move>([
+          {
+            start: Coordinate.toIndex('e1'),
+            target: Coordinate.toIndex('c1'),
+            capture: false,
+            castling: CastlingRight.QueenSide,
+          },
+        ])
+      );
+    });
+
+    it('cannot castle kingside as white if king is in check', () => {
+      // Board:
+      // 8  . . . k r . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . . . . . . . .
+      // 4  . . . . . . . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . K . . R
+      //    a b c d e f g h
+
+      const context = MoveGeneratorContext.from(
+        createGameStateMock({
+          pieces: {
+            d8: { type: PieceType.King, color: Color.Black },
+            e8: { type: PieceType.Rook, color: Color.Black },
+            e1: { type: PieceType.King, color: Color.White },
+            h1: { type: PieceType.Rook, color: Color.White },
+          },
+          castlingAbility: new Set([CastlingAbility.WhiteKing]),
+          turn: Color.White,
+        })
+      );
+
+      const moves = generateMoves(context);
+
+      expect(moves).not.toEqual(
+        expect.arrayContaining<Move>([
+          {
+            start: Coordinate.toIndex('e1'),
+            target: Coordinate.toIndex('g1'),
+            capture: false,
+            castling: CastlingRight.KingSide,
+          },
+        ])
+      );
+    });
+
+    it('cannot castle kingside as white if king path is attacked', () => {
+      // Board:
+      // 8  . . . k . . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . . . . . . . .
+      // 4  . . . . . . . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . K . . R
+      //    a b c d e f g h
+      const context = MoveGeneratorContext.from(
+        createGameStateMock({
+          pieces: {
+            d8: { type: PieceType.King, color: Color.Black },
+            e1: { type: PieceType.King, color: Color.White },
+            h1: { type: PieceType.Rook, color: Color.White },
+            c4: { type: PieceType.Bishop, color: Color.Black },
+          },
+          castlingAbility: new Set([CastlingAbility.WhiteKing]),
+          turn: Color.White,
+        })
+      );
+
+      const moves = generateMoves(context);
+
+      expect(moves).not.toEqual(
+        expect.arrayContaining<Move>([
+          {
+            start: Coordinate.toIndex('e1'),
+            target: Coordinate.toIndex('g1'),
+            capture: false,
+            castling: CastlingRight.KingSide,
+          },
         ])
       );
     });
