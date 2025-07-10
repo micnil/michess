@@ -13,6 +13,106 @@ import { generateMoves } from '../generateMoves';
 import { MoveGeneratorContext } from '../model/MoveGeneratorContext';
 
 describe('generateMoves', () => {
+  describe('bishop', () => {
+    it('can move diagonally from center', () => {
+      // Board:
+      // 8  . . . . . . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . . . . . . . .
+      // 4  . . . B . . . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . . . . .
+      //    a b c d e f g h
+      const context = MoveGeneratorContext.from(
+        createGameStateMock({
+          pieces: {
+            d4: { type: 'b', color: Color.White },
+          },
+        })
+      );
+
+      const moves = generateMoves(context);
+
+      // 7 up-right, 3 up-left, 3 down-right, 3 down-left (total 13)
+      expect(moves.length).toBe(13);
+      expect(moves).toEqual(
+        expect.arrayContaining([
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('e5'),
+            capture: false,
+          },
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('c5'),
+            capture: false,
+          },
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('e3'),
+            capture: false,
+          },
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('c3'),
+            capture: false,
+          },
+        ])
+      );
+    });
+  });
+  describe('rook', () => {
+    it('can move horizontally and vertically from center', () => {
+      // Board:
+      // 8  . . . . . . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . . . . . . . .
+      // 4  . . . R . . . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . . . . .
+      //    a b c d e f g h
+      const context = MoveGeneratorContext.from(
+        createGameStateMock({
+          pieces: {
+            d4: { type: 'r', color: Color.White },
+          },
+        })
+      );
+
+      const moves = generateMoves(context);
+
+      // 7 squares up, 7 down, 3 left, 4 right (total 21)
+      expect(moves.length).toBe(14);
+      expect(moves).toEqual(
+        expect.arrayContaining([
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('d5'),
+            capture: false,
+          },
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('d3'),
+            capture: false,
+          },
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('c4'),
+            capture: false,
+          },
+          {
+            start: Coordinate.toIndex('d4'),
+            target: Coordinate.toIndex('e4'),
+            capture: false,
+          },
+        ])
+      );
+    });
+  });
   describe('pawn', () => {
     it('can move 1 square forward as white', () => {
       const context = MoveGeneratorContext.from(
