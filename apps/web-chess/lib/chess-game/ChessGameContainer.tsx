@@ -1,19 +1,7 @@
 import { gameStateFromFen } from '@michess/core-fen';
-import { ChessGame, IChessGame, Move } from '@michess/core-rules';
-import { MovePayload } from '@michess/core-state';
+import { ChessGame, Move } from '@michess/core-rules';
 import { Chessboard as ChessboardView } from '@michess/react-chessboard';
 import { useState } from 'react';
-
-const uiMoveToCoreMove = (
-  chess: IChessGame,
-  movePayload: MovePayload
-): Move => {
-  return {
-    start: chess.getIndex(movePayload.from),
-    target: chess.getIndex(movePayload.to),
-    capture: false,
-  };
-};
 
 export const ChessGameContainer = () => {
   const [chessGame, setChessGame] = useState(() =>
