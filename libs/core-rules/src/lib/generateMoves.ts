@@ -11,7 +11,7 @@ import { Move } from './model/Move';
 import { MoveGeneratorContext } from './model/MoveGeneratorContext';
 
 import { Bitboard } from '@michess/core-state';
-import { isDefined, Maybe } from '@michess/common-utils';
+import { isDefined } from '@michess/common-utils';
 
 enum DirectionOffset {
   N = -8,
@@ -30,6 +30,43 @@ const DIAGONAL_OFFSETS = [
   DirectionOffset.SE,
   DirectionOffset.SW,
 ];
+const SLIDERS_BY_DIRECTION: Record<DirectionOffset, PieceType[]> = {
+  [DirectionOffset.N]: [PieceType.Rook, PieceType.Queen],
+  [DirectionOffset.S]: [PieceType.Rook, PieceType.Queen],
+  [DirectionOffset.E]: [PieceType.Rook, PieceType.Queen],
+  [DirectionOffset.W]: [PieceType.Rook, PieceType.Queen],
+  [DirectionOffset.NE]: [PieceType.Bishop, PieceType.Queen],
+  [DirectionOffset.SE]: [PieceType.Bishop, PieceType.Queen],
+  [DirectionOffset.NW]: [PieceType.Bishop, PieceType.Queen],
+  [DirectionOffset.SW]: [PieceType.Bishop, PieceType.Queen],
+};
+const DIRECTIONS_BY_SLIDER: Record<PieceType, DirectionOffset[]> = {
+  [PieceType.Bishop]: [
+    DirectionOffset.NE,
+    DirectionOffset.NW,
+    DirectionOffset.SE,
+    DirectionOffset.SW,
+  ],
+  [PieceType.Rook]: [
+    DirectionOffset.N,
+    DirectionOffset.S,
+    DirectionOffset.E,
+    DirectionOffset.W,
+  ],
+  [PieceType.Queen]: [
+    DirectionOffset.N,
+    DirectionOffset.S,
+    DirectionOffset.E,
+    DirectionOffset.W,
+    DirectionOffset.NE,
+    DirectionOffset.NW,
+    DirectionOffset.SE,
+    DirectionOffset.SW,
+  ],
+  [PieceType.Knight]: [],
+  [PieceType.King]: [],
+  [PieceType.Pawn]: [],
+};
 const VERTICAL_OFFSETS = [DirectionOffset.N, DirectionOffset.S];
 const HORIZONTAL_OFFSETS = [DirectionOffset.E, DirectionOffset.W];
 const ADJECENT_OFFSETS = [...VERTICAL_OFFSETS, ...HORIZONTAL_OFFSETS];
@@ -192,14 +229,7 @@ const getSlidingAttacks = (
   context: MoveGeneratorContext,
   { piece, coord }: PiecePlacement
 ): Bitboard => {
-  const moveOffsets =
-    piece.type === PieceType.Bishop
-      ? DIAGONAL_OFFSETS
-      : piece.type === PieceType.Rook
-      ? ADJECENT_OFFSETS
-      : piece.type === PieceType.Queen
-      ? NEIGHBORING_OFFSETS
-      : [];
+  const moveOffsets = DIRECTIONS_BY_SLIDER[piece.type] ?? [];
   return moveOffsets.reduce((attacksBoard, direction) => {
     return attacksBoard.union(getRayAttacks(context, direction, coord));
   }, Bitboard());
@@ -344,6 +374,19 @@ const getMovesForPawn = (
   return moves;
 };
 
+const getSliderAttacks = (context: MoveGeneratorContext, piece: Piece) => {
+  return context.bitboards[piece.color][piece.type]
+    .getCoordinates()
+    .reduce((attacks, coordinate) => {
+      return attacks.union(
+        getSlidingAttacks(context, {
+          piece,
+          coord: coordinate,
+        })
+      );
+    }, Bitboard());
+};
+
 const getAttackedSquares = (
   context: MoveGeneratorContext,
   color: Color
@@ -366,17 +409,11 @@ const getAttackedSquares = (
     .exclude(hFileBb);
   const pawnAttacks = pawnAttacksWest.union(pawnAttacksEast);
   const sliders = [PieceType.Bishop, PieceType.Rook, PieceType.Queen];
-  const sliderAttacks = sliders.reduce((attacks, piece) => {
-    const slidingPieceAttacks = pieceBitboards[piece]
-      .getCoordinates()
-      .reduce((attacks, coordinate) => {
-        return attacks.union(
-          getSlidingAttacks(context, {
-            piece: Piece.from(piece, color),
-            coord: coordinate,
-          })
-        );
-      }, Bitboard());
+  const sliderAttacks = sliders.reduce((attacks, pieceType) => {
+    const slidingPieceAttacks = getSliderAttacks(
+      context,
+      Piece.from(pieceType, color)
+    );
     return attacks.union(slidingPieceAttacks);
   }, Bitboard());
   return knightAttacks
@@ -407,20 +444,11 @@ const getMovesFromSquare = (
   }
 };
 
-export const generateMoves = (context: MoveGeneratorContext): Move[] => {
-  const attackers = getAttackedSquares(
-    context,
-    context.isTurn(Color.White) ? Color.Black : Color.White
-  );
-  const moves = context.board
-    .getPiecePlacements()
-    .filter((piecePlacement) => context.isTurn(piecePlacement.piece.color))
-    .flatMap((piecePlacement) => {
-      return getMovesFromSquare(context, piecePlacement);
-    });
-
-  // Castling moves
-  const castlingMoves: Move[] = context.castlingRights
+const getCastlingMoves = (
+  context: MoveGeneratorContext,
+  attackers: Bitboard
+): Move[] => {
+  return context.castlingRights
     .map((right) => {
       const kingIndex =
         context.bitboards[context.turn][PieceType.King].scanForward();
@@ -456,6 +484,63 @@ export const generateMoves = (context: MoveGeneratorContext): Move[] => {
       }
     })
     .filter(isDefined);
+};
+
+const getPinnedPieces = (context: MoveGeneratorContext): Bitboard => {
+  const ownOccupancy = context.bitboards.getOwnOccupancy(context.turn);
+  const getNextBlockerInDirection = (
+    blockers: Bitboard,
+    direction: DirectionOffset
+  ): Bitboard =>
+    direction > 0 ? blockers.getLowestSetBit() : blockers.getHighestSetBit();
+
+  const kingIndex =
+    context.bitboards[context.turn][PieceType.King].scanForward();
+  const kingCoord = Coordinate.fromIndex(kingIndex);
+  return NEIGHBORING_OFFSETS.reduce((pinnedPieces, direction) => {
+    const attacks = SLIDER_ATTACKS[kingCoord][direction];
+    const blockers = attacks.intersection(context.bitboards.occupied);
+    if (!blockers.isEmpty()) {
+      const pinningPieces = SLIDERS_BY_DIRECTION[direction];
+      const potentialPinners = pinningPieces.reduce(
+        (potentialPinners, pieceType) => {
+          return context.bitboards[context.opponentColor][pieceType].union(
+            potentialPinners
+          );
+        },
+        Bitboard()
+      );
+      const firstBlocker = getNextBlockerInDirection(blockers, direction);
+      const secondBlocker = getNextBlockerInDirection(
+        blockers.exclude(firstBlocker),
+        direction
+      );
+
+      if (
+        !ownOccupancy.intersection(firstBlocker).isEmpty() &&
+        !potentialPinners.intersection(secondBlocker).isEmpty()
+      ) {
+        return pinnedPieces.union(firstBlocker);
+      } else {
+        return pinnedPieces;
+      }
+    } else {
+      return pinnedPieces;
+    }
+  }, Bitboard());
+};
+
+export const generateMoves = (context: MoveGeneratorContext): Move[] => {
+  const attackers = getAttackedSquares(context, context.opponentColor);
+  const pinnedPieces = getPinnedPieces(context);
+  const moves = context.board
+    .getPiecePlacements()
+    .filter((piecePlacement) => context.isTurn(piecePlacement.piece.color))
+    .flatMap((piecePlacement) => {
+      return getMovesFromSquare(context, piecePlacement);
+    });
+
+  const castlingMoves = getCastlingMoves(context, attackers);
 
   moves.push(...castlingMoves);
   return moves;

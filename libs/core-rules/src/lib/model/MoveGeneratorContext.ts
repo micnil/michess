@@ -12,6 +12,7 @@ export type MoveGeneratorContext = {
   bitboards: ChessBitboard;
   turn: Color;
   isTurn(color: Color): boolean;
+  opponentColor: Color;
   enPassantCoord?: Coordinate;
   castlingRights: CastlingRight[];
 };
@@ -25,6 +26,7 @@ const from = (gameState: GameState): MoveGeneratorContext => {
     bitboards: chessbitboards,
     enPassantCoord: gameState.enPassant,
     turn: gameState.turn,
+    opponentColor: isTurn(Color.White) ? Color.Black : Color.White,
     isTurn,
     castlingRights: CastlingAbility.toCastlingRights(gameState.turn, [
       ...gameState.castlingAbility,
