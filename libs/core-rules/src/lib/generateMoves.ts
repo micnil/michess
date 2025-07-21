@@ -367,43 +367,47 @@ const getPinnedPieces = (context: MoveGeneratorContext): Bitboard => {
 
   const kingIndex =
     context.bitboards[context.turn][PieceType.King].scanForward();
-  const kingCoord = Coordinate.fromIndex(kingIndex);
-  return DirectionOffset.neighbors.reduce((pinnedPieces, direction) => {
-    const attacks = SliderAttacks.fromCoordAndDirection(kingCoord, direction);
-    const blockers = attacks.intersection(context.bitboards.occupied);
-    if (!blockers.isEmpty()) {
-      const pinningPieces = SLIDERS_BY_DIRECTION[direction];
-      const potentialPinners = pinningPieces.reduce(
-        (potentialPinners, pieceType) => {
-          return context.bitboards[context.opponentColor][pieceType].union(
-            potentialPinners
-          );
-        },
-        Bitboard()
-      );
-      const firstBlocker = getNextBlockerInDirection(blockers, direction);
-      const secondBlocker = getNextBlockerInDirection(
-        blockers.exclude(firstBlocker),
-        direction
-      );
+  if (kingIndex === -1) {
+    return Bitboard();
+  } else {
+    const kingCoord = Coordinate.fromIndex(kingIndex);
+    return DirectionOffset.neighbors.reduce((pinnedPieces, direction) => {
+      const attacks = SliderAttacks.fromCoordAndDirection(kingCoord, direction);
+      const blockers = attacks.intersection(context.bitboards.occupied);
+      if (!blockers.isEmpty()) {
+        const pinningPieces = SLIDERS_BY_DIRECTION[direction];
+        const potentialPinners = pinningPieces.reduce(
+          (potentialPinners, pieceType) => {
+            return context.bitboards[context.opponentColor][pieceType].union(
+              potentialPinners
+            );
+          },
+          Bitboard()
+        );
+        const firstBlocker = getNextBlockerInDirection(blockers, direction);
+        const secondBlocker = getNextBlockerInDirection(
+          blockers.exclude(firstBlocker),
+          direction
+        );
 
-      if (
-        !ownOccupancy.intersection(firstBlocker).isEmpty() &&
-        !potentialPinners.intersection(secondBlocker).isEmpty()
-      ) {
-        return pinnedPieces.union(firstBlocker);
+        if (
+          !ownOccupancy.intersection(firstBlocker).isEmpty() &&
+          !potentialPinners.intersection(secondBlocker).isEmpty()
+        ) {
+          return pinnedPieces.union(firstBlocker);
+        } else {
+          return pinnedPieces;
+        }
       } else {
         return pinnedPieces;
       }
-    } else {
-      return pinnedPieces;
-    }
-  }, Bitboard());
+    }, Bitboard());
+  }
 };
 
 export const generateMoves = (context: MoveGeneratorContext): Move[] => {
   const attackers = getAttackedSquares(context, context.opponentColor);
-  //const pinnedPieces = getPinnedPieces(context);
+  const pinnedPieces = getPinnedPieces(context);
   const moves = context.piecePlacements
     .filter((piecePlacement) => context.isTurn(piecePlacement.piece.color))
     .flatMap((piecePlacement) => {
