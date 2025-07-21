@@ -18,4 +18,13 @@ export const Color = Object.freeze({
       throw new Error(`Unrecognized colored piece: ${coloredPiece}`);
     }
   },
+  opposite: (color: Color): Color => {
+    if (color === 'white') {
+      return 'black';
+    } else if (color === 'black') {
+      return 'white';
+    } else {
+      throw new Error(`Unrecognized color: ${color}`);
+    }
+  },
 });
