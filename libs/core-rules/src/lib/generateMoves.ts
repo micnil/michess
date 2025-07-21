@@ -202,9 +202,7 @@ const getRayAttacks = (
     const indexOfFirstBlocker =
       direction > 0 ? blockers.scanForward() : blockers.scanBackward();
     return attacks.exclude(
-      SLIDER_ATTACKS[context.board.getCoordinates()[indexOfFirstBlocker]][
-        direction
-      ]
+      SLIDER_ATTACKS[Coordinate.fromIndex(indexOfFirstBlocker)][direction]
     );
   } else {
     return attacks;
@@ -216,7 +214,7 @@ const movesFromBitboard = (
   { piece, coord }: PiecePlacement,
   legalMoves: Bitboard
 ): Move[] => {
-  const startIndex = context.board.getIndex(coord);
+  const startIndex = Coordinate.toIndex(coord);
   const opponentOccupancy = context.bitboards.getOpponentOccupancy(piece.color);
   return legalMoves.getIndices().map((targetIndex) => ({
     start: startIndex,
@@ -293,23 +291,21 @@ const getMovesForPawn = (
   context: MoveGeneratorContext,
   { coord, piece }: PiecePlacement
 ): Move[] => {
-  const chessboard = context.board;
   const index = Coordinate.toIndex(coord);
-  const coordinates = chessboard.getCoordinates();
 
   const direction = piece.color === Color.White ? -1 : +1;
   const startRank = piece.color === Color.White ? 6 : 1;
   const promotionRank = piece.color === Color.White ? 8 : 1;
 
   const oneStepIndex = index + direction * 8;
-  const oneStepSquare = withinBoard(oneStepIndex)
-    ? chessboard.getSquare(coordinates[oneStepIndex])
-    : undefined;
+  const oneStepSquareOccupied =
+    withinBoard(oneStepIndex) &&
+    context.bitboards.occupied.isIndexSet(oneStepIndex);
 
   const twoStepIndex = index + direction * 16;
-  const twoStepSquare = withinBoard(twoStepIndex)
-    ? chessboard.getSquare(coordinates[twoStepIndex])
-    : undefined;
+  const twoStepSquareOccupied =
+    withinBoard(twoStepIndex) &&
+    context.bitboards.occupied.isIndexSet(twoStepIndex);
 
   const opponentOccupied = context.bitboards.getOpponentOccupancy(piece.color);
   const pawnAttacks =
@@ -333,7 +329,7 @@ const getMovesForPawn = (
   const isStartPosition = currentRank === startRank;
 
   const moves: Move[] = attackMoves;
-  if (!oneStepSquare?.piece) {
+  if (!oneStepSquareOccupied) {
     const move: Move = {
       start: index,
       target: oneStepIndex,
@@ -352,7 +348,7 @@ const getMovesForPawn = (
     }
   }
 
-  if (isStartPosition && !oneStepSquare?.piece && !twoStepSquare?.piece) {
+  if (isStartPosition && !oneStepSquareOccupied && !twoStepSquareOccupied) {
     moves.push({
       start: index,
       target: twoStepIndex,
