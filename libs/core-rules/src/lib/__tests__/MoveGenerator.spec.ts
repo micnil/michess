@@ -9,10 +9,9 @@ import {
   PieceType,
 } from '@michess/core-models';
 import { Move } from '../model/Move';
-import { generateMoves } from '../generateMoves';
-import { MoveGeneratorContext } from '../model/MoveGeneratorContext';
+import { MoveGenerator } from '../MoveGenerator';
 
-describe('generateMoves', () => {
+describe('MoveGenerator', () => {
   describe('bishop', () => {
     it('can move diagonally from center', () => {
       // Board:
@@ -25,7 +24,7 @@ describe('generateMoves', () => {
       // 2  . . . . . . . .
       // 1  . . . . . . . .
       //    a b c d e f g h
-      const context = MoveGeneratorContext.from(
+      const moveGenerator = MoveGenerator(
         createGameStateMock({
           pieces: {
             d4: { type: 'b', color: Color.White },
@@ -33,7 +32,7 @@ describe('generateMoves', () => {
         })
       );
 
-      const moves = generateMoves(context);
+      const { moves } = moveGenerator.generateMoves();
 
       // 7 up-right, 3 up-left, 3 down-right, 3 down-left (total 13)
       expect(moves.length).toBe(13);
@@ -75,7 +74,7 @@ describe('generateMoves', () => {
       // 2  . . . . . . . .
       // 1  . . . . . . . .
       //    a b c d e f g h
-      const context = MoveGeneratorContext.from(
+      const context = MoveGenerator(
         createGameStateMock({
           pieces: {
             d4: { type: 'r', color: Color.White },
@@ -83,7 +82,7 @@ describe('generateMoves', () => {
         })
       );
 
-      const moves = generateMoves(context);
+      const { moves } = context.generateMoves();
 
       // 7 squares up, 7 down, 3 left, 4 right (total 21)
       expect(moves.length).toBe(14);
@@ -115,7 +114,7 @@ describe('generateMoves', () => {
   });
   describe('pawn', () => {
     it('can move 1 square forward as white', () => {
-      const context = MoveGeneratorContext.from(
+      const moveGenerator = MoveGenerator(
         createGameStateMock({
           pieces: {
             c3: P,
@@ -123,7 +122,7 @@ describe('generateMoves', () => {
         })
       );
 
-      const moves = generateMoves(context);
+      const { moves } = moveGenerator.generateMoves();
 
       expect(moves).toEqual<Move[]>([
         {
@@ -135,7 +134,7 @@ describe('generateMoves', () => {
     });
 
     it('can move 1 square forward as black', () => {
-      const context = MoveGeneratorContext.from(
+      const context = MoveGenerator(
         createGameStateMock({
           pieces: {
             c3: p,
@@ -144,7 +143,7 @@ describe('generateMoves', () => {
         })
       );
 
-      const moves = generateMoves(context);
+      const { moves } = context.generateMoves();
 
       expect(moves).toEqual<Move[]>([
         {
@@ -156,7 +155,7 @@ describe('generateMoves', () => {
     });
 
     it('can move 2 squares forward from starting position as white', () => {
-      const context = MoveGeneratorContext.from(
+      const context = MoveGenerator(
         createGameStateMock({
           pieces: {
             c2: P,
@@ -164,7 +163,7 @@ describe('generateMoves', () => {
         })
       );
 
-      const moves = generateMoves(context);
+      const { moves } = context.generateMoves();
 
       expect(moves).toEqual<Move[]>([
         {
@@ -181,7 +180,7 @@ describe('generateMoves', () => {
     });
 
     it('can capture right as white', () => {
-      const context = MoveGeneratorContext.from(
+      const context = MoveGenerator(
         createGameStateMock({
           pieces: {
             c5: P,
@@ -190,7 +189,7 @@ describe('generateMoves', () => {
         })
       );
 
-      const moves = generateMoves(context);
+      const { moves } = context.generateMoves();
 
       expect(moves).toEqual(
         expect.arrayContaining<Move>([
@@ -209,7 +208,7 @@ describe('generateMoves', () => {
     });
 
     it('can capture en passant', () => {
-      const context = MoveGeneratorContext.from(
+      const context = MoveGenerator(
         createGameStateMock({
           pieces: {
             c5: P,
@@ -220,7 +219,7 @@ describe('generateMoves', () => {
         })
       );
 
-      const moves = generateMoves(context);
+      const { moves } = context.generateMoves();
 
       expect(moves).toEqual<Move[]>([
         {
@@ -238,7 +237,7 @@ describe('generateMoves', () => {
     });
 
     it('promotes when moving 1 step forward to 8th rank as white', () => {
-      const context = MoveGeneratorContext.from(
+      const context = MoveGenerator(
         createGameStateMock({
           pieces: {
             e7: P,
@@ -247,7 +246,7 @@ describe('generateMoves', () => {
         })
       );
 
-      const moves = generateMoves(context);
+      const { moves } = context.generateMoves();
 
       expect(moves).toEqual(
         expect.arrayContaining([
@@ -280,7 +279,7 @@ describe('generateMoves', () => {
     });
 
     it('promotes when moving 1 step forward to 1st rank as black', () => {
-      const context = MoveGeneratorContext.from(
+      const context = MoveGenerator(
         createGameStateMock({
           pieces: {
             d2: p,
@@ -289,7 +288,7 @@ describe('generateMoves', () => {
         })
       );
 
-      const moves = generateMoves(context);
+      const { moves } = context.generateMoves();
 
       expect(moves).toEqual(
         expect.arrayContaining([
@@ -322,7 +321,7 @@ describe('generateMoves', () => {
     });
 
     it('promotes with capture on 8th rank as white', () => {
-      const context = MoveGeneratorContext.from(
+      const context = MoveGenerator(
         createGameStateMock({
           pieces: {
             g7: P,
@@ -332,7 +331,7 @@ describe('generateMoves', () => {
         })
       );
 
-      const moves = generateMoves(context);
+      const { moves } = context.generateMoves();
 
       expect(moves).toEqual(
         expect.arrayContaining([
@@ -377,14 +376,14 @@ describe('generateMoves', () => {
       // 2  . . . . . . . .
       // 1  . . . . . . . .
       //    a b c d e f g h
-      const context = MoveGeneratorContext.from(
+      const context = MoveGenerator(
         createGameStateMock({
           pieces: {
             d4: { type: 'q', color: Color.White },
           },
         })
       );
-      const moves = generateMoves(context);
+      const { moves } = context.generateMoves();
 
       expect(moves.length).toBe(27); // 7+7+7+6 (horizontal, vertical, diagonals)
       expect(moves).toEqual(
@@ -434,7 +433,7 @@ describe('generateMoves', () => {
       // 2  . . . . . . . .
       // 1  . . . . . . . .
       //    a b c d e f g h
-      const context = MoveGeneratorContext.from(
+      const context = MoveGenerator(
         createGameStateMock({
           pieces: {
             d4: { type: 'q', color: Color.White },
@@ -444,7 +443,7 @@ describe('generateMoves', () => {
         })
       );
 
-      const moves = generateMoves(context);
+      const { moves } = context.generateMoves();
 
       // Can capture d5, but not move past it; cannot move to d3 (own piece)
       expect(moves).toEqual(
@@ -483,7 +482,7 @@ describe('generateMoves', () => {
       // 2  . . . . . . . .
       // 1  . . . . . . . .
       //    a b c d e f g h
-      const context = MoveGeneratorContext.from(
+      const context = MoveGenerator(
         createGameStateMock({
           pieces: {
             d4: { type: 'q', color: Color.White },
@@ -492,7 +491,7 @@ describe('generateMoves', () => {
         })
       );
 
-      const moves = generateMoves(context);
+      const { moves } = context.generateMoves();
 
       expect(moves).toEqual(
         expect.arrayContaining([
@@ -518,14 +517,14 @@ describe('generateMoves', () => {
       // 2  . . . . . . . .
       // 1  . . . . . . . .
       //    a b c d e f g h
-      const context = MoveGeneratorContext.from(
+      const context = MoveGenerator(
         createGameStateMock({
           pieces: {
             d4: { type: 'n', color: Color.White },
           },
         })
       );
-      const moves = generateMoves(context);
+      const { moves } = context.generateMoves();
 
       expect(moves).toEqual(
         expect.arrayContaining([
@@ -584,7 +583,7 @@ describe('generateMoves', () => {
       // 2  . . . . . . . .
       // 1  . . . . . . . .
       //    a b c d e f g h
-      const context = MoveGeneratorContext.from(
+      const context = MoveGenerator(
         createGameStateMock({
           pieces: {
             d4: { type: 'n', color: Color.White },
@@ -594,7 +593,7 @@ describe('generateMoves', () => {
         })
       );
 
-      const moves = generateMoves(context);
+      const { moves } = context.generateMoves();
 
       expect(moves).toEqual(
         expect.arrayContaining([
@@ -623,7 +622,7 @@ describe('generateMoves', () => {
       // 2  . . . . . . . .
       // 1  . . . . . . . .
       //    a b c d e f g h
-      const context = MoveGeneratorContext.from(
+      const context = MoveGenerator(
         createGameStateMock({
           pieces: {
             d4: { type: 'n', color: Color.White },
@@ -633,7 +632,7 @@ describe('generateMoves', () => {
         })
       );
 
-      const moves = generateMoves(context);
+      const { moves } = context.generateMoves();
 
       // Should not include moves to b5 or f5
       expect(moves).not.toEqual(
@@ -665,7 +664,7 @@ describe('generateMoves', () => {
       // 2  . . . . . . . .
       // 1  . . . . K . . .
       //    a b c d e f g h
-      const context = MoveGeneratorContext.from(
+      const context = MoveGenerator(
         createGameStateMock({
           pieces: {
             e8: { type: PieceType.King, color: Color.Black },
@@ -676,7 +675,7 @@ describe('generateMoves', () => {
           turn: Color.Black,
         })
       );
-      const moves = generateMoves(context);
+      const { moves } = context.generateMoves();
       expect(moves).toEqual(
         expect.arrayContaining<Move>([
           {
@@ -699,7 +698,7 @@ describe('generateMoves', () => {
       // 2  . . . . . . . .
       // 1  . . . . . . . .
       //    a b c d e f g h
-      const context = MoveGeneratorContext.from(
+      const context = MoveGenerator(
         createGameStateMock({
           pieces: {
             d4: { type: 'k', color: Color.White },
@@ -707,7 +706,7 @@ describe('generateMoves', () => {
         })
       );
 
-      const moves = generateMoves(context);
+      const { moves } = context.generateMoves();
 
       expect(moves).toEqual(
         expect.arrayContaining<Move>([
@@ -766,7 +765,7 @@ describe('generateMoves', () => {
       // 2  . . . . . . . .
       // 1  . . . . . . . .
       //    a b c d e f g h
-      const context = MoveGeneratorContext.from(
+      const context = MoveGenerator(
         createGameStateMock({
           pieces: {
             d4: { type: 'k', color: Color.White },
@@ -776,7 +775,7 @@ describe('generateMoves', () => {
         })
       );
 
-      const moves = generateMoves(context);
+      const { moves } = context.generateMoves();
 
       expect(moves).toEqual(
         expect.arrayContaining<Move>([
@@ -805,7 +804,7 @@ describe('generateMoves', () => {
       // 2  . . . . . . . .
       // 1  . . . . . . . .
       //    a b c d e f g h
-      const context = MoveGeneratorContext.from(
+      const context = MoveGenerator(
         createGameStateMock({
           pieces: {
             d4: { type: 'k', color: Color.White },
@@ -814,7 +813,7 @@ describe('generateMoves', () => {
           },
         })
       );
-      const moves = generateMoves(context);
+      const { moves } = context.generateMoves();
 
       // Should not include moves to e4 or e3
       expect(moves).not.toEqual(
@@ -844,7 +843,7 @@ describe('generateMoves', () => {
       // 2  . . . . . . . .
       // 1  . . . . K . . R
       //    a b c d e f g h
-      const context = MoveGeneratorContext.from(
+      const context = MoveGenerator(
         createGameStateMock({
           pieces: {
             d8: { type: PieceType.King, color: Color.Black },
@@ -856,7 +855,7 @@ describe('generateMoves', () => {
         })
       );
 
-      const moves = generateMoves(context);
+      const { moves } = context.generateMoves();
 
       expect(moves).toEqual(
         expect.arrayContaining<Move>([
@@ -881,7 +880,7 @@ describe('generateMoves', () => {
       // 2  . . . . . . . .
       // 1  R . . . K . . .
       //    a b c d e f g h
-      const context = MoveGeneratorContext.from(
+      const context = MoveGenerator(
         createGameStateMock({
           pieces: {
             d8: { type: PieceType.King, color: Color.Black },
@@ -892,7 +891,7 @@ describe('generateMoves', () => {
           turn: Color.White,
         })
       );
-      const moves = generateMoves(context);
+      const { moves } = context.generateMoves();
 
       expect(moves).toEqual(
         expect.arrayContaining<Move>([
@@ -917,7 +916,7 @@ describe('generateMoves', () => {
       // 2  . . . . . . . .
       // 1  . . . . K . R R
       //    a b c d e f g h
-      const context = MoveGeneratorContext.from(
+      const context = MoveGenerator(
         createGameStateMock({
           pieces: {
             d8: { type: PieceType.King, color: Color.Black },
@@ -929,7 +928,7 @@ describe('generateMoves', () => {
           turn: Color.White,
         })
       );
-      const moves = generateMoves(context);
+      const { moves } = context.generateMoves();
 
       expect(moves).not.toEqual(
         expect.arrayContaining<Move>([
@@ -954,7 +953,7 @@ describe('generateMoves', () => {
       // 2  . . . . . . . .
       // 1  R N . . K . . .
       //    a b c d e f g h
-      const context = MoveGeneratorContext.from(
+      const context = MoveGenerator(
         createGameStateMock({
           pieces: {
             d8: { type: PieceType.King, color: Color.Black },
@@ -966,7 +965,7 @@ describe('generateMoves', () => {
           turn: Color.White,
         })
       );
-      const moves = generateMoves(context);
+      const { moves } = context.generateMoves();
 
       // Should NOT include castling move to c1
       expect(moves).not.toEqual(
@@ -993,7 +992,7 @@ describe('generateMoves', () => {
       // 1  . . . . K . . R
       //    a b c d e f g h
 
-      const context = MoveGeneratorContext.from(
+      const context = MoveGenerator(
         createGameStateMock({
           pieces: {
             d8: { type: PieceType.King, color: Color.Black },
@@ -1006,7 +1005,7 @@ describe('generateMoves', () => {
         })
       );
 
-      const moves = generateMoves(context);
+      const { moves } = context.generateMoves();
 
       expect(moves).not.toEqual(
         expect.arrayContaining<Move>([
@@ -1031,7 +1030,7 @@ describe('generateMoves', () => {
       // 2  . . . . . . . .
       // 1  . . . . K . . R
       //    a b c d e f g h
-      const context = MoveGeneratorContext.from(
+      const context = MoveGenerator(
         createGameStateMock({
           pieces: {
             d8: { type: PieceType.King, color: Color.Black },
@@ -1044,7 +1043,7 @@ describe('generateMoves', () => {
         })
       );
 
-      const moves = generateMoves(context);
+      const { moves } = context.generateMoves();
 
       expect(moves).not.toEqual(
         expect.arrayContaining<Move>([
@@ -1070,7 +1069,7 @@ describe('generateMoves', () => {
       // 1  . . . . K . . R
       //    a b c d e f g h
 
-      const context = MoveGeneratorContext.from(
+      const context = MoveGenerator(
         createGameStateMock({
           pieces: {
             e1: { type: PieceType.King, color: Color.White },
@@ -1082,7 +1081,7 @@ describe('generateMoves', () => {
         })
       );
 
-      const moves = generateMoves(context);
+      const { moves } = context.generateMoves();
 
       expect(moves).not.toEqual(
         expect.arrayContaining<Move>([
