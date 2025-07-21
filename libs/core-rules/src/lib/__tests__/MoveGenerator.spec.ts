@@ -650,6 +650,38 @@ describe('MoveGenerator', () => {
         ])
       );
     });
+
+    it('cannot move if pinned to the king', () => {
+      // Board:
+      // 8  . . . r . . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . . . . . . . .
+      // 4  . . . n . . . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . k . . . .
+      //    a b c d e f g h
+      const context = MoveGenerator(
+        createGameStateMock({
+          pieces: {
+            d1: { type: 'k', color: Color.Black },
+            d4: { type: 'n', color: Color.Black },
+            d8: { type: 'r', color: Color.White },
+          },
+          turn: Color.Black,
+        })
+      );
+      const { moves } = context.generateMoves();
+
+      expect(moves).not.toEqual(
+        expect.arrayContaining<Move>([
+          expect.objectContaining<Partial<Move>>({
+            start: Coordinate.toIndex('d4'),
+          }),
+        ])
+      );
+    });
   });
 
   describe('king', () => {

@@ -110,7 +110,8 @@ const getSlidingMoves = (
 ): Move[] => {
   const ownOccupancy = context.bitboards.getOwnOccupancy(piece.color);
   const attacks = getSlidingAttacks(context.bitboards, { piece, coord });
-  const legalMoves = attacks.exclude(ownOccupancy);
+  const moves = attacks.exclude(ownOccupancy);
+  const legalMoves = applyPinRestrictions(context, moves, coord);
   return movesFromBitboard(context, { piece, coord }, legalMoves);
 };
 
@@ -125,14 +126,42 @@ const getMovesForKing = (
   return movesFromBitboard(context, { coord, piece }, legalKingMoves);
 };
 
+const applyPinRestrictions = (
+  context: MoveGeneratorContext,
+  moves: Bitboard,
+  coordinate: Coordinate
+): Bitboard => {
+  const isPinned = context.moveMasks.pinnedPieces.isCoordSet(coordinate);
+  if (isPinned) {
+    const kingIndex =
+      context.bitboards[context.turn][PieceType.King].scanForward();
+    const pinDirection = DirectionOffset.fromCoordinates(
+      Coordinate.toIndex(coordinate),
+      kingIndex
+    );
+    const pinMoveRestrictions = SliderAttacks.fromCoordAndDirection(
+      Coordinate.fromIndex(kingIndex),
+      pinDirection
+    );
+    return moves.intersection(pinMoveRestrictions);
+  } else {
+    return moves;
+  }
+};
+
 const getMovesForKnight = (
   context: MoveGeneratorContext,
   { coord, piece }: PiecePlacement
 ): Move[] => {
-  const ownOccupancy = context.bitboards.getOwnOccupancy(piece.color);
-  const legalKnightMoves = KnightAttacks.fromCoord(coord).exclude(ownOccupancy);
-
-  return movesFromBitboard(context, { piece, coord }, legalKnightMoves);
+  const isPinned = context.moveMasks.pinnedPieces.isCoordSet(coord);
+  // Knight can never move when pinned
+  if (isPinned) {
+    return [];
+  } else {
+    const ownOccupancy = context.bitboards.getOwnOccupancy(piece.color);
+    const knightMoves = KnightAttacks.fromCoord(coord).exclude(ownOccupancy);
+    return movesFromBitboard(context, { piece, coord }, knightMoves);
+  }
 };
 
 const getRank = (index: number) => 8 - Math.floor(index / 8);
