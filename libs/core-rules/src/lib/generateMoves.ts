@@ -113,27 +113,6 @@ const getSlidingMoves = (
   return movesFromBitboard(context, { piece, coord }, legalMoves);
 };
 
-const getMovesForQueen = (
-  context: MoveGeneratorContext,
-  piecePlacement: PiecePlacement
-): Move[] => {
-  return getSlidingMoves(context, piecePlacement);
-};
-
-const getMovesForBishop = (
-  context: MoveGeneratorContext,
-  piecePlacement: PiecePlacement
-): Move[] => {
-  return getSlidingMoves(context, piecePlacement);
-};
-
-const getMovesForRook = (
-  context: MoveGeneratorContext,
-  piecePlacement: PiecePlacement
-): Move[] => {
-  return getSlidingMoves(context, piecePlacement);
-};
-
 const getMovesForKing = (
   context: MoveGeneratorContext,
   { coord, piece }: PiecePlacement
@@ -298,18 +277,16 @@ const getMovesFromSquare = (
   piecePlacement: PiecePlacement
 ): Move[] => {
   switch (piecePlacement.piece.type) {
-    case PieceType.Queen:
-      return getMovesForQueen(context, piecePlacement);
-    case PieceType.Rook:
-      return getMovesForRook(context, piecePlacement);
     case PieceType.Pawn:
       return getMovesForPawn(context, piecePlacement);
     case PieceType.Knight:
       return getMovesForKnight(context, piecePlacement);
     case PieceType.King:
       return getMovesForKing(context, piecePlacement);
+    case PieceType.Queen:
+    case PieceType.Rook:
     case PieceType.Bishop:
-      return getMovesForBishop(context, piecePlacement);
+      return getSlidingMoves(context, piecePlacement);
     default:
       throw new Error(`Invalid piece type: ${piecePlacement.piece.type}`);
   }
