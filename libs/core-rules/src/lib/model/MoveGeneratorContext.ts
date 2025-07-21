@@ -7,6 +7,7 @@ import {
   PiecePlacement,
 } from '@michess/core-models';
 import { ChessBitboard } from '@michess/core-state';
+import { MoveMaskBitboards } from './MoveMaskBitboards';
 
 export type MoveGeneratorContext = {
   bitboards: ChessBitboard;
@@ -16,10 +17,14 @@ export type MoveGeneratorContext = {
   enPassantCoord?: Coordinate;
   castlingRights: CastlingRight[];
   piecePlacements: PiecePlacement[];
+  moveMasks: MoveMaskBitboards;
 };
 
-const from = (gameState: GameState): MoveGeneratorContext => {
-  const chessbitboards = ChessBitboard(gameState.pieces);
+const from = (
+  gameState: GameState,
+  chessBitboards: ChessBitboard,
+  moveMasks: MoveMaskBitboards
+): MoveGeneratorContext => {
   const isTurn = (color: Color): boolean => gameState.turn === color;
 
   const piecePlacements = Object.entries(gameState.pieces).map(
@@ -30,7 +35,8 @@ const from = (gameState: GameState): MoveGeneratorContext => {
   );
   return {
     piecePlacements,
-    bitboards: chessbitboards,
+    bitboards: chessBitboards,
+    moveMasks,
     enPassantCoord: gameState.enPassant,
     turn: gameState.turn,
     opponentColor: isTurn(Color.White) ? Color.Black : Color.White,

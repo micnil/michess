@@ -293,10 +293,7 @@ const getMovesFromSquare = (
   }
 };
 
-const getCastlingMoves = (
-  context: MoveGeneratorContext,
-  attackers: Bitboard
-): Move[] => {
+const getCastlingMoves = (context: MoveGeneratorContext): Move[] => {
   return context.castlingRights
     .map((right) => {
       const kingIndex =
@@ -310,11 +307,11 @@ const getCastlingMoves = (
         .intersection(context.bitboards.occupied)
         .isEmpty();
       const isKingPathNotAttacked = castlingKingPath
-        .intersection(attackers)
+        .intersection(context.moveMasks.attacks)
         .isEmpty();
       const isKingNotInCheck = context.bitboards[context.turn][PieceType.King]
         .setIndex(targetIndex)
-        .intersection(attackers)
+        .intersection(context.moveMasks.attacks)
         .isEmpty();
       if (
         isCastlingPathClear &&
@@ -386,18 +383,13 @@ const getPinnedPieces = (
 };
 
 const generateMoves = (context: MoveGeneratorContext): Move[] => {
-  const attackers = getAttackedSquares(
-    context.bitboards,
-    context.opponentColor
-  );
-  const pinnedPieces = getPinnedPieces(context.bitboards, context.turn);
   const moves = context.piecePlacements
     .filter((piecePlacement) => context.isTurn(piecePlacement.piece.color))
     .flatMap((piecePlacement) => {
       return getMovesFromSquare(context, piecePlacement);
     });
 
-  const castlingMoves = getCastlingMoves(context, attackers);
+  const castlingMoves = getCastlingMoves(context);
 
   moves.push(...castlingMoves);
   return moves;
@@ -409,8 +401,22 @@ export type MoveGenerator = {
 
 export const MoveGenerator = (gameState: GameState): MoveGenerator => {
   return {
-    generateMoves: () => ({
-      moves: generateMoves(MoveGeneratorContext.from(gameState)),
-    }),
+    generateMoves: () => {
+      const chessBitboards = ChessBitboard(gameState.pieces);
+      const pinnedPieces = getPinnedPieces(chessBitboards, gameState.turn);
+      const attackers = getAttackedSquares(
+        chessBitboards,
+        Color.opposite(gameState.turn)
+      );
+      return {
+        moves: generateMoves(
+          MoveGeneratorContext.from(gameState, chessBitboards, {
+            attacks: attackers,
+            doubleAttacks: Bitboard(),
+            pinnedPieces: pinnedPieces,
+          })
+        ),
+      };
+    },
   };
 };
