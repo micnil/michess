@@ -529,8 +529,7 @@ const getPinnedPieces = (context: MoveGeneratorContext): Bitboard => {
 export const generateMoves = (context: MoveGeneratorContext): Move[] => {
   const attackers = getAttackedSquares(context, context.opponentColor);
   const pinnedPieces = getPinnedPieces(context);
-  const moves = context.board
-    .getPiecePlacements()
+  const moves = context.piecePlacements
     .filter((piecePlacement) => context.isTurn(piecePlacement.piece.color))
     .flatMap((piecePlacement) => {
       return getMovesFromSquare(context, piecePlacement);
