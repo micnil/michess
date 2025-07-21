@@ -1,5 +1,4 @@
 import {
-  BoardCoordinates,
   CastlingRight,
   Color,
   Coordinate,
@@ -12,14 +11,12 @@ import { isDefined } from '@michess/common-utils';
 import { Move } from './model/Move';
 import { MoveGeneratorContext } from './model/MoveGeneratorContext';
 import { IndexBoardUtil } from './util/IndexBoardUtil';
+import { KingAttacks } from './bitboard/KingAttacks';
+import { SliderAttacks } from './bitboard/SliderAttacks';
+import { KnightAttacks } from './bitboard/KnightAttacks';
+import { PawnAttacks } from './bitboard/PawnAttacks';
 import { DirectionOffset } from './model/DirectionOffset';
 
-const DIAGONAL_OFFSETS = [
-  DirectionOffset.NE,
-  DirectionOffset.NW,
-  DirectionOffset.SE,
-  DirectionOffset.SW,
-];
 const SLIDERS_BY_DIRECTION: Record<DirectionOffset, PieceType[]> = {
   [DirectionOffset.N]: [PieceType.Rook, PieceType.Queen],
   [DirectionOffset.S]: [PieceType.Rook, PieceType.Queen],
@@ -57,114 +54,25 @@ const DIRECTIONS_BY_SLIDER: Record<PieceType, DirectionOffset[]> = {
   [PieceType.King]: [],
   [PieceType.Pawn]: [],
 };
-const VERTICAL_OFFSETS = [DirectionOffset.N, DirectionOffset.S];
-const HORIZONTAL_OFFSETS = [DirectionOffset.E, DirectionOffset.W];
-const ADJECENT_OFFSETS = [...VERTICAL_OFFSETS, ...HORIZONTAL_OFFSETS];
-const NEIGHBORING_OFFSETS = [...ADJECENT_OFFSETS, ...DIAGONAL_OFFSETS];
 
-const KNIGHT_JUMP_OFFSETS = [15, 17, -17, -15, 10, -6, 6, -10];
 const aFileBb = Bitboard().between('a1', 'a8');
 const hFileBb = Bitboard().between('h1', 'h8');
-
-type BitboardByDirection = Record<DirectionOffset, Bitboard>;
-type DirectionalBitboardsByCoordinate = Record<Coordinate, BitboardByDirection>;
-
-const SLIDER_ATTACKS: DirectionalBitboardsByCoordinate = Object.fromEntries(
-  BoardCoordinates.createWhite().map((coord, index) => {
-    const attacks: BitboardByDirection = {
-      [DirectionOffset.N]: Bitboard().setIndices(
-        IndexBoardUtil.unfoldDirection(index, DirectionOffset.N)
-      ),
-      [DirectionOffset.S]: Bitboard().setIndices(
-        IndexBoardUtil.unfoldDirection(index, DirectionOffset.S)
-      ),
-      [DirectionOffset.E]: Bitboard().setIndices(
-        IndexBoardUtil.unfoldDirection(index, DirectionOffset.E)
-      ),
-      [DirectionOffset.W]: Bitboard().setIndices(
-        IndexBoardUtil.unfoldDirection(index, DirectionOffset.W)
-      ),
-      [DirectionOffset.NE]: Bitboard().setIndices(
-        IndexBoardUtil.unfoldDirection(index, DirectionOffset.NE)
-      ),
-      [DirectionOffset.SE]: Bitboard().setIndices(
-        IndexBoardUtil.unfoldDirection(index, DirectionOffset.SE)
-      ),
-      [DirectionOffset.NW]: Bitboard().setIndices(
-        IndexBoardUtil.unfoldDirection(index, DirectionOffset.NW)
-      ),
-      [DirectionOffset.SW]: Bitboard().setIndices(
-        IndexBoardUtil.unfoldDirection(index, DirectionOffset.SW)
-      ),
-    };
-
-    return [coord, attacks];
-  })
-) as DirectionalBitboardsByCoordinate;
-
-const KNIGHT_ATTACKS: Record<Coordinate, Bitboard> = Object.fromEntries(
-  BoardCoordinates.createWhite().map((coord, index) => {
-    const attacks = KNIGHT_JUMP_OFFSETS.map((offset) => index + offset)
-      .filter(
-        (targetIndex) =>
-          IndexBoardUtil.withinBoard(targetIndex) &&
-          IndexBoardUtil.chebyshevDistance(index, targetIndex) <= 2
-      )
-      .reduce((acc, targetIndex) => acc.setIndex(targetIndex), Bitboard());
-
-    return [coord, attacks];
-  })
-) as Record<Coordinate, Bitboard>;
-
-const KING_ATTACKS: Record<Coordinate, Bitboard> = Object.fromEntries(
-  BoardCoordinates.createWhite().map((coord, index) => {
-    const attacks = NEIGHBORING_OFFSETS.reduce((attackBitboard, offset) => {
-      const target = index + offset;
-      return IndexBoardUtil.withinBoard(target) &&
-        IndexBoardUtil.isNeighbors(index, target)
-        ? attackBitboard.setIndex(target)
-        : attackBitboard;
-    }, Bitboard());
-
-    return [coord, attacks];
-  })
-) as Record<Coordinate, Bitboard>;
-
-const PAWN_ATTACKS: Record<
-  Coordinate,
-  Record<Color, Bitboard>
-> = Object.fromEntries(
-  BoardCoordinates.createWhite().map((coord, index) => {
-    const whiteAttacks = [index - 7, index - 9].filter(
-      (targetIndex) =>
-        IndexBoardUtil.withinBoard(targetIndex) &&
-        IndexBoardUtil.isNeighbors(index, targetIndex)
-    );
-    const blackAttacks = [index + 7, index + 9].filter(
-      (targetIndex) =>
-        IndexBoardUtil.withinBoard(targetIndex) &&
-        IndexBoardUtil.isNeighbors(index, targetIndex)
-    );
-    const attacks: Record<Color, Bitboard> = {
-      white: Bitboard().setIndices(whiteAttacks),
-      black: Bitboard().setIndices(blackAttacks),
-    };
-    return [coord, attacks];
-  })
-) as Record<Coordinate, Record<Color, Bitboard>>;
 
 const getRayAttacks = (
   context: MoveGeneratorContext,
   direction: DirectionOffset,
   coord: Coordinate
 ): Bitboard => {
-  const attacks = SLIDER_ATTACKS[coord][direction];
+  const attacks = SliderAttacks.fromCoordAndDirection(coord, direction);
   const blockers = attacks.intersection(context.bitboards.occupied);
   if (!blockers.isEmpty()) {
     const indexOfFirstBlocker =
       direction > 0 ? blockers.scanForward() : blockers.scanBackward();
     return attacks.exclude(
-      SLIDER_ATTACKS[Coordinate.fromIndex(indexOfFirstBlocker)][direction]
+      SliderAttacks.fromCoordAndDirection(
+        Coordinate.fromIndex(indexOfFirstBlocker),
+        direction
+      )
     );
   } else {
     return attacks;
@@ -231,7 +139,7 @@ const getMovesForKing = (
   { coord, piece }: PiecePlacement
 ): Move[] => {
   const ownOccupancy = context.bitboards.getOwnOccupancy(piece.color);
-  const kingAttacks = KING_ATTACKS[coord];
+  const kingAttacks = KingAttacks.fromCoord(coord);
   const legalKingMoves = kingAttacks.exclude(ownOccupancy);
 
   return movesFromBitboard(context, { coord, piece }, legalKingMoves);
@@ -242,7 +150,7 @@ const getMovesForKnight = (
   { coord, piece }: PiecePlacement
 ): Move[] => {
   const ownOccupancy = context.bitboards.getOwnOccupancy(piece.color);
-  const legalKnightMoves = KNIGHT_ATTACKS[coord].exclude(ownOccupancy);
+  const legalKnightMoves = KnightAttacks.fromCoord(coord).exclude(ownOccupancy);
 
   return movesFromBitboard(context, { piece, coord }, legalKnightMoves);
 };
@@ -270,8 +178,10 @@ const getMovesForPawn = (
     context.bitboards.occupied.isIndexSet(twoStepIndex);
 
   const opponentOccupied = context.bitboards.getOpponentOccupancy(piece.color);
-  const pawnAttacks =
-    PAWN_ATTACKS[coord][piece.color].intersection(opponentOccupied);
+  const pawnAttacks = PawnAttacks.fromCoordAndColor(
+    coord,
+    piece.color
+  ).intersection(opponentOccupied);
   const attackMoves = pawnAttacks.getIndices().flatMap((captureIndex) => {
     const attackMove = {
       start: index,
@@ -320,7 +230,11 @@ const getMovesForPawn = (
 
   if (context.enPassantCoord) {
     const enPassantIndex = Coordinate.toIndex(context.enPassantCoord);
-    if (PAWN_ATTACKS[coord][piece.color].isIndexSet(enPassantIndex)) {
+    if (
+      PawnAttacks.fromCoordAndColor(coord, piece.color).isIndexSet(
+        enPassantIndex
+      )
+    ) {
       moves.push({
         start: index,
         target: enPassantIndex,
@@ -353,12 +267,11 @@ const getAttackedSquares = (
   const knightAttacks = pieceBitboards[PieceType.Knight]
     .getCoordinates()
     .reduce((attacks, coordinate) => {
-      return attacks.union(KNIGHT_ATTACKS[coordinate]);
+      return attacks.union(KnightAttacks.fromCoord(coordinate));
     }, Bitboard());
-  const kingAttacks =
-    KING_ATTACKS[
-      Coordinate.fromIndex(pieceBitboards[PieceType.King].scanForward())
-    ] ?? Bitboard();
+  const kingAttacks = KingAttacks.fromCoord(
+    Coordinate.fromIndex(pieceBitboards[PieceType.King].scanForward())
+  );
   const pawnAttacksWest = pieceBitboards[PieceType.Pawn]
     .leftShift(7)
     .exclude(aFileBb);
@@ -455,8 +368,8 @@ const getPinnedPieces = (context: MoveGeneratorContext): Bitboard => {
   const kingIndex =
     context.bitboards[context.turn][PieceType.King].scanForward();
   const kingCoord = Coordinate.fromIndex(kingIndex);
-  return NEIGHBORING_OFFSETS.reduce((pinnedPieces, direction) => {
-    const attacks = SLIDER_ATTACKS[kingCoord][direction];
+  return DirectionOffset.neighbors.reduce((pinnedPieces, direction) => {
+    const attacks = SliderAttacks.fromCoordAndDirection(kingCoord, direction);
     const blockers = attacks.intersection(context.bitboards.occupied);
     if (!blockers.isEmpty()) {
       const pinningPieces = SLIDERS_BY_DIRECTION[direction];
@@ -490,7 +403,7 @@ const getPinnedPieces = (context: MoveGeneratorContext): Bitboard => {
 
 export const generateMoves = (context: MoveGeneratorContext): Move[] => {
   const attackers = getAttackedSquares(context, context.opponentColor);
-  const pinnedPieces = getPinnedPieces(context);
+  //const pinnedPieces = getPinnedPieces(context);
   const moves = context.piecePlacements
     .filter((piecePlacement) => context.isTurn(piecePlacement.piece.color))
     .flatMap((piecePlacement) => {
