@@ -7,22 +7,12 @@ import {
   PiecePlacement,
   PieceType,
 } from '@michess/core-models';
-import { Move } from './model/Move';
-import { MoveGeneratorContext } from './model/MoveGeneratorContext';
-
 import { Bitboard } from '@michess/core-state';
 import { isDefined } from '@michess/common-utils';
-
-enum DirectionOffset {
-  N = -8,
-  S = +8,
-  E = +1,
-  W = -1,
-  NE = -7,
-  SE = +9,
-  NW = -9,
-  SW = +7,
-}
+import { Move } from './model/Move';
+import { MoveGeneratorContext } from './model/MoveGeneratorContext';
+import { IndexBoardUtil } from './util/IndexBoardUtil';
+import { DirectionOffset } from './model/DirectionOffset';
 
 const DIAGONAL_OFFSETS = [
   DirectionOffset.NE,
@@ -76,38 +66,6 @@ const KNIGHT_JUMP_OFFSETS = [15, 17, -17, -15, 10, -6, 6, -10];
 const aFileBb = Bitboard().between('a1', 'a8');
 const hFileBb = Bitboard().between('h1', 'h8');
 
-const withinBoard = (index: number): boolean => 0 <= index && index <= 63;
-
-const chebyshevDistance = (startIndex: number, nextIndex: number): number => {
-  const startFile = startIndex % 8;
-  const nextFile = nextIndex % 8;
-  const startRank = (startIndex - startFile) / 8;
-  const nextRank = (nextIndex - nextFile) / 8;
-
-  return Math.max(
-    Math.abs(startRank - nextRank),
-    Math.abs(startFile - nextFile)
-  );
-};
-const isNeighbors = (startIndex: number, nextIndex: number): boolean => {
-  return chebyshevDistance(startIndex, nextIndex) <= 1;
-};
-
-const unfoldDirection = (
-  startIndex: number,
-  directionOffset: number
-): number[] => {
-  const indexes: number[] = [];
-  for (
-    let currentIndex = startIndex, nextIndex = startIndex + directionOffset;
-    withinBoard(nextIndex) && isNeighbors(currentIndex, nextIndex);
-    currentIndex = nextIndex, nextIndex = nextIndex + directionOffset
-  ) {
-    indexes.push(nextIndex);
-  }
-  return indexes;
-};
-
 type BitboardByDirection = Record<DirectionOffset, Bitboard>;
 type DirectionalBitboardsByCoordinate = Record<Coordinate, BitboardByDirection>;
 
@@ -115,28 +73,28 @@ const SLIDER_ATTACKS: DirectionalBitboardsByCoordinate = Object.fromEntries(
   BoardCoordinates.createWhite().map((coord, index) => {
     const attacks: BitboardByDirection = {
       [DirectionOffset.N]: Bitboard().setIndices(
-        unfoldDirection(index, DirectionOffset.N)
+        IndexBoardUtil.unfoldDirection(index, DirectionOffset.N)
       ),
       [DirectionOffset.S]: Bitboard().setIndices(
-        unfoldDirection(index, DirectionOffset.S)
+        IndexBoardUtil.unfoldDirection(index, DirectionOffset.S)
       ),
       [DirectionOffset.E]: Bitboard().setIndices(
-        unfoldDirection(index, DirectionOffset.E)
+        IndexBoardUtil.unfoldDirection(index, DirectionOffset.E)
       ),
       [DirectionOffset.W]: Bitboard().setIndices(
-        unfoldDirection(index, DirectionOffset.W)
+        IndexBoardUtil.unfoldDirection(index, DirectionOffset.W)
       ),
       [DirectionOffset.NE]: Bitboard().setIndices(
-        unfoldDirection(index, DirectionOffset.NE)
+        IndexBoardUtil.unfoldDirection(index, DirectionOffset.NE)
       ),
       [DirectionOffset.SE]: Bitboard().setIndices(
-        unfoldDirection(index, DirectionOffset.SE)
+        IndexBoardUtil.unfoldDirection(index, DirectionOffset.SE)
       ),
       [DirectionOffset.NW]: Bitboard().setIndices(
-        unfoldDirection(index, DirectionOffset.NW)
+        IndexBoardUtil.unfoldDirection(index, DirectionOffset.NW)
       ),
       [DirectionOffset.SW]: Bitboard().setIndices(
-        unfoldDirection(index, DirectionOffset.SW)
+        IndexBoardUtil.unfoldDirection(index, DirectionOffset.SW)
       ),
     };
 
@@ -149,7 +107,8 @@ const KNIGHT_ATTACKS: Record<Coordinate, Bitboard> = Object.fromEntries(
     const attacks = KNIGHT_JUMP_OFFSETS.map((offset) => index + offset)
       .filter(
         (targetIndex) =>
-          withinBoard(targetIndex) && chebyshevDistance(index, targetIndex) <= 2
+          IndexBoardUtil.withinBoard(targetIndex) &&
+          IndexBoardUtil.chebyshevDistance(index, targetIndex) <= 2
       )
       .reduce((acc, targetIndex) => acc.setIndex(targetIndex), Bitboard());
 
@@ -161,7 +120,8 @@ const KING_ATTACKS: Record<Coordinate, Bitboard> = Object.fromEntries(
   BoardCoordinates.createWhite().map((coord, index) => {
     const attacks = NEIGHBORING_OFFSETS.reduce((attackBitboard, offset) => {
       const target = index + offset;
-      return withinBoard(target) && isNeighbors(index, target)
+      return IndexBoardUtil.withinBoard(target) &&
+        IndexBoardUtil.isNeighbors(index, target)
         ? attackBitboard.setIndex(target)
         : attackBitboard;
     }, Bitboard());
@@ -177,11 +137,13 @@ const PAWN_ATTACKS: Record<
   BoardCoordinates.createWhite().map((coord, index) => {
     const whiteAttacks = [index - 7, index - 9].filter(
       (targetIndex) =>
-        withinBoard(targetIndex) && isNeighbors(index, targetIndex)
+        IndexBoardUtil.withinBoard(targetIndex) &&
+        IndexBoardUtil.isNeighbors(index, targetIndex)
     );
     const blackAttacks = [index + 7, index + 9].filter(
       (targetIndex) =>
-        withinBoard(targetIndex) && isNeighbors(index, targetIndex)
+        IndexBoardUtil.withinBoard(targetIndex) &&
+        IndexBoardUtil.isNeighbors(index, targetIndex)
     );
     const attacks: Record<Color, Bitboard> = {
       white: Bitboard().setIndices(whiteAttacks),
@@ -299,12 +261,12 @@ const getMovesForPawn = (
 
   const oneStepIndex = index + direction * 8;
   const oneStepSquareOccupied =
-    withinBoard(oneStepIndex) &&
+    IndexBoardUtil.withinBoard(oneStepIndex) &&
     context.bitboards.occupied.isIndexSet(oneStepIndex);
 
   const twoStepIndex = index + direction * 16;
   const twoStepSquareOccupied =
-    withinBoard(twoStepIndex) &&
+    IndexBoardUtil.withinBoard(twoStepIndex) &&
     context.bitboards.occupied.isIndexSet(twoStepIndex);
 
   const opponentOccupied = context.bitboards.getOpponentOccupancy(piece.color);
