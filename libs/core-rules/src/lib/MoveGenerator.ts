@@ -123,7 +123,7 @@ const getMovesForKing = (
   const kingAttacks = KingAttacks.fromCoord(coord);
   const legalKingMoves = kingAttacks
     .exclude(ownOccupancy)
-    .exclude(context.moveMasks.kingDanger);
+    .exclude(context.moveMasks.kingXRayAttacks);
 
   return movesFromBitboard(context, { coord, piece }, legalKingMoves);
 };
@@ -319,7 +319,7 @@ const getAttackedSquares = (
     .union(sliderAttacks);
 };
 
-const getKingDangerSquares = (
+const getKingXRayAttacks = (
   chessBitboard: ChessBitboard,
   color: Color
 ): Bitboard => {
@@ -469,7 +469,7 @@ export const MoveGenerator = (gameState: GameState): MoveGenerator => {
         .isEmpty();
 
       const kingDanger = isCheck
-        ? getKingDangerSquares(chessBitboards, gameState.turn)
+        ? getKingXRayAttacks(chessBitboards, gameState.turn)
         : attackers;
       return {
         moves: generateMoves(
@@ -477,7 +477,7 @@ export const MoveGenerator = (gameState: GameState): MoveGenerator => {
             attacks: attackers,
             doubleAttacks: Bitboard(),
             pinnedPieces: pinnedPieces,
-            kingDanger,
+            kingXRayAttacks: kingDanger,
           })
         ),
       };
