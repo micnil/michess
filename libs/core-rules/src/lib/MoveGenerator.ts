@@ -121,7 +121,9 @@ const getMovesForKing = (
 ): Move[] => {
   const ownOccupancy = context.bitboards.getOwnOccupancy(piece.color);
   const kingAttacks = KingAttacks.fromCoord(coord);
-  const legalKingMoves = kingAttacks.exclude(ownOccupancy);
+  const legalKingMoves = kingAttacks
+    .exclude(ownOccupancy)
+    .exclude(context.moveMasks.attacks);
 
   return movesFromBitboard(context, { coord, piece }, legalKingMoves);
 };

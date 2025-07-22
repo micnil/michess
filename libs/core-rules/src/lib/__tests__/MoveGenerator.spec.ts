@@ -1035,6 +1035,43 @@ describe('MoveGenerator', () => {
         ])
       );
     });
+
+    it('cannot move into check', () => {
+      // Board:
+      // 8  . . . . . . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . . . . . . . .
+      // 4  . . . . . . . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . K . r .
+      //    a b c d e f g h
+      const context = MoveGenerator(
+        createGameStateMock({
+          pieces: {
+            e1: { type: PieceType.King, color: Color.White },
+            g1: { type: PieceType.Rook, color: Color.Black },
+          },
+          turn: Color.White,
+        })
+      );
+
+      const { moves } = context.generateMoves();
+
+      expect(moves).not.toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            start: Coordinate.toIndex('e1'),
+            target: Coordinate.toIndex('f1'),
+          }),
+          expect.objectContaining({
+            start: Coordinate.toIndex('e1'),
+            target: Coordinate.toIndex('g1'),
+          }),
+        ])
+      );
+    });
     it('can move one square in any direction from center', () => {
       // Board:
       // 8  . . . . . . . .
