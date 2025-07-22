@@ -467,6 +467,7 @@ export const MoveGenerator = (gameState: GameState): MoveGenerator => {
       const isCheck = !attackers
         .intersection(chessBitboards[gameState.turn][PieceType.King])
         .isEmpty();
+
       const kingDanger = isCheck
         ? getKingDangerSquares(chessBitboards, gameState.turn)
         : attackers;
