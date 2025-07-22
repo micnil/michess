@@ -503,6 +503,220 @@ describe('MoveGenerator', () => {
         ])
       );
     });
+
+    it('cannot move if pinned vertically', () => {
+      // Board:
+      // 8  . . . . r . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . . . . . . . .
+      // 4  . . . . Q . . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . K . . .
+      //    a b c d e f g h
+      const context = MoveGenerator(
+        createGameStateMock({
+          pieces: {
+            e1: { type: PieceType.King, color: Color.White },
+            e4: { type: PieceType.Queen, color: Color.White },
+            e8: { type: PieceType.Rook, color: Color.Black },
+          },
+          turn: Color.White,
+        })
+      );
+
+      const { moves } = context.generateMoves();
+
+      // Only moves allowed are along the e-file (vertical)
+      expect(moves).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('e5'),
+          }),
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('e6'),
+          }),
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('e7'),
+          }),
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('e8'),
+            capture: true,
+          }),
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('e3'),
+          }),
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('e2'),
+          }),
+        ])
+      );
+      // Should not allow horizontal or diagonal moves
+      expect(moves).not.toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('d4'),
+          }),
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('f4'),
+          }),
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('d5'),
+          }),
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('f5'),
+          }),
+        ])
+      );
+    });
+
+    it('cannot move if pinned diagonally', () => {
+      // Board:
+      // 8  Q . . . . . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . . . . . . . .
+      // 4  . . . . q . . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . . . . k
+      //    a b c d e f g h
+      const context = MoveGenerator(
+        createGameStateMock({
+          pieces: {
+            h1: { type: PieceType.King, color: Color.Black },
+            e4: { type: PieceType.Queen, color: Color.Black },
+            a8: { type: PieceType.Queen, color: Color.White },
+          },
+          turn: Color.Black,
+        })
+      );
+      const { moves } = context.generateMoves();
+      // Only moves allowed are along the a7-h1 diagonal
+      expect(moves).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('g2'),
+          }),
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('f3'),
+          }),
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('d5'),
+          }),
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('c6'),
+          }),
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('b7'),
+          }),
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('a8'),
+          }),
+        ])
+      );
+      // Should not allow vertical or horizontal moves
+      expect(moves).not.toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('f5'),
+          }),
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('e3'),
+          }),
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('e5'),
+          }),
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('d3'),
+          }),
+        ])
+      );
+    });
+
+    it('cannot move if pinned horizontally', () => {
+      // Board:
+      // 8  . . . . . . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . . . . . . . .
+      // 4  . K . . Q r . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . . . . .
+      //    a b c d e f g h
+      const context = MoveGenerator(
+        createGameStateMock({
+          pieces: {
+            b4: { type: PieceType.King, color: Color.White },
+            e4: { type: PieceType.Queen, color: Color.White },
+            f4: { type: PieceType.Rook, color: Color.Black },
+          },
+          turn: Color.White,
+        })
+      );
+      const { moves } = context.generateMoves();
+
+      console.log(JSON.stringify(moves, null, 2));
+      expect(moves).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('f4'),
+          }),
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('d4'),
+          }),
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('c4'),
+          }),
+        ])
+      );
+      // Should not allow vertical or diagonal moves
+      expect(moves).not.toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('e5'),
+          }),
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('e3'),
+          }),
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('d5'),
+          }),
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('f5'),
+          }),
+        ])
+      );
+    });
   });
 
   describe('knight', () => {

@@ -136,8 +136,8 @@ const applyPinRestrictions = (
     const kingIndex =
       context.bitboards[context.turn][PieceType.King].scanForward();
     const pinDirection = DirectionOffset.fromCoordinates(
-      Coordinate.toIndex(coordinate),
-      kingIndex
+      kingIndex,
+      Coordinate.toIndex(coordinate)
     );
     const pinMoveRestrictions = SliderAttacks.fromCoordAndDirection(
       Coordinate.fromIndex(kingIndex),
