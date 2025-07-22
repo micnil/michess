@@ -10,13 +10,15 @@ import {
 } from '@michess/core-models';
 import { Bitboard } from './Bitboard';
 
-export type ChessBitboard = {
-  white: {
-    [piece in PieceType]: Bitboard;
-  };
-  black: {
-    [piece in PieceType]: Bitboard;
-  };
+type PieceBitboard = {
+  [piece in PieceType]: Bitboard;
+};
+
+type ColoredPieceBitboards = {
+  [color in Color]: PieceBitboard;
+};
+
+export type ChessBitboard = ColoredPieceBitboards & {
   castlingPaths: {
     [color in Color]: {
       [right in CastlingRight]: Bitboard;
@@ -35,15 +37,12 @@ export type ChessBitboard = {
   removePiece: (piece: Piece) => ChessBitboard;
   getOwnOccupancy: (color: Color) => Bitboard;
   getOpponentOccupancy: (color: Color) => Bitboard;
+  getOpponentPieceBoards: (color: Color) => PieceBitboard;
 };
 
-type PieceBitboards = {
-  [color in Color]: {
-    [piece in PieceType]: Bitboard;
-  };
-};
-
-const fromPieceBitboards = (bitboards: PieceBitboards): ChessBitboard => {
+const fromPieceBitboards = (
+  bitboards: ColoredPieceBitboards
+): ChessBitboard => {
   const colors: Color[] = ['white', 'black'];
   const pieces: PieceType[] = ['p', 'n', 'b', 'r', 'q', 'k'];
 
@@ -133,6 +132,12 @@ const fromPieceBitboards = (bitboards: PieceBitboards): ChessBitboard => {
       color === 'white' ? whiteOccupied : blackOccupied,
     getOpponentOccupancy: (color: Color) =>
       color === 'white' ? blackOccupied : whiteOccupied,
+    getOpponentPieceBoards: (color: Color): PieceBitboard => {
+      const opponentColor = Color.opposite(color);
+      return {
+        ...bitboards[opponentColor],
+      };
+    },
   };
 };
 

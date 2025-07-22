@@ -272,7 +272,10 @@ const getMovesForPawn = (
   return moves;
 };
 
-const getSliderAttacks = (chessBitboard: ChessBitboard, piece: Piece) => {
+const getSliderAttacks = (
+  chessBitboard: ChessBitboard,
+  piece: Piece
+): Bitboard => {
   return chessBitboard[piece.color][piece.type]
     .getCoordinates()
     .reduce((attacks, coordinate) => {
@@ -283,6 +286,55 @@ const getSliderAttacks = (chessBitboard: ChessBitboard, piece: Piece) => {
         })
       );
     }, Bitboard());
+};
+
+const getKingAttackers = (
+  chessBitboard: ChessBitboard,
+  color: Color
+): {
+  kingAttackers: Bitboard;
+  checkBlockPaths: Bitboard;
+} => {
+  const kingIndex = chessBitboard[color][PieceType.King].scanForward();
+
+  let checkBlockPaths = Bitboard(0xffffffffffffffffn);
+  if (kingIndex === -1) {
+    return { kingAttackers: Bitboard(), checkBlockPaths };
+  } else {
+    const kingCoord = Coordinate.fromIndex(kingIndex);
+
+    const opponentPieces = chessBitboard.getOpponentPieceBoards(color);
+
+    const knightAttackers = KnightAttacks.fromCoord(kingCoord).intersection(
+      opponentPieces[PieceType.Knight]
+    );
+    const pawnAttackers = PawnAttacks.fromCoordAndColor(
+      kingCoord,
+      color
+    ).intersection(opponentPieces[PieceType.Pawn]);
+    const opponentSliders = opponentPieces[PieceType.Bishop]
+      .union(opponentPieces[PieceType.Rook])
+      .union(opponentPieces[PieceType.Queen]);
+    const sliderAttackers = getSlidingAttacks(chessBitboard, {
+      coord: kingCoord,
+      piece: Piece.from(PieceType.Queen, color),
+    }).intersection(opponentSliders);
+    const kingAttackers = knightAttackers
+      .union(pawnAttackers)
+      .union(sliderAttackers);
+
+    if (kingAttackers.countBits() === 1) {
+      if (!kingAttackers.intersection(sliderAttackers).isEmpty()) {
+        checkBlockPaths = Bitboard().between(
+          kingCoord,
+          Coordinate.fromIndex(kingAttackers.scanForward())
+        );
+      } else {
+        checkBlockPaths = Bitboard();
+      }
+    }
+    return { kingAttackers, checkBlockPaths };
+  }
 };
 
 const getAttackedSquares = (
@@ -298,11 +350,15 @@ const getAttackedSquares = (
   const kingAttacks = KingAttacks.fromCoord(
     Coordinate.fromIndex(pieceBitboards[PieceType.King].scanForward())
   );
+  const pawnWestAttackOffset =
+    color === Color.White ? DirectionOffset.SW : DirectionOffset.NW;
+  const pawnEastAttackOffset =
+    color === Color.White ? DirectionOffset.SE : DirectionOffset.NE;
   const pawnAttacksWest = pieceBitboards[PieceType.Pawn]
-    .leftShift(7)
+    .leftShift(pawnWestAttackOffset)
     .exclude(aFileBb);
   const pawnAttacksEast = pieceBitboards[PieceType.Pawn]
-    .leftShift(9)
+    .leftShift(pawnEastAttackOffset)
     .exclude(hFileBb);
   const pawnAttacks = pawnAttacksWest.union(pawnAttacksEast);
   const sliders = [PieceType.Bishop, PieceType.Rook, PieceType.Queen];
@@ -439,7 +495,15 @@ const getPinnedPieces = (
 };
 
 const generateMoves = (context: MoveGeneratorContext): Move[] => {
-  const moves = context.piecePlacements
+  const numKingAttackers = context.moveMasks.kingAttackers.countBits();
+  const isDoubleCheck = numKingAttackers >= 2;
+  const piecePlacements = isDoubleCheck
+    ? context.piecePlacements.filter(
+        (piecePlacement) => piecePlacement.piece.type === PieceType.King
+      )
+    : context.piecePlacements;
+
+  const moves = piecePlacements
     .filter((piecePlacement) => context.isTurn(piecePlacement.piece.color))
     .flatMap((piecePlacement) => {
       return getMovesFromSquare(context, piecePlacement);
@@ -459,25 +523,37 @@ export const MoveGenerator = (gameState: GameState): MoveGenerator => {
   return {
     generateMoves: () => {
       const chessBitboards = ChessBitboard(gameState.pieces);
+      const { kingAttackers, checkBlockPaths } = getKingAttackers(
+        chessBitboards,
+        gameState.turn
+      );
       const pinnedPieces = getPinnedPieces(chessBitboards, gameState.turn);
       const attackers = getAttackedSquares(
         chessBitboards,
         Color.opposite(gameState.turn)
       );
-      const isCheck = !attackers
-        .intersection(chessBitboards[gameState.turn][PieceType.King])
-        .isEmpty();
+      const numKingAttackers = kingAttackers.countBits();
+      const isCheck = numKingAttackers > 0;
 
-      const kingDanger = isCheck
+      const captureMask =
+        numKingAttackers === 0
+          ? Bitboard(0xffffffffffffffffn)
+          : numKingAttackers === 1
+          ? kingAttackers
+          : Bitboard();
+
+      const kingXRayAttacks = isCheck
         ? getKingXRayAttacks(chessBitboards, gameState.turn)
         : attackers;
       return {
         moves: generateMoves(
           MoveGeneratorContext.from(gameState, chessBitboards, {
             attacks: attackers,
-            doubleAttacks: Bitboard(),
-            pinnedPieces: pinnedPieces,
-            kingXRayAttacks: kingDanger,
+            pinnedPieces,
+            kingXRayAttacks,
+            kingAttackers,
+            checkBlockPaths,
+            captureMask,
           })
         ),
       };

@@ -8,6 +8,8 @@ export type MoveMaskBitboards = {
    * but with the king removed to avoid walking in the sliding direction.
    */
   kingXRayAttacks: Bitboard;
-  doubleAttacks: Bitboard;
   pinnedPieces: Bitboard;
+  kingAttackers: Bitboard;
+  checkBlockPaths: Bitboard;
+  captureMask: Bitboard;
 };

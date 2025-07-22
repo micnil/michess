@@ -780,7 +780,6 @@ describe('MoveGenerator', () => {
       );
       const { moves } = context.generateMoves();
 
-      console.log(JSON.stringify(moves, null, 2));
       expect(moves).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
