@@ -362,6 +362,108 @@ describe('MoveGenerator', () => {
         ])
       );
     });
+
+    it('cannot move if pinned vertically', () => {
+      // Board:
+      // 8  . . . . r . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . . . p . . . .
+      // 4  . . . . P . . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . K . . .
+      //    a b c d e f g h
+      const context = MoveGenerator(
+        createGameStateMock({
+          pieces: {
+            e1: { type: PieceType.King, color: Color.White },
+            e4: { type: PieceType.Pawn, color: Color.White },
+            d5: { type: PieceType.Pawn, color: Color.Black },
+            e8: { type: PieceType.Rook, color: Color.Black },
+          },
+          turn: Color.White,
+        })
+      );
+      const { moves } = context.generateMoves();
+      expect(moves).not.toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('d5'),
+          }),
+        ])
+      );
+    });
+
+    it('cannot move if pinned diagonally', () => {
+      // Board:
+      // 8  Q . . . . . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . . . . . . . .
+      // 4  . . . . p . . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . . . . k
+      //    a b c d e f g h
+      const context = MoveGenerator(
+        createGameStateMock({
+          pieces: {
+            h1: { type: PieceType.King, color: Color.Black },
+            e4: { type: PieceType.Pawn, color: Color.Black },
+            a8: { type: PieceType.Queen, color: Color.White },
+          },
+          turn: Color.Black,
+        })
+      );
+
+      const { moves } = context.generateMoves();
+
+      expect(moves).not.toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            start: Coordinate.toIndex('e4'),
+            target: Coordinate.toIndex('e3'),
+          }),
+        ])
+      );
+    });
+
+    it('cannot capture en-passant if pinned', () => {
+      // Board:
+      // 8  . . . . . . . .
+      // 7  . . . . . . . b
+      // 6  . . . . . . . .
+      // 5  . . . . p P . .
+      // 4  . . . . K . . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . . . . .
+      //    a b c d e f g h
+      const context = MoveGenerator(
+        createGameStateMock({
+          pieces: {
+            e4: { type: PieceType.King, color: Color.White },
+            f5: { type: PieceType.Pawn, color: Color.White },
+            e5: { type: PieceType.Pawn, color: Color.Black },
+            h7: { type: PieceType.Bishop, color: Color.Black },
+          },
+          enPassant: 'e6',
+          turn: Color.White,
+        })
+      );
+      const { moves } = context.generateMoves();
+      // Should not be able to capture en-passant
+      expect(moves).not.toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            start: Coordinate.toIndex('f5'),
+            target: Coordinate.toIndex('e6'),
+          }),
+        ])
+      );
+    });
   });
 
   describe('queen', () => {

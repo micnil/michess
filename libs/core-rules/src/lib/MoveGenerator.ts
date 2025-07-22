@@ -126,6 +126,23 @@ const getMovesForKing = (
   return movesFromBitboard(context, { coord, piece }, legalKingMoves);
 };
 
+const getPinMoveRestrictions = (
+  context: MoveGeneratorContext,
+  coordinate: Coordinate
+): Bitboard => {
+  const kingIndex =
+    context.bitboards[context.turn][PieceType.King].scanForward();
+  const pinDirection = DirectionOffset.fromCoordinates(
+    kingIndex,
+    Coordinate.toIndex(coordinate)
+  );
+  const pinMoveRestrictions = SliderAttacks.fromCoordAndDirection(
+    Coordinate.fromIndex(kingIndex),
+    pinDirection
+  );
+  return pinMoveRestrictions;
+};
+
 const applyPinRestrictions = (
   context: MoveGeneratorContext,
   moves: Bitboard,
@@ -133,16 +150,7 @@ const applyPinRestrictions = (
 ): Bitboard => {
   const isPinned = context.moveMasks.pinnedPieces.isCoordSet(coordinate);
   if (isPinned) {
-    const kingIndex =
-      context.bitboards[context.turn][PieceType.King].scanForward();
-    const pinDirection = DirectionOffset.fromCoordinates(
-      kingIndex,
-      Coordinate.toIndex(coordinate)
-    );
-    const pinMoveRestrictions = SliderAttacks.fromCoordAndDirection(
-      Coordinate.fromIndex(kingIndex),
-      pinDirection
-    );
+    const pinMoveRestrictions = getPinMoveRestrictions(context, coordinate);
     return moves.intersection(pinMoveRestrictions);
   } else {
     return moves;
@@ -171,6 +179,11 @@ const getMovesForPawn = (
   { coord, piece }: PiecePlacement
 ): Move[] => {
   const index = Coordinate.toIndex(coord);
+  const isPinned = context.moveMasks.pinnedPieces.isCoordSet(coord);
+  const pinMoveRestrictions = isPinned
+    ? getPinMoveRestrictions(context, coord)
+    : // Bitboard with all bits set to 1
+      Bitboard(0xffffffffffffffffn);
 
   const directionOffset =
     piece.color === Color.White ? DirectionOffset.N : DirectionOffset.S;
@@ -178,20 +191,21 @@ const getMovesForPawn = (
   const promotionRank = piece.color === Color.White ? 8 : 1;
 
   const oneStepIndex = index + directionOffset;
-  const oneStepSquareOccupied =
+  const isOneStepLegal =
     IndexBoardUtil.withinBoard(oneStepIndex) &&
-    context.bitboards.occupied.isIndexSet(oneStepIndex);
+    !context.bitboards.occupied.isIndexSet(oneStepIndex) &&
+    pinMoveRestrictions.isIndexSet(oneStepIndex);
 
   const twoStepIndex = oneStepIndex + directionOffset;
-  const twoStepSquareOccupied =
+  const isTwoStepLegal =
     IndexBoardUtil.withinBoard(twoStepIndex) &&
-    context.bitboards.occupied.isIndexSet(twoStepIndex);
+    !context.bitboards.occupied.isIndexSet(twoStepIndex) &&
+    pinMoveRestrictions.isIndexSet(twoStepIndex);
 
   const opponentOccupied = context.bitboards.getOpponentOccupancy(piece.color);
-  const pawnAttacks = PawnAttacks.fromCoordAndColor(
-    coord,
-    piece.color
-  ).intersection(opponentOccupied);
+  const pawnAttacks = PawnAttacks.fromCoordAndColor(coord, piece.color)
+    .intersection(pinMoveRestrictions)
+    .intersection(opponentOccupied);
   const attackMoves = pawnAttacks.getIndices().flatMap((captureIndex) => {
     const attackMove = {
       start: index,
@@ -211,7 +225,7 @@ const getMovesForPawn = (
   const isStartPosition = currentRank === startRank;
 
   const moves: Move[] = attackMoves;
-  if (!oneStepSquareOccupied) {
+  if (isOneStepLegal) {
     const move: Move = {
       start: index,
       target: oneStepIndex,
@@ -230,7 +244,7 @@ const getMovesForPawn = (
     }
   }
 
-  if (isStartPosition && !oneStepSquareOccupied && !twoStepSquareOccupied) {
+  if (isStartPosition && isOneStepLegal && isTwoStepLegal) {
     moves.push({
       start: index,
       target: twoStepIndex,
@@ -239,12 +253,12 @@ const getMovesForPawn = (
   }
 
   if (context.enPassantCoord) {
+    const pawnAttacks = PawnAttacks.fromCoordAndColor(
+      coord,
+      piece.color
+    ).intersection(pinMoveRestrictions);
     const enPassantIndex = Coordinate.toIndex(context.enPassantCoord);
-    if (
-      PawnAttacks.fromCoordAndColor(coord, piece.color).isIndexSet(
-        enPassantIndex
-      )
-    ) {
+    if (pawnAttacks.isIndexSet(enPassantIndex)) {
       moves.push({
         start: index,
         target: enPassantIndex,
