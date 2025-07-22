@@ -172,16 +172,17 @@ const getMovesForPawn = (
 ): Move[] => {
   const index = Coordinate.toIndex(coord);
 
-  const direction = piece.color === Color.White ? -1 : +1;
+  const directionOffset =
+    piece.color === Color.White ? DirectionOffset.N : DirectionOffset.S;
   const startRank = piece.color === Color.White ? 6 : 1;
   const promotionRank = piece.color === Color.White ? 8 : 1;
 
-  const oneStepIndex = index + direction * 8;
+  const oneStepIndex = index + directionOffset;
   const oneStepSquareOccupied =
     IndexBoardUtil.withinBoard(oneStepIndex) &&
     context.bitboards.occupied.isIndexSet(oneStepIndex);
 
-  const twoStepIndex = index + direction * 16;
+  const twoStepIndex = oneStepIndex + directionOffset;
   const twoStepSquareOccupied =
     IndexBoardUtil.withinBoard(twoStepIndex) &&
     context.bitboards.occupied.isIndexSet(twoStepIndex);
