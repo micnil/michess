@@ -32,42 +32,20 @@ export type ChessBitboard = {
   occupied: Bitboard;
   empty: Bitboard;
   getPieceAt: (coord: Coordinate) => Maybe<Piece>;
+  removePiece: (piece: Piece) => ChessBitboard;
   getOwnOccupancy: (color: Color) => Bitboard;
   getOpponentOccupancy: (color: Color) => Bitboard;
 };
 
-export function ChessBitboard(placements?: PiecePlacements): ChessBitboard {
+type PieceBitboards = {
+  [color in Color]: {
+    [piece in PieceType]: Bitboard;
+  };
+};
+
+const fromPieceBitboards = (bitboards: PieceBitboards): ChessBitboard => {
   const colors: Color[] = ['white', 'black'];
   const pieces: PieceType[] = ['p', 'n', 'b', 'r', 'q', 'k'];
-
-  const bitboards = {
-    white: {
-      p: Bitboard(),
-      n: Bitboard(),
-      b: Bitboard(),
-      r: Bitboard(),
-      q: Bitboard(),
-      k: Bitboard(),
-    },
-    black: {
-      p: Bitboard(),
-      n: Bitboard(),
-      b: Bitboard(),
-      r: Bitboard(),
-      q: Bitboard(),
-      k: Bitboard(),
-    },
-  };
-
-  // If placements are provided, set the bits accordingly
-  if (placements) {
-    for (const [coord, piece] of Object.entries(placements)) {
-      const { color, type } = piece;
-      bitboards[color][type] = bitboards[color][type].setCoord(
-        coord as Coordinate
-      );
-    }
-  }
 
   const whiteOccupied = Object.values(bitboards.white).reduce(
     (acc, bb) => acc.union(bb),
@@ -141,9 +119,55 @@ export function ChessBitboard(placements?: PiecePlacements): ChessBitboard {
       }
       return undefined;
     },
+    removePiece: (piece: Piece): ChessBitboard => {
+      const newBitboards = {
+        ...bitboards,
+        [piece.color]: {
+          ...bitboards[piece.color],
+          [piece.type]: Bitboard(),
+        },
+      };
+      return fromPieceBitboards(newBitboards);
+    },
     getOwnOccupancy: (color: Color) =>
       color === 'white' ? whiteOccupied : blackOccupied,
     getOpponentOccupancy: (color: Color) =>
       color === 'white' ? blackOccupied : whiteOccupied,
   };
+};
+
+const fromPiecePlacements = (placements?: PiecePlacements): ChessBitboard => {
+  const bitboards = {
+    white: {
+      p: Bitboard(),
+      n: Bitboard(),
+      b: Bitboard(),
+      r: Bitboard(),
+      q: Bitboard(),
+      k: Bitboard(),
+    },
+    black: {
+      p: Bitboard(),
+      n: Bitboard(),
+      b: Bitboard(),
+      r: Bitboard(),
+      q: Bitboard(),
+      k: Bitboard(),
+    },
+  };
+
+  // If placements are provided, set the bits accordingly
+  if (placements) {
+    for (const [coord, piece] of Object.entries(placements)) {
+      const { color, type } = piece;
+      bitboards[color][type] = bitboards[color][type].setCoord(
+        coord as Coordinate
+      );
+    }
+  }
+  return fromPieceBitboards(bitboards);
+};
+
+export function ChessBitboard(placements?: PiecePlacements): ChessBitboard {
+  return fromPiecePlacements(placements);
 }

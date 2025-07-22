@@ -1059,19 +1059,20 @@ describe('MoveGenerator', () => {
 
       const { moves } = context.generateMoves();
 
-      expect(moves).not.toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            start: Coordinate.toIndex('e1'),
-            target: Coordinate.toIndex('f1'),
-          }),
-          expect.objectContaining({
-            start: Coordinate.toIndex('e1'),
-            target: Coordinate.toIndex('g1'),
-          }),
-        ])
+      expect(moves).not.toContainEqual(
+        expect.objectContaining({
+          start: Coordinate.toIndex('e1'),
+          target: Coordinate.toIndex('f1'),
+        })
+      );
+      expect(moves).not.toContainEqual(
+        expect.objectContaining({
+          start: Coordinate.toIndex('e1'),
+          target: Coordinate.toIndex('d1'),
+        })
       );
     });
+
     it('can move one square in any direction from center', () => {
       // Board:
       // 8  . . . . . . . .

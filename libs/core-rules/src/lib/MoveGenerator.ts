@@ -123,7 +123,7 @@ const getMovesForKing = (
   const kingAttacks = KingAttacks.fromCoord(coord);
   const legalKingMoves = kingAttacks
     .exclude(ownOccupancy)
-    .exclude(context.moveMasks.attacks);
+    .exclude(context.moveMasks.kingDanger);
 
   return movesFromBitboard(context, { coord, piece }, legalKingMoves);
 };
@@ -319,6 +319,16 @@ const getAttackedSquares = (
     .union(sliderAttacks);
 };
 
+const getKingDangerSquares = (
+  chessBitboard: ChessBitboard,
+  color: Color
+): Bitboard => {
+  const chessBitboardWithoutKing = chessBitboard.removePiece(
+    Piece.from(PieceType.King, color)
+  );
+  return getAttackedSquares(chessBitboardWithoutKing, Color.opposite(color));
+};
+
 const getMovesFromSquare = (
   context: MoveGeneratorContext,
   piecePlacement: PiecePlacement
@@ -454,12 +464,19 @@ export const MoveGenerator = (gameState: GameState): MoveGenerator => {
         chessBitboards,
         Color.opposite(gameState.turn)
       );
+      const isCheck = !attackers
+        .intersection(chessBitboards[gameState.turn][PieceType.King])
+        .isEmpty();
+      const kingDanger = isCheck
+        ? getKingDangerSquares(chessBitboards, gameState.turn)
+        : attackers;
       return {
         moves: generateMoves(
           MoveGeneratorContext.from(gameState, chessBitboards, {
             attacks: attackers,
             doubleAttacks: Bitboard(),
             pinnedPieces: pinnedPieces,
+            kingDanger,
           })
         ),
       };
