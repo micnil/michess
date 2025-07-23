@@ -1189,6 +1189,37 @@ describe('MoveGenerator', () => {
         ])
       );
     });
+    it('only allows king moves when in double check', () => {
+      // Board:
+      // 8  . . . . k . . .
+      // 7  . . . . . . K .
+      // 6  . . . . . b . .
+      // 5  . . . . R . . .
+      // 4  . . . . . . . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . K . . .
+      //    a b c d e f g h
+      const context = MoveGenerator(
+        createGameStateMock({
+          pieces: {
+            e1: { type: PieceType.King, color: Color.White },
+            e8: { type: PieceType.King, color: Color.Black },
+            e5: { type: PieceType.Rook, color: Color.White },
+            f6: { type: PieceType.Bishop, color: Color.Black },
+            g7: { type: PieceType.Knight, color: Color.White },
+          },
+          turn: Color.Black,
+        })
+      );
+      const { moves } = context.generateMoves();
+
+      // Only king moves should be allowed
+      expect(moves.every((m) => m.start === Coordinate.toIndex('e8'))).toBe(
+        true
+      );
+      expect(moves.length).toBe(4);
+    });
 
     it('cannot move into check', () => {
       // Board:
