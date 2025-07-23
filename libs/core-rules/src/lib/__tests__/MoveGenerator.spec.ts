@@ -10,7 +10,6 @@ import {
 } from '@michess/core-models';
 import { Move } from '../model/Move';
 import { MoveGenerator } from '../MoveGenerator';
-import exp = require('constants');
 
 describe('MoveGenerator', () => {
   describe('bishop', () => {
