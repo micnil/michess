@@ -10,6 +10,5 @@ export type MoveMaskBitboards = {
   kingXRayAttacks: Bitboard;
   pinnedPieces: Bitboard;
   kingAttackers: Bitboard;
-  checkBlockPaths: Bitboard;
-  captureMask: Bitboard;
+  checkEvasion: Bitboard;
 };

@@ -10,6 +10,7 @@ import {
 } from '@michess/core-models';
 import { Move } from '../model/Move';
 import { MoveGenerator } from '../MoveGenerator';
+import exp = require('constants');
 
 describe('MoveGenerator', () => {
   describe('bishop', () => {
@@ -464,6 +465,83 @@ describe('MoveGenerator', () => {
         ])
       );
     });
+
+    it('cannot capture en-passant if it exposes own king to discovered check', () => {
+      // Board:
+      // 8  . . . . . . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . . k . . . . .
+      // 4  . . . P p . . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . K . . .
+      //    a b c d e f g h
+      const context = MoveGenerator(
+        createGameStateMock({
+          pieces: {
+            c5: { type: PieceType.King, color: Color.Black },
+            d4: { type: PieceType.Pawn, color: Color.White },
+            e4: { type: PieceType.Pawn, color: Color.Black },
+            e1: { type: PieceType.King, color: Color.White },
+          },
+          enPassant: 'd3',
+          turn: Color.Black,
+        })
+      );
+      const { moves } = context.generateMoves();
+      const pawnMoves = moves.filter(
+        (m) => m.start === Coordinate.toIndex('e4')
+      );
+
+      // Cannot push dues to check. But can do ep-capture of checker.
+      expect(pawnMoves).toEqual([
+        expect.objectContaining({
+          start: Coordinate.toIndex('e4'),
+          target: Coordinate.toIndex('d3'),
+          capture: true,
+        }),
+      ]);
+    });
+
+    it('allows en-passant if it blocks a check', () => {
+      // Board:
+      // 8  . . . . . . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . k . . . . . .
+      // 4  . . . P p . . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . K Q . .
+      //    a b c d e f g h
+      const context = MoveGenerator(
+        createGameStateMock({
+          pieces: {
+            b5: { type: PieceType.King, color: Color.Black },
+            d4: { type: PieceType.Pawn, color: Color.White },
+            e4: { type: PieceType.Pawn, color: Color.Black },
+            e1: { type: PieceType.King, color: Color.White },
+            f1: { type: PieceType.Queen, color: Color.White },
+          },
+          enPassant: 'd3',
+          turn: Color.Black,
+        })
+      );
+
+      const { moves } = context.generateMoves();
+
+      const pawnMoves = moves.filter(
+        (m) => m.start === Coordinate.toIndex('e4')
+      );
+      expect(pawnMoves).toEqual([
+        expect.objectContaining({
+          start: Coordinate.toIndex('e4'),
+          target: Coordinate.toIndex('d3'),
+          capture: true,
+        }),
+      ]);
+    });
   });
 
   describe('queen', () => {
@@ -522,6 +600,41 @@ describe('MoveGenerator', () => {
           }, // down-left
         ])
       );
+    });
+
+    it('can only evade check by capturing the checker', () => {
+      // Board:
+      // 8  . . . . . . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . . .
+      // 5  . . . . . . . .
+      // 4  . . . . . Q . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . K r . .
+      //    a b c d e f g h
+      const context = MoveGenerator(
+        createGameStateMock({
+          pieces: {
+            f4: { type: PieceType.Queen, color: Color.White },
+            f1: { type: PieceType.Rook, color: Color.Black },
+            e1: { type: PieceType.King, color: Color.White },
+          },
+          turn: Color.White,
+        })
+      );
+      const { moves } = context.generateMoves();
+
+      const queenMoves = moves.filter(
+        (m) => m.start === Coordinate.toIndex('f4')
+      );
+      expect(queenMoves).toEqual([
+        expect.objectContaining({
+          start: Coordinate.toIndex('f4'),
+          target: Coordinate.toIndex('f1'),
+          capture: true,
+        }),
+      ]);
     });
 
     it('cannot move through blocking pieces', () => {
@@ -996,6 +1109,48 @@ describe('MoveGenerator', () => {
           }),
         ])
       );
+    });
+
+    it('can only block or capture when evading a rook check', () => {
+      // Board:
+      // 8  . . . . k . . .
+      // 7  . . . . . . . .
+      // 6  . . . . . . n .
+      // 5  . . . . R . . .
+      // 4  . . . . . . . .
+      // 3  . . . . . . . .
+      // 2  . . . . . . . .
+      // 1  . . . . K . . .
+      //    a b c d e f g h
+      const context = MoveGenerator(
+        createGameStateMock({
+          pieces: {
+            e8: { type: PieceType.King, color: Color.Black },
+            e5: { type: PieceType.Rook, color: Color.White },
+            g6: { type: PieceType.Knight, color: Color.Black },
+            e1: { type: PieceType.King, color: Color.White },
+          },
+          turn: Color.Black,
+        })
+      );
+      const { moves } = context.generateMoves();
+
+      const knightMoves = moves.filter(
+        (m) => m.start === Coordinate.toIndex('g6')
+      );
+
+      expect(knightMoves).toEqual([
+        expect.objectContaining<Move>({
+          start: Coordinate.toIndex('g6'),
+          target: Coordinate.toIndex('e7'),
+          capture: false,
+        }),
+        expect.objectContaining<Move>({
+          start: Coordinate.toIndex('g6'),
+          target: Coordinate.toIndex('e5'),
+          capture: true,
+        }),
+      ]);
     });
   });
 

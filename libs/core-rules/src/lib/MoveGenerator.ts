@@ -111,7 +111,9 @@ const getSlidingMoves = (
   const ownOccupancy = context.bitboards.getOwnOccupancy(piece.color);
   const attacks = getSlidingAttacks(context.bitboards, { piece, coord });
   const moves = attacks.exclude(ownOccupancy);
-  const legalMoves = applyPinRestrictions(context, moves, coord);
+  const legalMoves = applyPinRestrictions(context, moves, coord).intersection(
+    context.moveMasks.checkEvasion
+  );
   return movesFromBitboard(context, { piece, coord }, legalMoves);
 };
 
@@ -169,7 +171,11 @@ const getMovesForKnight = (
     return [];
   } else {
     const ownOccupancy = context.bitboards.getOwnOccupancy(piece.color);
-    const knightMoves = KnightAttacks.fromCoord(coord).exclude(ownOccupancy);
+
+    const knightMoves = KnightAttacks.fromCoord(coord)
+      .exclude(ownOccupancy)
+      .intersection(context.moveMasks.checkEvasion);
+
     return movesFromBitboard(context, { piece, coord }, knightMoves);
   }
 };
@@ -196,17 +202,20 @@ const getMovesForPawn = (
   const isOneStepLegal =
     IndexBoardUtil.withinBoard(oneStepIndex) &&
     !context.bitboards.occupied.isIndexSet(oneStepIndex) &&
-    pinMoveRestrictions.isIndexSet(oneStepIndex);
+    pinMoveRestrictions.isIndexSet(oneStepIndex) &&
+    context.moveMasks.checkEvasion.isIndexSet(oneStepIndex);
 
   const twoStepIndex = oneStepIndex + directionOffset;
   const isTwoStepLegal =
     IndexBoardUtil.withinBoard(twoStepIndex) &&
     !context.bitboards.occupied.isIndexSet(twoStepIndex) &&
-    pinMoveRestrictions.isIndexSet(twoStepIndex);
+    pinMoveRestrictions.isIndexSet(twoStepIndex) &&
+    context.moveMasks.checkEvasion.isIndexSet(twoStepIndex);
 
   const opponentOccupied = context.bitboards.getOpponentOccupancy(piece.color);
   const pawnAttacks = PawnAttacks.fromCoordAndColor(coord, piece.color)
     .intersection(pinMoveRestrictions)
+    .intersection(context.moveMasks.checkEvasion)
     .intersection(opponentOccupied);
   const attackMoves = pawnAttacks.getIndices().flatMap((captureIndex) => {
     const attackMove = {
@@ -259,8 +268,18 @@ const getMovesForPawn = (
       coord,
       piece.color
     ).intersection(pinMoveRestrictions);
+
     const enPassantIndex = Coordinate.toIndex(context.enPassantCoord);
-    if (pawnAttacks.isIndexSet(enPassantIndex)) {
+    const checkEvasionMask = context.moveMasks.checkEvasion;
+    if (
+      pawnAttacks.isIndexSet(enPassantIndex) &&
+      // Special case for en passant.
+      // we can evade check either by blocking the path of a
+      // sliding piece (moving to ep-square), or by capturing
+      // the attacker (pawn we take with ep).
+      (checkEvasionMask.isIndexSet(enPassantIndex) ||
+        checkEvasionMask.isIndexSet(enPassantIndex - directionOffset))
+    ) {
       moves.push({
         start: index,
         target: enPassantIndex,
@@ -297,9 +316,8 @@ const getKingAttackers = (
 } => {
   const kingIndex = chessBitboard[color][PieceType.King].scanForward();
 
-  let checkBlockPaths = Bitboard(0xffffffffffffffffn);
   if (kingIndex === -1) {
-    return { kingAttackers: Bitboard(), checkBlockPaths };
+    return { kingAttackers: Bitboard(), checkBlockPaths: Bitboard() };
   } else {
     const kingCoord = Coordinate.fromIndex(kingIndex);
 
@@ -312,6 +330,7 @@ const getKingAttackers = (
       kingCoord,
       color
     ).intersection(opponentPieces[PieceType.Pawn]);
+
     const opponentSliders = opponentPieces[PieceType.Bishop]
       .union(opponentPieces[PieceType.Rook])
       .union(opponentPieces[PieceType.Queen]);
@@ -323,14 +342,13 @@ const getKingAttackers = (
       .union(pawnAttackers)
       .union(sliderAttackers);
 
+    let checkBlockPaths = Bitboard();
     if (kingAttackers.countBits() === 1) {
       if (!kingAttackers.intersection(sliderAttackers).isEmpty()) {
         checkBlockPaths = Bitboard().between(
           kingCoord,
           Coordinate.fromIndex(kingAttackers.scanForward())
         );
-      } else {
-        checkBlockPaths = Bitboard();
       }
     }
     return { kingAttackers, checkBlockPaths };
@@ -535,12 +553,10 @@ export const MoveGenerator = (gameState: GameState): MoveGenerator => {
       const numKingAttackers = kingAttackers.countBits();
       const isCheck = numKingAttackers > 0;
 
-      const captureMask =
+      const checkEvasionMask =
         numKingAttackers === 0
           ? Bitboard(0xffffffffffffffffn)
-          : numKingAttackers === 1
-          ? kingAttackers
-          : Bitboard();
+          : kingAttackers.union(checkBlockPaths);
 
       const kingXRayAttacks = isCheck
         ? getKingXRayAttacks(chessBitboards, gameState.turn)
@@ -552,8 +568,7 @@ export const MoveGenerator = (gameState: GameState): MoveGenerator => {
             pinnedPieces,
             kingXRayAttacks,
             kingAttackers,
-            checkBlockPaths,
-            captureMask,
+            checkEvasion: checkEvasionMask,
           })
         ),
       };
