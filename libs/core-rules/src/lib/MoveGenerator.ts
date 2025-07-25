@@ -331,13 +331,24 @@ const getKingAttackers = (
       color
     ).intersection(opponentPieces[PieceType.Pawn]);
 
-    const opponentSliders = opponentPieces[PieceType.Bishop]
-      .union(opponentPieces[PieceType.Rook])
-      .union(opponentPieces[PieceType.Queen]);
-    const sliderAttackers = getSlidingAttacks(chessBitboard, {
+    const opponentDiagonalSliders = opponentPieces[PieceType.Bishop].union(
+      opponentPieces[PieceType.Queen]
+    );
+    const opponentOrthogonalSliders = opponentPieces[PieceType.Rook].union(
+      opponentPieces[PieceType.Queen]
+    );
+
+    const diagonalSliderAttackers = getSlidingAttacks(chessBitboard, {
       coord: kingCoord,
-      piece: Piece.from(PieceType.Queen, color),
-    }).intersection(opponentSliders);
+      piece: Piece.from(PieceType.Bishop, color),
+    }).intersection(opponentDiagonalSliders);
+    const orthogonalSliderAttackers = getSlidingAttacks(chessBitboard, {
+      coord: kingCoord,
+      piece: Piece.from(PieceType.Rook, color),
+    }).intersection(opponentOrthogonalSliders);
+    const sliderAttackers = diagonalSliderAttackers.union(
+      orthogonalSliderAttackers
+    );
     const kingAttackers = knightAttackers
       .union(pawnAttackers)
       .union(sliderAttackers);
@@ -514,6 +525,8 @@ const getPinnedPieces = (
 
 const generateMoves = (context: MoveGeneratorContext): Move[] => {
   const numKingAttackers = context.moveMasks.kingAttackers.countBits();
+  console.log({ numKingAttackers });
+  console.log(context.moveMasks.kingAttackers.toString());
   const isDoubleCheck = numKingAttackers >= 2;
   const piecePlacements = isDoubleCheck
     ? context.piecePlacements.filter(
