@@ -49,7 +49,6 @@ const getSquare = (board: BoardState, coord: Coordinate): SquareState => {
 export const Chessboard = (board: BoardState): IChessboard => {
   return {
     getIndex: (coord) => Coordinate.toIndex(coord),
-    getSquare: (coord) => getSquare(board, coord),
     getCoordinates: () => BoardCoordinates.createWhite(),
     getPiecePlacements: () => getPiecePlacements(board),
     movePiece: (movePayload: MovePayload) =>
