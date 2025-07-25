@@ -1,8 +1,4 @@
-import {
-  CastlingAbility,
-  emptyBoard,
-  startingBoard,
-} from '@michess/core-models';
+import { CastlingAbility, PiecePlacementsMock } from '@michess/core-models';
 import { gameStateFromFen } from '../gameStateFromFen';
 
 describe('gameStateFromFen', () => {
@@ -10,7 +6,7 @@ describe('gameStateFromFen', () => {
     const emptyBoardFen = '8/8/8/8/8/8/8/8 w KQkq - 0 1';
     const boardState = gameStateFromFen(emptyBoardFen);
 
-    expect(boardState.pieces).toEqual(emptyBoard);
+    expect(boardState.pieces).toEqual(PiecePlacementsMock.emptyBoard);
     expect(boardState.castlingAbility).toEqual(
       new Set([
         CastlingAbility.WhiteKing,
@@ -28,7 +24,7 @@ describe('gameStateFromFen', () => {
 
     const boardState = gameStateFromFen(startingFen);
 
-    expect(boardState.pieces).toEqual(startingBoard);
+    expect(boardState.pieces).toEqual(PiecePlacementsMock.startingBoard);
     expect(boardState.castlingAbility).toEqual(
       new Set([
         CastlingAbility.WhiteKing,
