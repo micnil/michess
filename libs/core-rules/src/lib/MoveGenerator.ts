@@ -591,6 +591,7 @@ export const MoveGenerator = (gameState: GameState): MoveGenerator => {
       return {
         moves,
         isCheckmate: isCheck && moves.length === 0,
+        isStaleMate: !isCheck && moves.length === 0,
         isCheck,
       };
     },
