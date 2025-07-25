@@ -547,7 +547,11 @@ const generateMoves = (context: MoveGeneratorContext): Move[] => {
 };
 
 export type MoveGenerator = {
-  generateMoves: () => { moves: Move[] };
+  generateMoves: () => {
+    moves: Move[];
+    isCheckmate: boolean;
+    isCheck: boolean;
+  };
 };
 
 export const MoveGenerator = (gameState: GameState): MoveGenerator => {
@@ -574,16 +578,20 @@ export const MoveGenerator = (gameState: GameState): MoveGenerator => {
       const kingXRayAttacks = isCheck
         ? getKingXRayAttacks(chessBitboards, gameState.turn)
         : attackers;
+
+      const moves = generateMoves(
+        MoveGeneratorContext.from(gameState, chessBitboards, {
+          attacks: attackers,
+          pinnedPieces,
+          kingXRayAttacks,
+          kingAttackers,
+          checkEvasion: checkEvasionMask,
+        })
+      );
       return {
-        moves: generateMoves(
-          MoveGeneratorContext.from(gameState, chessBitboards, {
-            attacks: attackers,
-            pinnedPieces,
-            kingXRayAttacks,
-            kingAttackers,
-            checkEvasion: checkEvasionMask,
-          })
-        ),
+        moves,
+        isCheckmate: isCheck && moves.length === 0,
+        isCheck,
       };
     },
   };
