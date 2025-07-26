@@ -1,10 +1,10 @@
 import { CastlingAbility, PiecePlacementsMock } from '@michess/core-models';
-import { gameStateFromFen } from '../gameStateFromFen';
+import { FenParser } from '../FenParser';
 
-describe('gameStateFromFen', () => {
+describe('FenParser.toGameState', () => {
   it('creates an empty board state', () => {
     const emptyBoardFen = '8/8/8/8/8/8/8/8 w KQkq - 0 1';
-    const boardState = gameStateFromFen(emptyBoardFen);
+    const boardState = FenParser.toGameState(emptyBoardFen);
 
     expect(boardState.pieces).toEqual(PiecePlacementsMock.emptyBoard);
     expect(boardState.castlingAbility).toEqual(
@@ -24,7 +24,7 @@ describe('gameStateFromFen', () => {
     const startingFen =
       'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
-    const boardState = gameStateFromFen(startingFen);
+    const boardState = FenParser.toGameState(startingFen);
 
     expect(boardState.pieces).toEqual(PiecePlacementsMock.startingBoard);
     expect(boardState.castlingAbility).toEqual(
@@ -43,7 +43,7 @@ describe('gameStateFromFen', () => {
   it('parses a fen string mid game', () => {
     const fen =
       'r3kb1N/ppp3p1/4pn2/3p3p/P1nPbB2/2q5/3N1PPP/R2QKB1R w KQq h6 0 14';
-    const boardState = gameStateFromFen(fen);
+    const boardState = FenParser.toGameState(fen);
     // Spot check a few key squares
     expect(boardState.pieces['c3']).toEqual({ type: 'q', color: 'black' });
     expect(boardState.pieces['e8']).toEqual({ type: 'k', color: 'black' });

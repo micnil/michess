@@ -5,7 +5,7 @@ import {
   Piece,
   PieceType,
 } from '@michess/core-models';
-import { coordIterator } from './coordIterator';
+import { coordIterator } from './util/coordIterator';
 import { parseFenParts } from './parseFenParts';
 import { FenPiecePlacementPart, FenStr } from './types/FenStr';
 import { FenValidationError } from './types/FenValidationError';

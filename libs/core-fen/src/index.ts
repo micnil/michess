@@ -1,3 +1,2 @@
-export * from './lib/boardStateFromFen';
-export * from './lib/gameStateFromFen';
+export * from './lib/FenParser';
 export * from './lib/types/FenStr';

@@ -1,4 +1,4 @@
-import { boardStateFromFen, FenStr } from '@michess/core-fen';
+import { FenStr, FenParser } from '@michess/core-fen';
 import { Color, PiecePlacements } from '@michess/core-models';
 import { Chessboard, IChessboard, MovePayload } from '@michess/core-state';
 import React, { ReactNode, useCallback, useRef, useState } from 'react';
@@ -24,7 +24,7 @@ export const ChessboardContextProvider = <TMoveMeta,>({
   moveOptions,
 }: Props<TMoveMeta>) => {
   const [chessboard, setChessboard] = useState<IChessboard>(() =>
-    Chessboard(boardStateFromFen(startingFen))
+    Chessboard(FenParser.toGameState(startingFen))
   );
   const onMoveRef = useRef(onMove);
   onMoveRef.current = onMove;

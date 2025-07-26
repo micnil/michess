@@ -1,4 +1,4 @@
-import { gameStateFromFen } from '@michess/core-fen';
+import { FenParser } from '@michess/core-fen';
 import { ChessGame, Move } from '@michess/core-rules';
 import { Chessboard as ChessboardView } from '@michess/react-chessboard';
 import { useState } from 'react';
@@ -6,7 +6,7 @@ import { useState } from 'react';
 export const ChessGameContainer = () => {
   const [chessGame, setChessGame] = useState(() =>
     ChessGame(
-      gameStateFromFen(
+      FenParser.toGameState(
         'rnbqkbnr/ppp5/r1N1Q1R1/8/8/8/PPP5/RNBQKBNR w KQkq - 0 1'
       )
     )

@@ -56,8 +56,7 @@ const enPassantCoordinateFromFenStr = (
     return fenEnPassantTargetSquare as Coordinate;
   }
 };
-
-export const gameStateFromFen = (fen: FenStr): GameState => {
+const gameStateFromFen = (fen: FenStr): GameState => {
   const fenParts = parseFenParts(fen);
 
   return {
@@ -68,4 +67,11 @@ export const gameStateFromFen = (fen: FenStr): GameState => {
     ply: Number(fenParts.halfMoveClock),
     fullMoves: Number(fenParts.fullMoveCounter),
   };
+};
+
+export const FenParser = {
+  toGameState: gameStateFromFen,
+  toFenStr: (_: GameState): FenStr => {
+    throw new Error('FenParser.toFenStr is not implemented yet');
+  },
 };
