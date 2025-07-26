@@ -115,10 +115,19 @@ const makeMove = (gameState: GameState, move: Move): GameState => {
     );
   }
 
+  const captureOrPawnMove =
+    move.capture || pieceToMove?.type === PieceType.Pawn;
+  const ply = captureOrPawnMove ? 0 : gameState.ply + 1;
+
   return {
     ...gameState,
     castlingAbility,
     turn: gameState.turn === Color.White ? Color.Black : Color.White,
+    fullMoves:
+      gameState.turn === Color.White
+        ? gameState.fullMoves + 1
+        : gameState.fullMoves,
+    ply,
     pieces: newPiecePlacements,
     // Update enPassant if the move is a double pawn advance
     enPassant:
