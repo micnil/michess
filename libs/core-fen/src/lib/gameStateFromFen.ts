@@ -12,7 +12,7 @@ import {
   FenEnPassantTargetSquarePart,
   FenSideToMovePart,
   FenStr,
-} from './types/Fen';
+} from './types/FenStr';
 import { FenValidationError } from './types/FenValidationError';
 
 const sideToMoveToColor = (sideToMove: FenSideToMovePart): Color => {

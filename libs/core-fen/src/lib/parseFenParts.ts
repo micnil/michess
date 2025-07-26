@@ -12,7 +12,7 @@ import {
   FenSideToMovePart,
   FenSideToMovePartRegex,
   FenStr,
-} from './types/Fen';
+} from './types/FenStr';
 import { FenParts } from './types/FenParts';
 import { FenValidationError } from './types/FenValidationError';
 
