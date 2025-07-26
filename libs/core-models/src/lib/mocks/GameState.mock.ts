@@ -11,6 +11,8 @@ export const gameStateMock: GameState = {
     CastlingAbility.WhiteQueen,
   ]),
   turn: 'white',
+  fullMoves: 1,
+  ply: 0,
 };
 
 export const createGameStateMock = (

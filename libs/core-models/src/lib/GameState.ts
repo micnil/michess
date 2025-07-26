@@ -7,4 +7,6 @@ export type GameState = BoardState & {
   enPassant?: Coordinate;
   turn: Color;
   castlingAbility: Set<CastlingAbility>;
+  ply: number;
+  fullMoves: number;
 };

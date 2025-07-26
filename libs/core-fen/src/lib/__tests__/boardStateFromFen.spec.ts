@@ -1,4 +1,4 @@
-import { emptyBoard, startingBoard } from '@michess/core-models';
+import { PiecePlacementsMock } from '@michess/core-models';
 import { boardStateFromFen } from '../boardStateFromFen';
 
 describe('boardStateFromFen', () => {
@@ -6,7 +6,7 @@ describe('boardStateFromFen', () => {
     const emptyBoardFen = '8/8/8/8/8/8/8/8 w KQkq - 0 1';
     const boardState = boardStateFromFen(emptyBoardFen);
 
-    expect(boardState.pieces).toEqual(emptyBoard);
+    expect(boardState.pieces).toEqual(PiecePlacementsMock.emptyBoard);
   });
   it('creates the start board state', () => {
     const startingFen =
@@ -14,6 +14,6 @@ describe('boardStateFromFen', () => {
 
     const boardState = boardStateFromFen(startingFen);
 
-    expect(boardState.pieces).toEqual(startingBoard);
+    expect(boardState.pieces).toEqual(PiecePlacementsMock.startingBoard);
   });
 });

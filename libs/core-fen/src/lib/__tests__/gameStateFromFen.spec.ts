@@ -17,6 +17,8 @@ describe('gameStateFromFen', () => {
     );
     expect(boardState.enPassant).toBeUndefined();
     expect(boardState.turn).toEqual('white');
+    expect(boardState.ply).toEqual(0);
+    expect(boardState.fullMoves).toEqual(1);
   });
   it('creates the start board state', () => {
     const startingFen =
@@ -35,5 +37,28 @@ describe('gameStateFromFen', () => {
     );
     expect(boardState.enPassant).toBeUndefined();
     expect(boardState.turn).toEqual('white');
+    expect(boardState.ply).toEqual(0);
+    expect(boardState.fullMoves).toEqual(1);
+  });
+  it('parses a fen string mid game', () => {
+    const fen =
+      'r3kb1N/ppp3p1/4pn2/3p3p/P1nPbB2/2q5/3N1PPP/R2QKB1R w KQq h6 0 14';
+    const boardState = gameStateFromFen(fen);
+    // Spot check a few key squares
+    expect(boardState.pieces['c3']).toEqual({ type: 'q', color: 'black' });
+    expect(boardState.pieces['e8']).toEqual({ type: 'k', color: 'black' });
+    expect(boardState.pieces['d2']).toEqual({ type: 'n', color: 'white' });
+    expect(boardState.pieces['f4']).toEqual({ type: 'b', color: 'white' });
+    expect(boardState.turn).toEqual('white');
+    expect(boardState.ply).toEqual(0);
+    expect(boardState.fullMoves).toEqual(14);
+    expect(boardState.enPassant).toEqual('h6');
+    expect(boardState.castlingAbility).toEqual(
+      new Set([
+        CastlingAbility.WhiteKing,
+        CastlingAbility.WhiteQueen,
+        CastlingAbility.BlackQueen,
+      ])
+    );
   });
 });

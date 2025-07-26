@@ -65,5 +65,7 @@ export const gameStateFromFen = (fen: FenStr): GameState => {
     enPassant: enPassantCoordinateFromFenStr(fenParts.enPassantTargetSquare),
     turn: sideToMoveToColor(fenParts.sideToMove),
     castlingAbility: castlingAbilityFromFen(fenParts.castlingAbility),
+    ply: Number(fenParts.halfMoveClock),
+    fullMoves: Number(fenParts.fullMoveCounter),
   };
 };
