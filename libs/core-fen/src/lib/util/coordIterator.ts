@@ -17,10 +17,12 @@ export const coordIterator = (): CoordIterator => {
     get: () => coord,
     next: (skip: number): Coordinate => {
       add(skip);
-      if (getBoardIndex() > 64)
+      if (getBoardIndex() > 64) {
         throw new FenValidationError('FenPiecePlacementPart');
-      coord = whiteCoordinates[getBoardIndex()];
-      return coord;
+      } else {
+        coord = whiteCoordinates[getBoardIndex()];
+        return coord;
+      }
     },
     isFinished: () => getBoardIndex() === 64,
   };
