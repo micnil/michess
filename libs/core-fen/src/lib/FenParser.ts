@@ -119,12 +119,7 @@ const toFenStr = (gameState: GameState): FenStr => {
   };
   let castling = '';
   if (gameState.castlingAbility && gameState.castlingAbility.size > 0) {
-    for (const right of [
-      CastlingAbility.WhiteKing,
-      CastlingAbility.WhiteQueen,
-      CastlingAbility.BlackKing,
-      CastlingAbility.BlackQueen,
-    ]) {
+    for (const right of CastlingAbility.allValues) {
       if (gameState.castlingAbility.has(right)) castling += castlingMap[right];
     }
   } else {
