@@ -39,7 +39,7 @@ function assertCastlingAbilityPart(
 ): asserts castlingAbilityPart is FenCastlingAbilityPart {
   const match = castlingAbilityPart.match(FenCastlingAbilityPartRegex);
   if (!match?.groups?.castlingAbility) {
-    throw new FenValidationError('FenCastlingAbilityPart');
+    throw new FenValidationError('FenCastlingAbilityPart', castlingAbilityPart);
   }
 }
 
@@ -50,7 +50,10 @@ function assertEnPassantTargetSquarePart(
     FenEnPassantTargetSquarePartRegex
   );
   if (!match?.groups?.enPassant) {
-    throw new FenValidationError('FenEnPassantTargetSquarePart');
+    throw new FenValidationError(
+      'FenEnPassantTargetSquarePart',
+      enPassantTargetSquarePart
+    );
   }
 }
 

@@ -124,7 +124,7 @@ const makeMove = (gameState: GameState, move: Move): GameState => {
     castlingAbility,
     turn: gameState.turn === Color.White ? Color.Black : Color.White,
     fullMoves:
-      gameState.turn === Color.White
+      gameState.turn === Color.Black
         ? gameState.fullMoves + 1
         : gameState.fullMoves,
     ply,

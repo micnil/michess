@@ -13,8 +13,9 @@ type FenValidationErrorType =
 
 export class FenValidationError extends Error {
   type: FenValidationErrorType;
-  constructor(type: FenValidationErrorType) {
-    super(`Validation error: ${type}`);
+  details?: string;
+  constructor(type: FenValidationErrorType, details?: string) {
+    super(`Validation error: ${type} (${details ?? ''})`);
     this.type = type;
     this.name = 'FenValidationError';
     Object.setPrototypeOf(this, new.target.prototype);
