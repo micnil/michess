@@ -2,10 +2,10 @@ import { CastlingRight } from './CastlingRight';
 import { Color } from './Color';
 
 const CastlingAbilityEnum = {
-  BlackQueen: 'BlackQueen',
-  BlackKing: 'BlackKing',
-  WhiteQueen: 'WhiteQueen',
   WhiteKing: 'WhiteKing',
+  WhiteQueen: 'WhiteQueen',
+  BlackKing: 'BlackKing',
+  BlackQueen: 'BlackQueen',
 } as const;
 
 export type CastlingAbility =
