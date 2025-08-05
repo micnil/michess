@@ -525,8 +525,6 @@ const getPinnedPieces = (
 
 const generateMoves = (context: MoveGeneratorContext): Move[] => {
   const numKingAttackers = context.moveMasks.kingAttackers.countBits();
-  console.log({ numKingAttackers });
-  console.log(context.moveMasks.kingAttackers.toString());
   const isDoubleCheck = numKingAttackers >= 2;
   const piecePlacements = isDoubleCheck
     ? context.piecePlacements.filter(

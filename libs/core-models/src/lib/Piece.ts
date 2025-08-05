@@ -13,6 +13,11 @@ const from = (type: PieceType, color: Color): Piece => {
   };
 };
 
+const isEqual = (a: Piece | undefined, b?: Piece): boolean => {
+  return a?.type === b?.type && a?.color === b?.color;
+};
+
 export const Piece = {
   from,
+  isEqual,
 };

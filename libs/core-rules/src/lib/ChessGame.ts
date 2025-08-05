@@ -24,6 +24,13 @@ const oneStepBackFromCoordinate = (
   return oneStepBackFromIndex(index, color);
 };
 
+const rookStartingPositions: Record<CastlingAbility, Coordinate> = {
+  [CastlingAbility.BlackKing]: 'h8',
+  [CastlingAbility.BlackQueen]: 'a8',
+  [CastlingAbility.WhiteKing]: 'h1',
+  [CastlingAbility.WhiteQueen]: 'a1',
+} as const;
+
 const makeMove = (gameState: GameState, move: Move): GameState => {
   const chessboard = Chessboard(gameState);
   const boardState = chessboard.getState();
@@ -93,27 +100,22 @@ const makeMove = (gameState: GameState, move: Move): GameState => {
     abilitiesToRemove.forEach((ability) => castlingAbility.delete(ability));
   }
 
-  if (
-    pieceToMove?.type === PieceType.Rook &&
-    fromCoord === 'a1' &&
-    castlingRights.has(CastlingRight.QueenSide)
-  ) {
-    castlingAbility.delete(
-      gameState.turn === Color.White
-        ? CastlingAbility.WhiteQueen
-        : CastlingAbility.BlackQueen
-    );
-  } else if (
-    pieceToMove?.type === PieceType.Rook &&
-    fromCoord === 'h8' &&
-    castlingRights.has(CastlingRight.KingSide)
-  ) {
-    castlingAbility.delete(
-      gameState.turn === Color.White
-        ? CastlingAbility.WhiteKing
-        : CastlingAbility.BlackKing
-    );
-  }
+  CastlingAbility.allValues.forEach((ability) => {
+    const rookStartingPosition = rookStartingPositions[ability];
+    const pieceOnRookStartingPositionOld =
+      boardState.pieces[rookStartingPosition];
+    const pieceOnRookStartingPositionNew =
+      newPiecePlacements[rookStartingPosition];
+
+    if (
+      !Piece.isEqual(
+        pieceOnRookStartingPositionOld,
+        pieceOnRookStartingPositionNew
+      )
+    ) {
+      castlingAbility.delete(ability);
+    }
+  });
 
   const captureOrPawnMove =
     move.capture || pieceToMove?.type === PieceType.Pawn;
