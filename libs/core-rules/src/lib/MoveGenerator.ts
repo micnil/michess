@@ -380,15 +380,17 @@ const getAttackedSquares = (
     Coordinate.fromIndex(pieceBitboards[PieceType.King].scanForward())
   );
   const pawnWestAttackOffset =
-    color === Color.White ? DirectionOffset.SW : DirectionOffset.NW;
+    color === Color.White ? DirectionOffset.NW : DirectionOffset.SW;
   const pawnEastAttackOffset =
-    color === Color.White ? DirectionOffset.SE : DirectionOffset.NE;
+    color === Color.White ? DirectionOffset.NE : DirectionOffset.SE;
+
   const pawnAttacksWest = pieceBitboards[PieceType.Pawn]
     .leftShift(pawnWestAttackOffset)
     .exclude(aFileBb);
   const pawnAttacksEast = pieceBitboards[PieceType.Pawn]
     .leftShift(pawnEastAttackOffset)
     .exclude(hFileBb);
+
   const pawnAttacks = pawnAttacksWest.union(pawnAttacksEast);
   const sliders = [PieceType.Bishop, PieceType.Rook, PieceType.Queen];
   const sliderAttacks = sliders.reduce((attacks, pieceType) => {
