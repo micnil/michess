@@ -70,29 +70,21 @@ const makeMove = (gameState: GameState, move: Move): GameState => {
     const rookCoord = gameState.turn === Color.White ? 'h1' : 'h8';
     const newRookCoord = gameState.turn === Color.White ? 'f1' : 'f8';
     newPiecePlacements[newRookCoord] = newPiecePlacements[rookCoord];
-    castlingAbility.delete(
-      gameState.turn === Color.White
-        ? CastlingAbility.WhiteKing
-        : CastlingAbility.BlackKing
-    );
     delete newPiecePlacements[rookCoord];
   } else if (move.castling === CastlingRight.QueenSide) {
     const rookCoord = gameState.turn === Color.White ? 'a1' : 'a8';
     const newRookCoord = gameState.turn === Color.White ? 'd1' : 'd8';
     newPiecePlacements[newRookCoord] = newPiecePlacements[rookCoord];
-    castlingAbility.delete(
-      gameState.turn === Color.White
-        ? CastlingAbility.WhiteQueen
-        : CastlingAbility.BlackQueen
-    );
     delete newPiecePlacements[rookCoord];
   }
 
-  if (
-    pieceToMove?.type === PieceType.King &&
-    !move.castling &&
-    castlingRights.size > 0
-  ) {
+  if (move.castling) {
+    const abilitiesToRemove =
+      gameState.turn === Color.White
+        ? CastlingAbility.whiteValues
+        : CastlingAbility.blackValues;
+    abilitiesToRemove.forEach((ability) => castlingAbility.delete(ability));
+  } else if (pieceToMove?.type === PieceType.King && castlingRights.size > 0) {
     const abilitiesToRemove =
       gameState.turn === Color.White
         ? CastlingAbility.whiteValues
