@@ -34,7 +34,7 @@ export type ChessBitboard = ColoredPieceBitboards & {
   occupied: Bitboard;
   empty: Bitboard;
   getPieceAt: (coord: Coordinate) => Maybe<Piece>;
-  removePiece: (piece: Piece) => ChessBitboard;
+  removePiece: (piece: Piece, coord?: Coordinate) => ChessBitboard;
   getOwnOccupancy: (color: Color) => Bitboard;
   getOpponentOccupancy: (color: Color) => Bitboard;
   getOpponentPieceBoards: (color: Color) => PieceBitboard;
@@ -118,14 +118,17 @@ const fromPieceBitboards = (
       }
       return undefined;
     },
-    removePiece: (piece: Piece): ChessBitboard => {
+    removePiece: (piece: Piece, coord?: Coordinate): ChessBitboard => {
       const newBitboards = {
         ...bitboards,
         [piece.color]: {
           ...bitboards[piece.color],
-          [piece.type]: Bitboard(),
+          [piece.type]: coord
+            ? bitboards[piece.color][piece.type].clearCoord(coord)
+            : Bitboard(),
         },
       };
+
       return fromPieceBitboards(newBitboards);
     },
     getOwnOccupancy: (color: Color) =>

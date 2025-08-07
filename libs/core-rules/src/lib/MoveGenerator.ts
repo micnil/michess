@@ -270,6 +270,7 @@ const getMovesForPawn = (
     ).intersection(pinMoveRestrictions);
 
     const enPassantIndex = Coordinate.toIndex(context.enPassantCoord);
+    const epAttackedIndex = enPassantIndex - directionOffset;
     const checkEvasionMask = context.moveMasks.checkEvasion;
     if (
       pawnAttacks.isIndexSet(enPassantIndex) &&
@@ -278,13 +279,27 @@ const getMovesForPawn = (
       // sliding piece (moving to ep-square), or by capturing
       // the attacker (pawn we take with ep).
       (checkEvasionMask.isIndexSet(enPassantIndex) ||
-        checkEvasionMask.isIndexSet(enPassantIndex - directionOffset))
+        checkEvasionMask.isIndexSet(epAttackedIndex))
     ) {
-      moves.push({
-        start: index,
-        target: enPassantIndex,
-        capture: true,
-      });
+      const bitboards = context.bitboards.removePiece(
+        Piece.from(PieceType.Pawn, Color.opposite(piece.color)),
+        Coordinate.fromIndex(epAttackedIndex)
+      );
+      const pins = getHorizontalPins(bitboards, piece.color);
+
+      // Special case for en passant. THe normal pin bitboard does not
+      // capture the case where the pawn attacking by en-passant is pinned
+      // horizontally. This is because there are 2 blocking pieces between
+      // the king and the slider. Here we remove the opponent pawn we are about
+      // to capture and check for pins again before allowing the en-passant move.
+      if (!pins.isCoordSet(coord)) {
+        // En passant move
+        moves.push({
+          start: index,
+          target: enPassantIndex,
+          capture: true,
+        });
+      }
     }
   }
 
@@ -475,9 +490,17 @@ const getCastlingMoves = (context: MoveGeneratorContext): Move[] => {
     .filter(isDefined);
 };
 
-const getPinnedPieces = (
+const getHorizontalPins = (
   chessBitboard: ChessBitboard,
   color: Color
+): Bitboard => {
+  return getPinnedPieces(chessBitboard, color, DirectionOffset.horizontals);
+};
+
+const getPinnedPieces = (
+  chessBitboard: ChessBitboard,
+  color: Color,
+  directions: DirectionOffset[] = DirectionOffset.neighbors
 ): Bitboard => {
   const ownOccupancy = chessBitboard.getOwnOccupancy(color);
   const getNextBlockerInDirection = (
@@ -491,7 +514,8 @@ const getPinnedPieces = (
     return Bitboard();
   } else {
     const kingCoord = Coordinate.fromIndex(kingIndex);
-    return DirectionOffset.neighbors.reduce((pinnedPieces, direction) => {
+
+    return directions.reduce((pinnedPieces, direction) => {
       const attacks = SliderAttacks.fromCoordAndDirection(kingCoord, direction);
       const blockers = attacks.intersection(chessBitboard.occupied);
       if (!blockers.isEmpty()) {
