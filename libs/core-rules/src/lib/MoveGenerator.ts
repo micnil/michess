@@ -17,6 +17,7 @@ import { PawnAttacks } from './bitboard/PawnAttacks';
 import { SliderAttacks } from './bitboard/SliderAttacks';
 import { DirectionOffset } from './model/DirectionOffset';
 import { IndexBoardUtil } from './util/IndexBoardUtil';
+import { MoveGeneratorResult } from './model/MoveGeneratorResult';
 
 const SLIDERS_BY_DIRECTION: Record<DirectionOffset, PieceType[]> = {
   [DirectionOffset.N]: [PieceType.Rook, PieceType.Queen],
@@ -571,11 +572,7 @@ const generateMoves = (context: MoveGeneratorContext): Move[] => {
 };
 
 export type MoveGenerator = {
-  generateMoves: () => {
-    moves: Move[];
-    isCheckmate: boolean;
-    isCheck: boolean;
-  };
+  generateMoves: () => MoveGeneratorResult;
 };
 
 export const MoveGenerator = (gameState: GameState): MoveGenerator => {

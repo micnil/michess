@@ -10,3 +10,4 @@ export * from './lib/counter';
 export * from './lib/unfold';
 export * from './lib/takeWhile';
 export * from './lib/isDefined';
+export * from './lib/lazyValue';

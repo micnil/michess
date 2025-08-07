@@ -1,6 +1,7 @@
 export * from './lib/PiecePlacements';
 export * from './lib/BoardState';
 export * from './lib/GameState';
+export * from './lib/GameResult';
 export * from './lib/Color';
 export * from './lib/ColoredPieceType';
 export * from './lib/Coordinate';

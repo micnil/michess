@@ -3,6 +3,7 @@ import {
   CastlingRight,
   Color,
   Coordinate,
+  GameResult,
   GameState,
   Piece,
   PiecePlacements,
@@ -12,6 +13,8 @@ import { Chessboard } from '@michess/core-state';
 import { IChessGame } from './model/IChessGame';
 import { Move } from './model/Move';
 import { MoveGenerator } from './MoveGenerator';
+import { MoveGeneratorResult } from './model/MoveGeneratorResult';
+import { lazyValue, Maybe } from '@michess/common-utils';
 
 const oneStepBackFromIndex = (index: number, color: Color): Coordinate => {
   return Coordinate.fromIndex(color === Color.White ? index + 8 : index - 8);
@@ -131,14 +134,47 @@ const makeMove = (gameState: GameState, move: Move): GameState => {
   };
 };
 
+const toGameResult = (
+  gameState: GameState,
+  moveGeneratorResult: MoveGeneratorResult
+): GameResult => {
+  const fiftyMoveRule = gameState.ply >= 100;
+
+  const noLegalMoves = moveGeneratorResult.moves.length === 0;
+
+  const isGameOver = noLegalMoves || fiftyMoveRule;
+
+  const winner: Maybe<Color | 'draw'> = !isGameOver
+    ? undefined
+    : noLegalMoves && moveGeneratorResult.isCheck
+    ? gameState.turn === Color.White
+      ? Color.Black
+      : Color.White
+    : 'draw';
+
+  return {
+    isGameOver,
+    winner,
+  };
+};
+
 export const ChessGame = (gameState: GameState): IChessGame => {
   const chessboard = Chessboard(gameState);
   const moveGenerator = MoveGenerator(gameState);
 
+  const getMovesLazy = lazyValue(() => moveGenerator.generateMoves());
+  const getState = (): GameState & GameResult => {
+    const moveGeneratorResult: MoveGeneratorResult = getMovesLazy();
+    const gameResult = toGameResult(gameState, moveGeneratorResult);
+    return {
+      ...gameState,
+      ...gameResult,
+    };
+  };
   return {
     ...chessboard,
-    getState: () => gameState,
-    getMoves: () => moveGenerator.generateMoves().moves,
+    getState,
+    getMoves: () => getMovesLazy().moves,
     makeMove: (move) => ChessGame(makeMove(gameState, move)),
   };
 };
