@@ -7,7 +7,7 @@ export const ChessGameContainer = () => {
   const [chessGame, setChessGame] = useState(() =>
     ChessGame(
       FenParser.toGameState(
-        'rnbqkbnr/ppp5/r1N1Q1R1/8/8/8/PPP5/RNBQKBNR w KQkq - 0 1'
+        'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
       )
     )
   );
