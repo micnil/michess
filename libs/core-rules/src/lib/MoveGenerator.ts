@@ -57,6 +57,7 @@ const DIRECTIONS_BY_SLIDER: Record<PieceType, DirectionOffset[]> = {
   [PieceType.Pawn]: [],
 };
 
+const FULL_BITBOARD = Bitboard(0xffffffffffffffffn);
 const aFileBb = Bitboard().between('a1', 'a8');
 const hFileBb = Bitboard().between('h1', 'h8');
 
@@ -183,6 +184,14 @@ const getMovesForKnight = (
 
 const getRank = (index: number) => 8 - Math.floor(index / 8);
 
+const getPawnDirections = (color: Color) => ({
+  pushOffset: color === Color.White ? DirectionOffset.N : DirectionOffset.S,
+  westAttackOffset:
+    color === Color.White ? DirectionOffset.NW : DirectionOffset.SW,
+  eastAttackOffset:
+    color === Color.White ? DirectionOffset.NE : DirectionOffset.SE,
+});
+
 const getMovesForPawn = (
   context: MoveGeneratorContext,
   { coord, piece }: PiecePlacement
@@ -191,22 +200,19 @@ const getMovesForPawn = (
   const isPinned = context.moveMasks.pinnedPieces.isCoordSet(coord);
   const pinMoveRestrictions = isPinned
     ? getPinMoveRestrictions(context, coord)
-    : // Bitboard with all bits set to 1
-      Bitboard(0xffffffffffffffffn);
-
-  const directionOffset =
-    piece.color === Color.White ? DirectionOffset.N : DirectionOffset.S;
+    : FULL_BITBOARD;
   const startRank = piece.color === Color.White ? 6 : 1;
   const promotionRank = piece.color === Color.White ? 8 : 1;
+  const { pushOffset } = getPawnDirections(piece.color);
 
-  const oneStepIndex = index + directionOffset;
+  const oneStepIndex = index + pushOffset;
   const isOneStepLegal =
     IndexBoardUtil.withinBoard(oneStepIndex) &&
     !context.bitboards.occupied.isIndexSet(oneStepIndex) &&
     pinMoveRestrictions.isIndexSet(oneStepIndex) &&
     context.moveMasks.checkEvasion.isIndexSet(oneStepIndex);
 
-  const twoStepIndex = oneStepIndex + directionOffset;
+  const twoStepIndex = oneStepIndex + pushOffset;
   const isTwoStepLegal =
     IndexBoardUtil.withinBoard(twoStepIndex) &&
     !context.bitboards.occupied.isIndexSet(twoStepIndex) &&
@@ -271,7 +277,7 @@ const getMovesForPawn = (
     ).intersection(pinMoveRestrictions);
 
     const enPassantIndex = Coordinate.toIndex(context.enPassantCoord);
-    const epAttackedIndex = enPassantIndex - directionOffset;
+    const epAttackedIndex = enPassantIndex - pushOffset;
     const checkEvasionMask = context.moveMasks.checkEvasion;
     if (
       pawnAttacks.isIndexSet(enPassantIndex) &&
@@ -395,16 +401,13 @@ const getAttackedSquares = (
   const kingAttacks = KingAttacks.fromCoord(
     Coordinate.fromIndex(pieceBitboards[PieceType.King].scanForward())
   );
-  const pawnWestAttackOffset =
-    color === Color.White ? DirectionOffset.NW : DirectionOffset.SW;
-  const pawnEastAttackOffset =
-    color === Color.White ? DirectionOffset.NE : DirectionOffset.SE;
+  const { westAttackOffset, eastAttackOffset } = getPawnDirections(color);
 
   const pawnAttacksWest = pieceBitboards[PieceType.Pawn]
-    .leftShift(pawnWestAttackOffset)
+    .leftShift(westAttackOffset)
     .exclude(aFileBb);
   const pawnAttacksEast = pieceBitboards[PieceType.Pawn]
-    .leftShift(pawnEastAttackOffset)
+    .leftShift(eastAttackOffset)
     .exclude(hFileBb);
 
   const pawnAttacks = pawnAttacksWest.union(pawnAttacksEast);
@@ -504,6 +507,7 @@ const getPinnedPieces = (
   directions: DirectionOffset[] = DirectionOffset.neighbors
 ): Bitboard => {
   const ownOccupancy = chessBitboard.getOwnOccupancy(color);
+
   const getNextBlockerInDirection = (
     blockers: Bitboard,
     direction: DirectionOffset
@@ -593,7 +597,7 @@ export const MoveGenerator = (gameState: GameState): MoveGenerator => {
 
       const checkEvasionMask =
         numKingAttackers === 0
-          ? Bitboard(0xffffffffffffffffn)
+          ? FULL_BITBOARD
           : kingAttackers.union(checkBlockPaths);
 
       const kingXRayAttacks = isCheck
