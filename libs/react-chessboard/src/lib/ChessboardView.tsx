@@ -19,12 +19,6 @@ type Props = {
 export const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
   const { chessboard, squares } = useChessboardContext();
   const { state } = useDragDropContext();
-  const squareSize = size / 8;
-  const squareCoordinates = chessboard.getCoordinates();
-  const squarePositions = squareCoordinates.map((_, i) => ({
-    x: (i % 8) * squareSize,
-    y: Math.floor(i / 8) * squareSize,
-  }));
 
   const boardState = chessboard.getState();
   return (
