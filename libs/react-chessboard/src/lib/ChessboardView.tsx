@@ -16,8 +16,8 @@ type Props = {
   size: number;
 };
 
-const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
-  const { chessboard } = useChessboardContext();
+export const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
+  const { chessboard, squares } = useChessboardContext();
   const { state } = useDragDropContext();
   const squareSize = size / 8;
   const squareCoordinates = chessboard.getCoordinates();
@@ -30,30 +30,28 @@ const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
   return (
     <Board width={size} height={size}>
       <Squares>
-        {squareCoordinates.map((coord, i) => {
+        {squares.map((square) => {
           return (
             <SquareView
-              coordinate={coord}
-              key={coord}
-              position={squarePositions[i]}
-              size={squareSize}
-              color={((9 * i) & 8) === 0 ? 'white' : 'black'} // Todo: Expose in model
+              coordinate={square.coordinate}
+              key={square.coordinate}
+              position={square.position}
+              size={square.size}
+              color={square.color}
             />
           );
         })}
       </Squares>
       <Pieces>
         {Object.entries(boardState.pieces).map(([coord, piece]) => {
-          const pieceId = coord;
+          const square = squares[chessboard.getIndex(coord as Coordinate)];
           return (
             <PieceView
-              key={pieceId}
+              key={coord}
               coord={coord as Coordinate}
               piece={piece}
-              position={
-                squarePositions[chessboard.getIndex(coord as Coordinate)]
-              }
-              squareSize={squareSize}
+              position={square.position}
+              squareSize={square.size}
             />
           );
         })}
@@ -62,5 +60,3 @@ const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
     </Board>
   );
 };
-
-export default ChessboardView;

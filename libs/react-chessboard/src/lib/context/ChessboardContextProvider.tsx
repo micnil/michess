@@ -5,12 +5,16 @@ import React, { ReactNode, useCallback, useRef, useState } from 'react';
 import { MoveOptions } from '../move/model/MoveOptions';
 import { MoveOptionsMap } from '../move/model/MoveOptionsMap';
 import { ChessboardContext } from './ChessboardContext';
+import { GameStatusType } from '../model/GameStatusType';
+import { Square } from '../model/Square';
 
 type Props<TMoveMeta = unknown> = {
+  size: number;
   orientation?: Color;
   startingFen?: FenStr;
   piecePlacements?: PiecePlacements;
   moveOptions?: MoveOptions<TMoveMeta>;
+  gameStatus: GameStatusType;
   onMove?: (move: MovePayload<TMoveMeta>) => void;
   children: ReactNode;
 };
@@ -22,6 +26,7 @@ export const ChessboardContextProvider = <TMoveMeta,>({
   onMove,
   piecePlacements,
   moveOptions,
+  size,
 }: Props<TMoveMeta>) => {
   const [chessboard, setChessboard] = useState<IChessboard>(() =>
     Chessboard(FenParser.toGameState(startingFen))
@@ -33,6 +38,18 @@ export const ChessboardContextProvider = <TMoveMeta,>({
     ? Chessboard({ pieces: piecePlacements, orientation }) // Consumer owned
     : chessboard; // Internally owned
 
+  const squareSize = size / 8;
+  const squareCoordinates = chessboard.getCoordinates();
+  const squares: Square[] = squareCoordinates.map((coordinate, i) => ({
+    size: squareSize,
+    color: ((9 * i) & 8) === 0 ? 'white' : 'black',
+    coordinate,
+    position: {
+      x: (i % 8) * squareSize,
+      y: Math.floor(i / 8) * squareSize,
+    },
+  }));
+
   const movePiece = useCallback((payload: MovePayload<TMoveMeta>) => {
     onMoveRef.current?.(payload);
     setChessboard((prevChessboard) => {
@@ -43,6 +60,7 @@ export const ChessboardContextProvider = <TMoveMeta,>({
   return (
     <ChessboardContext.Provider
       value={{
+        squares,
         chessboard: contextChessboard,
         movePiece: movePiece as (payload: MovePayload<unknown>) => void,
         moveOptionsMap: moveOptions
