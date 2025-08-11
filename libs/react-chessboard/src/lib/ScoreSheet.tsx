@@ -79,22 +79,19 @@ const getGameResultText = (
 ): string => {
   if (gameStatus === 'active') {
     return 'Game in progress';
-  }
-
-  if (gameStatus === 'checkmate') {
+  } else if (gameStatus === 'checkmate') {
     if (winner === 'white') {
       return 'White wins by checkmate';
     } else if (winner === 'black') {
       return 'Black wins by checkmate';
+    } else {
+      return 'Checkmate';
     }
-    return 'Checkmate';
-  }
-
-  if (gameStatus === 'draw') {
+  } else if (gameStatus === 'draw') {
     return 'Draw';
+  } else {
+    return 'Game in progress';
   }
-
-  return 'Game in progress';
 };
 
 export const ScoreSheet: React.FC<ScoreSheetProps> = ({
