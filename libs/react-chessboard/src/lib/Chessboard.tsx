@@ -1,10 +1,21 @@
 import { Color, PiecePlacements } from '@michess/core-models';
 import { MovePayload } from '@michess/core-state';
 import { DragDropContextProvider } from '@michess/react-dnd';
+import React from 'react';
+import styled from 'styled-components';
 import { ChessboardView } from './ChessboardView';
 import { ChessboardContextProvider } from './context/ChessboardContextProvider';
 import { MoveOptions } from './move/model/MoveOptions';
 import { GameStatusType } from './model/GameStatusType';
+import { ScoreSheet } from './ScoreSheet';
+
+const ChessboardContainer = styled.div`
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+`;
 
 type Props<TMoveMeta = unknown> = {
   orientation?: Color;
@@ -12,6 +23,7 @@ type Props<TMoveMeta = unknown> = {
   piecePlacements?: PiecePlacements;
   moveOptions?: MoveOptions<TMoveMeta>;
   gameStatus?: GameStatusType;
+  winner?: Color;
   onMove?: (move: MovePayload<TMoveMeta>) => void;
 };
 export const Chessboard = <TMoveMeta,>({
@@ -20,20 +32,24 @@ export const Chessboard = <TMoveMeta,>({
   moveOptions,
   piecePlacements,
   gameStatus = 'active',
+  winner,
   onMove,
 }: Props<TMoveMeta>) => {
   return (
-    <ChessboardContextProvider
-      size={size}
-      orientation={orientation}
-      moveOptions={moveOptions}
-      piecePlacements={piecePlacements}
-      gameStatus={gameStatus}
-      onMove={onMove}
-    >
-      <DragDropContextProvider>
-        <ChessboardView size={size} />
-      </DragDropContextProvider>
-    </ChessboardContextProvider>
+    <ChessboardContainer>
+      <ChessboardContextProvider
+        size={size}
+        orientation={orientation}
+        moveOptions={moveOptions}
+        piecePlacements={piecePlacements}
+        gameStatus={gameStatus}
+        onMove={onMove}
+      >
+        <DragDropContextProvider>
+          <ChessboardView size={size} />
+        </DragDropContextProvider>
+      </ChessboardContextProvider>
+      <ScoreSheet gameStatus={gameStatus} winner={winner} />
+    </ChessboardContainer>
   );
 };

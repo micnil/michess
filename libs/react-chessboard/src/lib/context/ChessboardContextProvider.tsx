@@ -22,6 +22,7 @@ type Props<TMoveMeta = unknown> = {
 export const ChessboardContextProvider = <TMoveMeta,>({
   children,
   orientation = 'white',
+  gameStatus,
   startingFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
   onMove,
   piecePlacements,
