@@ -66,7 +66,7 @@ const getGameResultDisplay = (
     return '0-0';
   } else if (gameStatus === 'checkmate') {
     return winner === 'white' ? '1-0' : winner === 'black' ? '0-1' : '1/2-1/2';
-  } else if (gameStatus === 'stalemate' || gameStatus === 'draw') {
+  } else if (gameStatus === 'draw') {
     return '1/2-1/2';
   } else {
     return '0-0';
@@ -88,10 +88,6 @@ const getGameResultText = (
       return 'Black wins by checkmate';
     }
     return 'Checkmate';
-  }
-
-  if (gameStatus === 'stalemate') {
-    return 'Draw by stalemate';
   }
 
   if (gameStatus === 'draw') {

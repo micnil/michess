@@ -1,1 +1,1 @@
-export type GameStatusType = 'active' | 'checkmate' | 'stalemate' | 'draw';
+export type GameStatusType = 'active' | 'checkmate' | 'draw';

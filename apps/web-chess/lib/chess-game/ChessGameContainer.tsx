@@ -7,27 +7,19 @@ import {
 } from '@michess/react-chessboard';
 import { useState } from 'react';
 
-const getGameStatus = (
-  gameState: { isGameOver: boolean; winner?: Color | 'draw' },
-  moves: Move[]
-): GameStatusType => {
+const getGameStatus = (gameState: {
+  isGameOver: boolean;
+  winner?: Color | 'draw';
+}): GameStatusType => {
   if (!gameState.isGameOver) {
     return 'active';
-  }
-
-  if (gameState.winner === 'draw') {
-    // Check if it's stalemate (no legal moves but not in check)
-    if (moves.length === 0) {
-      return 'stalemate';
-    }
+  } else if (gameState.winner === 'draw') {
     return 'draw';
-  }
-
-  if (gameState.winner === 'white' || gameState.winner === 'black') {
+  } else if (gameState.winner === 'white' || gameState.winner === 'black') {
     return 'checkmate';
+  } else {
+    return 'active';
   }
-
-  return 'active';
 };
 
 export const ChessGameContainer = () => {
@@ -41,7 +33,7 @@ export const ChessGameContainer = () => {
 
   const gameState = chessGame.getState();
   const moves = chessGame.getMoves();
-  const gameStatus = getGameStatus(gameState, moves);
+  const gameStatus = getGameStatus(gameState);
 
   return (
     <ChessboardView<Move>
