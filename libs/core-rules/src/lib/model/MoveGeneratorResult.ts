@@ -1,4 +1,4 @@
-import { Move } from './Move';
+import { Move } from '@michess/core-models';
 
 export type MoveGeneratorResult = {
   moves: Move[];

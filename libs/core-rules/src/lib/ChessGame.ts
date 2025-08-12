@@ -8,10 +8,10 @@ import {
   Piece,
   PiecePlacements,
   PieceType,
+  Move,
 } from '@michess/core-models';
 import { Chessboard } from '@michess/core-state';
 import { IChessGame } from './model/IChessGame';
-import { Move } from './model/Move';
 import { MoveGenerator } from './MoveGenerator';
 import { MoveGeneratorResult } from './model/MoveGeneratorResult';
 import { lazyValue, Maybe } from '@michess/common-utils';

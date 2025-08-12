@@ -7,8 +7,9 @@ import {
   CastlingAbility,
   CastlingRight,
   PieceType,
+  Move,
 } from '@michess/core-models';
-import { Move } from '../model/Move';
+
 import { MoveGenerator } from '../MoveGenerator';
 
 describe('MoveGenerator', () => {

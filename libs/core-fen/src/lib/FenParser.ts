@@ -1,6 +1,5 @@
 import { Maybe } from '@michess/common-utils';
 import {
-  // BoardCoordinates,
   CastlingAbility,
   Color,
   Coordinate,

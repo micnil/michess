@@ -6,8 +6,8 @@ import {
   Piece,
   PiecePlacement,
   PieceType,
+  Move,
 } from '@michess/core-models';
-import { Move } from './model/Move';
 import { MoveGeneratorContext } from './model/MoveGeneratorContext';
 import { isDefined } from '@michess/common-utils';
 import { Bitboard, ChessBitboard } from '@michess/core-state';
