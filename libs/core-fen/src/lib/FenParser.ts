@@ -120,7 +120,9 @@ const toFenStr = (chessPosition: ChessPosition): FenStr => {
   let castling = '';
   if (chessPosition.castlingAbility && chessPosition.castlingAbility.size > 0) {
     for (const right of CastlingAbility.allValues) {
-      if (chessPosition.castlingAbility.has(right)) castling += castlingMap[right];
+      if (chessPosition.castlingAbility.has(right)) {
+        castling += castlingMap[right];
+      }
     }
   } else {
     castling = '-';

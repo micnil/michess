@@ -15,7 +15,10 @@ const getGameStatus = (chessPosition: {
     return 'active';
   } else if (chessPosition.winner === 'draw') {
     return 'draw';
-  } else if (chessPosition.winner === 'white' || chessPosition.winner === 'black') {
+  } else if (
+    chessPosition.winner === 'white' ||
+    chessPosition.winner === 'black'
+  ) {
     return 'checkmate';
   } else {
     return 'active';
@@ -41,7 +44,9 @@ export const ChessGameContainer = () => {
       size={500}
       piecePlacements={chessPosition.pieces}
       gameStatus={gameStatus}
-      winner={chessPosition.winner !== 'draw' ? chessPosition.winner : undefined}
+      winner={
+        chessPosition.winner !== 'draw' ? chessPosition.winner : undefined
+      }
       onMove={(movePayload) => {
         console.log(movePayload);
         setChessGame(chessGame.makeMove(movePayload.meta));
