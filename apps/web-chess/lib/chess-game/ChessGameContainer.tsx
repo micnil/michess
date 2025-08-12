@@ -1,6 +1,6 @@
 import { FenParser } from '@michess/core-fen';
-import { Color } from '@michess/core-models';
-import { ChessGame, Move } from '@michess/core-rules';
+import { Color, Move } from '@michess/core-models';
+import { ChessGame } from '@michess/core-rules';
 import {
   Chessboard as ChessboardView,
   GameStatusType,
