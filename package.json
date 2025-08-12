@@ -7,7 +7,7 @@
     "build": "nx build",
     "test": "nx test",
     "test:all": "nx run-many --target=test --all",
-    "typecheck": "tsc -p tsconfig.base.json --noEmit --jsx react-jsx"
+    "typecheck": "tsc -p apps/web-chess --noEmit --jsx react-jsx"
   },
   "private": true,
   "dependencies": {

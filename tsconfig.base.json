@@ -2,6 +2,7 @@
   "compileOnSave": false,
   "compilerOptions": {
     "rootDir": ".",
+    "pretty": true,
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",

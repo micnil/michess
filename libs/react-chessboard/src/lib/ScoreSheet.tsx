@@ -53,10 +53,10 @@ const MovesTitle = styled.h4`
   color: #666;
 `;
 
-interface ScoreSheetProps {
+type ScoreSheetProps = {
   gameStatus: GameStatusType;
   winner?: Color;
-}
+};
 
 const getGameResultDisplay = (
   gameStatus: GameStatusType,
