@@ -7,15 +7,15 @@ import {
 } from '@michess/react-chessboard';
 import { useState } from 'react';
 
-const getGameStatus = (gameState: {
+const getGameStatus = (chessPosition: {
   isGameOver: boolean;
   winner?: Color | 'draw';
 }): GameStatusType => {
-  if (!gameState.isGameOver) {
+  if (!chessPosition.isGameOver) {
     return 'active';
-  } else if (gameState.winner === 'draw') {
+  } else if (chessPosition.winner === 'draw') {
     return 'draw';
-  } else if (gameState.winner === 'white' || gameState.winner === 'black') {
+  } else if (chessPosition.winner === 'white' || chessPosition.winner === 'black') {
     return 'checkmate';
   } else {
     return 'active';
@@ -25,23 +25,23 @@ const getGameStatus = (gameState: {
 export const ChessGameContainer = () => {
   const [chessGame, setChessGame] = useState(() =>
     ChessGame(
-      FenParser.toGameState(
+      FenParser.toChessPosition(
         'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
       )
     )
   );
 
-  const gameState = chessGame.getState();
+  const chessPosition = chessGame.getState();
   const moves = chessGame.getMoves();
-  const gameStatus = getGameStatus(gameState);
+  const gameStatus = getGameStatus(chessPosition);
 
   return (
     <ChessboardView<Move>
-      orientation={gameState.orientation}
+      orientation={chessPosition.orientation}
       size={500}
-      piecePlacements={gameState.pieces}
+      piecePlacements={chessPosition.pieces}
       gameStatus={gameStatus}
-      winner={gameState.winner !== 'draw' ? gameState.winner : undefined}
+      winner={chessPosition.winner !== 'draw' ? chessPosition.winner : undefined}
       onMove={(movePayload) => {
         console.log(movePayload);
         setChessGame(chessGame.makeMove(movePayload.meta));

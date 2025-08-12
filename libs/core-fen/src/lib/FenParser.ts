@@ -4,7 +4,7 @@ import {
   CastlingAbility,
   Color,
   Coordinate,
-  GameState,
+  ChessPosition,
   Piece,
 } from '@michess/core-models';
 import { boardStateFromFen } from './boardStateFromFen';
@@ -59,7 +59,7 @@ const enPassantCoordinateFromFenStr = (
     return fenEnPassantTargetSquare as Coordinate;
   }
 };
-const gameStateFromFen = (fen: FenStr): GameState => {
+const chessPositionFromFen = (fen: FenStr): ChessPosition => {
   const fenParts = parseFenParts(fen);
 
   return {
@@ -78,13 +78,13 @@ const pieceToChar = (piece: Piece) => {
     : piece.type.toLowerCase();
 };
 
-const toFenStr = (gameState: GameState): FenStr => {
+const toFenStr = (chessPosition: ChessPosition): FenStr => {
   const coordIter = coordIterator();
   let piecePlacement = '';
   let empty = 0;
   while (!coordIter.isFinished()) {
     const coord = coordIter.get();
-    const piece = gameState.pieces[coord];
+    const piece = chessPosition.pieces[coord];
     if (piece) {
       if (empty > 0) {
         piecePlacement += empty;
@@ -108,7 +108,7 @@ const toFenStr = (gameState: GameState): FenStr => {
   }
 
   // Active color
-  const activeColor = gameState.turn === 'white' ? 'w' : 'b';
+  const activeColor = chessPosition.turn === 'white' ? 'w' : 'b';
 
   // Castling rights
   const castlingMap = {
@@ -118,27 +118,27 @@ const toFenStr = (gameState: GameState): FenStr => {
     [CastlingAbility.BlackQueen]: 'q',
   };
   let castling = '';
-  if (gameState.castlingAbility && gameState.castlingAbility.size > 0) {
+  if (chessPosition.castlingAbility && chessPosition.castlingAbility.size > 0) {
     for (const right of CastlingAbility.allValues) {
-      if (gameState.castlingAbility.has(right)) castling += castlingMap[right];
+      if (chessPosition.castlingAbility.has(right)) castling += castlingMap[right];
     }
   } else {
     castling = '-';
   }
 
   // En passant
-  const enPassant = gameState.enPassant ? gameState.enPassant : '-';
+  const enPassant = chessPosition.enPassant ? chessPosition.enPassant : '-';
 
   // Halfmove clock
-  const halfMoveClock = gameState.ply ?? 0;
+  const halfMoveClock = chessPosition.ply ?? 0;
 
   // Fullmove number
-  const fullMoveNumber = gameState.fullMoves ?? 1;
+  const fullMoveNumber = chessPosition.fullMoves ?? 1;
 
   return `${piecePlacement} ${activeColor} ${castling} ${enPassant} ${halfMoveClock} ${fullMoveNumber}` as FenStr;
 };
 
 export const FenParser = {
-  toGameState: gameStateFromFen,
+  toChessPosition: chessPositionFromFen,
   toFenStr,
 };

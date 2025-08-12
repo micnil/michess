@@ -3,7 +3,7 @@ import { CastlingAbility } from './CastlingAbility';
 import { Color } from './Color';
 import { Coordinate } from './Coordinate';
 
-export type GameState = BoardState & {
+export type ChessPosition = BoardState & {
   enPassant?: Coordinate;
   turn: Color;
   castlingAbility: Set<CastlingAbility>;

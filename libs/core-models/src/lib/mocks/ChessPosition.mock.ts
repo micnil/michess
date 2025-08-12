@@ -1,8 +1,8 @@
 import { CastlingAbility } from '../CastlingAbility';
-import { GameState } from '../GameState';
+import { ChessPosition } from '../ChessPosition';
 import { boardStateMock } from './BoardState.mock';
 
-export const gameStateMock: GameState = {
+export const chessPositionMock: ChessPosition = {
   ...boardStateMock,
   castlingAbility: new Set([
     CastlingAbility.BlackKing,
@@ -15,9 +15,9 @@ export const gameStateMock: GameState = {
   ply: 0,
 };
 
-export const createGameStateMock = (
-  partialGameState?: Partial<GameState>
-): GameState => ({
-  ...gameStateMock,
-  ...partialGameState,
+export const createChessPositionMock = (
+  partialChessPosition?: Partial<ChessPosition>
+): ChessPosition => ({
+  ...chessPositionMock,
+  ...partialChessPosition,
 });

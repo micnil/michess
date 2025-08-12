@@ -1,6 +1,6 @@
 import {
   Color,
-  createGameStateMock,
+  createChessPositionMock,
   p,
   P,
   Coordinate,
@@ -25,7 +25,7 @@ describe('MoveGenerator', () => {
       // 1  . . . . . . . .
       //    a b c d e f g h
       const moveGenerator = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             d4: { type: 'b', color: Color.White },
           },
@@ -75,7 +75,7 @@ describe('MoveGenerator', () => {
       // 1  . . . . . . . .
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             d4: { type: 'r', color: Color.White },
           },
@@ -115,7 +115,7 @@ describe('MoveGenerator', () => {
   describe('pawn', () => {
     it('can move 1 square forward as white', () => {
       const moveGenerator = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             c3: P,
           },
@@ -135,7 +135,7 @@ describe('MoveGenerator', () => {
 
     it('can move 1 square forward as black', () => {
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             c3: p,
           },
@@ -156,7 +156,7 @@ describe('MoveGenerator', () => {
 
     it('can move 2 squares forward from starting position as white', () => {
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             c2: P,
           },
@@ -181,7 +181,7 @@ describe('MoveGenerator', () => {
 
     it('can capture right as white', () => {
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             c5: P,
             d6: p,
@@ -209,7 +209,7 @@ describe('MoveGenerator', () => {
 
     it('can capture en passant', () => {
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             c5: P,
             d5: p,
@@ -238,7 +238,7 @@ describe('MoveGenerator', () => {
 
     it('promotes when moving 1 step forward to 8th rank as white', () => {
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             e7: P,
           },
@@ -280,7 +280,7 @@ describe('MoveGenerator', () => {
 
     it('promotes when moving 1 step forward to 1st rank as black', () => {
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             d2: p,
           },
@@ -322,7 +322,7 @@ describe('MoveGenerator', () => {
 
     it('promotes with capture on 8th rank as white', () => {
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             g7: P,
             h8: p,
@@ -375,7 +375,7 @@ describe('MoveGenerator', () => {
       // 1  . . . . K . . .
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             e1: { type: PieceType.King, color: Color.White },
             e4: { type: PieceType.Pawn, color: Color.White },
@@ -408,7 +408,7 @@ describe('MoveGenerator', () => {
       // 1  . . . . . . . k
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             h1: { type: PieceType.King, color: Color.Black },
             e4: { type: PieceType.Pawn, color: Color.Black },
@@ -442,7 +442,7 @@ describe('MoveGenerator', () => {
       // 1  . . . . . . . .
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             e4: { type: PieceType.King, color: Color.White },
             f5: { type: PieceType.Pawn, color: Color.White },
@@ -477,7 +477,7 @@ describe('MoveGenerator', () => {
       // 1  . . . . K . . .
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             c5: { type: PieceType.King, color: Color.Black },
             d4: { type: PieceType.Pawn, color: Color.White },
@@ -515,7 +515,7 @@ describe('MoveGenerator', () => {
       // 1  . . . . K Q . .
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             b5: { type: PieceType.King, color: Color.Black },
             d4: { type: PieceType.Pawn, color: Color.White },
@@ -556,7 +556,7 @@ describe('MoveGenerator', () => {
       // 1  . . . . . . . .
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             d4: { type: 'q', color: Color.White },
           },
@@ -613,7 +613,7 @@ describe('MoveGenerator', () => {
       // 1  . . . . K r . .
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             f4: { type: PieceType.Queen, color: Color.White },
             f1: { type: PieceType.Rook, color: Color.Black },
@@ -648,7 +648,7 @@ describe('MoveGenerator', () => {
       // 1  . . . . . . . .
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             d4: { type: 'q', color: Color.White },
             d3: { type: 'p', color: Color.White },
@@ -697,7 +697,7 @@ describe('MoveGenerator', () => {
       // 1  . . . . . . . .
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             d4: { type: 'q', color: Color.White },
             e5: { type: 'p', color: Color.Black },
@@ -730,7 +730,7 @@ describe('MoveGenerator', () => {
       // 1  . . . . K . . .
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             e1: { type: PieceType.King, color: Color.White },
             e4: { type: PieceType.Queen, color: Color.White },
@@ -807,7 +807,7 @@ describe('MoveGenerator', () => {
       // 1  . . . . . . . k
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             h1: { type: PieceType.King, color: Color.Black },
             e4: { type: PieceType.Queen, color: Color.Black },
@@ -881,7 +881,7 @@ describe('MoveGenerator', () => {
       // 1  . . . . . . . .
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             b4: { type: PieceType.King, color: Color.White },
             e4: { type: PieceType.Queen, color: Color.White },
@@ -945,7 +945,7 @@ describe('MoveGenerator', () => {
       // 1  . . . . . . . .
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             d4: { type: 'n', color: Color.White },
           },
@@ -1011,7 +1011,7 @@ describe('MoveGenerator', () => {
       // 1  . . . . . . . .
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             d4: { type: 'n', color: Color.White },
             b5: { type: 'p', color: Color.Black },
@@ -1050,7 +1050,7 @@ describe('MoveGenerator', () => {
       // 1  . . . . . . . .
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             d4: { type: 'n', color: Color.White },
             b5: { type: 'p', color: Color.White },
@@ -1090,7 +1090,7 @@ describe('MoveGenerator', () => {
       // 1  . . . k . . . .
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             d1: { type: 'k', color: Color.Black },
             d4: { type: 'n', color: Color.Black },
@@ -1122,7 +1122,7 @@ describe('MoveGenerator', () => {
       // 1  . . . . K . . .
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             e8: { type: PieceType.King, color: Color.Black },
             e5: { type: PieceType.Rook, color: Color.White },
@@ -1166,7 +1166,7 @@ describe('MoveGenerator', () => {
       // 1  . . . . K . . .
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             e8: { type: PieceType.King, color: Color.Black },
             h8: { type: PieceType.Rook, color: Color.Black },
@@ -1200,7 +1200,7 @@ describe('MoveGenerator', () => {
       // 1  . . . . K . . .
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             e1: { type: PieceType.King, color: Color.White },
             e8: { type: PieceType.King, color: Color.Black },
@@ -1232,7 +1232,7 @@ describe('MoveGenerator', () => {
       // 1  . . . . K . r .
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             e1: { type: PieceType.King, color: Color.White },
             g1: { type: PieceType.Rook, color: Color.Black },
@@ -1269,7 +1269,7 @@ describe('MoveGenerator', () => {
       // 1  . . . . . . . .
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             d4: { type: 'k', color: Color.White },
           },
@@ -1336,7 +1336,7 @@ describe('MoveGenerator', () => {
       // 1  . . . . . . . .
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             d4: { type: 'k', color: Color.White },
             e4: { type: 'p', color: Color.Black },
@@ -1375,7 +1375,7 @@ describe('MoveGenerator', () => {
       // 1  . . . . . . . .
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             d4: { type: 'k', color: Color.White },
             e4: { type: 'q', color: Color.White },
@@ -1414,7 +1414,7 @@ describe('MoveGenerator', () => {
       // 1  . . . . K . . R
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             d8: { type: PieceType.King, color: Color.Black },
             e1: { type: PieceType.King, color: Color.White },
@@ -1451,7 +1451,7 @@ describe('MoveGenerator', () => {
       // 1  R . . . K . . .
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             d8: { type: PieceType.King, color: Color.Black },
             e1: { type: PieceType.King, color: Color.White },
@@ -1487,7 +1487,7 @@ describe('MoveGenerator', () => {
       // 1  . . . . K . R R
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             d8: { type: PieceType.King, color: Color.Black },
             e1: { type: PieceType.King, color: Color.White },
@@ -1524,7 +1524,7 @@ describe('MoveGenerator', () => {
       // 1  R N . . K . . .
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             d8: { type: PieceType.King, color: Color.Black },
             a1: { type: PieceType.Rook, color: Color.White },
@@ -1563,7 +1563,7 @@ describe('MoveGenerator', () => {
       //    a b c d e f g h
 
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             d8: { type: PieceType.King, color: Color.Black },
             e8: { type: PieceType.Rook, color: Color.Black },
@@ -1601,7 +1601,7 @@ describe('MoveGenerator', () => {
       // 1  . . . . K . . R
       //    a b c d e f g h
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             d8: { type: PieceType.King, color: Color.Black },
             e1: { type: PieceType.King, color: Color.White },
@@ -1640,7 +1640,7 @@ describe('MoveGenerator', () => {
       //    a b c d e f g h
 
       const context = MoveGenerator(
-        createGameStateMock({
+        createChessPositionMock({
           pieces: {
             e1: { type: PieceType.King, color: Color.White },
             h1: { type: PieceType.Rook, color: Color.White },

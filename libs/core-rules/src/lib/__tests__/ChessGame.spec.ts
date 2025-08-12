@@ -23,7 +23,7 @@ describe('ChessGame', () => {
     it.each(castlingTestCases.testCases)(
       'should handle castling correctly for $start.fen',
       ({ start, expected }) => {
-        const gameState = ChessGame(FenParser.toGameState(start.fen));
+        const gameState = ChessGame(FenParser.toChessPosition(start.fen));
         const actualFens = getAndApplyMoves(gameState);
         const expectedFens = expected.map((e) => e.fen);
         expect(actualFens.sort()).toEqual(expectedFens.sort());
@@ -35,7 +35,7 @@ describe('ChessGame', () => {
     it.each(checkmatesTestCases.testCases)(
       'should handle checkmates correctly for $start.fen',
       ({ start, expected }) => {
-        const gameState = ChessGame(FenParser.toGameState(start.fen));
+        const gameState = ChessGame(FenParser.toChessPosition(start.fen));
         const actualFens = getAndApplyMoves(gameState);
         const expectedFens = expected.map((e) => e.fen);
         expect(actualFens.sort()).toEqual(expectedFens.sort());
@@ -47,7 +47,7 @@ describe('ChessGame', () => {
     it.each(famousTestCases.testCases)(
       'should handle famous positions correctly for $start.fen',
       ({ start, expected }) => {
-        const gameState = ChessGame(FenParser.toGameState(start.fen));
+        const gameState = ChessGame(FenParser.toChessPosition(start.fen));
         const actualFens = getAndApplyMoves(gameState);
         const expectedFens = expected.map((e) => e.fen);
         expect(actualFens.sort()).toEqual(expectedFens.sort());
@@ -59,7 +59,7 @@ describe('ChessGame', () => {
     it.each(pawnsTestCases.testCases)(
       'should handle pawns correctly for $start.fen',
       ({ start, expected }) => {
-        const gameState = ChessGame(FenParser.toGameState(start.fen));
+        const gameState = ChessGame(FenParser.toChessPosition(start.fen));
         const actualFens = getAndApplyMoves(gameState);
         const expectedFens = expected.map((e) => e.fen);
         expect(actualFens.sort()).toEqual(expectedFens.sort());
@@ -71,7 +71,7 @@ describe('ChessGame', () => {
     it.each(promotionsTestCases.testCases)(
       'should handle promotions correctly for $start.fen',
       ({ start, expected }) => {
-        const gameState = ChessGame(FenParser.toGameState(start.fen));
+        const gameState = ChessGame(FenParser.toChessPosition(start.fen));
         const actualFens = getAndApplyMoves(gameState);
         const expectedFens = expected.map((e) => e.fen);
         expect(actualFens.sort()).toEqual(expectedFens.sort());
@@ -83,7 +83,7 @@ describe('ChessGame', () => {
     it.each(stalematesTestCases.testCases)(
       'should handle stalemates correctly for $start.fen',
       ({ start, expected }) => {
-        const gameState = ChessGame(FenParser.toGameState(start.fen));
+        const gameState = ChessGame(FenParser.toChessPosition(start.fen));
         const actualFens = getAndApplyMoves(gameState);
         const expectedFens = expected.map((e) => e.fen);
         expect(actualFens.sort()).toEqual(expectedFens.sort());
@@ -95,7 +95,7 @@ describe('ChessGame', () => {
     it.each(standardTestCases.testCases)(
       'should handle standard positions correctly for $start.fen',
       ({ start, expected }) => {
-        const gameState = ChessGame(FenParser.toGameState(start.fen));
+        const gameState = ChessGame(FenParser.toChessPosition(start.fen));
         const actualFens = getAndApplyMoves(gameState);
         const expectedFens = expected.map((e) => e.fen);
         expect(actualFens.sort()).toEqual(expectedFens.sort());
@@ -107,7 +107,7 @@ describe('ChessGame', () => {
     it.each(taxingTestCases.testCases)(
       'should handle taxing positions correctly for $start.fen',
       ({ start, expected }) => {
-        const gameState = ChessGame(FenParser.toGameState(start.fen));
+        const gameState = ChessGame(FenParser.toChessPosition(start.fen));
         const actualFens = getAndApplyMoves(gameState);
         const expectedFens = expected.map((e) => e.fen);
         expect(actualFens.sort()).toEqual(expectedFens.sort());

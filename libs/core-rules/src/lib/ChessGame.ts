@@ -4,7 +4,7 @@ import {
   Color,
   Coordinate,
   GameResult,
-  GameState,
+  ChessPosition,
   Piece,
   PiecePlacements,
   PieceType,
@@ -34,19 +34,19 @@ const rookStartingPositions: Record<CastlingAbility, Coordinate> = {
   [CastlingAbility.WhiteQueen]: 'a1',
 } as const;
 
-const makeMove = (gameState: GameState, move: Move): GameState => {
-  const chessboard = Chessboard(gameState);
+const makeMove = (chessPosition: ChessPosition, move: Move): ChessPosition => {
+  const chessboard = Chessboard(chessPosition);
   const boardState = chessboard.getState();
   const coordinates = chessboard.getCoordinates();
   const castlingRights = new Set(
-    CastlingAbility.toCastlingRights(gameState.turn, [
-      ...gameState.castlingAbility,
+    CastlingAbility.toCastlingRights(chessPosition.turn, [
+      ...chessPosition.castlingAbility,
     ])
   );
-  const castlingAbility = new Set(gameState.castlingAbility);
+  const castlingAbility = new Set(chessPosition.castlingAbility);
 
   if (move.start == move.target) {
-    return gameState;
+    return chessPosition;
   }
 
   const fromCoord = coordinates[move.start];
@@ -59,9 +59,9 @@ const makeMove = (gameState: GameState, move: Move): GameState => {
   };
   delete newPiecePlacements[fromCoord];
 
-  if (Coordinate.fromIndex(move.target) === gameState.enPassant) {
+  if (Coordinate.fromIndex(move.target) === chessPosition.enPassant) {
     delete newPiecePlacements[
-      oneStepBackFromCoordinate(gameState.enPassant, gameState.turn)
+      oneStepBackFromCoordinate(chessPosition.enPassant, chessPosition.turn)
     ];
   }
 
@@ -70,26 +70,26 @@ const makeMove = (gameState: GameState, move: Move): GameState => {
   }
 
   if (move.castling === CastlingRight.KingSide) {
-    const rookCoord = gameState.turn === Color.White ? 'h1' : 'h8';
-    const newRookCoord = gameState.turn === Color.White ? 'f1' : 'f8';
+    const rookCoord = chessPosition.turn === Color.White ? 'h1' : 'h8';
+    const newRookCoord = chessPosition.turn === Color.White ? 'f1' : 'f8';
     newPiecePlacements[newRookCoord] = newPiecePlacements[rookCoord];
     delete newPiecePlacements[rookCoord];
   } else if (move.castling === CastlingRight.QueenSide) {
-    const rookCoord = gameState.turn === Color.White ? 'a1' : 'a8';
-    const newRookCoord = gameState.turn === Color.White ? 'd1' : 'd8';
+    const rookCoord = chessPosition.turn === Color.White ? 'a1' : 'a8';
+    const newRookCoord = chessPosition.turn === Color.White ? 'd1' : 'd8';
     newPiecePlacements[newRookCoord] = newPiecePlacements[rookCoord];
     delete newPiecePlacements[rookCoord];
   }
 
   if (move.castling) {
     const abilitiesToRemove =
-      gameState.turn === Color.White
+      chessPosition.turn === Color.White
         ? CastlingAbility.whiteValues
         : CastlingAbility.blackValues;
     abilitiesToRemove.forEach((ability) => castlingAbility.delete(ability));
   } else if (pieceToMove?.type === PieceType.King && castlingRights.size > 0) {
     const abilitiesToRemove =
-      gameState.turn === Color.White
+      chessPosition.turn === Color.White
         ? CastlingAbility.whiteValues
         : CastlingAbility.blackValues;
     abilitiesToRemove.forEach((ability) => castlingAbility.delete(ability));
@@ -114,31 +114,31 @@ const makeMove = (gameState: GameState, move: Move): GameState => {
 
   const captureOrPawnMove =
     move.capture || pieceToMove?.type === PieceType.Pawn;
-  const ply = captureOrPawnMove ? 0 : gameState.ply + 1;
+  const ply = captureOrPawnMove ? 0 : chessPosition.ply + 1;
 
   return {
-    ...gameState,
+    ...chessPosition,
     castlingAbility,
-    turn: gameState.turn === Color.White ? Color.Black : Color.White,
+    turn: chessPosition.turn === Color.White ? Color.Black : Color.White,
     fullMoves:
-      gameState.turn === Color.Black
-        ? gameState.fullMoves + 1
-        : gameState.fullMoves,
+      chessPosition.turn === Color.Black
+        ? chessPosition.fullMoves + 1
+        : chessPosition.fullMoves,
     ply,
     pieces: newPiecePlacements,
     // Update enPassant if the move is a double pawn advance
     enPassant:
       pieceToMove?.type === 'p' && Math.abs(move.start - move.target) === 16
-        ? oneStepBackFromIndex(move.target, gameState.turn)
+        ? oneStepBackFromIndex(move.target, chessPosition.turn)
         : undefined,
   };
 };
 
 const toGameResult = (
-  gameState: GameState,
+  chessPosition: ChessPosition,
   moveGeneratorResult: MoveGeneratorResult
 ): GameResult => {
-  const fiftyMoveRule = gameState.ply >= 100;
+  const fiftyMoveRule = chessPosition.ply >= 100;
 
   const noLegalMoves = moveGeneratorResult.moves.length === 0;
 
@@ -147,7 +147,7 @@ const toGameResult = (
   const winner: Maybe<Color | 'draw'> = !isGameOver
     ? undefined
     : noLegalMoves && moveGeneratorResult.isCheck
-    ? gameState.turn === Color.White
+    ? chessPosition.turn === Color.White
       ? Color.Black
       : Color.White
     : 'draw';
@@ -158,16 +158,16 @@ const toGameResult = (
   };
 };
 
-export const ChessGame = (gameState: GameState): IChessGame => {
-  const chessboard = Chessboard(gameState);
-  const moveGenerator = MoveGenerator(gameState);
+export const ChessGame = (chessPosition: ChessPosition): IChessGame => {
+  const chessboard = Chessboard(chessPosition);
+  const moveGenerator = MoveGenerator(chessPosition);
 
   const getMovesLazy = lazyValue(() => moveGenerator.generateMoves());
-  const getState = (): GameState & GameResult => {
+  const getState = (): ChessPosition & GameResult => {
     const moveGeneratorResult: MoveGeneratorResult = getMovesLazy();
-    const gameResult = toGameResult(gameState, moveGeneratorResult);
+    const gameResult = toGameResult(chessPosition, moveGeneratorResult);
     return {
-      ...gameState,
+      ...chessPosition,
       ...gameResult,
     };
   };
@@ -175,6 +175,6 @@ export const ChessGame = (gameState: GameState): IChessGame => {
     ...chessboard,
     getState,
     getMoves: () => getMovesLazy().moves,
-    makeMove: (move) => ChessGame(makeMove(gameState, move)),
+    makeMove: (move) => ChessGame(makeMove(chessPosition, move)),
   };
 };

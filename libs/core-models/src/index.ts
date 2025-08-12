@@ -1,6 +1,6 @@
 export * from './lib/PiecePlacements';
 export * from './lib/BoardState';
-export * from './lib/GameState';
+export * from './lib/ChessPosition';
 export * from './lib/GameResult';
 export * from './lib/Color';
 export * from './lib/ColoredPieceType';
@@ -15,4 +15,4 @@ export * from './lib/CastlingRight';
 export * from './lib/mocks/PiecePlacements.mock';
 export * from './lib/mocks/Piece.mock';
 export * from './lib/mocks/BoardState.mock';
-export * from './lib/mocks/GameState.mock';
+export * from './lib/mocks/ChessPosition.mock';

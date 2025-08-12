@@ -2,7 +2,7 @@ import {
   CastlingRight,
   Color,
   Coordinate,
-  GameState,
+  ChessPosition,
   Piece,
   PiecePlacement,
   PieceType,
@@ -579,18 +579,18 @@ export type MoveGenerator = {
   generateMoves: () => MoveGeneratorResult;
 };
 
-export const MoveGenerator = (gameState: GameState): MoveGenerator => {
+export const MoveGenerator = (chessPosition: ChessPosition): MoveGenerator => {
   return {
     generateMoves: () => {
-      const chessBitboards = ChessBitboard(gameState.pieces);
+      const chessBitboards = ChessBitboard(chessPosition.pieces);
       const { kingAttackers, checkBlockPaths } = getKingAttackers(
         chessBitboards,
-        gameState.turn
+        chessPosition.turn
       );
-      const pinnedPieces = getPinnedPieces(chessBitboards, gameState.turn);
+      const pinnedPieces = getPinnedPieces(chessBitboards, chessPosition.turn);
       const attackers = getAttackedSquares(
         chessBitboards,
-        Color.opposite(gameState.turn)
+        Color.opposite(chessPosition.turn)
       );
       const numKingAttackers = kingAttackers.countBits();
       const isCheck = numKingAttackers > 0;
@@ -601,11 +601,11 @@ export const MoveGenerator = (gameState: GameState): MoveGenerator => {
           : kingAttackers.union(checkBlockPaths);
 
       const kingXRayAttacks = isCheck
-        ? getKingXRayAttacks(chessBitboards, gameState.turn)
+        ? getKingXRayAttacks(chessBitboards, chessPosition.turn)
         : attackers;
 
       const moves = generateMoves(
-        MoveGeneratorContext.from(gameState, chessBitboards, {
+        MoveGeneratorContext.from(chessPosition, chessBitboards, {
           attacks: attackers,
           pinnedPieces,
           kingXRayAttacks,
