@@ -191,35 +191,32 @@ export type ZobristHash = {
   copy: () => ZobristHash;
 };
 
-export const ZobristHash = (
-  position?: ChessPosition,
-  initialHash?: bigint
-): ZobristHash => {
-  const hash = initialHash ?? (position ? computeInitialHash(position) : 0n);
+const fromHash = (initialHash?: bigint): ZobristHash => {
+  const hash = initialHash ?? 0n;
 
   return {
     getValue: () => hash,
     toString: () => hashToString(hash),
     movePiece: (piece, fromSquare, toSquare) =>
-      ZobristHash(
-        undefined,
-        updateHashForPieceMove(hash, piece, fromSquare, toSquare)
-      ),
+      fromHash(updateHashForPieceMove(hash, piece, fromSquare, toSquare)),
     capturePiece: (capturedPiece, square) =>
-      ZobristHash(undefined, updateHashForCapture(hash, capturedPiece, square)),
-    toggleSideToMove: () =>
-      ZobristHash(undefined, updateHashForSideToMove(hash)),
+      fromHash(updateHashForCapture(hash, capturedPiece, square)),
+    toggleSideToMove: () => fromHash(updateHashForSideToMove(hash)),
     updateCastlingRights: (oldRights, newRights) =>
-      ZobristHash(
-        undefined,
-        updateHashForCastlingRights(hash, oldRights, newRights)
-      ),
+      fromHash(updateHashForCastlingRights(hash, oldRights, newRights)),
     updateEnPassant: (oldEnPassant, newEnPassant) =>
-      ZobristHash(
-        undefined,
-        updateHashForEnPassant(hash, oldEnPassant, newEnPassant)
-      ),
+      fromHash(updateHashForEnPassant(hash, oldEnPassant, newEnPassant)),
     equals: (other: ZobristHash) => hash === other.getValue(),
-    copy: () => ZobristHash(undefined, hash),
+    copy: () => fromHash(hash),
   };
+};
+
+const fromChessPosition = (position: ChessPosition): ZobristHash => {
+  const hash = computeInitialHash(position);
+  return fromHash(hash);
+};
+
+export const ZobristHash = {
+  fromHash,
+  fromChessPosition,
 };

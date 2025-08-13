@@ -17,7 +17,7 @@ describe('ZobristHash', () => {
         enPassant: undefined,
       });
 
-      const hash = ZobristHash(position);
+      const hash = ZobristHash.fromChessPosition(position);
 
       expect(hash.getValue()).not.toBe(0n);
       expect(hash.toString()).toMatch(/^0x[0-9a-f]{16}$/);
@@ -34,8 +34,8 @@ describe('ZobristHash', () => {
         turn: 'white',
       });
 
-      const hash1 = ZobristHash(position1);
-      const hash2 = ZobristHash(position2);
+      const hash1 = ZobristHash.fromChessPosition(position1);
+      const hash2 = ZobristHash.fromChessPosition(position2);
 
       expect(hash1.getValue()).not.toBe(hash2.getValue());
     });
@@ -51,8 +51,8 @@ describe('ZobristHash', () => {
         turn: 'black',
       });
 
-      const hash1 = ZobristHash(position1);
-      const hash2 = ZobristHash(position2);
+      const hash1 = ZobristHash.fromChessPosition(position1);
+      const hash2 = ZobristHash.fromChessPosition(position2);
 
       expect(hash1.getValue()).not.toBe(hash2.getValue());
     });
@@ -65,7 +65,7 @@ describe('ZobristHash', () => {
         turn: 'white',
       });
 
-      const originalHash = ZobristHash(position);
+      const originalHash = ZobristHash.fromChessPosition(position);
       const updatedHash = originalHash.movePiece(
         { color: 'white', type: 'k' },
         4, // e1 index
@@ -76,7 +76,7 @@ describe('ZobristHash', () => {
     });
 
     it('should update hash when capturing a piece', () => {
-      const originalHash = ZobristHash();
+      const originalHash = ZobristHash.fromHash();
       const updatedHash = originalHash.capturePiece(
         { color: 'black', type: 'q' },
         27 // d4 index
@@ -86,7 +86,7 @@ describe('ZobristHash', () => {
     });
 
     it('should update hash when toggling side to move', () => {
-      const originalHash = ZobristHash();
+      const originalHash = ZobristHash.fromHash();
       const updatedHash = originalHash.toggleSideToMove();
 
       expect(originalHash.getValue()).not.toBe(updatedHash.getValue());
@@ -103,7 +103,7 @@ describe('ZobristHash', () => {
       ]);
       const newRights = new Set([CastlingAbility.WhiteKing]);
 
-      const originalHash = ZobristHash();
+      const originalHash = ZobristHash.fromHash();
       const updatedHash = originalHash.updateCastlingRights(
         originalRights,
         newRights
@@ -113,7 +113,7 @@ describe('ZobristHash', () => {
     });
 
     it('should update hash when changing en passant', () => {
-      const originalHash = ZobristHash();
+      const originalHash = ZobristHash.fromHash();
       const updatedHash = originalHash.updateEnPassant(undefined, 'e3');
 
       expect(originalHash.getValue()).not.toBe(updatedHash.getValue());
@@ -131,8 +131,8 @@ describe('ZobristHash', () => {
         pieces: { e1: { color: 'white', type: 'k' } },
       });
 
-      const hash1 = ZobristHash(position);
-      const hash2 = ZobristHash(position);
+      const hash1 = ZobristHash.fromChessPosition(position);
+      const hash2 = ZobristHash.fromChessPosition(position);
       const hash3 = hash1.copy();
 
       expect(hash1.equals(hash2)).toBe(true);
@@ -143,7 +143,7 @@ describe('ZobristHash', () => {
     });
 
     it('should copy hash correctly', () => {
-      const originalHash = ZobristHash();
+      const originalHash = ZobristHash.fromHash();
       const copiedHash = originalHash.copy();
 
       expect(originalHash.getValue()).toBe(copiedHash.getValue());
@@ -155,7 +155,7 @@ describe('ZobristHash', () => {
     });
 
     it('should convert to string correctly', () => {
-      const hash = ZobristHash();
+      const hash = ZobristHash.fromHash();
       const hashString = hash.toString();
 
       expect(hashString).toMatch(/^0x[0-9a-f]{16}$/);
