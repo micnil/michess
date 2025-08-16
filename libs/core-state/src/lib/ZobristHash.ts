@@ -4,6 +4,7 @@ import {
   Coordinate,
   PieceType,
   CastlingAbility,
+  Piece,
 } from '@michess/core-models';
 
 // Zobrist hash constants - using pre-generated deterministic 64-bit values
@@ -96,7 +97,7 @@ const computeInitialHash = (position: ChessPosition): bigint => {
 
 const updateHashForPieceMove = (
   hash: bigint,
-  piece: { color: Color; type: PieceType },
+  piece: Piece,
   fromSquare: number,
   toSquare: number
 ): bigint => {
@@ -109,7 +110,7 @@ const updateHashForPieceMove = (
 
 const updateHashForCapture = (
   hash: bigint,
-  capturedPiece: { color: Color; type: PieceType },
+  capturedPiece: Piece,
   square: number
 ): bigint => {
   // Remove captured piece
@@ -162,6 +163,19 @@ const updateHashForEnPassant = (
   return newHash;
 };
 
+const updateHashForPromotePawn = (
+  hash: bigint,
+  pawn: Piece,
+  promotedPiece: Piece,
+  square: number
+): bigint => {
+  // Remove the pawn from the square
+  let newHash = hash ^ ZOBRIST_PIECES[pawn.color][pawn.type][square];
+  // Add the promoted piece to the same square
+  newHash ^= ZOBRIST_PIECES[promotedPiece.color][promotedPiece.type][square];
+  return newHash;
+};
+
 const hashToString = (hash: bigint): string => {
   return `0x${hash.toString(16).padStart(16, '0')}`;
 };
@@ -170,12 +184,14 @@ export type ZobristHash = {
   getValue: () => bigint;
   toString: () => string;
   movePiece: (
-    piece: { color: Color; type: PieceType },
+    piece: Piece,
     fromSquare: number,
     toSquare: number
   ) => ZobristHash;
-  capturePiece: (
-    capturedPiece: { color: Color; type: PieceType },
+  capturePiece: (capturedPiece: Piece, square: number) => ZobristHash;
+  promotePawn: (
+    pawn: Piece,
+    promotedPiece: Piece,
     square: number
   ) => ZobristHash;
   toggleSideToMove: () => ZobristHash;
@@ -201,6 +217,8 @@ const fromHash = (initialHash?: bigint): ZobristHash => {
       fromHash(updateHashForPieceMove(hash, piece, fromSquare, toSquare)),
     capturePiece: (capturedPiece, square) =>
       fromHash(updateHashForCapture(hash, capturedPiece, square)),
+    promotePawn: (pawn, promotedPiece, square) =>
+      fromHash(updateHashForPromotePawn(hash, pawn, promotedPiece, square)),
     toggleSideToMove: () => fromHash(updateHashForSideToMove(hash)),
     updateCastlingRights: (oldRights, newRights) =>
       fromHash(updateHashForCastlingRights(hash, oldRights, newRights)),

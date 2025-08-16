@@ -9,5 +9,16 @@ export type GameState = ChessPosition & {
     // reason?: 'resignation' | 'stalemate' | 'threefold_repetition' | 'fifty_moves';
   }>;
   resultStr: string;
-  moves: Move[];
+  moveHistory: Move[];
+  isRepetition: boolean;
+};
+
+export const GameState = {
+  fromChessPosition: (chessPosition: ChessPosition): GameState => ({
+    ...chessPosition,
+    result: undefined,
+    resultStr: '0-0',
+    moveHistory: [],
+    isRepetition: false,
+  }),
 };

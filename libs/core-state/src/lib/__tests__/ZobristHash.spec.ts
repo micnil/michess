@@ -2,7 +2,7 @@ import { createChessPositionMock, CastlingAbility } from '@michess/core-models';
 import { ZobristHash } from '../ZobristHash';
 
 describe('ZobristHash', () => {
-  describe('initialization', () => {
+  describe('fromChessPosition', () => {
     it('should create a hash from a chess position', () => {
       const position = createChessPositionMock({
         pieces: {
@@ -58,7 +58,21 @@ describe('ZobristHash', () => {
     });
   });
 
-  describe('updates', () => {
+  describe('fromHash', () => {
+    it('should create a hash from a bigint value', () => {
+      const hash = ZobristHash.fromHash(123456789n);
+
+      expect(hash.getValue()).toBe(123456789n);
+    });
+
+    it('should create a zero hash when no value provided', () => {
+      const hash = ZobristHash.fromHash();
+
+      expect(hash.getValue()).toBe(0n);
+    });
+  });
+
+  describe('movePiece', () => {
     it('should update hash when moving a piece', () => {
       const position = createChessPositionMock({
         pieces: { e1: { color: 'white', type: 'k' } },
@@ -74,7 +88,9 @@ describe('ZobristHash', () => {
 
       expect(originalHash.getValue()).not.toBe(updatedHash.getValue());
     });
+  });
 
+  describe('capturePiece', () => {
     it('should update hash when capturing a piece', () => {
       const originalHash = ZobristHash.fromHash();
       const updatedHash = originalHash.capturePiece(
@@ -84,7 +100,40 @@ describe('ZobristHash', () => {
 
       expect(originalHash.getValue()).not.toBe(updatedHash.getValue());
     });
+  });
 
+  describe('promotePawn', () => {
+    it('should update hash when promoting a pawn', () => {
+      const originalHash = ZobristHash.fromHash();
+      const updatedHash = originalHash.promotePawn(
+        { color: 'white', type: 'p' },
+        { color: 'white', type: 'q' },
+        56 // a8 index
+      );
+
+      expect(originalHash.getValue()).not.toBe(updatedHash.getValue());
+    });
+
+    it('should be equivalent to removing pawn and adding promoted piece', () => {
+      const originalHash = ZobristHash.fromHash();
+
+      // Using promotePawn
+      const promotedHash = originalHash.promotePawn(
+        { color: 'white', type: 'p' },
+        { color: 'white', type: 'q' },
+        56 // a8 index
+      );
+
+      // Using capturePiece + movePiece simulation
+      const manualHash = originalHash
+        .capturePiece({ color: 'white', type: 'p' }, 56)
+        .movePiece({ color: 'white', type: 'q' }, 56, 56);
+
+      expect(promotedHash.getValue()).toBe(manualHash.getValue());
+    });
+  });
+
+  describe('toggleSideToMove', () => {
     it('should update hash when toggling side to move', () => {
       const originalHash = ZobristHash.fromHash();
       const updatedHash = originalHash.toggleSideToMove();
@@ -95,7 +144,9 @@ describe('ZobristHash', () => {
       const doubleToggled = updatedHash.toggleSideToMove();
       expect(originalHash.getValue()).toBe(doubleToggled.getValue());
     });
+  });
 
+  describe('updateCastlingRights', () => {
     it('should update hash when changing castling rights', () => {
       const originalRights = new Set([
         CastlingAbility.WhiteKing,
@@ -111,7 +162,9 @@ describe('ZobristHash', () => {
 
       expect(originalHash.getValue()).not.toBe(updatedHash.getValue());
     });
+  });
 
+  describe('updateEnPassant', () => {
     it('should update hash when changing en passant', () => {
       const originalHash = ZobristHash.fromHash();
       const updatedHash = originalHash.updateEnPassant(undefined, 'e3');
@@ -125,7 +178,7 @@ describe('ZobristHash', () => {
     });
   });
 
-  describe('utility methods', () => {
+  describe('equals', () => {
     it('should compare hashes correctly', () => {
       const position = createChessPositionMock({
         pieces: { e1: { color: 'white', type: 'k' } },
@@ -141,7 +194,9 @@ describe('ZobristHash', () => {
       const differentHash = hash1.toggleSideToMove();
       expect(hash1.equals(differentHash)).toBe(false);
     });
+  });
 
+  describe('copy', () => {
     it('should copy hash correctly', () => {
       const originalHash = ZobristHash.fromHash();
       const copiedHash = originalHash.copy();
@@ -153,7 +208,9 @@ describe('ZobristHash', () => {
       const modifiedCopy = copiedHash.toggleSideToMove();
       expect(originalHash.equals(modifiedCopy)).toBe(false);
     });
+  });
 
+  describe('toString', () => {
     it('should convert to string correctly', () => {
       const hash = ZobristHash.fromHash();
       const hashString = hash.toString();
@@ -162,6 +219,16 @@ describe('ZobristHash', () => {
       expect(hashString).toBe(
         `0x${hash.getValue().toString(16).padStart(16, '0')}`
       );
+    });
+  });
+
+  describe('getValue', () => {
+    it('should return the hash value as bigint', () => {
+      const testValue = 987654321n;
+      const hash = ZobristHash.fromHash(testValue);
+
+      expect(hash.getValue()).toBe(testValue);
+      expect(typeof hash.getValue()).toBe('bigint');
     });
   });
 });

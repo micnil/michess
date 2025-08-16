@@ -1,5 +1,5 @@
 import { FenParser } from '@michess/core-fen';
-import { Color, Move } from '@michess/core-models';
+import { Coordinate, GameState, Move } from '@michess/core-models';
 import { ChessGame } from '@michess/core-rules';
 import {
   Chessboard as ChessboardView,
@@ -7,17 +7,14 @@ import {
 } from '@michess/react-chessboard';
 import { useState } from 'react';
 
-const getGameStatus = (chessPosition: {
-  isGameOver: boolean;
-  winner?: Color | 'draw';
-}): GameStatusType => {
-  if (!chessPosition.isGameOver) {
+const getGameStatus = (gameState: GameState): GameStatusType => {
+  if (!gameState.result) {
     return 'active';
-  } else if (chessPosition.winner === 'draw') {
+  } else if (gameState.result.type === 'draw') {
     return 'draw';
   } else if (
-    chessPosition.winner === 'white' ||
-    chessPosition.winner === 'black'
+    gameState.result.type === 'white_win' ||
+    gameState.result.type === 'black_win'
   ) {
     return 'checkmate';
   } else {
@@ -27,33 +24,37 @@ const getGameStatus = (chessPosition: {
 
 export const ChessGameContainer = () => {
   const [chessGame, setChessGame] = useState(() =>
-    ChessGame(
+    ChessGame.fromChessPosition(
       FenParser.toChessPosition(
         'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
       )
     )
   );
 
-  const chessPosition = chessGame.getState();
+  const gameState = chessGame.getState();
   const moves = chessGame.getMoves();
-  const gameStatus = getGameStatus(chessPosition);
+  const gameStatus = getGameStatus(gameState);
 
   return (
     <ChessboardView<Move>
-      orientation={chessPosition.orientation}
+      orientation={gameState.orientation}
       size={500}
-      piecePlacements={chessPosition.pieces}
+      piecePlacements={gameState.pieces}
       gameStatus={gameStatus}
       winner={
-        chessPosition.winner !== 'draw' ? chessPosition.winner : undefined
+        gameState.result?.type === 'black_win'
+          ? 'black'
+          : gameState.result?.type === 'white_win'
+          ? 'white'
+          : undefined
       }
       onMove={(movePayload) => {
         console.log(movePayload);
         setChessGame(chessGame.makeMove(movePayload.meta));
       }}
       moveOptions={moves.map((move) => ({
-        from: chessGame.getCoordinates()[move.start],
-        to: chessGame.getCoordinates()[move.target],
+        from: Coordinate.fromIndex(move.start),
+        to: Coordinate.fromIndex(move.target),
         meta: move,
       }))}
     />
