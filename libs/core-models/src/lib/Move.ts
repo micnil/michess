@@ -1,4 +1,5 @@
-import { CastlingRight, type PieceType } from '@michess/core-models';
+import { CastlingRight } from './CastlingRight';
+import { PieceType } from './PieceType';
 
 export type Move = {
   start: number;

@@ -1,4 +1,9 @@
-import { createChessPositionMock, CastlingAbility } from '@michess/core-models';
+import {
+  createChessPositionMock,
+  CastlingAbility,
+  Piece,
+  Coordinate,
+} from '@michess/core-models';
 import { ZobristHash } from '../ZobristHash';
 
 describe('ZobristHash', () => {
@@ -115,21 +120,28 @@ describe('ZobristHash', () => {
     });
 
     it('should be equivalent to removing pawn and adding promoted piece', () => {
-      const originalHash = ZobristHash.fromHash();
+      // Start with a hash that has a pawn on a8
+      const positionWithPawn = createChessPositionMock({
+        pieces: { a8: Piece.PawnWhite() },
+        turn: 'white',
+      });
+      const hashWithPawn = ZobristHash.fromChessPosition(positionWithPawn);
 
-      // Using promotePawn
-      const promotedHash = originalHash.promotePawn(
-        { color: 'white', type: 'p' },
-        { color: 'white', type: 'q' },
-        56 // a8 index
+      // Using promotePawn - should remove pawn and add queen
+      const promotedHash = hashWithPawn.promotePawn(
+        Piece.PawnWhite(),
+        Piece.QueenWhite(),
+        Coordinate.toIndex('a8')
       );
 
-      // Using capturePiece + movePiece simulation
-      const manualHash = originalHash
-        .capturePiece({ color: 'white', type: 'p' }, 56)
-        .movePiece({ color: 'white', type: 'q' }, 56, 56);
+      // Manual approach: start with pawn, remove it, then create position with queen
+      const positionWithQueen = createChessPositionMock({
+        pieces: { a8: Piece.QueenWhite() },
+        turn: 'white',
+      });
+      const expectedHash = ZobristHash.fromChessPosition(positionWithQueen);
 
-      expect(promotedHash.getValue()).toBe(manualHash.getValue());
+      expect(promotedHash.getValue()).toBe(expectedHash.getValue());
     });
   });
 

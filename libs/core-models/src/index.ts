@@ -16,4 +16,6 @@ export * from './lib/mocks/PiecePlacements.mock';
 export * from './lib/mocks/Piece.mock';
 export * from './lib/mocks/BoardState.mock';
 export * from './lib/mocks/ChessPosition.mock';
+export * from './lib/ChessGameResult';
+export * from './lib/ChessGameResultType';
 export * from './lib/Move';

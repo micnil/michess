@@ -9,20 +9,24 @@ import {
   PiecePlacements,
   PieceType,
   Move,
+  ChessGameResult,
 } from '@michess/core-models';
 import { Chessboard, ZobristHash } from '@michess/core-state';
 import { MoveGenerator } from './MoveGenerator';
 import { MoveGeneratorResult } from './model/MoveGeneratorResult';
+import { ChessGameInternalState } from './model/ChessGameInternalState';
+import { GameStateHistoryItem } from './model/GameStateHistoryItem';
 
 export type ChessGame = {
   getState(): GameState;
   getMoves(): Move[];
   makeMove(move: Move): ChessGame;
-};
-
-type GameStateInternal = GameState & {
-  positionHash: ZobristHash;
-  previousPositionHash: ZobristHash[];
+  setResult(result: ChessGameResult): ChessGame;
+  // requestDraw(): ChessGame;
+  // resign(): ChessGame;
+  // claimDraw(): ChessGame;
+  // acceptDraw(): ChessGame;
+  // rejectDraw(): ChessGame;
 };
 
 const oneStepBackFromIndex = (index: number, color: Color): Coordinate => {
@@ -37,10 +41,10 @@ const rookStartingPositions: Record<CastlingAbility, Coordinate> = {
 } as const;
 
 const makeMove = (
-  gameState: GameStateInternal,
+  gameState: ChessGameInternalState,
   move: Move
 ): {
-  gameState: GameStateInternal;
+  gameState: ChessGameInternalState;
 } => {
   if (move.start == move.target) {
     return { gameState };
@@ -69,6 +73,15 @@ const makeMove = (
   );
   const captureCoord = isEnpassantCapture ? enPassantCaptureCoord : toCoord;
   const pieceToCapture = boardState.pieces[captureCoord];
+
+  const historyItem: GameStateHistoryItem = {
+    move,
+    positionHash: gameState.positionHash,
+    ply: gameState.ply,
+    castlingAbility: new Set(gameState.castlingAbility),
+    capture: pieceToCapture,
+    enPassant: gameState.enPassant,
+  };
 
   const newPiecePlacements: PiecePlacements = {
     ...boardState.pieces,
@@ -164,11 +177,7 @@ const makeMove = (
     gameState: {
       ...gameState,
       positionHash: newPositionHash,
-      previousPositionHash: [
-        ...gameState.previousPositionHash,
-        gameState.positionHash,
-      ],
-      moveHistory: [...gameState.moveHistory, move],
+      gameHistory: [...gameState.gameHistory, historyItem],
       castlingAbility,
       turn: gameState.turn === Color.White ? Color.Black : Color.White,
       fullMoves:
@@ -183,11 +192,11 @@ const makeMove = (
 };
 
 const fromGameStateInternal = (
-  gameStateInternal: GameStateInternal,
+  gameStateInternal: ChessGameInternalState,
   moveGenResult: MoveGeneratorResult
 ): ChessGame => {
   const getState = (): GameState => {
-    return gameStateInternal;
+    return ChessGameInternalState.toGameState(gameStateInternal);
   };
 
   return {
@@ -198,19 +207,33 @@ const fromGameStateInternal = (
       const moveGenerator = MoveGenerator(gameState);
       return fromGameStateInternal(gameState, moveGenerator.generateMoves());
     },
+    setResult: (result: ChessGameResult): ChessGame => {
+      const newGameState = {
+        ...gameStateInternal,
+        result,
+      };
+      return fromGameStateInternal(newGameState, moveGenResult);
+    },
   };
 };
 
 const fromGameState = (gameState: GameState): ChessGame => {
-  const moveGenerator = MoveGenerator(gameState);
-  return fromGameStateInternal(
+  const moveGenerator = MoveGenerator(gameState.initialPosition);
+  const initialChessGame = fromGameStateInternal(
     {
-      ...gameState,
-      positionHash: ZobristHash.fromChessPosition(gameState),
-      previousPositionHash: [],
+      ...gameState.initialPosition,
+      result: undefined,
+      positionHash: ZobristHash.fromChessPosition(gameState.initialPosition),
+      gameHistory: [],
+      initialPosition: gameState.initialPosition,
     },
     moveGenerator.generateMoves()
   );
+  const chessGame = gameState.moveHistory.reduce((chessGame, move) => {
+    return chessGame.makeMove(move);
+  }, initialChessGame);
+
+  return gameState.result ? chessGame.setResult(gameState.result) : chessGame;
 };
 
 const fromChessPosition = (chessPosition: ChessPosition): ChessGame => {

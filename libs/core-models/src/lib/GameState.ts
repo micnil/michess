@@ -1,24 +1,21 @@
 import { Maybe } from '@michess/common-utils';
 import { ChessPosition } from './ChessPosition';
-import { GameResultType } from './GameResultType';
 import { Move } from './Move';
+import { ChessGameResult } from './ChessGameResult';
 
 export type GameState = ChessPosition & {
-  result: Maybe<{
-    type: GameResultType;
-    // reason?: 'resignation' | 'stalemate' | 'threefold_repetition' | 'fifty_moves';
-  }>;
+  result: Maybe<ChessGameResult>;
   resultStr: string;
+  initialPosition: ChessPosition;
   moveHistory: Move[];
-  isRepetition: boolean;
 };
 
 export const GameState = {
   fromChessPosition: (chessPosition: ChessPosition): GameState => ({
     ...chessPosition,
+    initialPosition: chessPosition,
     result: undefined,
     resultStr: '0-0',
     moveHistory: [],
-    isRepetition: false,
   }),
 };
