@@ -10,6 +10,7 @@ import {
   PieceType,
   Move,
   ChessGameResult,
+  ChessGameAction,
 } from '@michess/core-models';
 import { Chessboard, ZobristHash } from '@michess/core-state';
 import { MoveGenerator } from './MoveGenerator';
@@ -20,6 +21,8 @@ import { GameStateHistoryItem } from './model/GameStateHistoryItem';
 export type ChessGame = {
   getState(): GameState;
   getMoves(): Move[];
+  getAdditionalActions(): ChessGameAction[];
+  makeAction(action: ChessGameAction): ChessGame;
   makeMove(move: Move): ChessGame;
   setResult(result: ChessGameResult): ChessGame;
   // requestDraw(): ChessGame;
@@ -39,6 +42,25 @@ const rookStartingPositions: Record<CastlingAbility, Coordinate> = {
   [CastlingAbility.WhiteKing]: 'h1',
   [CastlingAbility.WhiteQueen]: 'a1',
 } as const;
+
+const isThreeFoldRepetition = (
+  positionHash: ZobristHash,
+  gameState: GameStateHistoryItem[]
+): boolean => {
+  let occurrences = 1;
+  for (let index = gameState.length - 1; index >= 0; index--) {
+    const historyItem = gameState[index];
+    if (historyItem.positionHash.equals(positionHash)) {
+      occurrences++;
+    }
+
+    if (occurrences === 3) {
+      break;
+    }
+  }
+
+  return occurrences === 3;
+};
 
 const makeMove = (
   gameState: ChessGameInternalState,
@@ -172,12 +194,19 @@ const makeMove = (
     );
   }
   newPositionHash = newPositionHash.toggleSideToMove();
+  const gameHistory = [...gameState.gameHistory, historyItem];
 
   return {
     gameState: {
       ...gameState,
+      additionalActions: isThreeFoldRepetition(
+        newPositionHash,
+        gameState.gameHistory
+      )
+        ? [ChessGameAction.claimDrawThreeFold()]
+        : [],
       positionHash: newPositionHash,
-      gameHistory: [...gameState.gameHistory, historyItem],
+      gameHistory,
       castlingAbility,
       turn: gameState.turn === Color.White ? Color.Black : Color.White,
       fullMoves:
@@ -191,6 +220,28 @@ const makeMove = (
   };
 };
 
+const makeAction = (
+  gameState: ChessGameInternalState,
+  action: ChessGameAction
+): {
+  gameState: ChessGameInternalState;
+} => {
+  switch (action.type) {
+    case 'CLAIM_DRAW':
+      return {
+        gameState: {
+          ...gameState,
+          result: ChessGameResult.fromChessGameAction(action),
+          additionalActions: [],
+        },
+      };
+    default:
+      return {
+        gameState,
+      };
+  }
+};
+
 const fromGameStateInternal = (
   gameStateInternal: ChessGameInternalState,
   moveGenResult: MoveGeneratorResult
@@ -200,6 +251,11 @@ const fromGameStateInternal = (
   };
 
   return {
+    makeAction: (action: ChessGameAction): ChessGame =>
+      fromGameStateInternal(
+        makeAction(gameStateInternal, action).gameState,
+        moveGenResult
+      ),
     getState,
     getMoves: () => moveGenResult.moves,
     makeMove: (move) => {
@@ -210,10 +266,12 @@ const fromGameStateInternal = (
     setResult: (result: ChessGameResult): ChessGame => {
       const newGameState = {
         ...gameStateInternal,
+        additionalActions: [],
         result,
       };
       return fromGameStateInternal(newGameState, moveGenResult);
     },
+    getAdditionalActions: () => gameStateInternal.additionalActions,
   };
 };
 
@@ -223,6 +281,7 @@ const fromGameState = (gameState: GameState): ChessGame => {
     {
       ...gameState.initialPosition,
       result: undefined,
+      additionalActions: [],
       positionHash: ZobristHash.fromChessPosition(gameState.initialPosition),
       gameHistory: [],
       initialPosition: gameState.initialPosition,

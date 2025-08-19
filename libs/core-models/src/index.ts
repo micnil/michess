@@ -19,3 +19,4 @@ export * from './lib/mocks/ChessPosition.mock';
 export * from './lib/ChessGameResult';
 export * from './lib/ChessGameResultType';
 export * from './lib/Move';
+export * from './lib/ChessGameAction';

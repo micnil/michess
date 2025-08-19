@@ -7,6 +7,19 @@ export type ChessGameResult = {
 };
 
 export const ChessGameResult = {
+  fromChessGameAction: (action: {
+    type: string;
+    reason?: string;
+  }): Maybe<ChessGameResult> => {
+    switch (action.type) {
+      case 'CLAIM_DRAW':
+        return {
+          type: 'draw',
+        };
+      default:
+        return undefined;
+    }
+  },
   toResultString: (result: Maybe<ChessGameResult>): string => {
     if (result) {
       switch (result.type) {

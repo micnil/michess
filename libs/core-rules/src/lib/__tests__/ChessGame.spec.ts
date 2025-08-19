@@ -8,6 +8,7 @@ import { stalematesTestCases } from './test-cases/stalemates';
 import { standardTestCases } from './test-cases/standard';
 import { pawnsTestCases } from './test-cases/pawns';
 import { taxingTestCases } from './test-cases/taxing';
+import { Coordinate, createChessPositionMock } from '@michess/core-models';
 
 const getAndApplyMoves = (chessGame: ChessGame): FenStr[] => {
   const moves = chessGame.getMoves();
@@ -128,5 +129,127 @@ describe('ChessGame', () => {
         expect(actualFens.sort()).toEqual(expectedFens.sort());
       }
     );
+  });
+
+  describe('getAdditionalActions', () => {
+    it('should return three-fold repetition action when applicable', () => {
+      const position = createChessPositionMock();
+      const chessGame = ChessGame.fromChessPosition(position);
+
+      expect(
+        chessGame
+          .getAdditionalActions()
+          .filter((action) => action.type === 'CLAIM_DRAW')
+      ).toHaveLength(0);
+
+      // Bongcloud draw (magnus - hikaru game).
+      const almostThreeFoldRepetition = chessGame
+        .makeMove({
+          start: Coordinate.toIndex('e2'),
+          target: Coordinate.toIndex('e4'),
+          capture: false,
+        })
+        .makeMove({
+          start: Coordinate.toIndex('e7'),
+          target: Coordinate.toIndex('e5'),
+          capture: false,
+        })
+        .makeMove({
+          start: Coordinate.toIndex('e1'),
+          target: Coordinate.toIndex('e2'),
+          capture: false,
+        })
+        .makeMove({
+          start: Coordinate.toIndex('e8'),
+          target: Coordinate.toIndex('e7'),
+          capture: false,
+        })
+        .makeMove({
+          start: Coordinate.toIndex('e2'),
+          target: Coordinate.toIndex('e1'),
+          capture: false,
+        })
+        .makeMove({
+          start: Coordinate.toIndex('e7'),
+          target: Coordinate.toIndex('e8'),
+          capture: false,
+        })
+        .makeMove({
+          start: Coordinate.toIndex('e1'),
+          target: Coordinate.toIndex('e2'),
+          capture: false,
+        })
+        .makeMove({
+          start: Coordinate.toIndex('e8'),
+          target: Coordinate.toIndex('e7'),
+          capture: false,
+        });
+
+      expect(
+        almostThreeFoldRepetition
+          .getAdditionalActions()
+          .filter((action) => action.type === 'CLAIM_DRAW')
+      ).toHaveLength(0);
+
+      const threeFoldRepetitionGame = almostThreeFoldRepetition
+        .makeMove({
+          start: Coordinate.toIndex('e2'),
+          target: Coordinate.toIndex('e1'),
+          capture: false,
+        })
+        .makeMove({
+          start: Coordinate.toIndex('e7'),
+          target: Coordinate.toIndex('e8'),
+          capture: false,
+        });
+
+      const claimDrawAction = threeFoldRepetitionGame
+        .getAdditionalActions()
+        .filter((action) => action.type === 'CLAIM_DRAW')[0];
+
+      expect(claimDrawAction).toBeDefined();
+
+      expect(threeFoldRepetitionGame.getState().result).toBeUndefined();
+      const drawnGame = threeFoldRepetitionGame.makeAction(claimDrawAction);
+      expect(drawnGame.getState().result?.type).toEqual('draw');
+    });
+
+    it('should return standard actions when no special conditions are met', () => {
+      const position = createChessPositionMock({
+        pieces: {
+          e1: { color: 'white', type: 'k' },
+          e8: { color: 'black', type: 'k' },
+        },
+        turn: 'white',
+      });
+
+      const chessGame = ChessGame.fromChessPosition(position);
+      const actions = chessGame.getAdditionalActions();
+
+      // Should always include offer draw and resign options
+      expect(actions).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ type: 'OFFER_DRAW' }),
+          expect.objectContaining({ type: 'RESIGN' }),
+        ])
+      );
+    });
+
+    it('should return empty array when game is finished', () => {
+      const position = createChessPositionMock({
+        pieces: {
+          e1: { color: 'white', type: 'k' },
+          e8: { color: 'black', type: 'k' },
+        },
+        turn: 'white',
+      });
+
+      const chessGame = ChessGame.fromChessPosition(position).setResult({
+        type: 'white_win',
+      });
+
+      const actions = chessGame.getAdditionalActions();
+      expect(actions).toEqual([]);
+    });
   });
 });
