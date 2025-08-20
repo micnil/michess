@@ -111,11 +111,16 @@ const updateHashForPieceMove = (
 
 const updateHashForCapture = (
   hash: bigint,
-  capturedPiece: Piece,
+  capturedPiece: Maybe<Piece>,
   square: number
 ): bigint => {
-  // Remove captured piece
-  return hash ^ ZOBRIST_PIECES[capturedPiece.color][capturedPiece.type][square];
+  if (capturedPiece) {
+    return (
+      hash ^ ZOBRIST_PIECES[capturedPiece.color][capturedPiece.type][square]
+    );
+  } else {
+    return hash;
+  }
 };
 
 const updateHashForSideToMove = (hash: bigint): bigint => {
@@ -129,14 +134,16 @@ const updateHashForCastlingRights = (
 ): bigint => {
   let newHash = hash;
 
-  // Remove old rights
-  for (const ability of oldRights) {
-    newHash ^= ZOBRIST_CASTLING[ability];
-  }
+  if (newRights.symmetricDifference(oldRights).size == 0) {
+    // Remove old rights
+    for (const ability of oldRights) {
+      newHash ^= ZOBRIST_CASTLING[ability];
+    }
 
-  // Add new rights
-  for (const ability of newRights) {
-    newHash ^= ZOBRIST_CASTLING[ability];
+    // Add new rights
+    for (const ability of newRights) {
+      newHash ^= ZOBRIST_CASTLING[ability];
+    }
   }
 
   return newHash;
@@ -167,14 +174,18 @@ const updateHashForEnPassant = (
 const updateHashForPromotePawn = (
   hash: bigint,
   pawn: Piece,
-  promotedPiece: Piece,
+  promotedPiece: Maybe<Piece>,
   square: number
 ): bigint => {
-  // Remove the pawn from the square
-  let newHash = hash ^ ZOBRIST_PIECES[pawn.color][pawn.type][square];
-  // Add the promoted piece to the same square
-  newHash ^= ZOBRIST_PIECES[promotedPiece.color][promotedPiece.type][square];
-  return newHash;
+  if (promotedPiece) {
+    // Remove the pawn from the square
+    let newHash = hash ^ ZOBRIST_PIECES[pawn.color][pawn.type][square];
+    // Add the promoted piece to the same square
+    newHash ^= ZOBRIST_PIECES[promotedPiece.color][promotedPiece.type][square];
+    return newHash;
+  } else {
+    return hash;
+  }
 };
 
 const hashToString = (hash: bigint): string => {
@@ -189,10 +200,10 @@ export type ZobristHash = {
     fromSquare: number,
     toSquare: number
   ) => ZobristHash;
-  capturePiece: (capturedPiece: Piece, square: number) => ZobristHash;
+  capturePiece: (capturedPiece: Maybe<Piece>, square: number) => ZobristHash;
   promotePawn: (
     pawn: Piece,
-    promotedPiece: Piece,
+    promotedPiece: Maybe<Piece>,
     square: number
   ) => ZobristHash;
   toggleSideToMove: () => ZobristHash;

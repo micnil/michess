@@ -194,32 +194,13 @@ const makeMove = (
       ? oneStepBackFromIndex(move.target, gameState.turn)
       : undefined;
 
-  // Update the hash of the position
-  newPositionHash = movedPiece
-    ? newPositionHash.movePiece(movedPiece, move.start, move.target)
-    : newPositionHash;
-  newPositionHash = capturedPiece
-    ? newPositionHash.capturePiece(capturedPiece, move.target)
-    : newPositionHash;
-  newPositionHash = promotedPiece
-    ? newPositionHash.promotePawn(movedPiece, promotedPiece, move.target)
-    : newPositionHash;
-
-  newPositionHash = newPositionHash.updateEnPassant(
-    gameState.enPassant,
-    enPassant
-  );
-
-  if (
-    newCastlingAbilities.symmetricDifference(gameState.castlingAbility).size ==
-    0
-  ) {
-    newPositionHash = newPositionHash.updateCastlingRights(
-      gameState.castlingAbility,
-      newCastlingAbilities
-    );
-  }
-  newPositionHash = newPositionHash.toggleSideToMove();
+  newPositionHash = newPositionHash
+    .movePiece(movedPiece, move.start, move.target)
+    .capturePiece(capturedPiece, move.target)
+    .promotePawn(movedPiece, promotedPiece, move.target)
+    .updateEnPassant(gameState.enPassant, enPassant)
+    .updateCastlingRights(gameState.castlingAbility, newCastlingAbilities)
+    .toggleSideToMove();
 
   const gameHistory = [...gameState.gameHistory, historyItem];
 
