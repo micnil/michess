@@ -205,9 +205,10 @@ const makeMove = (
     ? newPositionHash.promotePawn(movedPiece, promotedPiece, move.target)
     : newPositionHash;
 
-  if (enPassant !== gameState.enPassant) {
-    newPositionHash = newPositionHash.updateEnPassant(enPassant);
-  }
+  newPositionHash = newPositionHash.updateEnPassant(
+    gameState.enPassant,
+    enPassant
+  );
 
   if (
     newCastlingAbilities.symmetricDifference(gameState.castlingAbility).size ==

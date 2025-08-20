@@ -1,3 +1,4 @@
+import { Maybe } from '@michess/common-utils';
 import {
   ChessPosition,
   Color,
@@ -143,8 +144,8 @@ const updateHashForCastlingRights = (
 
 const updateHashForEnPassant = (
   hash: bigint,
-  oldEnPassant?: Coordinate,
-  newEnPassant?: Coordinate
+  oldEnPassant: Maybe<Coordinate>,
+  newEnPassant: Maybe<Coordinate>
 ): bigint => {
   let newHash = hash;
 
@@ -200,8 +201,8 @@ export type ZobristHash = {
     newRights: Set<CastlingAbility>
   ) => ZobristHash;
   updateEnPassant: (
-    oldEnPassant?: Coordinate,
-    newEnPassant?: Coordinate
+    oldEnPassant: Maybe<Coordinate>,
+    newEnPassant: Maybe<Coordinate>
   ) => ZobristHash;
   equals: (other: ZobristHash) => boolean;
   copy: () => ZobristHash;
