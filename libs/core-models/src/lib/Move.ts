@@ -5,7 +5,7 @@ export type Move = {
   start: number;
   target: number;
   capture: boolean;
-  // enPassant?: boolean;
+  enPassant?: boolean;
   castling?: CastlingRight;
   promotion?: PieceType;
 };

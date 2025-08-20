@@ -304,6 +304,7 @@ const getMovesForPawn = (
         moves.push({
           start: index,
           target: enPassantIndex,
+          enPassant: true,
           capture: true,
         });
       }

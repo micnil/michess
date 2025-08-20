@@ -47,4 +47,31 @@ export const CastlingAbility = Object.freeze({
     );
     return relevantAbilitys.map(toCastingRights);
   },
+  fromCastlingRights: (
+    rights: CastlingRight[],
+    color: Color
+  ): Set<CastlingAbility> => {
+    const abilities = new Set<CastlingAbility>();
+    rights.forEach((right) => {
+      const ability = CastlingAbility.fromCastlingRight(right, color);
+      if (ability) {
+        abilities.add(ability);
+      }
+    });
+    return abilities;
+  },
+  fromCastlingRight: (right: CastlingRight, color: Color): CastlingAbility => {
+    switch (right) {
+      case CastlingRight.KingSide:
+        return color === Color.White
+          ? CastlingAbility.WhiteKing
+          : CastlingAbility.BlackKing;
+      case CastlingRight.QueenSide:
+        return color === Color.White
+          ? CastlingAbility.WhiteQueen
+          : CastlingAbility.BlackQueen;
+      default:
+        throw new Error(`Unknown castling right: ${right}`);
+    }
+  },
 });

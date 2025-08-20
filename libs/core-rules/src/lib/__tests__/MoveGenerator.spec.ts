@@ -231,6 +231,7 @@ describe('MoveGenerator', () => {
         {
           // en-passant capture
           capture: true,
+          enPassant: true,
           start: Coordinate.toIndex('c5'),
           target: Coordinate.toIndex('d6'),
         },

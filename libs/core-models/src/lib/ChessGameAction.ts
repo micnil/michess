@@ -5,12 +5,7 @@ export type ChessGameActionType =
   | 'OFFER_DRAW'
   | 'RESIGN';
 
-type DrawReason =
-  | 'three-fold-repetition'
-  | 'fifty-move-rule'
-  | 'insufficient-material'
-  | 'stalemate'
-  | 'by-agreement';
+type DrawReason = 'THREE_FOLD_REPETITION' | 'FIFTY_MOVE_RULE' | 'BY_AGREEMENT';
 
 export type ChessGameAction = {
   type: ChessGameActionType;
@@ -21,19 +16,19 @@ export type ChessGameAction = {
 export const ChessGameAction = {
   claimDrawThreeFold: (): ChessGameAction => ({
     type: 'CLAIM_DRAW',
-    reason: 'three-fold-repetition',
+    reason: 'THREE_FOLD_REPETITION',
     message: 'Claim draw by threefold repetition',
   }),
 
   claimDrawFiftyMoveRule: (): ChessGameAction => ({
     type: 'CLAIM_DRAW',
-    reason: 'fifty-move-rule',
+    reason: 'FIFTY_MOVE_RULE',
     message: 'Claim draw by fifty-move rule',
   }),
 
   acceptDraw: (): ChessGameAction => ({
     type: 'ACCEPT_DRAW',
-    reason: 'by-agreement',
+    reason: 'BY_AGREEMENT',
     message: 'Accept draw offer',
   }),
 
