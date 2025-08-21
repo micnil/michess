@@ -1,24 +1,24 @@
+import { assertDefined, Maybe } from '@michess/common-utils';
 import {
   CastlingAbility,
   CastlingRight,
+  ChessGameAction,
+  ChessGameResult,
+  ChessPosition,
   Color,
   Coordinate,
   GameState,
-  ChessPosition,
+  Move,
   Piece,
   PiecePlacements,
   PieceType,
-  Move,
-  ChessGameResult,
-  ChessGameAction,
 } from '@michess/core-models';
 import { Chessboard, ZobristHash } from '@michess/core-state';
+import { ChessGameActions } from './ChessGameActions';
 import { MoveGenerator } from './MoveGenerator';
-import { MoveGeneratorResult } from './model/MoveGeneratorResult';
 import { ChessGameInternalState } from './model/ChessGameInternalState';
 import { GameStateHistoryItem } from './model/GameStateHistoryItem';
-import { assertDefined, Maybe } from '@michess/common-utils';
-import { ChessGameActions } from './ChessGameActions';
+import { MoveGeneratorResult } from './model/MoveGeneratorResult';
 
 export type ChessGame = {
   getState(): GameState;
