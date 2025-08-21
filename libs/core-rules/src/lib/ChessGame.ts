@@ -26,6 +26,7 @@ export type ChessGame = {
   getAdditionalActions(): ChessGameAction[];
   makeAction(action: ChessGameAction, playerColor: Color): ChessGame;
   makeMove(move: Move): ChessGame;
+  unmakeMove(): ChessGame;
   setResult(result: ChessGameResult): ChessGame;
 };
 
@@ -191,8 +192,8 @@ const makeMove = (
     positionHash: gameState.positionHash,
     ply: gameState.ply,
     castlingAbility: new Set(gameState.castlingAbility),
-    capture: capturedPiece,
     enPassant: gameState.enPassant,
+    pieces: boardState.pieces,
   };
 
   const newCastlingAbilities = updateCastlingRights(
@@ -250,6 +251,55 @@ const makeMove = (
       ply,
       pieces: newPiecePlacements,
       enPassant,
+    },
+  };
+};
+
+const unmakeMove = (
+  gameState: ChessGameInternalState
+): {
+  gameState: ChessGameInternalState;
+} => {
+  if (gameState.gameHistory.length === 0) {
+    return { gameState };
+  }
+
+  const lastHistoryItem =
+    gameState.gameHistory[gameState.gameHistory.length - 1];
+  const piecePlacements = lastHistoryItem.pieces;
+  const gameHistory = gameState.gameHistory.slice(0, -1);
+
+  let additionalActions = ChessGameActions.fromResult(undefined);
+  additionalActions = isThreeFoldRepetition(
+    lastHistoryItem.positionHash,
+    gameHistory
+  )
+    ? additionalActions.addAction(ChessGameAction.claimDrawThreeFold())
+    : additionalActions;
+  additionalActions = isFiftyMoveRule(lastHistoryItem.ply)
+    ? additionalActions.addAction(ChessGameAction.claimDrawFiftyMoveRule())
+    : additionalActions;
+  additionalActions = isInsufficientMaterial(piecePlacements)
+    ? additionalActions.addAction(
+        ChessGameAction.claimDrawInsufficientMaterial()
+      )
+    : additionalActions;
+
+  return {
+    gameState: {
+      ...gameState,
+      additionalActions,
+      positionHash: lastHistoryItem.positionHash,
+      gameHistory,
+      castlingAbility: lastHistoryItem.castlingAbility,
+      turn: gameState.turn === Color.White ? Color.Black : Color.White,
+      fullMoves:
+        gameState.turn === Color.White
+          ? gameState.fullMoves - 1
+          : gameState.fullMoves,
+      ply: lastHistoryItem.ply,
+      pieces: lastHistoryItem.pieces,
+      enPassant: lastHistoryItem.enPassant,
     },
   };
 };
@@ -315,6 +365,11 @@ const fromGameStateInternal = (
     getMoves: () => moveGenResult.moves,
     makeMove: (move) => {
       const { gameState } = makeMove(gameStateInternal, move);
+      const moveGenerator = MoveGenerator(gameState);
+      return fromGameStateInternal(gameState, moveGenerator.generateMoves());
+    },
+    unmakeMove: () => {
+      const { gameState } = unmakeMove(gameStateInternal);
       const moveGenerator = MoveGenerator(gameState);
       return fromGameStateInternal(gameState, moveGenerator.generateMoves());
     },

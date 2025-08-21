@@ -272,4 +272,103 @@ describe('ChessGame', () => {
       expect(actions).toEqual([]);
     });
   });
+
+  describe('unmakeMove', () => {
+    it('should restore the position after unmaking a simple move', () => {
+      const initialPosition = createChessPositionMock({
+        pieces: {
+          e2: { color: 'white', type: 'p' },
+          e7: { color: 'black', type: 'p' },
+          e1: { color: 'white', type: 'k' },
+          e8: { color: 'black', type: 'k' },
+        },
+        turn: 'white',
+      });
+
+      let chessGame = ChessGame.fromChessPosition(initialPosition);
+      const originalFen = FenParser.toFenStr(chessGame.getState());
+
+      chessGame = chessGame.makeMove({
+        start: Coordinate.toIndex('e2'),
+        target: Coordinate.toIndex('e4'),
+        capture: false,
+      });
+      const afterMoveFen = FenParser.toFenStr(chessGame.getState());
+
+      expect(afterMoveFen).not.toEqual(originalFen);
+      expect(chessGame.getState().turn).toBe('black');
+
+      chessGame = chessGame.unmakeMove();
+      const afterUnmakeFen = FenParser.toFenStr(chessGame.getState());
+
+      expect(afterUnmakeFen).toEqual(originalFen);
+      expect(chessGame.getState().turn).toBe('white');
+    });
+
+    it('should handle unmaking multiple moves correctly', () => {
+      const initialPosition = createChessPositionMock({
+        pieces: {
+          e2: { color: 'white', type: 'p' },
+          e7: { color: 'black', type: 'p' },
+          d2: { color: 'white', type: 'p' },
+          d7: { color: 'black', type: 'p' },
+          e1: { color: 'white', type: 'k' },
+          e8: { color: 'black', type: 'k' },
+        },
+        turn: 'white',
+      });
+
+      let chessGame = ChessGame.fromChessPosition(initialPosition);
+      const originalFen = FenParser.toFenStr(chessGame.getState());
+
+      // Make first move (e2-e4)
+      chessGame = chessGame.makeMove({
+        start: Coordinate.toIndex('e2'),
+        target: Coordinate.toIndex('e4'),
+        capture: false,
+      });
+
+      // Make second move (e7-e5)
+      chessGame = chessGame.makeMove({
+        start: Coordinate.toIndex('e7'),
+        target: Coordinate.toIndex('e5'),
+        capture: false,
+      });
+
+      // Make third move (d2-d4)
+      chessGame = chessGame.makeMove({
+        start: Coordinate.toIndex('d2'),
+        target: Coordinate.toIndex('d4'),
+        capture: false,
+      });
+
+      // Unmake all three moves
+      chessGame = chessGame.unmakeMove(); // unmake d2-d4
+      chessGame = chessGame.unmakeMove(); // unmake e7-e5
+      chessGame = chessGame.unmakeMove(); // unmake e2-e4
+
+      const finalFen = FenParser.toFenStr(chessGame.getState());
+      expect(finalFen).toEqual(originalFen);
+      expect(chessGame.getState().turn).toBe('white');
+    });
+
+    it('should handle unmakeMove on initial position gracefully', () => {
+      const initialPosition = createChessPositionMock({
+        pieces: {
+          e1: { color: 'white', type: 'k' },
+          e8: { color: 'black', type: 'k' },
+        },
+        turn: 'white',
+      });
+
+      const chessGame = ChessGame.fromChessPosition(initialPosition);
+      const originalFen = FenParser.toFenStr(chessGame.getState());
+
+      const afterUnmake = chessGame.unmakeMove();
+      const afterUnmakeFen = FenParser.toFenStr(afterUnmake.getState());
+
+      expect(afterUnmakeFen).toEqual(originalFen);
+      expect(afterUnmake.getState().turn).toBe('white');
+    });
+  });
 });
