@@ -1,3 +1,5 @@
+import { Color } from './Color';
+
 export type ChessGameActionType =
   | 'CLAIM_DRAW'
   | 'ACCEPT_DRAW'
@@ -9,6 +11,7 @@ type DrawReason = 'THREE_FOLD_REPETITION' | 'FIFTY_MOVE_RULE' | 'BY_AGREEMENT';
 
 export type ChessGameAction = {
   type: ChessGameActionType;
+  color?: Color;
   reason?: DrawReason;
   message?: string;
 };
@@ -26,15 +29,17 @@ export const ChessGameAction = {
     message: 'Claim draw by fifty-move rule',
   }),
 
-  acceptDraw: (): ChessGameAction => ({
+  acceptDraw: (color: Color): ChessGameAction => ({
     type: 'ACCEPT_DRAW',
     reason: 'BY_AGREEMENT',
     message: 'Accept draw offer',
+    color,
   }),
 
-  rejectDraw: (): ChessGameAction => ({
+  rejectDraw: (color: Color): ChessGameAction => ({
     type: 'REJECT_DRAW',
     message: 'Reject draw offer',
+    color,
   }),
 
   offerDraw: (): ChessGameAction => ({

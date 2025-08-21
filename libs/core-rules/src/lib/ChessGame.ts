@@ -39,6 +39,10 @@ const rookStartingPositions: Record<CastlingAbility, Coordinate> = {
   [CastlingAbility.WhiteQueen]: 'a1',
 } as const;
 
+const isFiftyMoveRule = (ply: number): boolean => {
+  return ply >= 100; // 50 moves = 100 plies (half-moves)
+};
+
 const isThreeFoldRepetition = (
   positionHash: ZobristHash,
   gameState: GameStateHistoryItem[]
