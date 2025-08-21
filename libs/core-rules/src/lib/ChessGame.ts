@@ -29,16 +29,16 @@ export type ChessGame = {
   setResult(result: ChessGameResult): ChessGame;
 };
 
-const oneStepBackFromIndex = (index: number, color: Color): Coordinate => {
-  return Coordinate.fromIndex(color === Color.White ? index + 8 : index - 8);
-};
-
 const rookStartingPositions: Record<CastlingAbility, Coordinate> = {
   [CastlingAbility.BlackKing]: 'h8',
   [CastlingAbility.BlackQueen]: 'a8',
   [CastlingAbility.WhiteKing]: 'h1',
   [CastlingAbility.WhiteQueen]: 'a1',
 } as const;
+
+const oneStepBackFromIndex = (index: number, color: Color): Coordinate => {
+  return Coordinate.fromIndex(color === Color.White ? index + 8 : index - 8);
+};
 
 const isFiftyMoveRule = (ply: number): boolean => {
   return ply >= 100; // 50 moves = 100 plies (half-moves)
