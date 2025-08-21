@@ -1,5 +1,4 @@
 import {
-  ChessGameAction,
   ChessGameResult,
   ChessPosition,
   GameState,
@@ -7,10 +6,11 @@ import {
 import { ZobristHash } from '@michess/core-state';
 import { GameStateHistoryItem } from './GameStateHistoryItem';
 import { Maybe } from '@michess/common-utils';
+import { ChessGameActions } from '../ChessGameActions';
 
 export type ChessGameInternalState = {
   positionHash: ZobristHash;
-  additionalActions: ChessGameAction[];
+  additionalActions: ChessGameActions;
   gameHistory: GameStateHistoryItem[];
   initialPosition: ChessPosition;
   result: Maybe<ChessGameResult>;

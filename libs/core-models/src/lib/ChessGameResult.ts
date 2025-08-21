@@ -1,5 +1,7 @@
 import { Maybe } from '@michess/common-utils';
 import { ChessGameResultType } from './ChessGameResultType';
+import { ChessGameAction } from './ChessGameAction';
+import { Color } from './Color';
 
 export type ChessGameResult = {
   type: ChessGameResultType;
@@ -7,14 +9,22 @@ export type ChessGameResult = {
 };
 
 export const ChessGameResult = {
-  fromChessGameAction: (action: {
-    type: string;
-    reason?: string;
-  }): Maybe<ChessGameResult> => {
+  fromChessGameAction: (
+    action: ChessGameAction,
+    turn: Color
+  ): Maybe<ChessGameResult> => {
     switch (action.type) {
       case 'CLAIM_DRAW':
         return {
           type: 'draw',
+        };
+      case 'ACCEPT_DRAW':
+        return {
+          type: 'draw',
+        };
+      case 'RESIGN':
+        return {
+          type: turn === Color.White ? 'white_win' : 'black_win',
         };
       default:
         return undefined;

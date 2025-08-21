@@ -1,25 +1,32 @@
 import { Maybe } from '@michess/common-utils';
 import { ChessGameAction, ChessGameResult, Color } from '@michess/core-models';
 
-type ChessGameActions = {
+export type ChessGameActions = {
   addAction: (action: ChessGameAction) => ChessGameActions;
   useAction: (action: ChessGameAction, currentTurn: Color) => ChessGameActions;
-  isActionAvailable: (action: ChessGameAction) => boolean;
+  isActionAvailable: (action: ChessGameAction, playerColor: Color) => boolean;
+  value: () => ChessGameAction[];
 };
 
 const fromActions = (actions: ChessGameAction[]): ChessGameActions => {
   return {
+    value: () => actions,
     addAction: (action: ChessGameAction) => {
       const newActions =
         action.type === 'CLAIM_DRAW'
-          ? [...actions.filter((a) => a.type !== 'OFFER_DRAW'), action]
+          ? [
+              ...actions.filter(
+                (a) => a.type !== 'OFFER_DRAW' && a.type !== 'CLAIM_DRAW'
+              ),
+              action,
+            ]
           : [...actions, action];
 
       return fromActions(newActions);
     },
-    useAction: (action: ChessGameAction, currentTurn: Color) => {
+    useAction: (action: ChessGameAction, playerColor: Color) => {
       const isValidUsage = actions.some(
-        (a) => a.type === action.type && (!a.color || a.color === currentTurn)
+        (a) => a.type === action.type && (!a.color || a.color === playerColor)
       );
       if (isValidUsage) {
         const newActions = actions.filter((a) => a.type !== action.type);
@@ -27,7 +34,7 @@ const fromActions = (actions: ChessGameAction[]): ChessGameActions => {
         switch (action.type) {
           case 'OFFER_DRAW': {
             const opponentColor =
-              currentTurn === Color.White ? Color.Black : Color.White;
+              playerColor === Color.White ? Color.Black : Color.White;
             return fromActions([
               ...newActions,
               ChessGameAction.acceptDraw(opponentColor),
@@ -55,10 +62,10 @@ const fromActions = (actions: ChessGameAction[]): ChessGameActions => {
         return fromActions(actions);
       }
     },
-    isActionAvailable: (action: ChessGameAction) =>
+    isActionAvailable: (action: ChessGameAction, playerColor: Color) =>
       actions.some(
         (a) =>
-          a.type === action.type && (!action.color || a.color === action.color)
+          a.type === action.type && (!action.color || a.color === playerColor)
       ),
   };
 };

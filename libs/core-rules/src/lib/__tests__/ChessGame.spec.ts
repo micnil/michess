@@ -8,7 +8,11 @@ import { stalematesTestCases } from './test-cases/stalemates';
 import { standardTestCases } from './test-cases/standard';
 import { pawnsTestCases } from './test-cases/pawns';
 import { taxingTestCases } from './test-cases/taxing';
-import { Coordinate, createChessPositionMock } from '@michess/core-models';
+import {
+  Color,
+  Coordinate,
+  createChessPositionMock,
+} from '@michess/core-models';
 
 const getAndApplyMoves = (chessGame: ChessGame): FenStr[] => {
   const moves = chessGame.getMoves();
@@ -159,6 +163,7 @@ describe('ChessGame', () => {
           target: Coordinate.toIndex('e2'),
           capture: false,
         })
+        // 1st occurance below
         .makeMove({
           start: Coordinate.toIndex('e8'),
           target: Coordinate.toIndex('e7'),
@@ -179,19 +184,12 @@ describe('ChessGame', () => {
           target: Coordinate.toIndex('e2'),
           capture: false,
         })
+        // 2nd occurance below
         .makeMove({
           start: Coordinate.toIndex('e8'),
           target: Coordinate.toIndex('e7'),
           capture: false,
-        });
-
-      expect(
-        almostThreeFoldRepetition
-          .getAdditionalActions()
-          .filter((action) => action.type === 'CLAIM_DRAW')
-      ).toHaveLength(0);
-
-      const threeFoldRepetitionGame = almostThreeFoldRepetition
+        })
         .makeMove({
           start: Coordinate.toIndex('e2'),
           target: Coordinate.toIndex('e1'),
@@ -203,6 +201,25 @@ describe('ChessGame', () => {
           capture: false,
         });
 
+      expect(
+        almostThreeFoldRepetition
+          .getAdditionalActions()
+          .filter((action) => action.type === 'CLAIM_DRAW')
+      ).toHaveLength(0);
+
+      const threeFoldRepetitionGame = almostThreeFoldRepetition
+        .makeMove({
+          start: Coordinate.toIndex('e1'),
+          target: Coordinate.toIndex('e2'),
+          capture: false,
+        })
+        // 3rd occurance below
+        .makeMove({
+          start: Coordinate.toIndex('e8'),
+          target: Coordinate.toIndex('e7'),
+          capture: false,
+        });
+
       const claimDrawAction = threeFoldRepetitionGame
         .getAdditionalActions()
         .filter((action) => action.type === 'CLAIM_DRAW')[0];
@@ -210,7 +227,10 @@ describe('ChessGame', () => {
       expect(claimDrawAction).toBeDefined();
 
       expect(threeFoldRepetitionGame.getState().result).toBeUndefined();
-      const drawnGame = threeFoldRepetitionGame.makeAction(claimDrawAction);
+      const drawnGame = threeFoldRepetitionGame.makeAction(
+        claimDrawAction,
+        Color.White
+      );
       expect(drawnGame.getState().result?.type).toEqual('draw');
     });
 

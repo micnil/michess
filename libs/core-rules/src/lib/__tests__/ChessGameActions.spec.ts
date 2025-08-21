@@ -13,19 +13,24 @@ describe('ChessGameActions', () => {
 
       expect(
         afterOfferDraw.isActionAvailable(
-          ChessGameAction.acceptDraw(Color.Black)
+          ChessGameAction.acceptDraw(Color.Black),
+          Color.Black
         )
       ).toBe(true);
       expect(
         afterOfferDraw.isActionAvailable(
-          ChessGameAction.rejectDraw(Color.Black)
+          ChessGameAction.rejectDraw(Color.Black),
+          Color.Black
         )
       ).toBe(true);
-      expect(afterOfferDraw.isActionAvailable(ChessGameAction.resign())).toBe(
-        true
-      );
       expect(
-        afterOfferDraw.isActionAvailable(ChessGameAction.offerDraw())
+        afterOfferDraw.isActionAvailable(ChessGameAction.resign(), Color.Black)
+      ).toBe(true);
+      expect(
+        afterOfferDraw.isActionAvailable(
+          ChessGameAction.offerDraw(),
+          Color.Black
+        )
       ).toBe(false);
     });
 
@@ -42,19 +47,24 @@ describe('ChessGameActions', () => {
       );
 
       expect(
-        afterRejectDraw.isActionAvailable(ChessGameAction.offerDraw())
+        afterRejectDraw.isActionAvailable(
+          ChessGameAction.offerDraw(),
+          Color.Black
+        )
       ).toBe(true);
-      expect(afterRejectDraw.isActionAvailable(ChessGameAction.resign())).toBe(
-        true
-      );
+      expect(
+        afterRejectDraw.isActionAvailable(ChessGameAction.resign(), Color.Black)
+      ).toBe(true);
       expect(
         afterRejectDraw.isActionAvailable(
-          ChessGameAction.acceptDraw(Color.Black)
+          ChessGameAction.acceptDraw(Color.Black),
+          Color.Black
         )
       ).toBe(false);
       expect(
         afterRejectDraw.isActionAvailable(
-          ChessGameAction.rejectDraw(Color.Black)
+          ChessGameAction.rejectDraw(Color.Black),
+          Color.Black
         )
       ).toBe(false);
     });
@@ -72,14 +82,18 @@ describe('ChessGameActions', () => {
       );
 
       expect(
-        afterAcceptDraw.isActionAvailable(ChessGameAction.offerDraw())
+        afterAcceptDraw.isActionAvailable(
+          ChessGameAction.offerDraw(),
+          Color.Black
+        )
       ).toBe(false);
-      expect(afterAcceptDraw.isActionAvailable(ChessGameAction.resign())).toBe(
-        false
-      );
+      expect(
+        afterAcceptDraw.isActionAvailable(ChessGameAction.resign(), Color.Black)
+      ).toBe(false);
       expect(
         afterAcceptDraw.isActionAvailable(
-          ChessGameAction.acceptDraw(Color.Black)
+          ChessGameAction.acceptDraw(Color.Black),
+          Color.Black
         )
       ).toBe(false);
     });
@@ -94,14 +108,20 @@ describe('ChessGameActions', () => {
       );
 
       expect(
-        withClaimDraw.isActionAvailable(ChessGameAction.claimDrawThreeFold())
+        withClaimDraw.isActionAvailable(
+          ChessGameAction.claimDrawThreeFold(),
+          Color.White
+        )
       ).toBe(true);
-      expect(withClaimDraw.isActionAvailable(ChessGameAction.offerDraw())).toBe(
-        false
-      );
-      expect(withClaimDraw.isActionAvailable(ChessGameAction.resign())).toBe(
-        true
-      );
+      expect(
+        withClaimDraw.isActionAvailable(
+          ChessGameAction.offerDraw(),
+          Color.White
+        )
+      ).toBe(false);
+      expect(
+        withClaimDraw.isActionAvailable(ChessGameAction.resign(), Color.White)
+      ).toBe(true);
     });
   });
 });

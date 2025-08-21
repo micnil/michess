@@ -18,12 +18,13 @@ import { MoveGeneratorResult } from './model/MoveGeneratorResult';
 import { ChessGameInternalState } from './model/ChessGameInternalState';
 import { GameStateHistoryItem } from './model/GameStateHistoryItem';
 import { assertDefined } from '@michess/common-utils';
+import { ChessGameActions } from './ChessGameActions';
 
 export type ChessGame = {
   getState(): GameState;
   getMoves(): Move[];
   getAdditionalActions(): ChessGameAction[];
-  makeAction(action: ChessGameAction): ChessGame;
+  makeAction(action: ChessGameAction, playerColor: Color): ChessGame;
   makeMove(move: Move): ChessGame;
   setResult(result: ChessGameResult): ChessGame;
 };
@@ -58,7 +59,6 @@ const isThreeFoldRepetition = (
       break;
     }
   }
-
   return occurrences === 3;
 };
 
@@ -165,7 +165,6 @@ const makeMove = (
     return { gameState };
   }
 
-  let newPositionHash = gameState.positionHash.copy();
   const chessboard = Chessboard(gameState);
   const boardState = chessboard.getState();
 
@@ -198,7 +197,7 @@ const makeMove = (
       ? oneStepBackFromIndex(move.target, gameState.turn)
       : undefined;
 
-  newPositionHash = newPositionHash
+  const newPositionHash = gameState.positionHash
     .movePiece(movedPiece, move.start, move.target)
     .capturePiece(capturedPiece, move.target)
     .promotePawn(movedPiece, promotedPiece, move.target)
@@ -208,15 +207,18 @@ const makeMove = (
 
   const gameHistory = [...gameState.gameHistory, historyItem];
 
+  let additionalActions = gameState.additionalActions;
+  additionalActions = isThreeFoldRepetition(newPositionHash, gameHistory)
+    ? additionalActions.addAction(ChessGameAction.claimDrawThreeFold())
+    : additionalActions;
+  additionalActions = isFiftyMoveRule(ply)
+    ? additionalActions.addAction(ChessGameAction.claimDrawFiftyMoveRule())
+    : additionalActions;
+
   return {
     gameState: {
       ...gameState,
-      additionalActions: isThreeFoldRepetition(
-        newPositionHash,
-        gameState.gameHistory
-      )
-        ? [ChessGameAction.claimDrawThreeFold()]
-        : [],
+      additionalActions,
       positionHash: newPositionHash,
       gameHistory,
       castlingAbility: newCastlingAbilities,
@@ -234,23 +236,44 @@ const makeMove = (
 
 const makeAction = (
   gameState: ChessGameInternalState,
-  action: ChessGameAction
+  action: ChessGameAction,
+  playerColor: Color
 ): {
   gameState: ChessGameInternalState;
 } => {
-  switch (action.type) {
-    case 'CLAIM_DRAW':
-      return {
-        gameState: {
-          ...gameState,
-          result: ChessGameResult.fromChessGameAction(action),
-          additionalActions: [],
-        },
-      };
-    default:
-      return {
-        gameState,
-      };
+  if (gameState.additionalActions.isActionAvailable(action, playerColor)) {
+    const newActions = gameState.additionalActions.useAction(
+      action,
+      playerColor
+    );
+    switch (action.type) {
+      case 'CLAIM_DRAW':
+      case 'ACCEPT_DRAW':
+      case 'RESIGN':
+        return {
+          gameState: {
+            ...gameState,
+            result: ChessGameResult.fromChessGameAction(action, gameState.turn),
+            additionalActions: newActions,
+          },
+        };
+      case 'OFFER_DRAW':
+      case 'REJECT_DRAW':
+        return {
+          gameState: {
+            ...gameState,
+            additionalActions: newActions,
+          },
+        };
+      default:
+        return {
+          gameState,
+        };
+    }
+  } else {
+    throw new Error(
+      `Action ${action.type} is not available for turn ${gameState.turn}`
+    );
   }
 };
 
@@ -263,9 +286,9 @@ const fromGameStateInternal = (
   };
 
   return {
-    makeAction: (action: ChessGameAction): ChessGame =>
+    makeAction: (action: ChessGameAction, playerColor: Color): ChessGame =>
       fromGameStateInternal(
-        makeAction(gameStateInternal, action).gameState,
+        makeAction(gameStateInternal, action, playerColor).gameState,
         moveGenResult
       ),
     getState,
@@ -278,12 +301,12 @@ const fromGameStateInternal = (
     setResult: (result: ChessGameResult): ChessGame => {
       const newGameState = {
         ...gameStateInternal,
-        additionalActions: [],
+        additionalActions: ChessGameActions.fromResult(result),
         result,
       };
       return fromGameStateInternal(newGameState, moveGenResult);
     },
-    getAdditionalActions: () => gameStateInternal.additionalActions,
+    getAdditionalActions: () => gameStateInternal.additionalActions.value(),
   };
 };
 
@@ -293,9 +316,10 @@ const fromGameState = (gameState: GameState): ChessGame => {
     {
       ...gameState.initialPosition,
       result: undefined,
-      additionalActions: [],
+      additionalActions: ChessGameActions.fromResult(undefined),
       positionHash: ZobristHash.fromChessPosition(gameState.initialPosition),
       gameHistory: [],
+
       initialPosition: gameState.initialPosition,
     },
     moveGenerator.generateMoves()

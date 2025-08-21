@@ -134,7 +134,7 @@ const updateHashForCastlingRights = (
 ): bigint => {
   let newHash = hash;
 
-  if (newRights.symmetricDifference(oldRights).size == 0) {
+  if (newRights.symmetricDifference(oldRights).size !== 0) {
     // Remove old rights
     for (const ability of oldRights) {
       newHash ^= ZOBRIST_CASTLING[ability];

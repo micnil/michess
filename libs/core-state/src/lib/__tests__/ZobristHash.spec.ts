@@ -166,7 +166,10 @@ describe('ZobristHash', () => {
       ]);
       const newRights = new Set([CastlingAbility.WhiteKing]);
 
-      const originalHash = ZobristHash.fromHash();
+      const originalHash = ZobristHash.fromHash().updateCastlingRights(
+        new Set([]),
+        originalRights
+      );
       const updatedHash = originalHash.updateCastlingRights(
         originalRights,
         newRights
