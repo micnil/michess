@@ -17,7 +17,7 @@ import { MoveGenerator } from './MoveGenerator';
 import { MoveGeneratorResult } from './model/MoveGeneratorResult';
 import { ChessGameInternalState } from './model/ChessGameInternalState';
 import { GameStateHistoryItem } from './model/GameStateHistoryItem';
-import { assertDefined } from '@michess/common-utils';
+import { assertDefined, Maybe } from '@michess/common-utils';
 import { ChessGameActions } from './ChessGameActions';
 
 export type ChessGame = {
@@ -42,6 +42,21 @@ const rookStartingPositions: Record<CastlingAbility, Coordinate> = {
 
 const isFiftyMoveRule = (ply: number): boolean => {
   return ply >= 100; // 50 moves = 100 plies (half-moves)
+};
+
+const isInsufficientMaterial = (piecePlacements: PiecePlacements): boolean => {
+  const pieces = Object.values(piecePlacements);
+  if (pieces.length <= 2) {
+    return true;
+  } else if (pieces.length === 3) {
+    const isKingOrMinorPiece = (piece: Maybe<Piece>) =>
+      piece?.type === PieceType.King ||
+      piece?.type === PieceType.Bishop ||
+      piece?.type === PieceType.Knight;
+    return pieces.every(isKingOrMinorPiece);
+  } else {
+    return false;
+  }
 };
 
 const isThreeFoldRepetition = (
@@ -213,6 +228,11 @@ const makeMove = (
     : additionalActions;
   additionalActions = isFiftyMoveRule(ply)
     ? additionalActions.addAction(ChessGameAction.claimDrawFiftyMoveRule())
+    : additionalActions;
+  additionalActions = isInsufficientMaterial(newPiecePlacements)
+    ? additionalActions.addAction(
+        ChessGameAction.claimDrawInsufficientMaterial()
+      )
     : additionalActions;
 
   return {
