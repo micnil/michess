@@ -28,6 +28,9 @@ export type ChessGame = {
   makeMove(move: Move): ChessGame;
   unmakeMove(): ChessGame;
   setResult(result: ChessGameResult): ChessGame;
+  perft: (depth: number) => {
+    nodes: number;
+  };
 };
 
 const rookStartingPositions: Record<CastlingAbility, Coordinate> = {
@@ -347,6 +350,27 @@ const makeAction = (
   }
 };
 
+const perft = (
+  gameStateInternal: ChessGameInternalState,
+  depth: number
+): { nodes: number } => {
+  if (depth === 0) {
+    return { nodes: 1 };
+  }
+
+  const moveGenerator = MoveGenerator(gameStateInternal);
+  const moveGenResult = moveGenerator.generateMoves();
+  let nodes = 0;
+
+  for (const move of moveGenResult.moves) {
+    const { gameState } = makeMove(gameStateInternal, move);
+    const result = perft(gameState, depth - 1);
+    nodes += result.nodes;
+  }
+
+  return { nodes };
+};
+
 const fromGameStateInternal = (
   gameStateInternal: ChessGameInternalState,
   moveGenResult: MoveGeneratorResult
@@ -382,6 +406,7 @@ const fromGameStateInternal = (
       return fromGameStateInternal(newGameState, moveGenResult);
     },
     getAdditionalActions: () => gameStateInternal.additionalActions.value(),
+    perft: (depth: number) => perft(gameStateInternal, depth),
   };
 };
 

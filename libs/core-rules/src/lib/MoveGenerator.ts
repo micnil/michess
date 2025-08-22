@@ -215,6 +215,7 @@ const getMovesForPawn = (
   const twoStepIndex = oneStepIndex + pushOffset;
   const isTwoStepLegal =
     IndexBoardUtil.withinBoard(twoStepIndex) &&
+    !context.bitboards.occupied.isIndexSet(oneStepIndex) &&
     !context.bitboards.occupied.isIndexSet(twoStepIndex) &&
     pinMoveRestrictions.isIndexSet(twoStepIndex) &&
     context.moveMasks.checkEvasion.isIndexSet(twoStepIndex);
@@ -262,7 +263,7 @@ const getMovesForPawn = (
     }
   }
 
-  if (isStartPosition && isOneStepLegal && isTwoStepLegal) {
+  if (isStartPosition && isTwoStepLegal) {
     moves.push({
       start: index,
       target: twoStepIndex,

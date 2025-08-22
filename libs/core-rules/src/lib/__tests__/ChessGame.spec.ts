@@ -371,4 +371,51 @@ describe('ChessGame', () => {
       expect(afterUnmake.getState().turn).toBe('white');
     });
   });
+
+  describe('perft', () => {
+    it('should return correct node counts for initial position depths 1-5', () => {
+      const initialPosition = FenParser.toChessPosition(
+        'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+      );
+      const chessGame = ChessGame.fromChessPosition(initialPosition);
+
+      // Known correct perft results for initial position
+      expect(chessGame.perft(1).nodes).toBe(20);
+      expect(chessGame.perft(2).nodes).toBe(400);
+      expect(chessGame.perft(3).nodes).toBe(8902);
+      expect(chessGame.perft(4).nodes).toBe(197281);
+      expect(chessGame.perft(5).nodes).toBe(4865609);
+    });
+
+    it('should handle perft depth 0', () => {
+      const initialPosition = FenParser.toChessPosition(
+        'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+      );
+      const chessGame = ChessGame.fromChessPosition(initialPosition);
+
+      expect(chessGame.perft(0).nodes).toBe(1);
+    });
+
+    it('should work with Kiwipete position (Position 2)', () => {
+      const kiwipetePosition = FenParser.toChessPosition(
+        'r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1'
+      );
+      const chessGame = ChessGame.fromChessPosition(kiwipetePosition);
+
+      expect(chessGame.perft(1).nodes).toBe(48);
+      expect(chessGame.perft(2).nodes).toBe(2039);
+      expect(chessGame.perft(3).nodes).toBe(97862);
+    });
+
+    it('should work with Kiwipete position (Position 4)', () => {
+      const kiwipetePosition = FenParser.toChessPosition(
+        'r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1'
+      );
+      const chessGame = ChessGame.fromChessPosition(kiwipetePosition);
+
+      expect(chessGame.perft(1).nodes).toBe(6);
+      expect(chessGame.perft(2).nodes).toBe(264);
+      expect(chessGame.perft(3).nodes).toBe(9467);
+    });
+  });
 });
