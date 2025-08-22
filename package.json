@@ -7,7 +7,8 @@
     "build": "nx build",
     "test": "nx test",
     "test:all": "nx run-many --target=test --all",
-    "typecheck": "tsc -p apps/web-chess --noEmit --jsx react-jsx"
+    "typecheck": "tsc -p apps/web-chess --noEmit --jsx react-jsx",
+    "perft": "tsx --tsconfig tools/tsconfig.tools.json tools/perft.ts"
   },
   "private": true,
   "dependencies": {
@@ -50,6 +51,7 @@
     "eslint-plugin-react-hooks": "5.0.0",
     "jest": "30.0.5",
     "jest-environment-jsdom": "30.0.5",
+    "jest-util": "30.0.5",
     "nx": "21.3.11",
     "prettier": "2.7.1",
     "react-is": "18.3.1",
@@ -57,7 +59,7 @@
     "ts-jest": "29.4.1",
     "ts-node": "10.9.1",
     "tslib": "^2.4.0",
-    "typescript": "5.8.3",
-    "jest-util": "30.0.5"
+    "tsx": "^4.20.4",
+    "typescript": "5.8.3"
   }
 }
