@@ -1,75 +1,10 @@
+import { Command } from 'commander';
 import { ChessPosition } from '@michess/core-models';
-import { FenParser } from '@michess/core-fen';
+import { FenParser, FenStr } from '@michess/core-fen';
 import { ChessGame } from '@michess/core-rules';
 
 // Default FEN for standard starting position
 const DEFAULT_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
-
-function printUsage() {
-  console.log('Usage: pnpm perft [OPTIONS]');
-  console.log(
-    '   or: tsx --tsconfig tools/tsconfig.tools.json tools/perft.ts [OPTIONS]'
-  );
-  console.log('');
-  console.log('Options:');
-  console.log('  --fen <fen-string>    Chess position in FEN notation');
-  console.log('                        (default: standard starting position)');
-  console.log('  --depth <depth>       Perft search depth (default: 5)');
-  console.log('  --help, -h            Show this help message');
-  console.log('');
-  console.log('Examples:');
-  console.log('  pnpm perft');
-  console.log('  pnpm perft --depth 6');
-  console.log(
-    '  pnpm perft --fen "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1" --depth 4'
-  );
-}
-
-function parseArgs(): { fen: string; depth: number; help: boolean } {
-  const args = process.argv.slice(2);
-  let fen = DEFAULT_FEN;
-  let depth = 5;
-  let help = false;
-
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-
-    switch (arg) {
-      case '--help':
-      case '-h':
-        help = true;
-        break;
-
-      case '--fen':
-        if (i + 1 >= args.length) {
-          console.error('Error: --fen requires a FEN string argument');
-          process.exit(1);
-        }
-        fen = args[++i];
-        break;
-
-      case '--depth':
-        if (i + 1 >= args.length) {
-          console.error('Error: --depth requires a numeric argument');
-          process.exit(1);
-        }
-        const depthArg = parseInt(args[++i], 10);
-        if (isNaN(depthArg) || depthArg < 0) {
-          console.error('Error: --depth must be a non-negative integer');
-          process.exit(1);
-        }
-        depth = depthArg;
-        break;
-
-      default:
-        console.error(`Error: Unknown argument: ${arg}`);
-        printUsage();
-        process.exit(1);
-    }
-  }
-
-  return { fen, depth, help };
-}
 
 function formatNumber(num: number): string {
   return num.toLocaleString();
@@ -87,39 +22,69 @@ function formatTime(ms: number): string {
   }
 }
 
-function main() {
-  const { fen, depth, help } = parseArgs();
+interface PerfOptions {
+  fen: string;
+  depth: number;
+}
 
-  if (help) {
-    printUsage();
-    return;
-  }
+function main() {
+  const program = new Command();
+
+  program
+    .name('perft')
+    .description('Chess performance test tool - counts nodes at given depth')
+    .version('1.0.0')
+    .option('-f, --fen <fen>', 'Chess position in FEN notation', DEFAULT_FEN)
+    .option(
+      '-d, --depth <depth>',
+      'Perft search depth',
+      (value) => {
+        const depth = parseInt(value, 10);
+        if (isNaN(depth) || depth < 0) {
+          program.error('Error: depth must be a non-negative integer');
+        }
+        return depth;
+      },
+      5
+    )
+    .addHelpText(
+      'after',
+      `
+Examples:
+  $ pnpm perft
+  $ pnpm perft --depth 6
+  $ pnpm perft -f "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1" -d 4
+
+Known test positions:
+  Starting position: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+  Kiwipete test:     "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"`
+    );
+
+  program.parse();
+  const options = program.opts<PerfOptions>();
 
   console.log('Chess Perft Tool');
   console.log('================');
-  console.log(`FEN: ${fen}`);
-  console.log(`Depth: ${depth}`);
+  console.log(`FEN: ${options.fen}`);
+  console.log(`Depth: ${options.depth}`);
   console.log('');
 
   try {
-    // Parse the FEN string to create a chess position
-    const chessPosition: ChessPosition = FenParser.toChessPosition(fen);
+    const chessPosition: ChessPosition = FenParser.toChessPosition(
+      options.fen as FenStr
+    );
 
-    // Create a chess game from the position
     const chessGame = ChessGame.fromChessPosition(chessPosition);
 
     console.log('Running perft...');
 
-    // Measure execution time
     const startTime = performance.now();
 
-    // Run perft
-    const result = chessGame.perft(depth);
+    const result = chessGame.perft(options.depth);
 
     const endTime = performance.now();
     const elapsed = endTime - startTime;
 
-    // Display results
     console.log('');
     console.log('Results:');
     console.log('--------');
@@ -131,11 +96,9 @@ function main() {
       console.log(`NPS: ${formatNumber(Math.round(nps))} nodes/second`);
     }
   } catch (error) {
-    console.error(
-      'Error:',
-      error instanceof Error ? error.message : String(error)
+    program.error(
+      `Error: ${error instanceof Error ? error.message : String(error)}`
     );
-    process.exit(1);
   }
 }
 
