@@ -1,21 +1,52 @@
 # Michess
 
-This project was generated using [Nx](https://nx.dev).
+A modern chess application built with React, Next.js, and TypeScript. Features a interactive chessboard with move validation and game state management.
 
-<p style="text-align: center;"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="450"></p>
+## Quick Start
 
-## Getting started
+1. Install dependencies:
 
-Run `pnpm`
+   ```bash
+   pnpm install
+   ```
 
-Run `pnpm nx serve webchess`
+2. Start the development server:
 
-## Running unit tests
+   ```bash
+   pnpm nx serve web-chess
+   ```
 
-Run `pnpm nx test <lib_name/app_name>` to execute the unit tests via [Jest](https://jestjs.io).
+3. Open your browser and navigate to `http://localhost:4200`
 
-Run `nx affected:test` to execute the unit tests affected by a change.
+## Project Structure
 
-## Further help
+This is an Nx monorepo with the following key libraries:
 
-Visit the [Nx Documentation](https://nx.dev) to learn more.
+- `core-rules` - Chess game logic and move generation
+- `react-chessboard` - React chessboard UI components
+- `web-chess` - Main Next.js application
+
+## Development
+
+### Running Tests
+
+```bash
+# Test all projects
+pnpm test:all
+
+# Test specific library
+pnpm nx test <library-name>
+```
+
+### Building
+
+```bash
+# Build the web application
+pnpm nx build web-chess
+```
+
+### Type Checking
+
+```bash
+pnpm run typecheck
+```
