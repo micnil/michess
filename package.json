@@ -8,7 +8,8 @@
     "test": "nx test",
     "test:all": "nx run-many --target=test --all",
     "typecheck": "tsc -p apps/web-chess --noEmit --jsx react-jsx",
-    "perft": "tsx --tsconfig tools/tsconfig.tools.json tools/perft.ts"
+    "perft": "tsx --tsconfig tools/tsconfig.tools.json tools/perft.ts",
+    "perft:debug": "tsx --inspect-brk --tsconfig tools/tsconfig.tools.json tools/perft.ts"
   },
   "private": true,
   "dependencies": {
