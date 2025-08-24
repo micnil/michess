@@ -60,14 +60,7 @@ export const ChessboardContextProvider = <TMoveMeta,>({
     });
   }, []);
 
-  // Get the latest move from moveHistory for highlighting
-  const latestMove =
-    moveHistory && moveHistory.length > 0
-      ? {
-          from: moveHistory[moveHistory.length - 1].from,
-          to: moveHistory[moveHistory.length - 1].to,
-        }
-      : undefined;
+  const latestMove = moveHistory?.[moveHistory.length - 1];
 
   return (
     <ChessboardContext.Provider
