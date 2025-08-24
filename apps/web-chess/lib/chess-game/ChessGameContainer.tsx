@@ -48,6 +48,12 @@ export const ChessGameContainer = () => {
           ? 'white'
           : undefined
       }
+      moveHistory={gameState.moveHistory.map((move) => ({
+        from: Coordinate.fromIndex(move.start),
+        to: Coordinate.fromIndex(move.target),
+        promotion: move.promotion,
+        meta: move,
+      }))}
       onMove={(movePayload) => {
         console.log(movePayload);
         setChessGame(chessGame.makeMove(movePayload.meta));

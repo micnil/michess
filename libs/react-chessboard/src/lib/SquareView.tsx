@@ -30,6 +30,15 @@ const StyledOverlayRect = styled.rect<OverlayRectProps>`
   pointer-events: all;
 `;
 
+type LatestMoveOverlayProps = {
+  highlight: boolean;
+};
+const StyledLatestMoveOverlay = styled.rect<LatestMoveOverlayProps>`
+  fill: ${({ highlight }) =>
+    highlight ? 'rgba(255,255,0,0.3)' : 'rgba(255,255,0,0.0)'};
+  pointer-events: none;
+`;
+
 type Props = {
   coordinate: Coordinate;
   showPromotionDialog: (
@@ -48,7 +57,7 @@ export const SquareView: React.FC<Props> = ({
   position,
   size,
 }) => {
-  const { movePiece, chessboard } = useChessboardContext();
+  const { movePiece, chessboard, latestMove } = useChessboardContext();
   const { state } = useDragDropContext();
   const moveOptions = useMoveOptions(state.draggingId as Coordinate);
   const canMoveHere = canMoveTo(moveOptions, coordinate);
@@ -78,6 +87,10 @@ export const SquareView: React.FC<Props> = ({
   const higlightSquare =
     (!!moveOptions && canMoveHere) || (isHovering && canMoveHere);
 
+  const isLatestMoveSquare =
+    latestMove &&
+    (latestMove.from === coordinate || latestMove.to === coordinate);
+
   return (
     <>
       <StyledRect
@@ -86,6 +99,12 @@ export const SquareView: React.FC<Props> = ({
         width={size}
         height={size}
         ref={register}
+      />
+      <StyledLatestMoveOverlay
+        {...position}
+        width={size}
+        height={size}
+        highlight={!!isLatestMoveSquare}
       />
       <StyledOverlayRect
         {...position}

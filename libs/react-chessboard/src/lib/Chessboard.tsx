@@ -23,6 +23,7 @@ type Props<TMoveMeta = unknown> = {
   moveOptions?: MoveOptions<TMoveMeta>;
   gameStatus?: GameStatusType;
   winner?: Color;
+  moveHistory?: MovePayload<TMoveMeta>[];
   onMove?: (move: MovePayload<TMoveMeta>) => void;
 };
 export const Chessboard = <TMoveMeta,>({
@@ -32,6 +33,7 @@ export const Chessboard = <TMoveMeta,>({
   piecePlacements,
   gameStatus = 'active',
   winner,
+  moveHistory,
   onMove,
 }: Props<TMoveMeta>) => {
   return (
@@ -42,6 +44,7 @@ export const Chessboard = <TMoveMeta,>({
         moveOptions={moveOptions}
         piecePlacements={piecePlacements}
         gameStatus={gameStatus}
+        moveHistory={moveHistory}
         onMove={onMove}
       >
         <DragDropContextProvider>

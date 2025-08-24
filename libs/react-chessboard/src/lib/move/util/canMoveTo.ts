@@ -1,6 +1,6 @@
 import { Maybe } from '@michess/common-utils';
 import { Coordinate } from '@michess/core-models';
-import { MoveOptions } from './model/MoveOptions';
+import { MoveOptions } from '../model/MoveOptions';
 
 export const canMoveTo = (
   moveOptions: Maybe<MoveOptions>,

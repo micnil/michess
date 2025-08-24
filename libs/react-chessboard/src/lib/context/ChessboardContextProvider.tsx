@@ -15,6 +15,7 @@ type Props<TMoveMeta = unknown> = {
   piecePlacements?: PiecePlacements;
   moveOptions?: MoveOptions<TMoveMeta>;
   gameStatus: GameStatusType;
+  moveHistory?: MovePayload<TMoveMeta>[];
   onMove?: (move: MovePayload<TMoveMeta>) => void;
   children: ReactNode;
 };
@@ -27,6 +28,7 @@ export const ChessboardContextProvider = <TMoveMeta,>({
   onMove,
   piecePlacements,
   moveOptions,
+  moveHistory,
   size,
 }: Props<TMoveMeta>) => {
   const [chessboard, setChessboard] = useState<IChessboard>(() =>
@@ -58,6 +60,11 @@ export const ChessboardContextProvider = <TMoveMeta,>({
     });
   }, []);
 
+  // Get the latest move from moveHistory for highlighting
+  const latestMove = moveHistory && moveHistory.length > 0 
+    ? { from: moveHistory[moveHistory.length - 1].from, to: moveHistory[moveHistory.length - 1].to }
+    : undefined;
+
   return (
     <ChessboardContext.Provider
       value={{
@@ -67,6 +74,7 @@ export const ChessboardContextProvider = <TMoveMeta,>({
         moveOptionsMap: moveOptions
           ? MoveOptionsMap.fromMoveOptions(moveOptions)
           : undefined,
+        latestMove,
       }}
     >
       {children}
