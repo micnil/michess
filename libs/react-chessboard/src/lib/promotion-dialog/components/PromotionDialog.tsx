@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Position } from '@michess/common-utils';
 import { ColoredPieceType, PieceType, Color } from '@michess/core-models';
-import pieceSprite from '../assets/chessboard-sprite-staunty.svg';
+import pieceSprite from '../../../assets/chessboard-sprite-staunty.svg';
 
 const DEFAULT_SPRITE_SIZE = 40;
 
