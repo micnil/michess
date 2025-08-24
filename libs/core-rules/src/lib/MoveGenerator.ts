@@ -57,9 +57,9 @@ const DIRECTIONS_BY_SLIDER: Record<PieceType, DirectionOffset[]> = {
   [PieceType.Pawn]: [],
 };
 
-const FULL_BITBOARD = Bitboard(0xffffffffffffffffn);
-const aFileBb = Bitboard().between('a1', 'a8');
-const hFileBb = Bitboard().between('h1', 'h8');
+const FULL_BITBOARD = new Bitboard(0xffffffffffffffffn);
+const aFileBb = new Bitboard().between('a1', 'a8');
+const hFileBb = new Bitboard().between('h1', 'h8');
 
 const getRayAttacks = (
   chessBitboard: ChessBitboard,
@@ -103,7 +103,7 @@ const getSlidingAttacks = (
   const moveOffsets = DIRECTIONS_BY_SLIDER[piece.type] ?? [];
   return moveOffsets.reduce((attacksBoard, direction) => {
     return attacksBoard.union(getRayAttacks(chessBitboard, direction, coord));
-  }, Bitboard());
+  }, new Bitboard());
 };
 
 const getSlidingMoves = (
@@ -328,7 +328,7 @@ const getSliderAttacks = (
           coord: coordinate,
         })
       );
-    }, Bitboard());
+    }, new Bitboard());
 };
 
 const getKingAttackers = (
@@ -341,7 +341,7 @@ const getKingAttackers = (
   const kingIndex = chessBitboard[color][PieceType.King].scanForward();
 
   if (kingIndex === -1) {
-    return { kingAttackers: Bitboard(), checkBlockPaths: Bitboard() };
+    return { kingAttackers: new Bitboard(), checkBlockPaths: new Bitboard() };
   } else {
     const kingCoord = Coordinate.fromIndex(kingIndex);
 
@@ -377,10 +377,10 @@ const getKingAttackers = (
       .union(pawnAttackers)
       .union(sliderAttackers);
 
-    let checkBlockPaths = Bitboard();
+    let checkBlockPaths = new Bitboard();
     if (kingAttackers.countBits() === 1) {
       if (!kingAttackers.intersection(sliderAttackers).isEmpty()) {
-        checkBlockPaths = Bitboard().between(
+        checkBlockPaths = new Bitboard().between(
           kingCoord,
           Coordinate.fromIndex(kingAttackers.scanForward())
         );
@@ -399,7 +399,7 @@ const getAttackedSquares = (
     .getCoordinates()
     .reduce((attacks, coordinate) => {
       return attacks.union(KnightAttacks.fromCoord(coordinate));
-    }, Bitboard());
+    }, new Bitboard());
   const kingAttacks = KingAttacks.fromCoord(
     Coordinate.fromIndex(pieceBitboards[PieceType.King].scanForward())
   );
@@ -420,7 +420,7 @@ const getAttackedSquares = (
       Piece.from(pieceType, color)
     );
     return attacks.union(slidingPieceAttacks);
-  }, Bitboard());
+  }, new Bitboard());
   return knightAttacks
     .union(kingAttacks)
     .union(pawnAttacks)
@@ -518,7 +518,7 @@ const getPinnedPieces = (
 
   const kingIndex = chessBitboard[color][PieceType.King].scanForward();
   if (kingIndex === -1) {
-    return Bitboard();
+    return new Bitboard();
   } else {
     const kingCoord = Coordinate.fromIndex(kingIndex);
 
@@ -533,7 +533,7 @@ const getPinnedPieces = (
               potentialPinners
             );
           },
-          Bitboard()
+          new Bitboard()
         );
         const firstBlocker = getNextBlockerInDirection(blockers, direction);
         const secondBlocker = getNextBlockerInDirection(
@@ -552,7 +552,7 @@ const getPinnedPieces = (
       } else {
         return pinnedPieces;
       }
-    }, Bitboard());
+    }, new Bitboard());
   }
 };
 

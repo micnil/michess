@@ -13,7 +13,7 @@ const KING_ATTACKS: Record<Coordinate, Bitboard> = Object.fromEntries(
           ? attackBitboard.setIndex(target)
           : attackBitboard;
       },
-      Bitboard()
+      new Bitboard()
     );
 
     return [coord, attacks];
@@ -21,5 +21,5 @@ const KING_ATTACKS: Record<Coordinate, Bitboard> = Object.fromEntries(
 ) as Record<Coordinate, Bitboard>;
 
 export const KingAttacks = {
-  fromCoord: (coord: Coordinate): Bitboard => KING_ATTACKS[coord] ?? Bitboard(),
+  fromCoord: (coord: Coordinate): Bitboard => KING_ATTACKS[coord] ?? new Bitboard(),
 };

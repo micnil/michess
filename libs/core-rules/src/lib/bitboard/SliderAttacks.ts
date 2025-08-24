@@ -9,28 +9,28 @@ type DirectionalBitboardsByCoordinate = Record<Coordinate, BitboardByDirection>;
 const SLIDER_ATTACKS: DirectionalBitboardsByCoordinate = Object.fromEntries(
   BoardCoordinates.createWhite().map((coord, index) => {
     const attacks: BitboardByDirection = {
-      [DirectionOffset.N]: Bitboard().setIndices(
+      [DirectionOffset.N]: new Bitboard().setIndices(
         IndexBoardUtil.unfoldDirection(index, DirectionOffset.N)
       ),
-      [DirectionOffset.S]: Bitboard().setIndices(
+      [DirectionOffset.S]: new Bitboard().setIndices(
         IndexBoardUtil.unfoldDirection(index, DirectionOffset.S)
       ),
-      [DirectionOffset.E]: Bitboard().setIndices(
+      [DirectionOffset.E]: new Bitboard().setIndices(
         IndexBoardUtil.unfoldDirection(index, DirectionOffset.E)
       ),
-      [DirectionOffset.W]: Bitboard().setIndices(
+      [DirectionOffset.W]: new Bitboard().setIndices(
         IndexBoardUtil.unfoldDirection(index, DirectionOffset.W)
       ),
-      [DirectionOffset.NE]: Bitboard().setIndices(
+      [DirectionOffset.NE]: new Bitboard().setIndices(
         IndexBoardUtil.unfoldDirection(index, DirectionOffset.NE)
       ),
-      [DirectionOffset.SE]: Bitboard().setIndices(
+      [DirectionOffset.SE]: new Bitboard().setIndices(
         IndexBoardUtil.unfoldDirection(index, DirectionOffset.SE)
       ),
-      [DirectionOffset.NW]: Bitboard().setIndices(
+      [DirectionOffset.NW]: new Bitboard().setIndices(
         IndexBoardUtil.unfoldDirection(index, DirectionOffset.NW)
       ),
-      [DirectionOffset.SW]: Bitboard().setIndices(
+      [DirectionOffset.SW]: new Bitboard().setIndices(
         IndexBoardUtil.unfoldDirection(index, DirectionOffset.SW)
       ),
     };

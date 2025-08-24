@@ -16,8 +16,8 @@ const PAWN_ATTACKS: PawnAttacksType = Object.fromEntries(
         IndexBoardUtil.isNeighbors(index, targetIndex)
     );
     const attacks: Record<Color, Bitboard> = {
-      white: Bitboard().setIndices(whiteAttacks),
-      black: Bitboard().setIndices(blackAttacks),
+      white: new Bitboard().setIndices(whiteAttacks),
+      black: new Bitboard().setIndices(blackAttacks),
     };
     return [coord, attacks];
   })
@@ -25,5 +25,5 @@ const PAWN_ATTACKS: PawnAttacksType = Object.fromEntries(
 
 export const PawnAttacks = {
   fromCoordAndColor: (coord: Coordinate, color: Color): Bitboard =>
-    PAWN_ATTACKS[coord]?.[color] ?? Bitboard(),
+    PAWN_ATTACKS[coord]?.[color] ?? new Bitboard(),
 };

@@ -48,26 +48,26 @@ const fromPieceBitboards = (
 
   const whiteOccupied = Object.values(bitboards.white).reduce(
     (acc, bb) => acc.union(bb),
-    Bitboard()
+    new Bitboard()
   );
   const blackOccupied = Object.values(bitboards.black).reduce(
     (acc, bb) => acc.union(bb),
-    Bitboard()
+    new Bitboard()
   );
   const occupiedBoard = whiteOccupied.union(blackOccupied);
   const empty = occupiedBoard.invert();
 
   const castlingKingPaths: { [ability in CastlingAbility]: Bitboard } = {
-    [CastlingAbility.WhiteKing]: Bitboard().between('e1', 'g1'),
-    [CastlingAbility.WhiteQueen]: Bitboard().between('e1', 'c1'),
-    [CastlingAbility.BlackKing]: Bitboard().between('e8', 'g8'),
-    [CastlingAbility.BlackQueen]: Bitboard().between('e8', 'c8'),
+    [CastlingAbility.WhiteKing]: new Bitboard().between('e1', 'g1'),
+    [CastlingAbility.WhiteQueen]: new Bitboard().between('e1', 'c1'),
+    [CastlingAbility.BlackKing]: new Bitboard().between('e8', 'g8'),
+    [CastlingAbility.BlackQueen]: new Bitboard().between('e8', 'c8'),
   };
   const castlingRookPaths: { [ability in CastlingAbility]: Bitboard } = {
-    [CastlingAbility.WhiteKing]: Bitboard().between('h1', 'f1'),
-    [CastlingAbility.WhiteQueen]: Bitboard().between('a1', 'd1'),
-    [CastlingAbility.BlackKing]: Bitboard().between('h8', 'f8'),
-    [CastlingAbility.BlackQueen]: Bitboard().between('a8', 'd8'),
+    [CastlingAbility.WhiteKing]: new Bitboard().between('h1', 'f1'),
+    [CastlingAbility.WhiteQueen]: new Bitboard().between('a1', 'd1'),
+    [CastlingAbility.BlackKing]: new Bitboard().between('h8', 'f8'),
+    [CastlingAbility.BlackQueen]: new Bitboard().between('a8', 'd8'),
   };
 
   return {
@@ -125,7 +125,7 @@ const fromPieceBitboards = (
           ...bitboards[piece.color],
           [piece.type]: coord
             ? bitboards[piece.color][piece.type].clearCoord(coord)
-            : Bitboard(),
+            : new Bitboard(),
         },
       };
 
@@ -147,20 +147,20 @@ const fromPieceBitboards = (
 const fromPiecePlacements = (placements?: PiecePlacements): ChessBitboard => {
   const bitboards = {
     white: {
-      p: Bitboard(),
-      n: Bitboard(),
-      b: Bitboard(),
-      r: Bitboard(),
-      q: Bitboard(),
-      k: Bitboard(),
+      p: new Bitboard(),
+      n: new Bitboard(),
+      b: new Bitboard(),
+      r: new Bitboard(),
+      q: new Bitboard(),
+      k: new Bitboard(),
     },
     black: {
-      p: Bitboard(),
-      n: Bitboard(),
-      b: Bitboard(),
-      r: Bitboard(),
-      q: Bitboard(),
-      k: Bitboard(),
+      p: new Bitboard(),
+      n: new Bitboard(),
+      b: new Bitboard(),
+      r: new Bitboard(),
+      q: new Bitboard(),
+      k: new Bitboard(),
     },
   };
 

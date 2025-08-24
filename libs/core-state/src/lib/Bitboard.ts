@@ -139,64 +139,102 @@ const leftShift = (board: bigint, shift: number): bigint => {
   return (board << BigInt(shift)) & ((1n << 64n) - 1n);
 };
 
-export type Bitboard = {
-  countBits: () => number;
-  scanForward: () => number;
-  scanBackward: () => number;
-  setCoord: (coord: Coordinate) => Bitboard;
-  setIndex: (index: number) => Bitboard;
-  setIndices: (indices: number[]) => Bitboard;
-  clearCoord: (coord: Coordinate) => Bitboard;
-  clearIndex: (index: number) => Bitboard;
-  isCoordSet: (coord: Coordinate) => boolean;
-  isIndexSet: (index: number) => boolean;
-  isEmpty: () => boolean;
-  getBitboardState: () => bigint;
-  union: (other: Bitboard) => Bitboard;
-  between: (start: Coordinate, end: Coordinate) => Bitboard;
-  exclude: (other: Bitboard) => Bitboard;
-  invert: () => Bitboard;
-  intersection: (other: Bitboard) => Bitboard;
-  toString: () => string;
-  getLowestSetBit: () => Bitboard;
-  getHighestSetBit: () => Bitboard;
-  getIndices: () => number[];
-  getCoordinates: () => Coordinate[];
-  leftShift: (shift: number) => Bitboard;
-  value: () => bigint;
-};
+export class Bitboard {
+  constructor(private board = 0n) {}
 
-export const Bitboard = (initialBoard?: bigint): Bitboard => {
-  const board = initialBoard ?? 0n;
+  countBits(): number {
+    return countBits(this.board);
+  }
 
-  return {
-    countBits: () => countBits(board),
-    scanForward: () => scanForward(board),
-    scanBackward: () => scanBackward(board),
-    setCoord: (coord: Coordinate) => Bitboard(setCoord(board, coord)),
-    setIndex: (index: number) => Bitboard(setIndex(board, index)),
-    setIndices: (indices: number[]) => Bitboard(setIndices(board, indices)),
-    clearCoord: (coord: Coordinate) => Bitboard(clearCoord(board, coord)),
-    clearIndex: (index: number) => Bitboard(clearIndex(board, index)),
-    isCoordSet: (coord: Coordinate) => isCoordSet(board, coord),
-    isIndexSet: (index: number) => isIndexSet(board, index),
-    isEmpty: () => !board,
-    getBitboardState: () => board,
-    union: (other: Bitboard) => Bitboard(board | other.getBitboardState()),
-    invert: () => Bitboard(invert(board)),
-    exclude: (other: Bitboard) => Bitboard(board & ~other.getBitboardState()),
-    between: (start: Coordinate, end: Coordinate) =>
-      Bitboard(between(board, start, end)),
-    intersection: (other: Bitboard) =>
-      Bitboard(intersection(board, other.getBitboardState())),
-    toString: () => bitboardToString(board),
-    getLowestSetBit: () => Bitboard(getLowestSetBit(board)),
-    getHighestSetBit: () => Bitboard(getHighestSetBit(board)),
-    getIndices: () => getIndices(board),
-    getCoordinates: () => {
-      return getIndices(board).map((index) => Coordinate.fromIndex(index));
-    },
-    leftShift: (shift: number) => Bitboard(leftShift(board, shift)),
-    value: () => board,
-  };
-};
+  scanForward(): number {
+    return scanForward(this.board);
+  }
+
+  scanBackward(): number {
+    return scanBackward(this.board);
+  }
+
+  setCoord(coord: Coordinate): Bitboard {
+    return new Bitboard(setCoord(this.board, coord));
+  }
+
+  setIndex(index: number): Bitboard {
+    return new Bitboard(setIndex(this.board, index));
+  }
+
+  setIndices(indices: number[]): Bitboard {
+    return new Bitboard(setIndices(this.board, indices));
+  }
+
+  clearCoord(coord: Coordinate): Bitboard {
+    return new Bitboard(clearCoord(this.board, coord));
+  }
+
+  clearIndex(index: number): Bitboard {
+    return new Bitboard(clearIndex(this.board, index));
+  }
+
+  isCoordSet(coord: Coordinate): boolean {
+    return isCoordSet(this.board, coord);
+  }
+
+  isIndexSet(index: number): boolean {
+    return isIndexSet(this.board, index);
+  }
+
+  isEmpty(): boolean {
+    return !this.board;
+  }
+
+  getBitboardState(): bigint {
+    return this.board;
+  }
+
+  union(other: Bitboard): Bitboard {
+    return new Bitboard(this.board | other.getBitboardState());
+  }
+
+  invert(): Bitboard {
+    return new Bitboard(invert(this.board));
+  }
+
+  exclude(other: Bitboard): Bitboard {
+    return new Bitboard(this.board & ~other.getBitboardState());
+  }
+
+  between(start: Coordinate, end: Coordinate): Bitboard {
+    return new Bitboard(between(this.board, start, end));
+  }
+
+  intersection(other: Bitboard): Bitboard {
+    return new Bitboard(intersection(this.board, other.getBitboardState()));
+  }
+
+  toString(): string {
+    return bitboardToString(this.board);
+  }
+
+  getLowestSetBit(): Bitboard {
+    return new Bitboard(getLowestSetBit(this.board));
+  }
+
+  getHighestSetBit(): Bitboard {
+    return new Bitboard(getHighestSetBit(this.board));
+  }
+
+  getIndices(): number[] {
+    return getIndices(this.board);
+  }
+
+  getCoordinates(): Coordinate[] {
+    return getIndices(this.board).map((index) => Coordinate.fromIndex(index));
+  }
+
+  leftShift(shift: number): Bitboard {
+    return new Bitboard(leftShift(this.board, shift));
+  }
+
+  value(): bigint {
+    return this.board;
+  }
+}

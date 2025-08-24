@@ -4,14 +4,14 @@ import { Coordinate } from '@michess/core-models';
 describe('Bitboard', () => {
   describe('constructor', () => {
     it('create an empty board by default', () => {
-      const emptyBitboard = Bitboard();
+      const emptyBitboard = new Bitboard();
       expect(emptyBitboard.getBitboardState()).toBe(0n);
     });
   });
 
   describe('setIndex', () => {
     it('can set first bit by index', () => {
-      const emptyBitboard = Bitboard();
+      const emptyBitboard = new Bitboard();
 
       const testBoard = emptyBitboard.setIndex(0);
 
@@ -19,7 +19,7 @@ describe('Bitboard', () => {
     });
 
     it('can set last bit by index', () => {
-      const emptyBitboard = Bitboard();
+      const emptyBitboard = new Bitboard();
 
       const testBoard = emptyBitboard.setIndex(63);
 
@@ -27,7 +27,7 @@ describe('Bitboard', () => {
     });
 
     it('can set bits outside of chess board range', () => {
-      const emptyBitboard = Bitboard();
+      const emptyBitboard = new Bitboard();
 
       const testBoard = emptyBitboard.setIndex(100);
 
@@ -37,7 +37,7 @@ describe('Bitboard', () => {
 
   describe('setCoord', () => {
     it('can set 8 bits by coordinate', () => {
-      const emptyBitboard = Bitboard();
+      const emptyBitboard = new Bitboard();
 
       const testBoard = emptyBitboard
         .setCoord('a1')
@@ -66,7 +66,7 @@ describe('Bitboard', () => {
 
   describe('clearIndex', () => {
     it('can clear a bit by index', () => {
-      const bit31SetBoard = Bitboard(2147483648n);
+      const bit31SetBoard = new Bitboard(2147483648n);
 
       const emptyBitboard = bit31SetBoard.clearIndex(31);
 
@@ -77,7 +77,7 @@ describe('Bitboard', () => {
 
   describe('clearCoord', () => {
     it('can clear bit by coordinate', () => {
-      const bit31SetBoard = Bitboard(2147483648n);
+      const bit31SetBoard = new Bitboard(2147483648n);
 
       const emptyBitboard = bit31SetBoard.clearCoord('h5');
 
@@ -88,13 +88,13 @@ describe('Bitboard', () => {
 
   describe('scanForward', () => {
     it('can scan forward to find the least significant bit index', () => {
-      const bit31SetBoard = Bitboard(2147483648n);
+      const bit31SetBoard = new Bitboard(2147483648n);
 
       expect(bit31SetBoard.scanForward()).toBe(31);
     });
 
     it('can scan forward to find the least significant bit index', () => {
-      const bit_31_45_50_board = Bitboard(1161086426415104n);
+      const bit_31_45_50_board = new Bitboard(1161086426415104n);
 
       expect(bit_31_45_50_board.scanForward()).toBe(31);
     });
@@ -102,31 +102,31 @@ describe('Bitboard', () => {
 
   describe('scanBackward', () => {
     it('returns -1 for an empty board', () => {
-      expect(Bitboard(0n).scanBackward()).toBe(-1);
+      expect(new Bitboard(0n).scanBackward()).toBe(-1);
     });
 
     it('returns the index of the only set bit', () => {
-      expect(Bitboard(1n << 42n).scanBackward()).toBe(42);
+      expect(new Bitboard(1n << 42n).scanBackward()).toBe(42);
     });
 
     it('returns the index of the most significant set bit when multiple bits are set', () => {
       // bits 3, 6, 9 set (0b1001001000)
-      expect(Bitboard(584n).scanBackward()).toBe(9);
+      expect(new Bitboard(584n).scanBackward()).toBe(9);
     });
 
     it('returns 63 for the highest bit set', () => {
-      expect(Bitboard(1n << 63n).scanBackward()).toBe(63);
+      expect(new Bitboard(1n << 63n).scanBackward()).toBe(63);
     });
 
     it('returns the correct index for a large number', () => {
       // bits 31, 45, 50 set
-      expect(Bitboard(1161086426415104n).scanBackward()).toBe(50);
+      expect(new Bitboard(1161086426415104n).scanBackward()).toBe(50);
     });
   });
 
   describe('countBits', () => {
     it('can count the amount of bits', () => {
-      const bit_31_45_50_board = Bitboard(1161086426415104n);
+      const bit_31_45_50_board = new Bitboard(1161086426415104n);
 
       expect(bit_31_45_50_board.countBits()).toBe(3);
     });
@@ -134,38 +134,38 @@ describe('Bitboard', () => {
 
   describe('getLowestSetBit', () => {
     it('returns the lowest set bit when multiple bits are set', () => {
-      const board = Bitboard(72n);
+      const board = new Bitboard(72n);
       expect(board.getLowestSetBit().value()).toBe(8n); // 0b1000 (bit 3)
     });
 
     it('returns the bit itself when only one bit is set', () => {
-      expect(Bitboard(1024n).getLowestSetBit().value()).toBe(1024n);
+      expect(new Bitboard(1024n).getLowestSetBit().value()).toBe(1024n);
     });
 
     it('returns 0n when no bits are set', () => {
-      expect(Bitboard(0n).getLowestSetBit().value()).toBe(0n);
+      expect(new Bitboard(0n).getLowestSetBit().value()).toBe(0n);
     });
   });
 
   describe('getHighestSetBit', () => {
     it('returns the highest set bit when multiple bits are set', () => {
       // 0b1001000... (bits 3 and 6 set)
-      const board = Bitboard(72n);
+      const board = new Bitboard(72n);
       expect(board.getHighestSetBit().value()).toBe(64n); // 0b1000000 (bit 6)
     });
 
     it('returns the bit itself when only one bit is set', () => {
-      expect(Bitboard(1024n).getHighestSetBit().value()).toBe(1024n);
+      expect(new Bitboard(1024n).getHighestSetBit().value()).toBe(1024n);
     });
 
     it('returns 0n when no bits are set', () => {
-      expect(Bitboard(0n).getHighestSetBit().value()).toBe(0n);
+      expect(new Bitboard(0n).getHighestSetBit().value()).toBe(0n);
     });
 
     it('returns the highest bit for a large number', () => {
       // 0b100...0 (bit 63 set)
       expect(
-        Bitboard(1n << 63n)
+        new Bitboard(1n << 63n)
           .getHighestSetBit()
           .value()
       ).toBe(1n << 63n);
@@ -174,7 +174,7 @@ describe('Bitboard', () => {
 
   describe('toString', () => {
     it('prints an empty board', () => {
-      const bb = Bitboard();
+      const bb = new Bitboard();
       expect(bb.toString()).toBe(
         '8  . . . . . . . .\n' +
           '7  . . . . . . . .\n' +
@@ -188,7 +188,7 @@ describe('Bitboard', () => {
       );
     });
     it('prints a board with a single bit set', () => {
-      const bb = Bitboard().setCoord('e4');
+      const bb = new Bitboard().setCoord('e4');
       expect(bb.toString()).toBe(
         '8  . . . . . . . .\n' +
           '7  . . . . . . . .\n' +
@@ -206,37 +206,37 @@ describe('Bitboard', () => {
   describe('getIndices', () => {
     it('returns all set bit indices in order from LSB to MSB', () => {
       // 0b1001001000 (bits 3, 6, 9 set)
-      const board = Bitboard(584n);
+      const board = new Bitboard(584n);
       expect(board.getIndices()).toEqual([3, 6, 9]);
     });
 
     it('returns an empty array for an empty board', () => {
-      expect(Bitboard(0n).getIndices()).toEqual([]);
+      expect(new Bitboard(0n).getIndices()).toEqual([]);
     });
 
     it('returns a single index for a single set bit', () => {
-      expect(Bitboard(1n << 42n).getIndices()).toEqual([42]);
+      expect(new Bitboard(1n << 42n).getIndices()).toEqual([42]);
     });
   });
 
   describe('intersection', () => {
     it('returns a bitboard with only the bits set in both boards', () => {
       // 0b10110
-      const boardA = Bitboard().setIndex(1).setIndex(2).setIndex(4);
+      const boardA = new Bitboard().setIndex(1).setIndex(2).setIndex(4);
       // 0b11010
-      const boardB = Bitboard().setIndex(1).setIndex(3).setIndex(4);
+      const boardB = new Bitboard().setIndex(1).setIndex(3).setIndex(4);
 
       const intersection = boardA.intersection(boardB);
       expect(intersection.getIndices()).toEqual([1, 4]);
     });
     it('returns an empty bitboard if no bits overlap', () => {
-      const boardA = Bitboard().setIndex(0).setIndex(2);
-      const boardB = Bitboard().setIndex(1).setIndex(3);
+      const boardA = new Bitboard().setIndex(0).setIndex(2);
+      const boardB = new Bitboard().setIndex(1).setIndex(3);
       const intersection = boardA.intersection(boardB);
       expect(intersection.isEmpty()).toBe(true);
     });
     it('returns the same board if intersected with itself', () => {
-      const board = Bitboard().setIndex(5).setIndex(10);
+      const board = new Bitboard().setIndex(5).setIndex(10);
       const intersection = board.intersection(board);
       expect(intersection.getIndices()).toEqual([5, 10]);
     });
@@ -244,7 +244,7 @@ describe('Bitboard', () => {
 
   describe('between', () => {
     it('returns all squares between two coordinates on the same file', () => {
-      const bb = Bitboard().between('a1', 'a4');
+      const bb = new Bitboard().between('a1', 'a4');
       const indices = bb.getIndices();
       expect(indices.sort((a, b) => a - b)).toEqual([
         Coordinate.toIndex('a3'),
@@ -252,7 +252,7 @@ describe('Bitboard', () => {
       ]);
     });
     it('returns all squares between two coordinates on the same rank', () => {
-      const bb = Bitboard().between('b2', 'e2');
+      const bb = new Bitboard().between('b2', 'e2');
       const indices = bb.getIndices();
       expect(indices.sort((a, b) => a - b)).toEqual([
         Coordinate.toIndex('c2'),
@@ -260,7 +260,7 @@ describe('Bitboard', () => {
       ]);
     });
     it('returns all squares between two coordinates on the same diagonal', () => {
-      const bb = Bitboard().between('c1', 'f4');
+      const bb = new Bitboard().between('c1', 'f4');
       const indices = bb.getIndices();
       expect(indices.sort((a, b) => a - b)).toEqual([
         Coordinate.toIndex('e3'),
@@ -268,11 +268,11 @@ describe('Bitboard', () => {
       ]);
     });
     it('returns an empty bitboard if not aligned', () => {
-      const bb = Bitboard().between('a1', 'b3');
+      const bb = new Bitboard().between('a1', 'b3');
       expect(bb.isEmpty()).toBe(true);
     });
     it('returns an empty bitboard if from == to', () => {
-      const bb = Bitboard().between('d4', 'd4');
+      const bb = new Bitboard().between('d4', 'd4');
       expect(bb.isEmpty()).toBe(true);
     });
   });
