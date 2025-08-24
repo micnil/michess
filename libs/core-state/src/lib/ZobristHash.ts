@@ -192,61 +192,55 @@ const hashToString = (hash: bigint): string => {
   return `0x${hash.toString(16).padStart(16, '0')}`;
 };
 
-export type ZobristHash = {
-  getValue: () => bigint;
-  toString: () => string;
-  movePiece: (
-    piece: Piece,
-    fromSquare: number,
-    toSquare: number
-  ) => ZobristHash;
-  capturePiece: (capturedPiece: Maybe<Piece>, square: number) => ZobristHash;
-  promotePawn: (
-    pawn: Piece,
-    promotedPiece: Maybe<Piece>,
-    square: number
-  ) => ZobristHash;
-  toggleSideToMove: () => ZobristHash;
-  updateCastlingRights: (
-    oldRights: Set<CastlingAbility>,
-    newRights: Set<CastlingAbility>
-  ) => ZobristHash;
-  updateEnPassant: (
-    oldEnPassant: Maybe<Coordinate>,
-    newEnPassant: Maybe<Coordinate>
-  ) => ZobristHash;
-  equals: (other: ZobristHash) => boolean;
-  copy: () => ZobristHash;
-};
+export class ZobristHash {
+  constructor(private hash = 0n) {}
 
-const fromHash = (initialHash?: bigint): ZobristHash => {
-  const hash = initialHash ?? 0n;
+  getValue(): bigint {
+    return this.hash;
+  }
 
-  return {
-    getValue: () => hash,
-    toString: () => hashToString(hash),
-    movePiece: (piece, fromSquare, toSquare) =>
-      fromHash(updateHashForPieceMove(hash, piece, fromSquare, toSquare)),
-    capturePiece: (capturedPiece, square) =>
-      fromHash(updateHashForCapture(hash, capturedPiece, square)),
-    promotePawn: (pawn, promotedPiece, square) =>
-      fromHash(updateHashForPromotePawn(hash, pawn, promotedPiece, square)),
-    toggleSideToMove: () => fromHash(updateHashForSideToMove(hash)),
-    updateCastlingRights: (oldRights, newRights) =>
-      fromHash(updateHashForCastlingRights(hash, oldRights, newRights)),
-    updateEnPassant: (oldEnPassant, newEnPassant) =>
-      fromHash(updateHashForEnPassant(hash, oldEnPassant, newEnPassant)),
-    equals: (other: ZobristHash) => hash === other.getValue(),
-    copy: () => fromHash(hash),
-  };
-};
+  toString(): string {
+    return hashToString(this.hash);
+  }
 
-const fromChessPosition = (position: ChessPosition): ZobristHash => {
-  const hash = computeInitialHash(position);
-  return fromHash(hash);
-};
+  movePiece(piece: Piece, fromSquare: number, toSquare: number): ZobristHash {
+    return new ZobristHash(updateHashForPieceMove(this.hash, piece, fromSquare, toSquare));
+  }
 
-export const ZobristHash = {
-  fromHash,
-  fromChessPosition,
-};
+  capturePiece(capturedPiece: Maybe<Piece>, square: number): ZobristHash {
+    return new ZobristHash(updateHashForCapture(this.hash, capturedPiece, square));
+  }
+
+  promotePawn(pawn: Piece, promotedPiece: Maybe<Piece>, square: number): ZobristHash {
+    return new ZobristHash(updateHashForPromotePawn(this.hash, pawn, promotedPiece, square));
+  }
+
+  toggleSideToMove(): ZobristHash {
+    return new ZobristHash(updateHashForSideToMove(this.hash));
+  }
+
+  updateCastlingRights(oldRights: Set<CastlingAbility>, newRights: Set<CastlingAbility>): ZobristHash {
+    return new ZobristHash(updateHashForCastlingRights(this.hash, oldRights, newRights));
+  }
+
+  updateEnPassant(oldEnPassant: Maybe<Coordinate>, newEnPassant: Maybe<Coordinate>): ZobristHash {
+    return new ZobristHash(updateHashForEnPassant(this.hash, oldEnPassant, newEnPassant));
+  }
+
+  equals(other: ZobristHash): boolean {
+    return this.hash === other.getValue();
+  }
+
+  copy(): ZobristHash {
+    return new ZobristHash(this.hash);
+  }
+
+  static fromHash(initialHash?: bigint): ZobristHash {
+    return new ZobristHash(initialHash);
+  }
+
+  static fromChessPosition(position: ChessPosition): ZobristHash {
+    const hash = computeInitialHash(position);
+    return new ZobristHash(hash);
+  }
+}
