@@ -26,7 +26,7 @@ export const ChessGameContainer = () => {
   const [chessGame, setChessGame] = useState(() =>
     ChessGame.fromChessPosition(
       FenParser.toChessPosition(
-        'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+        'rnbq1b1r/pppPpk1p/5np1/5p2/8/8/PPPP1PPP/RNBQKBNR w KQ - 1 5'
       )
     )
   );
@@ -55,6 +55,7 @@ export const ChessGameContainer = () => {
       moveOptions={moves.map((move) => ({
         from: Coordinate.fromIndex(move.start),
         to: Coordinate.fromIndex(move.target),
+        promotion: move.promotion,
         meta: move,
       }))}
     />

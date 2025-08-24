@@ -1,11 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Position } from '@michess/common-utils';
+import { Maybe, Position } from '@michess/common-utils';
 import { useDragDropContext, useDrop } from '@michess/react-dnd';
-import { Color, Coordinate } from '@michess/core-models';
+import { Color, Coordinate, PieceType } from '@michess/core-models';
 import { useChessboardContext } from './context/hooks/useChessboardContext';
 import { useMoveOptions } from './context/hooks/useMoveOptions';
 import { canMoveTo } from './move/canMoveTo';
+import { MovePayload } from '@michess/core-state';
 
 type RectProps = {
   color: Color;
@@ -31,6 +32,10 @@ const StyledOverlayRect = styled.rect<OverlayRectProps>`
 
 type Props = {
   coordinate: Coordinate;
+  showPromotionDialog: (
+    coordinate: Coordinate,
+    color: Color
+  ) => Promise<PieceType>;
   color: Color;
   position: Position;
   size: number;
@@ -38,16 +43,27 @@ type Props = {
 
 export const SquareView: React.FC<Props> = ({
   coordinate,
+  showPromotionDialog,
   color,
   position,
   size,
 }) => {
-  const { movePiece } = useChessboardContext();
+  const { movePiece, chessboard } = useChessboardContext();
   const { state } = useDragDropContext();
   const moveOptions = useMoveOptions(state.draggingId as Coordinate);
   const canMoveHere = canMoveTo(moveOptions, coordinate);
-  const handleDrop = (draggableId: string) => {
-    const move = moveOptions?.find((option) => option.to === coordinate);
+  const handleDrop = async (draggableId: string) => {
+    const fromCoord = draggableId as Coordinate;
+    const options = moveOptions?.filter((option) => option.to === coordinate);
+    const color = chessboard.getState().pieces[fromCoord]?.color;
+
+    let move: Maybe<MovePayload>;
+    if (options && options.length > 1 && color) {
+      const pieceType = await showPromotionDialog(coordinate, color);
+      move = options.find((option) => option.promotion === pieceType);
+    } else {
+      move = options?.[0];
+    }
     if (move) {
       console.debug(`moving from ${draggableId} to coordinate ${move.to}`);
       movePiece(move);

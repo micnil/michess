@@ -1,7 +1,6 @@
 import { Color, PiecePlacements } from '@michess/core-models';
 import { MovePayload } from '@michess/core-state';
 import { DragDropContextProvider } from '@michess/react-dnd';
-import React from 'react';
 import styled from 'styled-components';
 import { ChessboardView } from './ChessboardView';
 import { ChessboardContextProvider } from './context/ChessboardContextProvider';
