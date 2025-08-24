@@ -4,8 +4,8 @@ import { Coordinate } from '@michess/core-models';
 import { PieceView } from './PieceView';
 import { useChessboardContext } from './context/hooks/useChessboardContext';
 import { SquareView } from './SquareView';
-import { PromotionDialog } from './PromotionDialog';
-import { usePromotionDialog } from './context/hooks/usePromotionDialog';
+import { PromotionDialog } from './promotion-dialog/components/PromotionDialog';
+import { usePromotionDialog } from './promotion-dialog/hooks/usePromotionDialog';
 import { useDragDropContext } from '@michess/react-dnd';
 
 const Board = styled.svg`
