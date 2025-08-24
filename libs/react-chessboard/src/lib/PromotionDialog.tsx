@@ -14,25 +14,26 @@ const DialogOverlay = styled.div`
 
 const DialogContainer = styled.div`
   background: rgba(255, 255, 255, 0.95);
-  border: 2px solid #8b4513;
+
   border-radius: 4px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  padding: 4px;
+  padding: 0;
   display: flex;
   flex-direction: column;
 `;
 
 const PieceButton = styled.button`
   background: transparent;
-  border: 2px solid transparent;
-  border-radius: 4px;
+  border: 1px solid transparent;
+  border-radius: 2px;
   cursor: pointer;
-  padding: 4px;
-  margin: 2px;
+  padding: 0;
+  margin: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  box-sizing: border-box;
 
   &:hover {
     background: rgba(139, 69, 19, 0.1);
@@ -89,8 +90,8 @@ export const PromotionDialog: React.FC<Props> = ({
     onCancel();
   };
 
-  const dialogWidth = squareSize + 16; // square + padding
-  const dialogHeight = squareSize * 4 + 24; // 4 squares + padding
+  const dialogWidth = squareSize;
+  const dialogHeight = squareSize * 4;
 
   const dialogStyle: React.CSSProperties = {
     left: position.x,
