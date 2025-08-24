@@ -90,7 +90,6 @@ const updatePiecePlacements = (
   capturedPiece?: Piece;
   promotedPiece?: Piece;
 } => {
-  const newPiecePlacements: PiecePlacements = { ...piecePlacements };
   const fromCoord = Coordinate.fromIndex(move.start);
   const toCoord = Coordinate.fromIndex(move.target);
   const pieceToMove = piecePlacements[fromCoord];
@@ -100,15 +99,18 @@ const updatePiecePlacements = (
   const enPassantCaptureCoord = oneStepBackFromIndex(move.target, turn);
   const captureCoord = move.enPassant ? enPassantCaptureCoord : toCoord;
   const pieceToCapture = piecePlacements[captureCoord];
-
-  delete newPiecePlacements[captureCoord];
-  delete newPiecePlacements[fromCoord];
-  newPiecePlacements[toCoord] = pieceToMove;
-
   const promotedPiece = move.promotion
     ? Piece.from(move.promotion, pieceToMove.color)
     : undefined;
-  promotedPiece && (newPiecePlacements[toCoord] = promotedPiece);
+
+  const newPiecePlacements: PiecePlacements = Object.assign(
+    {},
+    piecePlacements
+  );
+
+  delete newPiecePlacements[captureCoord];
+  delete newPiecePlacements[fromCoord];
+  newPiecePlacements[toCoord] = promotedPiece || pieceToMove;
 
   if (move.castling) {
     const castlingAbility = CastlingAbility.fromCastlingRight(
@@ -224,7 +226,8 @@ const makeMove = (
     .updateCastlingRights(gameState.castlingAbility, newCastlingAbilities)
     .toggleSideToMove();
 
-  const gameHistory = [...gameState.gameHistory, historyItem];
+  const gameHistory = gameState.gameHistory.slice();
+  gameHistory.push(historyItem);
 
   let additionalActions = gameState.additionalActions;
   additionalActions = isThreeFoldRepetition(newPositionHash, gameHistory)
@@ -239,6 +242,13 @@ const makeMove = (
       )
     : additionalActions;
 
+  // Pre-calculate values to avoid repeated computations
+  const newTurn = gameState.turn === Color.White ? Color.Black : Color.White;
+  const newFullMoves =
+    gameState.turn === Color.Black
+      ? gameState.fullMoves + 1
+      : gameState.fullMoves;
+
   return {
     gameState: {
       initialPosition: gameState.initialPosition,
@@ -248,11 +258,8 @@ const makeMove = (
       positionHash: newPositionHash,
       gameHistory,
       castlingAbility: newCastlingAbilities,
-      turn: gameState.turn === Color.White ? Color.Black : Color.White,
-      fullMoves:
-        gameState.turn === Color.Black
-          ? gameState.fullMoves + 1
-          : gameState.fullMoves,
+      turn: newTurn,
+      fullMoves: newFullMoves,
       ply,
       pieces: newPiecePlacements,
       enPassant,
