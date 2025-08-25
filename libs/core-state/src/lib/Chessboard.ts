@@ -19,21 +19,18 @@ const movePiece = (board: BoardState, move: MovePayload): BoardState => {
   }
 
   const movedPiece = fromSquare.piece;
-  const squaresCopy = { ...board.pieces };
-  delete squaresCopy[fromSquare.coord];
-  const squaresWithMovedPiece = {
-    ...squaresCopy,
-    [toSquare.coord]: movedPiece,
-  };
+  const squaresCopy = new Map(board.pieces);
+  squaresCopy.delete(fromSquare.coord);
+  squaresCopy.set(toSquare.coord, movedPiece);
 
   return {
     ...board,
-    pieces: squaresWithMovedPiece,
+    pieces: squaresCopy,
   };
 };
 
 const getPiecePlacements = (board: BoardState): PiecePlacement[] => {
-  return Object.entries(board.pieces).map(([coord, piece]) => ({
+  return Array.from(board.pieces.entries()).map(([coord, piece]) => ({
     coord: coord as Coordinate,
     piece,
   }));
@@ -42,7 +39,7 @@ const getPiecePlacements = (board: BoardState): PiecePlacement[] => {
 const getSquare = (board: BoardState, coord: Coordinate): SquareState => {
   return {
     coord,
-    piece: board.pieces[coord],
+    piece: board.pieces.get(coord),
   };
 };
 

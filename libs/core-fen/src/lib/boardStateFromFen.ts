@@ -52,10 +52,7 @@ const piecePlacementsFromFenPiecePlacement = (
     });
 
   if (coordIter.isFinished()) {
-    return piecePlacements.reduce(
-      (acc, curr) => ({ ...acc, [curr.coord]: curr.piece }),
-      {} as PiecePlacements
-    );
+    return new Map(piecePlacements.map(p => [p.coord, p.piece]));
   } else {
     throw new FenValidationError('SquaresMissing');
   }

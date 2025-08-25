@@ -166,7 +166,7 @@ const fromPiecePlacements = (placements?: PiecePlacements): ChessBitboard => {
 
   // If placements are provided, set the bits accordingly
   if (placements) {
-    for (const [coord, piece] of Object.entries(placements)) {
+    for (const [coord, piece] of placements.entries()) {
       const { color, type } = piece;
       bitboards[color][type] = bitboards[color][type].setCoord(
         coord as Coordinate

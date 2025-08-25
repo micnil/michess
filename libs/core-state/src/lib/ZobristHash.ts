@@ -73,8 +73,8 @@ const ZOBRIST_EN_PASSANT = [
 const computeInitialHash = (position: ChessPosition): bigint => {
   let hash = 0n;
 
-  for (const [coord, piece] of Object.entries(position.pieces)) {
-    const squareIndex = Coordinate.toIndex(coord as Coordinate);
+  for (const [coord, piece] of position.pieces.entries()) {
+    const squareIndex = Coordinate.toIndex(coord);
     hash ^= ZOBRIST_PIECES[piece.color][piece.type][squareIndex];
   }
 

@@ -1,4 +1,4 @@
-import { assertDefined, countProps, Maybe } from '@michess/common-utils';
+import { assertDefined, Maybe } from '@michess/common-utils';
 import {
   CastlingAbility,
   CastlingRight,
@@ -13,7 +13,7 @@ import {
   PiecePlacements,
   PieceType,
 } from '@michess/core-models';
-import { Chessboard, ZobristHash } from '@michess/core-state';
+import { ZobristHash } from '@michess/core-state';
 import { ChessGameActions } from './ChessGameActions';
 import { MoveGenerator } from './MoveGenerator';
 import { ChessGameInternalState } from './model/ChessGameInternalState';
@@ -49,7 +49,7 @@ const isFiftyMoveRule = (ply: number): boolean => {
 };
 
 const isInsufficientMaterial = (piecePlacements: PiecePlacements): boolean => {
-  const pieceCount = countProps(piecePlacements, 4);
+  const pieceCount = piecePlacements.size;
   if (pieceCount <= 2) {
     return true;
   } else if (pieceCount === 3) {
@@ -57,7 +57,7 @@ const isInsufficientMaterial = (piecePlacements: PiecePlacements): boolean => {
       piece?.type === PieceType.King ||
       piece?.type === PieceType.Bishop ||
       piece?.type === PieceType.Knight;
-    return Object.values(piecePlacements).every(isKingOrMinorPiece);
+    return Array.from(piecePlacements.values()).every(isKingOrMinorPiece);
   } else {
     return false;
   }
@@ -92,25 +92,22 @@ const updatePiecePlacements = (
 } => {
   const fromCoord = Coordinate.fromIndex(move.start);
   const toCoord = Coordinate.fromIndex(move.target);
-  const pieceToMove = piecePlacements[fromCoord];
+  const pieceToMove = piecePlacements.get(fromCoord);
   assertDefined(pieceToMove, `No piece at ${fromCoord} to move`);
   const turn = pieceToMove.color;
 
   const enPassantCaptureCoord = oneStepBackFromIndex(move.target, turn);
   const captureCoord = move.enPassant ? enPassantCaptureCoord : toCoord;
-  const pieceToCapture = piecePlacements[captureCoord];
+  const pieceToCapture = piecePlacements.get(captureCoord);
   const promotedPiece = move.promotion
     ? Piece.from(move.promotion, pieceToMove.color)
     : undefined;
 
-  const newPiecePlacements: PiecePlacements = Object.assign(
-    {},
-    piecePlacements
-  );
+  const newPiecePlacements: PiecePlacements = new Map(piecePlacements);
 
-  delete newPiecePlacements[captureCoord];
-  delete newPiecePlacements[fromCoord];
-  newPiecePlacements[toCoord] = promotedPiece || pieceToMove;
+  newPiecePlacements.delete(captureCoord);
+  newPiecePlacements.delete(fromCoord);
+  newPiecePlacements.set(toCoord, promotedPiece || pieceToMove);
 
   if (move.castling) {
     const castlingAbility = CastlingAbility.fromCastlingRight(
@@ -123,8 +120,9 @@ const updatePiecePlacements = (
         ? move.target - 1
         : move.target + 1;
     const newRookCoord = Coordinate.fromIndex(newRookIndex);
-    newPiecePlacements[newRookCoord] = newPiecePlacements[rookCoord];
-    delete newPiecePlacements[rookCoord];
+    const rook = newPiecePlacements.get(rookCoord);
+    rook && newPiecePlacements.set(newRookCoord, rook);
+    newPiecePlacements.delete(rookCoord);
   }
 
   return {
@@ -143,25 +141,22 @@ const updateCastlingRights = (
   newPiecePlacements: PiecePlacements
 ): Set<CastlingAbility> => {
   const castlingAbilitySet = new Set(castlingAbility);
-  const castlingRights = new Set(
-    CastlingAbility.toCastlingRights(pieceToMove.color, [...castlingAbility])
-  );
-  const ownAbilities = CastlingAbility.fromCastlingRights(
-    [...castlingRights],
-    pieceToMove.color
+
+  const ownAbilities = castlingAbility.intersection(
+    CastlingAbility.fromColor(pieceToMove.color)
   );
 
   if (move.castling) {
     ownAbilities.forEach((ability) => castlingAbilitySet.delete(ability));
-  } else if (pieceToMove.type === PieceType.King && castlingRights.size > 0) {
+  } else if (pieceToMove.type === PieceType.King && ownAbilities.size > 0) {
     ownAbilities.forEach((ability) => castlingAbilitySet.delete(ability));
   } else {
     CastlingAbility.allValues.forEach((ability) => {
       const rookStartingPosition = rookStartingPositions[ability];
       const pieceOnRookStartingPositionOld =
-        oldPiecePlacements[rookStartingPosition];
+        oldPiecePlacements.get(rookStartingPosition);
       const pieceOnRookStartingPositionNew =
-        newPiecePlacements[rookStartingPosition];
+        newPiecePlacements.get(rookStartingPosition);
 
       if (
         !Piece.isEqual(
@@ -210,26 +205,23 @@ const makeMove = (
     return { gameState };
   }
 
-  const chessboard = Chessboard(gameState);
-  const boardState = chessboard.getState();
-
   const { newPiecePlacements, movedPiece, capturedPiece, promotedPiece } =
-    updatePiecePlacements(move, boardState.pieces);
+    updatePiecePlacements(move, gameState.pieces);
 
   const historyItem: GameStateHistoryItem = {
     move,
     positionHash: gameState.positionHash,
     ply: gameState.ply,
-    castlingAbility: new Set(gameState.castlingAbility),
+    castlingAbility: gameState.castlingAbility,
     enPassant: gameState.enPassant,
-    pieces: boardState.pieces,
+    pieces: gameState.pieces,
   };
 
   const newCastlingAbilities = updateCastlingRights(
     move,
     gameState.castlingAbility,
     movedPiece,
-    boardState.pieces,
+    gameState.pieces,
     newPiecePlacements
   );
 

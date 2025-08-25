@@ -83,7 +83,7 @@ const toFenStr = (chessPosition: ChessPosition): FenStr => {
   let empty = 0;
   while (!coordIter.isFinished()) {
     const coord = coordIter.get();
-    const piece = chessPosition.pieces[coord];
+    const piece = chessPosition.pieces.get(coord);
     if (piece) {
       if (empty > 0) {
         piecePlacement += empty;

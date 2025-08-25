@@ -559,21 +559,29 @@ const getPinnedPieces = (
 const generateMoves = (context: MoveGeneratorContext): Move[] => {
   const numKingAttackers = context.moveMasks.kingAttackers.countBits();
   const isDoubleCheck = numKingAttackers >= 2;
-  const piecePlacements = isDoubleCheck
-    ? context.piecePlacements.filter(
-        (piecePlacement) => piecePlacement.piece.type === PieceType.King
-      )
-    : context.piecePlacements;
 
-  const moves = piecePlacements
-    .filter((piecePlacement) => context.isTurn(piecePlacement.piece.color))
-    .flatMap((piecePlacement) => {
-      return getMovesFromSquare(context, piecePlacement);
-    });
+  const moves: Move[] = [];
+  for (const entry of context.piecePlacements) {
+    const piecePlacement: PiecePlacement = {
+      coord: entry[0],
+      piece: entry[1],
+    };
+    if (isDoubleCheck && piecePlacement.piece.type !== PieceType.King) {
+      continue;
+    }
 
-  const castlingMoves = getCastlingMoves(context);
+    if (piecePlacement.piece.color !== context.turn) {
+      continue;
+    }
 
-  moves.push(...castlingMoves);
+    // Hot path optimization
+    // eslint-disable-next-line prefer-spread
+    moves.push.apply(moves, getMovesFromSquare(context, piecePlacement));
+  }
+
+  // eslint-disable-next-line prefer-spread
+  moves.push.apply(moves, getCastlingMoves(context));
+
   return moves;
 };
 

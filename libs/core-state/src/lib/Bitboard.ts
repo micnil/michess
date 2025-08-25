@@ -1,16 +1,16 @@
 import { Coordinate } from '@michess/core-models';
 
 const countBits = (board: bigint): number => {
-  const left32 = Number(board & 0xffffffffn);
-  const right32 = Number(board >> 32n);
-
-  function count32(n: number) {
-    n = n - ((n >> 1) & 0x55555555);
-    n = (n & 0x33333333) + ((n >> 2) & 0x33333333);
-    return (((n + (n >> 4)) & 0xf0f0f0f) * 0x1010101) >> 24;
+  // Brian Kernighan's algorithm - very fast for sparse bitboards
+  // Each iteration clears the lowest set bit, so we only loop
+  // for the number of set bits rather than all 64 bits
+  let count = 0;
+  let b = board;
+  while (b !== 0n) {
+    b = b & (b - 1n); // Clear the lowest set bit
+    count++;
   }
-
-  return count32(left32) + count32(right32);
+  return count;
 };
 
 const between = (board: bigint, start: Coordinate, end: Coordinate): bigint => {

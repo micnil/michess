@@ -1,5 +1,8 @@
 import { CastlingAbility } from '../CastlingAbility';
 import { ChessPosition } from '../ChessPosition';
+import { Coordinate } from '../Coordinate';
+import { Piece } from '../Piece';
+import { PiecePlacements } from '../PiecePlacements';
 import { boardStateMock } from './BoardState.mock';
 
 export const chessPositionMock: ChessPosition = {
@@ -15,9 +18,36 @@ export const chessPositionMock: ChessPosition = {
   ply: 0,
 };
 
+// Type to allow both Map and object literal for pieces
+type PiecesInput = PiecePlacements | Partial<Record<Coordinate, Piece>>;
+
+// Helper function to convert object literal to Map for backward compatibility
+const convertPiecesToMap = (pieces: PiecesInput): PiecePlacements => {
+  if (pieces instanceof Map) {
+    return pieces;
+  }
+  if (pieces && typeof pieces === 'object') {
+    return new Map(Object.entries(pieces) as Array<[Coordinate, Piece]>);
+  }
+  return new Map();
+};
+
 export const createChessPositionMock = (
-  partialChessPosition?: Partial<ChessPosition>
-): ChessPosition => ({
-  ...chessPositionMock,
-  ...partialChessPosition,
-});
+  partialChessPosition?: Partial<Omit<ChessPosition, 'pieces'>> & {
+    pieces?: PiecesInput;
+  }
+): ChessPosition => {
+  let finalPieces: PiecePlacements;
+
+  if (partialChessPosition?.pieces) {
+    finalPieces = convertPiecesToMap(partialChessPosition.pieces);
+  } else {
+    finalPieces = chessPositionMock.pieces;
+  }
+
+  return {
+    ...chessPositionMock,
+    ...partialChessPosition,
+    pieces: finalPieces,
+  };
+};

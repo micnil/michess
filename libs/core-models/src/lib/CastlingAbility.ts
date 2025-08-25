@@ -39,6 +39,15 @@ export const CastlingAbility = Object.freeze({
   allValues: Object.values(CastlingAbilityEnum),
   whiteValues: WHITE_CASTLING_ABILITIES,
   blackValues: BLACK_CASTLING_ABILITIES,
+  fromColor: (color?: Color): Set<CastlingAbility> => {
+    if (color === Color.White) {
+      return new Set(WHITE_CASTLING_ABILITIES);
+    } else if (color === Color.Black) {
+      return new Set(BLACK_CASTLING_ABILITIES);
+    } else {
+      return new Set(CastlingAbility.allValues);
+    }
+  },
   toCastlingRights: (color: Color, abilities: CastlingAbility[]) => {
     const relevantAbilitys = abilities.filter(
       (ability) =>
