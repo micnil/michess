@@ -1,4 +1,4 @@
-import { assertDefined, Maybe } from '@michess/common-utils';
+import { assertDefined, countProps, Maybe } from '@michess/common-utils';
 import {
   CastlingAbility,
   CastlingRight,
@@ -49,15 +49,15 @@ const isFiftyMoveRule = (ply: number): boolean => {
 };
 
 const isInsufficientMaterial = (piecePlacements: PiecePlacements): boolean => {
-  const pieces = Object.values(piecePlacements);
-  if (pieces.length <= 2) {
+  const pieceCount = countProps(piecePlacements, 4);
+  if (pieceCount <= 2) {
     return true;
-  } else if (pieces.length === 3) {
+  } else if (pieceCount === 3) {
     const isKingOrMinorPiece = (piece: Maybe<Piece>) =>
       piece?.type === PieceType.King ||
       piece?.type === PieceType.Bishop ||
       piece?.type === PieceType.Knight;
-    return pieces.every(isKingOrMinorPiece);
+    return Object.values(piecePlacements).every(isKingOrMinorPiece);
   } else {
     return false;
   }
