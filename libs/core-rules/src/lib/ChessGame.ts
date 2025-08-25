@@ -176,6 +176,30 @@ const updateCastlingRights = (
   return castlingAbilitySet;
 };
 
+const evalAdditionalActions = (
+  previousActions: ChessGameActions,
+  args: {
+    positionHash: ZobristHash;
+    gameHistory: GameStateHistoryItem[];
+    ply: number;
+    piecePlacements: PiecePlacements;
+  }
+): ChessGameActions => {
+  let additionalActions = previousActions;
+  additionalActions = isThreeFoldRepetition(args.positionHash, args.gameHistory)
+    ? additionalActions.addAction(ChessGameAction.claimDrawThreeFold())
+    : additionalActions;
+  additionalActions = isFiftyMoveRule(args.ply)
+    ? additionalActions.addAction(ChessGameAction.claimDrawFiftyMoveRule())
+    : additionalActions;
+  additionalActions = isInsufficientMaterial(args.piecePlacements)
+    ? additionalActions.addAction(
+        ChessGameAction.claimDrawInsufficientMaterial()
+      )
+    : additionalActions;
+  return additionalActions;
+};
+
 const makeMove = (
   gameState: ChessGameInternalState,
   move: Move
@@ -229,18 +253,12 @@ const makeMove = (
   const gameHistory = gameState.gameHistory.slice();
   gameHistory.push(historyItem);
 
-  let additionalActions = gameState.additionalActions;
-  additionalActions = isThreeFoldRepetition(newPositionHash, gameHistory)
-    ? additionalActions.addAction(ChessGameAction.claimDrawThreeFold())
-    : additionalActions;
-  additionalActions = isFiftyMoveRule(ply)
-    ? additionalActions.addAction(ChessGameAction.claimDrawFiftyMoveRule())
-    : additionalActions;
-  additionalActions = isInsufficientMaterial(newPiecePlacements)
-    ? additionalActions.addAction(
-        ChessGameAction.claimDrawInsufficientMaterial()
-      )
-    : additionalActions;
+  const additionalActions = evalAdditionalActions(gameState.additionalActions, {
+    positionHash: newPositionHash,
+    gameHistory,
+    ply,
+    piecePlacements: newPiecePlacements,
+  });
 
   // Pre-calculate values to avoid repeated computations
   const newTurn = gameState.turn === Color.White ? Color.Black : Color.White;

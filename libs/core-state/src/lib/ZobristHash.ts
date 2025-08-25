@@ -204,27 +204,47 @@ export class ZobristHash {
   }
 
   movePiece(piece: Piece, fromSquare: number, toSquare: number): ZobristHash {
-    return new ZobristHash(updateHashForPieceMove(this.hash, piece, fromSquare, toSquare));
+    return new ZobristHash(
+      updateHashForPieceMove(this.hash, piece, fromSquare, toSquare)
+    );
   }
 
   capturePiece(capturedPiece: Maybe<Piece>, square: number): ZobristHash {
-    return new ZobristHash(updateHashForCapture(this.hash, capturedPiece, square));
+    return new ZobristHash(
+      updateHashForCapture(this.hash, capturedPiece, square)
+    );
   }
 
-  promotePawn(pawn: Piece, promotedPiece: Maybe<Piece>, square: number): ZobristHash {
-    return new ZobristHash(updateHashForPromotePawn(this.hash, pawn, promotedPiece, square));
+  promotePawn(
+    pawn: Piece,
+    promotedPiece: Maybe<Piece>,
+    square: number
+  ): ZobristHash {
+    return new ZobristHash(
+      updateHashForPromotePawn(this.hash, pawn, promotedPiece, square)
+    );
   }
 
   toggleSideToMove(): ZobristHash {
     return new ZobristHash(updateHashForSideToMove(this.hash));
   }
 
-  updateCastlingRights(oldRights: Set<CastlingAbility>, newRights: Set<CastlingAbility>): ZobristHash {
-    return new ZobristHash(updateHashForCastlingRights(this.hash, oldRights, newRights));
+  updateCastlingRights(
+    oldRights: Set<CastlingAbility>,
+    newRights: Set<CastlingAbility>
+  ): ZobristHash {
+    return new ZobristHash(
+      updateHashForCastlingRights(this.hash, oldRights, newRights)
+    );
   }
 
-  updateEnPassant(oldEnPassant: Maybe<Coordinate>, newEnPassant: Maybe<Coordinate>): ZobristHash {
-    return new ZobristHash(updateHashForEnPassant(this.hash, oldEnPassant, newEnPassant));
+  updateEnPassant(
+    oldEnPassant: Maybe<Coordinate>,
+    newEnPassant: Maybe<Coordinate>
+  ): ZobristHash {
+    return new ZobristHash(
+      updateHashForEnPassant(this.hash, oldEnPassant, newEnPassant)
+    );
   }
 
   equals(other: ZobristHash): boolean {
