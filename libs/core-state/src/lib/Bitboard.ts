@@ -1,5 +1,14 @@
 import { Coordinate } from '@michess/core-models';
 
+// De Bruijn constants for scanForward
+const DEBRUIJN64 = 0x03f79d71b4cb0a89n;
+const INDEX64 = [
+  0, 1, 48, 2, 57, 49, 28, 3, 61, 58, 50, 42, 38, 29, 17, 4, 62, 55, 59, 36, 53,
+  51, 43, 22, 45, 39, 33, 30, 24, 18, 12, 5, 63, 47, 56, 27, 60, 41, 37, 16, 54,
+  35, 52, 21, 44, 32, 23, 11, 46, 26, 40, 15, 34, 20, 31, 10, 25, 14, 19, 9, 13,
+  8, 7, 6,
+];
+
 const countBits = (board: bigint): number => {
   // Brian Kernighan's algorithm - very fast for sparse bitboards
   // Each iteration clears the lowest set bit, so we only loop
@@ -7,7 +16,7 @@ const countBits = (board: bigint): number => {
   let count = 0;
   let b = board;
   while (b !== 0n) {
-    b = b & (b - 1n); // Clear the lowest set bit
+    b = clearLowestSetBit(b);
     count++;
   }
   return count;
@@ -39,10 +48,18 @@ const between = (board: bigint, start: Coordinate, end: Coordinate): bigint => {
 const scanForward = (board: bigint): number => {
   if (board === 0n) {
     return -1;
-  } else {
-    const lsb = getLowestSetBit(board);
-    return countBits(lsb - 1n);
   }
+
+  // De Bruijn multiplication with isolated LS1B
+  // From Martin Läuter et al. (1997) via chess programming wiki
+  // Source: https://www.chessprogramming.org/BitScan
+
+  // LS1B isolation: bb & -bb isolates the least significant bit
+  const isolated = board & -board;
+  // Critical: mask the product to 64 bits to prevent overflow
+  const product = (isolated * DEBRUIJN64) & 0xffffffffffffffffn;
+  const hashIndex = Number(product >> 58n);
+  return INDEX64[hashIndex];
 };
 
 /**
@@ -52,10 +69,37 @@ const scanForward = (board: bigint): number => {
 const scanBackward = (board: bigint): number => {
   if (board === 0n) {
     return -1;
-  } else {
-    const msb = getHighestSetBit(board);
-    return countBits(msb - 1n);
   }
+
+  // Find the position of the MSB using binary search approach
+  let index = 0;
+  let b = board;
+
+  if (b > 0xffffffffn) {
+    index += 32;
+    b >>= 32n;
+  }
+  if (b > 0xffffn) {
+    index += 16;
+    b >>= 16n;
+  }
+  if (b > 0xffn) {
+    index += 8;
+    b >>= 8n;
+  }
+  if (b > 0xfn) {
+    index += 4;
+    b >>= 4n;
+  }
+  if (b > 0x3n) {
+    index += 2;
+    b >>= 2n;
+  }
+  if (b > 0x1n) {
+    index += 1;
+  }
+
+  return index;
 };
 
 const setCoord = (board: bigint, coord: Coordinate): bigint => {
@@ -71,7 +115,7 @@ const setIndices = (initialBoard: bigint, indices: number[]): bigint => {
 };
 
 const invert = (board: bigint): bigint => {
-  return ~board & ((1n << 64n) - 1n);
+  return ~board & 0xffffffffffffffffn;
 };
 
 const isCoordSet = (board: bigint, coord: Coordinate): boolean => {
@@ -94,27 +138,26 @@ const getLowestSetBit = (board: bigint): bigint => {
   return board & -board;
 };
 
+const clearLowestSetBit = (board: bigint): bigint => {
+  return board & (board - 1n);
+};
+
 const getHighestSetBit = (board: bigint): bigint => {
-  if (board === 0n) return 0n;
-  let b = board;
-  // Shift right until only the highest bit remains
-  b |= b >> 1n;
-  b |= b >> 2n;
-  b |= b >> 4n;
-  b |= b >> 8n;
-  b |= b >> 16n;
-  b |= b >> 32n;
-  return b & ~(b >> 1n);
+  if (board === 0n) {
+    return 0n;
+  }
+
+  const msbIndex = scanBackward(board);
+  return 1n << BigInt(msbIndex);
 };
 
 const getIndices = (board: bigint): number[] => {
   const indices: number[] = [];
   let b = board;
   while (b !== 0n) {
-    const lsb = getLowestSetBit(b);
-    const idx = countBits(lsb - 1n);
+    const idx = scanForward(b);
     indices.push(idx);
-    b = b & ~lsb;
+    b = clearLowestSetBit(b);
   }
   return indices;
 };
@@ -136,7 +179,16 @@ const bitboardToString = (board: bigint): string => {
 const intersection = (a: bigint, b: bigint): bigint => a & b;
 
 const leftShift = (board: bigint, shift: number): bigint => {
-  return (board << BigInt(shift)) & ((1n << 64n) - 1n);
+  // Optimize for common case where shift is 0
+  if (shift === 0) {
+    return board;
+  }
+  // Optimize for cases where shift would overflow
+  if (shift >= 64) {
+    return 0n;
+  }
+  // Use single left shift and mask for 64-bit limit
+  return (board << BigInt(shift)) & 0xffffffffffffffffn;
 };
 
 export class Bitboard {
