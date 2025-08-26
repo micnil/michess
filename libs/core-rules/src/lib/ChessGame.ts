@@ -96,8 +96,9 @@ const updatePiecePlacements = (
   assertDefined(pieceToMove, `No piece at ${fromCoord} to move`);
   const turn = pieceToMove.color;
 
-  const enPassantCaptureCoord = oneStepBackFromIndex(move.target, turn);
-  const captureCoord = move.enPassant ? enPassantCaptureCoord : toCoord;
+  const captureCoord = move.enPassant
+    ? oneStepBackFromIndex(move.target, turn)
+    : toCoord;
   const pieceToCapture = piecePlacements.get(captureCoord);
   const promotedPiece = move.promotion
     ? Piece.from(move.promotion, pieceToMove.color)
@@ -133,42 +134,65 @@ const updatePiecePlacements = (
   };
 };
 
+const isRookOnStartingSquare = (
+  castlingAbility: CastlingAbility,
+  oldPiecePlacements: PiecePlacements,
+  newPiecePlacements: PiecePlacements
+): boolean => {
+  const rookStartingPosition = rookStartingPositions[castlingAbility];
+  const pieceOnRookStartingPositionOld =
+    oldPiecePlacements.get(rookStartingPosition);
+  const pieceOnRookStartingPositionNew =
+    newPiecePlacements.get(rookStartingPosition);
+
+  return Piece.isEqual(
+    pieceOnRookStartingPositionOld,
+    pieceOnRookStartingPositionNew
+  );
+};
+
 const updateCastlingRights = (
   move: Move,
   castlingAbility: Set<CastlingAbility>,
   pieceToMove: Piece,
+  capturedPiece: Maybe<Piece>,
   oldPiecePlacements: PiecePlacements,
   newPiecePlacements: PiecePlacements
 ): Set<CastlingAbility> => {
-  const castlingAbilitySet = new Set(castlingAbility);
+  let newCastlingAbility = new Set(castlingAbility);
 
-  const ownAbilities = castlingAbility.intersection(
+  const ownAbilities = newCastlingAbility.intersection(
     CastlingAbility.fromColor(pieceToMove.color)
   );
 
   if (move.castling) {
-    ownAbilities.forEach((ability) => castlingAbilitySet.delete(ability));
+    newCastlingAbility = newCastlingAbility.difference(ownAbilities);
   } else if (pieceToMove.type === PieceType.King && ownAbilities.size > 0) {
-    ownAbilities.forEach((ability) => castlingAbilitySet.delete(ability));
-  } else {
-    CastlingAbility.allValues.forEach((ability) => {
-      const rookStartingPosition = rookStartingPositions[ability];
-      const pieceOnRookStartingPositionOld =
-        oldPiecePlacements.get(rookStartingPosition);
-      const pieceOnRookStartingPositionNew =
-        newPiecePlacements.get(rookStartingPosition);
-
+    newCastlingAbility = newCastlingAbility.difference(ownAbilities);
+  } else if (pieceToMove.type === PieceType.Rook && ownAbilities.size > 0) {
+    CastlingAbility.fromColor(pieceToMove.color).forEach((ability) => {
       if (
-        !Piece.isEqual(
-          pieceOnRookStartingPositionOld,
-          pieceOnRookStartingPositionNew
-        )
+        !isRookOnStartingSquare(ability, oldPiecePlacements, newPiecePlacements)
       ) {
-        castlingAbilitySet.delete(ability);
+        newCastlingAbility.delete(ability);
       }
     });
   }
-  return castlingAbilitySet;
+
+  if (
+    capturedPiece?.type === PieceType.Rook &&
+    newCastlingAbility.difference(ownAbilities).size > 0
+  ) {
+    CastlingAbility.fromColor(capturedPiece.color).forEach((ability) => {
+      if (
+        !isRookOnStartingSquare(ability, oldPiecePlacements, newPiecePlacements)
+      ) {
+        newCastlingAbility.delete(ability);
+      }
+    });
+  }
+
+  return newCastlingAbility;
 };
 
 const evalAdditionalActions = (
@@ -221,6 +245,7 @@ const makeMove = (
     move,
     gameState.castlingAbility,
     movedPiece,
+    capturedPiece,
     gameState.pieces,
     newPiecePlacements
   );

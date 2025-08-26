@@ -5230,5 +5230,28 @@ export const castlingTestCases: TestCases = {
         },
       ],
     },
+    {
+      description:
+        'King captures rook should remove castling right for opponent',
+      start: {
+        fen: '4k2r/6K1/8/8/8/8/8/8 w k - 0 1',
+        description:
+          'From https://lichess.org/editor/4k2r/6K1/8/8/8/8/8/8_w_k_-_0_1?color=white',
+      },
+      expected: [
+        {
+          move: 'Kxh8',
+          fen: '4k2K/8/8/8/8/8/8/8 b - - 0 1',
+        },
+        {
+          move: 'Kg6',
+          fen: '4k2r/8/6K1/8/8/8/8/8 b k - 1 1',
+        },
+        {
+          move: 'Kf6',
+          fen: '4k2r/8/5K2/8/8/8/8/8 b k - 1 1',
+        },
+      ],
+    },
   ],
 };
