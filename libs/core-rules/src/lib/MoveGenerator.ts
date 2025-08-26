@@ -29,6 +29,19 @@ const SLIDERS_BY_DIRECTION: Record<DirectionOffset, PieceType[]> = {
   [DirectionOffset.NW]: [PieceType.Bishop, PieceType.Queen],
   [DirectionOffset.SW]: [PieceType.Bishop, PieceType.Queen],
 };
+const PAWN_DIRECTIONS = {
+  [Color.White]: {
+    pushOffset: DirectionOffset.N,
+    westAttackOffset: DirectionOffset.NW,
+    eastAttackOffset: DirectionOffset.NE,
+  },
+  [Color.Black]: {
+    pushOffset: DirectionOffset.S,
+    westAttackOffset: DirectionOffset.SW,
+    eastAttackOffset: DirectionOffset.SE,
+  },
+} as const;
+
 const DIRECTIONS_BY_SLIDER: Record<PieceType, DirectionOffset[]> = {
   [PieceType.Bishop]: [
     DirectionOffset.NE,
@@ -87,13 +100,19 @@ const movesFromBitboard = (
   { piece, coord }: PiecePlacement,
   legalMoves: Bitboard
 ): Move[] => {
-  const startIndex = Coordinate.toIndex(coord);
-  const opponentOccupancy = context.bitboards.getOpponentOccupancy(piece.color);
-  return legalMoves.getIndices().map((targetIndex) => ({
-    start: startIndex,
-    target: targetIndex,
-    capture: opponentOccupancy.isIndexSet(targetIndex),
-  }));
+  if (legalMoves.isEmpty()) {
+    return [];
+  } else {
+    const startIndex = Coordinate.toIndex(coord);
+    const opponentOccupancy = context.bitboards.getOpponentOccupancy(
+      piece.color
+    );
+    return legalMoves.getIndices().map((targetIndex) => ({
+      start: startIndex,
+      target: targetIndex,
+      capture: opponentOccupancy.isIndexSet(targetIndex),
+    }));
+  }
 };
 
 const getSlidingAttacks = (
@@ -113,10 +132,14 @@ const getSlidingMoves = (
   const ownOccupancy = context.bitboards.getOwnOccupancy(piece.color);
   const attacks = getSlidingAttacks(context.bitboards, { piece, coord });
   const moves = attacks.exclude(ownOccupancy);
-  const legalMoves = applyPinRestrictions(context, moves, coord).intersection(
-    context.moveMasks.checkEvasion
-  );
-  return movesFromBitboard(context, { piece, coord }, legalMoves);
+  if (moves.isEmpty()) {
+    return [];
+  } else {
+    const legalMoves = applyPinRestrictions(context, moves, coord).intersection(
+      context.moveMasks.checkEvasion
+    );
+    return movesFromBitboard(context, { piece, coord }, legalMoves);
+  }
 };
 
 const getMovesForKing = (
@@ -182,15 +205,7 @@ const getMovesForKnight = (
   }
 };
 
-const getRank = (index: number) => 8 - Math.floor(index / 8);
-
-const getPawnDirections = (color: Color) => ({
-  pushOffset: color === Color.White ? DirectionOffset.N : DirectionOffset.S,
-  westAttackOffset:
-    color === Color.White ? DirectionOffset.NW : DirectionOffset.SW,
-  eastAttackOffset:
-    color === Color.White ? DirectionOffset.NE : DirectionOffset.SE,
-});
+const getRank = (index: number) => 8 - (index >> 3);
 
 const getMovesForPawn = (
   context: MoveGeneratorContext,
@@ -201,9 +216,11 @@ const getMovesForPawn = (
   const pinMoveRestrictions = isPinned
     ? getPinMoveRestrictions(context, coord)
     : FULL_BITBOARD;
-  const startRank = piece.color === Color.White ? 6 : 1;
-  const promotionRank = piece.color === Color.White ? 8 : 1;
-  const { pushOffset } = getPawnDirections(piece.color);
+
+  const isWhite = piece.color === Color.White;
+  const startRank = isWhite ? 6 : 1;
+  const promotionRank = isWhite ? 8 : 1;
+  const pushOffset = PAWN_DIRECTIONS[piece.color].pushOffset;
 
   const oneStepIndex = index + pushOffset;
   const isOneStepLegal =
@@ -253,9 +270,9 @@ const getMovesForPawn = (
     const isPromotion = getRank(oneStepIndex) === promotionRank;
     if (isPromotion) {
       moves.push(
-        ...PieceType.promotionValues.map((piece) => ({
+        ...PieceType.promotionValues.map((promotionPiece) => ({
           ...move,
-          promotion: piece,
+          promotion: promotionPiece,
         }))
       );
     } else {
@@ -403,7 +420,7 @@ const getAttackedSquares = (
   const kingAttacks = KingAttacks.fromCoord(
     Coordinate.fromIndex(pieceBitboards[PieceType.King].scanForward())
   );
-  const { westAttackOffset, eastAttackOffset } = getPawnDirections(color);
+  const { westAttackOffset, eastAttackOffset } = PAWN_DIRECTIONS[color];
 
   const pawnAttacksWest = pieceBitboards[PieceType.Pawn]
     .leftShift(westAttackOffset)
@@ -458,10 +475,10 @@ const getMovesFromSquare = (
 };
 
 const getCastlingMoves = (context: MoveGeneratorContext): Move[] => {
+  const kingBitboard = context.bitboards[context.turn][PieceType.King];
+  const kingIndex = kingBitboard.scanForward();
   return context.castlingRights
     .map((right) => {
-      const kingIndex =
-        context.bitboards[context.turn][PieceType.King].scanForward();
       const targetIndex =
         right === CastlingRight.KingSide ? kingIndex + 2 : kingIndex - 2;
       const castlingPath = context.bitboards.castlingPaths[context.turn][right];
@@ -473,7 +490,7 @@ const getCastlingMoves = (context: MoveGeneratorContext): Move[] => {
       const isKingPathNotAttacked = castlingKingPath
         .intersection(context.moveMasks.attacks)
         .isEmpty();
-      const isKingNotInCheck = context.bitboards[context.turn][PieceType.King]
+      const isKingNotInCheck = kingBitboard
         .setIndex(targetIndex)
         .intersection(context.moveMasks.attacks)
         .isEmpty();
@@ -561,22 +578,18 @@ const generateMoves = (context: MoveGeneratorContext): Move[] => {
   const isDoubleCheck = numKingAttackers >= 2;
 
   const moves: Move[] = [];
-  for (const entry of context.piecePlacements) {
-    const piecePlacement: PiecePlacement = {
-      coord: entry[0],
-      piece: entry[1],
-    };
-    if (isDoubleCheck && piecePlacement.piece.type !== PieceType.King) {
+  for (const [coord, piece] of context.piecePlacements) {
+    if (piece.color !== context.turn) {
       continue;
     }
-
-    if (piecePlacement.piece.color !== context.turn) {
+    // In double check, only king moves are allowed
+    if (isDoubleCheck && piece.type !== PieceType.King) {
       continue;
     }
 
     // Hot path optimization
     // eslint-disable-next-line prefer-spread
-    moves.push.apply(moves, getMovesFromSquare(context, piecePlacement));
+    moves.push.apply(moves, getMovesFromSquare(context, { piece, coord }));
   }
 
   // eslint-disable-next-line prefer-spread

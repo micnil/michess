@@ -35,9 +35,10 @@ const from = (
     turn: chessPosition.turn,
     opponentColor: isTurn(Color.White) ? Color.Black : Color.White,
     isTurn,
-    castlingRights: CastlingAbility.toCastlingRights(chessPosition.turn, [
-      ...chessPosition.castlingAbility,
-    ]),
+    castlingRights: CastlingAbility.toCastlingRights(
+      chessPosition.turn,
+      Array.from(chessPosition.castlingAbility.values())
+    ),
   };
 };
 export const MoveGeneratorContext = {
