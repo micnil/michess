@@ -1,0 +1,30 @@
+{
+  "name": "hono-chess-api",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/hono-chess-api/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/hono-chess-api",
+        "tsConfig": "libs/hono-chess-api/tsconfig.lib.json",
+        "packageJson": "libs/hono-chess-api/package.json",
+        "main": "libs/hono-chess-api/src/index.ts",
+        "assets": ["libs/hono-chess-api/*.md"]
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/hono-chess-api/jest.config.ts"
+      }
+    }
+  }
+}
