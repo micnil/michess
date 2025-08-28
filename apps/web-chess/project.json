@@ -24,7 +24,8 @@
       "defaultConfiguration": "development",
       "options": {
         "buildTarget": "web-chess:build",
-        "dev": true
+        "dev": true,
+        "proxyConfig": "apps/web-chess/proxy.conf.json"
       },
       "configurations": {
         "development": {
@@ -35,7 +36,8 @@
           "buildTarget": "web-chess:build:production",
           "dev": false
         }
-      }
+      },
+      "dependsOn": ["node-chess:serve"]
     },
     "export": {
       "executor": "@nx/next:export",
