@@ -1,5 +1,5 @@
-import { Piece } from './Piece';
-import { PieceType } from './PieceType';
+import { Piece } from './common/Piece';
+import { PieceType } from './common/PieceType';
 
 export type ColoredPieceType =
   | 'wk'

@@ -1,5 +1,5 @@
 import { Color } from './Color';
-import { P } from './mocks/Piece.mock';
+import { P } from '../mocks/Piece.mock';
 import { PieceType } from './PieceType';
 
 export type Piece = {

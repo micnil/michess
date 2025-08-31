@@ -1,5 +1,5 @@
+import { Color } from '../../common/Color';
 import { CastlingRight } from './CastlingRight';
-import { Color } from './Color';
 
 const CastlingAbilityEnum = {
   WhiteKing: 'WhiteKing',

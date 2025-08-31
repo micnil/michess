@@ -1,8 +1,8 @@
-import { CastlingAbility } from '../CastlingAbility';
-import { ChessPosition } from '../ChessPosition';
-import { Coordinate } from '../Coordinate';
-import { Piece } from '../Piece';
-import { PiecePlacements } from '../PiecePlacements';
+import { CastlingAbility } from '../position/model/CastlingAbility';
+import { ChessPosition } from '../position/model/ChessPosition';
+import { Coordinate } from '../common/Coordinate';
+import { Piece } from '../common/Piece';
+import { PiecePlacements } from '../position/model/PiecePlacements';
 import { boardStateMock } from './BoardState.mock';
 
 export const chessPositionMock: ChessPosition = {

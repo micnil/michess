@@ -1,4 +1,4 @@
-import { ColoredPieceType } from './ColoredPieceType';
+import { ColoredPieceType } from '../ColoredPieceType';
 
 const PieceTypeEnum = {
   Pawn: 'p',

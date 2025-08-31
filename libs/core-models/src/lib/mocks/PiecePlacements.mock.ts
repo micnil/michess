@@ -1,4 +1,4 @@
-import { PiecePlacements } from '../PiecePlacements';
+import { PiecePlacements } from '../position/model/PiecePlacements';
 import { B, b, K, k, N, n, P, p, Q, q, r, R } from './Piece.mock';
 
 const emptyBoard: PiecePlacements = new Map();

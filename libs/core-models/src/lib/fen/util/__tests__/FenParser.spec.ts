@@ -1,4 +1,4 @@
-import { CastlingAbility } from '../../../CastlingAbility';
+import { CastlingAbility } from '../../../position/model/CastlingAbility';
 import { createChessPositionMock } from '../../../mocks/ChessPosition.mock';
 import { PiecePlacementsMock } from '../../../mocks/PiecePlacements.mock';
 import { FenParser } from '../FenParser';

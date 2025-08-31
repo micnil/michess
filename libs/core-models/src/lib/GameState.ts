@@ -1,5 +1,5 @@
 import { Maybe } from '@michess/common-utils';
-import { ChessPosition } from './ChessPosition';
+import { ChessPosition } from './position/model/ChessPosition';
 import { Move } from './Move';
 import { ChessGameResult } from './ChessGameResult';
 

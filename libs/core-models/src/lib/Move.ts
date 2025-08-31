@@ -1,5 +1,5 @@
-import { CastlingRight } from './CastlingRight';
-import { PieceType } from './PieceType';
+import { CastlingRight } from './position/model/CastlingRight';
+import { PieceType } from './common/PieceType';
 
 export type Move = {
   start: number;

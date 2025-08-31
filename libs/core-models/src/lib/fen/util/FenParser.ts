@@ -9,11 +9,11 @@ import {
 } from '../model/FenStr';
 import { FenValidationError } from '../model/FenValidationError';
 import { coordIterator } from './coordIterator';
-import { CastlingAbility } from '../../CastlingAbility';
-import { Color } from '../../Color';
-import { Coordinate } from '../../Coordinate';
-import { ChessPosition } from '../../ChessPosition';
-import { Piece } from '../../Piece';
+import { CastlingAbility } from '../../position/model/CastlingAbility';
+import { Color } from '../../common/Color';
+import { Coordinate } from '../../common/Coordinate';
+import { ChessPosition } from '../../position/model/ChessPosition';
+import { Piece } from '../../common/Piece';
 
 const sideToMoveToColor = (sideToMove: FenSideToMovePart): Color => {
   return sideToMove === 'w' ? 'white' : 'black';

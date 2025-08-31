@@ -1,5 +1,5 @@
-import { PiecePlacements } from './PiecePlacements';
-import { Color } from './Color';
+import { Color } from './common/Color';
+import { PiecePlacements } from './position/model/PiecePlacements';
 
 export type BoardState = {
   pieces: PiecePlacements;

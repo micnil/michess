@@ -1,6 +1,7 @@
-import { Color } from './Color';
-import { Coordinate } from './Coordinate';
-import { Piece } from './Piece';
+
+import { Color } from '../../common/Color';
+import { Coordinate } from '../../common/Coordinate';
+import { Piece } from '../../common/Piece';
 
 export type PiecePlacements = Map<Coordinate, Piece>;
 

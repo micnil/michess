@@ -1,6 +1,6 @@
+import { Color } from '../../common/Color';
+import { Coordinate } from '../../common/Coordinate';
 import { CastlingAbility } from './CastlingAbility';
-import { Color } from './Color';
-import { Coordinate } from './Coordinate';
 import { PiecePlacements } from './PiecePlacements';
 
 export type ChessPosition = {
