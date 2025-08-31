@@ -5,8 +5,8 @@ import { useDragDropContext, useDrop } from '@michess/react-dnd';
 import { Color, Coordinate, PieceType } from '@michess/core-models';
 import { useChessboardContext } from './context/hooks/useChessboardContext';
 import { useMoveOptions } from './context/hooks/useMoveOptions';
-import { MovePayload } from '@michess/core-state';
 import { canMoveTo } from './move/util/canMoveTo';
+import { MovePayload } from './model/MovePayload';
 
 type RectProps = {
   color: Color;

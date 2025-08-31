@@ -1,8 +1,9 @@
-import { IReadOnlyChessboard, MovePayload } from '@michess/core-state';
 import React from 'react';
 import { MoveOptionsMap } from '../move/model/MoveOptionsMap';
 import { Square } from '../model/Square';
 import { Coordinate } from '@michess/core-models';
+import { IReadOnlyChessboard } from '../model/IReadOnlyChessboard';
+import { MovePayload } from '../model/MovePayload';
 
 export type ChessboardContextState<TMoveMeta = unknown> = {
   chessboard: IReadOnlyChessboard;

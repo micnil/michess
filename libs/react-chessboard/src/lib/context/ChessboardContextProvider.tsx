@@ -1,12 +1,14 @@
 import { FenStr, FenParser } from '@michess/core-models';
 import { Color, PiecePlacements } from '@michess/core-models';
-import { Chessboard, IChessboard, MovePayload } from '@michess/core-state';
 import { ReactNode, useCallback, useRef, useState } from 'react';
 import { MoveOptions } from '../move/model/MoveOptions';
 import { MoveOptionsMap } from '../move/model/MoveOptionsMap';
 import { ChessboardContext } from './ChessboardContext';
 import { GameStatusType } from '../model/GameStatusType';
 import { Square } from '../model/Square';
+import { MovePayload } from '../model/MovePayload';
+import { IChessboard } from '../model/IChessboard';
+import { Chessboard } from '../model/Chessboard';
 
 type Props<TMoveMeta = unknown> = {
   size: number;

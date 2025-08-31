@@ -5,8 +5,8 @@ import {
   PiecePlacement,
   SquareState,
 } from '@michess/core-models';
-import { IChessboard } from './model/IChessboard';
-import { MovePayload } from './model/MovePayload';
+import { MovePayload } from './MovePayload';
+import { IChessboard } from './IChessboard';
 
 const movePiece = (board: BoardState, move: MovePayload): BoardState => {
   console.debug({ move });

@@ -1,5 +1,4 @@
 import { Color, PiecePlacements } from '@michess/core-models';
-import { MovePayload } from '@michess/core-state';
 import { DragDropContextProvider } from '@michess/react-dnd';
 import styled from 'styled-components';
 import { ChessboardView } from './ChessboardView';
@@ -7,6 +6,7 @@ import { ChessboardContextProvider } from './context/ChessboardContextProvider';
 import { MoveOptions } from './move/model/MoveOptions';
 import { GameStatusType } from './model/GameStatusType';
 import { ScoreSheet } from './ScoreSheet';
+import { MovePayload } from './model/MovePayload';
 
 const ChessboardContainer = styled.div`
   display: flex;
