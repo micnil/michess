@@ -1,14 +1,12 @@
 import { Maybe } from '@michess/common-utils';
-import {
-  CastlingAbility,
-  CastlingRight,
-  Color,
-  Coordinate,
-  Piece,
-  PiecePlacements,
-  PieceType,
-} from '@michess/core-board';
 import { Bitboard } from './Bitboard';
+import { Color } from '../common/Color';
+import { Coordinate } from '../common/Coordinate';
+import { Piece } from '../common/Piece';
+import { PieceType } from '../common/PieceType';
+import { CastlingAbility } from '../position/model/CastlingAbility';
+import { CastlingRight } from '../position/model/CastlingRight';
+import { PiecePlacements } from '../position/model/PiecePlacements';
 
 type PieceBitboard = {
   [piece in PieceType]: Bitboard;
@@ -16,6 +14,18 @@ type PieceBitboard = {
 
 type ColoredPieceBitboards = {
   [color in Color]: PieceBitboard;
+};
+const castlingKingPaths: { [ability in CastlingAbility]: Bitboard } = {
+  [CastlingAbility.WhiteKing]: new Bitboard().between('e1', 'g1'),
+  [CastlingAbility.WhiteQueen]: new Bitboard().between('e1', 'c1'),
+  [CastlingAbility.BlackKing]: new Bitboard().between('e8', 'g8'),
+  [CastlingAbility.BlackQueen]: new Bitboard().between('e8', 'c8'),
+};
+const castlingRookPaths: { [ability in CastlingAbility]: Bitboard } = {
+  [CastlingAbility.WhiteKing]: new Bitboard().between('h1', 'f1'),
+  [CastlingAbility.WhiteQueen]: new Bitboard().between('a1', 'd1'),
+  [CastlingAbility.BlackKing]: new Bitboard().between('h8', 'f8'),
+  [CastlingAbility.BlackQueen]: new Bitboard().between('a8', 'd8'),
 };
 
 export type ChessBitboard = ColoredPieceBitboards & {
@@ -56,19 +66,6 @@ const fromPieceBitboards = (
   );
   const occupiedBoard = whiteOccupied.union(blackOccupied);
   const empty = occupiedBoard.invert();
-
-  const castlingKingPaths: { [ability in CastlingAbility]: Bitboard } = {
-    [CastlingAbility.WhiteKing]: new Bitboard().between('e1', 'g1'),
-    [CastlingAbility.WhiteQueen]: new Bitboard().between('e1', 'c1'),
-    [CastlingAbility.BlackKing]: new Bitboard().between('e8', 'g8'),
-    [CastlingAbility.BlackQueen]: new Bitboard().between('e8', 'c8'),
-  };
-  const castlingRookPaths: { [ability in CastlingAbility]: Bitboard } = {
-    [CastlingAbility.WhiteKing]: new Bitboard().between('h1', 'f1'),
-    [CastlingAbility.WhiteQueen]: new Bitboard().between('a1', 'd1'),
-    [CastlingAbility.BlackKing]: new Bitboard().between('h8', 'f8'),
-    [CastlingAbility.BlackQueen]: new Bitboard().between('a8', 'd8'),
-  };
 
   return {
     ...bitboards,

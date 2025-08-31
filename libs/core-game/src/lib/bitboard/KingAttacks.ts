@@ -1,5 +1,5 @@
 import { BoardCoordinates, Coordinate } from '@michess/core-board';
-import { Bitboard } from '@michess/core-state';
+import { Bitboard } from '@michess/core-board';
 import { DirectionOffset } from '../model/DirectionOffset';
 import { IndexBoardUtil } from '../util/IndexBoardUtil';
 

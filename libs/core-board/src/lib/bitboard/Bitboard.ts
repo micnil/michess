@@ -1,4 +1,4 @@
-import { Coordinate } from '@michess/core-board';
+import { Coordinate } from '../common/Coordinate';
 
 // De Bruijn constants for scanForward
 const DEBRUIJN64 = 0x03f79d71b4cb0a89n;

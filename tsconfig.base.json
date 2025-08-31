@@ -18,9 +18,8 @@
     "baseUrl": ".",
     "paths": {
       "@michess/common-utils": ["libs/common-utils/src/index.ts"],
-      "@michess/core-game": ["libs/core-game/src/index.ts"],
       "@michess/core-board": ["libs/core-board/src/index.ts"],
-      "@michess/core-state": ["libs/core-state/src/index.ts"],
+      "@michess/core-game": ["libs/core-game/src/index.ts"],
       "@michess/hono-app": ["libs/hono-app/src/index.ts"],
       "@michess/react-chessboard": ["libs/react-chessboard/src/index.ts"],
       "@michess/react-dnd": ["libs/react-dnd/src/index.ts"]

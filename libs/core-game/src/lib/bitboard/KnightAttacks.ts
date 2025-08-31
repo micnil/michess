@@ -1,5 +1,4 @@
-import { BoardCoordinates, Coordinate } from '@michess/core-board';
-import { Bitboard } from '@michess/core-state';
+import { BoardCoordinates, Coordinate, Bitboard } from '@michess/core-board';
 import { IndexBoardUtil } from '../util/IndexBoardUtil';
 
 const KNIGHT_JUMP_OFFSETS = [15, 17, -17, -15, 10, -6, 6, -10];

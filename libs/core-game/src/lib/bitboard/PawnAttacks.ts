@@ -1,5 +1,9 @@
-import { BoardCoordinates, Color, Coordinate } from '@michess/core-board';
-import { Bitboard } from '@michess/core-state';
+import {
+  BoardCoordinates,
+  Color,
+  Coordinate,
+  Bitboard,
+} from '@michess/core-board';
 import { IndexBoardUtil } from '../util/IndexBoardUtil';
 
 type PawnAttacksType = Record<Coordinate, Record<Color, Bitboard>>;

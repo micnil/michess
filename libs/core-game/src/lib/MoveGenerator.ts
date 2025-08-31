@@ -7,10 +7,11 @@ import {
   PiecePlacement,
   PieceType,
   Move,
+  Bitboard,
+  ChessBitboard,
 } from '@michess/core-board';
 import { MoveGeneratorContext } from './model/MoveGeneratorContext';
 import { isDefined } from '@michess/common-utils';
-import { Bitboard, ChessBitboard } from '@michess/core-state';
 import { KingAttacks } from './bitboard/KingAttacks';
 import { KnightAttacks } from './bitboard/KnightAttacks';
 import { PawnAttacks } from './bitboard/PawnAttacks';

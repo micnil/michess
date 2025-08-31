@@ -17,3 +17,5 @@ export * from './lib/mocks/ChessPosition.mock';
 export * from './lib/Move';
 export * from './lib//fen/util/FenParser';
 export * from './lib/fen/model/FenStr';
+export * from './lib/bitboard/Bitboard';
+export * from './lib/bitboard/ChessBitboard';

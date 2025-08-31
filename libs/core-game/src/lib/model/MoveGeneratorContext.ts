@@ -5,8 +5,8 @@ import {
   Coordinate,
   ChessPosition,
   PiecePlacements,
+  ChessBitboard,
 } from '@michess/core-board';
-import { ChessBitboard } from '@michess/core-state';
 import { MoveMaskBitboards } from './MoveMaskBitboards';
 
 export type MoveGeneratorContext = {

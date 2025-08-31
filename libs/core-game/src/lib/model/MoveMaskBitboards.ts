@@ -1,4 +1,4 @@
-import { Bitboard } from '@michess/core-state';
+import { Bitboard } from '@michess/core-board';
 
 export type MoveMaskBitboards = {
   attacks: Bitboard;
