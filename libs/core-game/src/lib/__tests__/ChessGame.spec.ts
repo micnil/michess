@@ -1,4 +1,4 @@
-import { FenParser, FenStr } from '@michess/core-fen';
+import { FenParser, FenStr } from '@michess/core-models';
 import { ChessGame } from '../ChessGame';
 import { castlingTestCases } from './test-cases/castling';
 import { checkmatesTestCases } from './test-cases/checkmates';

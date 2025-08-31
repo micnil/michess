@@ -1,11 +1,4 @@
 import { Maybe } from '@michess/common-utils';
-import {
-  CastlingAbility,
-  Color,
-  Coordinate,
-  ChessPosition,
-  Piece,
-} from '@michess/core-models';
 import { piecePlacementsFromFen } from './piecePlacementsFromFen';
 import { parseFenParts } from './parseFenParts';
 import {
@@ -13,9 +6,14 @@ import {
   FenEnPassantTargetSquarePart,
   FenSideToMovePart,
   FenStr,
-} from './types/FenStr';
-import { FenValidationError } from './types/FenValidationError';
-import { coordIterator } from './util/coordIterator';
+} from '../model/FenStr';
+import { FenValidationError } from '../model/FenValidationError';
+import { coordIterator } from './coordIterator';
+import { CastlingAbility } from '../../CastlingAbility';
+import { Color } from '../../Color';
+import { Coordinate } from '../../Coordinate';
+import { ChessPosition } from '../../ChessPosition';
+import { Piece } from '../../Piece';
 
 const sideToMoveToColor = (sideToMove: FenSideToMovePart): Color => {
   return sideToMove === 'w' ? 'white' : 'black';

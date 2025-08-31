@@ -1,4 +1,4 @@
-import { FenStr } from '@michess/core-fen';
+import { FenStr } from '@michess/core-models';
 type TestCase = {
   description?: string;
   start: {

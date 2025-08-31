@@ -6,7 +6,7 @@ import {
   FenPiecePlacementPart,
   FenSideToMovePart,
   FenStr,
-} from './FenStr';
+} from '../model/FenStr';
 
 export type FenParts = {
   fullFenStr: FenStr;

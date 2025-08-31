@@ -1,4 +1,4 @@
-import { FenStr, FenParser } from '@michess/core-fen';
+import { FenStr, FenParser } from '@michess/core-models';
 import { Color, PiecePlacements } from '@michess/core-models';
 import { Chessboard, IChessboard, MovePayload } from '@michess/core-state';
 import { ReactNode, useCallback, useRef, useState } from 'react';

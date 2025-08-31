@@ -19,4 +19,6 @@ export * from './lib/mocks/ChessPosition.mock';
 export * from './lib/ChessGameResult';
 export * from './lib/ChessGameResultType';
 export * from './lib/Move';
+export * from './lib//fen/util/FenParser';
+export * from './lib/fen/model/FenStr';
 export * from './lib/ChessGameAction';

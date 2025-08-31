@@ -1,6 +1,7 @@
 import { counter } from '@michess/common-utils';
-import { BoardCoordinates, Coordinate } from '@michess/core-models';
-import { FenValidationError } from '../types/FenValidationError';
+import { FenValidationError } from '../model/FenValidationError';
+import { BoardCoordinates } from '../../BoardCoordinates';
+import { Coordinate } from '../../Coordinate';
 
 const whiteCoordinates = BoardCoordinates.fromOrientation('white');
 

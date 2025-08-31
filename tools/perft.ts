@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import { ChessPosition } from '@michess/core-models';
-import { FenParser, FenStr } from '@michess/core-fen';
+import { FenParser, FenStr } from '@michess/core-models';
 import { ChessGame } from '@michess/core-game';
 
 // Default FEN for standard starting position

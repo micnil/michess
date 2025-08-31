@@ -1,8 +1,6 @@
-import {
-  CastlingAbility,
-  createChessPositionMock,
-  PiecePlacementsMock,
-} from '@michess/core-models';
+import { CastlingAbility } from '../../../CastlingAbility';
+import { createChessPositionMock } from '../../../mocks/ChessPosition.mock';
+import { PiecePlacementsMock } from '../../../mocks/PiecePlacements.mock';
 import { FenParser } from '../FenParser';
 
 describe('FenParser', () => {
@@ -50,10 +48,22 @@ describe('FenParser', () => {
         'r3kb1N/ppp3p1/4pn2/3p3p/P1nPbB2/2q5/3N1PPP/R2QKB1R w KQq h6 0 14';
       const boardState = FenParser.toChessPosition(fen);
       // Spot check a few key squares
-      expect(boardState.pieces.get('c3')).toEqual({ type: 'q', color: 'black' });
-      expect(boardState.pieces.get('e8')).toEqual({ type: 'k', color: 'black' });
-      expect(boardState.pieces.get('d2')).toEqual({ type: 'n', color: 'white' });
-      expect(boardState.pieces.get('f4')).toEqual({ type: 'b', color: 'white' });
+      expect(boardState.pieces.get('c3')).toEqual({
+        type: 'q',
+        color: 'black',
+      });
+      expect(boardState.pieces.get('e8')).toEqual({
+        type: 'k',
+        color: 'black',
+      });
+      expect(boardState.pieces.get('d2')).toEqual({
+        type: 'n',
+        color: 'white',
+      });
+      expect(boardState.pieces.get('f4')).toEqual({
+        type: 'b',
+        color: 'white',
+      });
       expect(boardState.turn).toEqual('white');
       expect(boardState.ply).toEqual(0);
       expect(boardState.fullMoves).toEqual(14);

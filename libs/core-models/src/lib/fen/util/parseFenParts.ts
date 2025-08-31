@@ -12,9 +12,9 @@ import {
   FenSideToMovePart,
   FenSideToMovePartRegex,
   FenStr,
-} from './types/FenStr';
-import { FenParts } from './types/FenParts';
-import { FenValidationError } from './types/FenValidationError';
+} from '../model/FenStr';
+import { FenParts } from '../model/FenParts';
+import { FenValidationError } from '../model/FenValidationError';
 
 function assertPiecePlacementPart(
   piecePlacementPart: string

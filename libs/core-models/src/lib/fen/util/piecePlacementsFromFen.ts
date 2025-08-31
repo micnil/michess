@@ -4,10 +4,10 @@ import {
   Piece,
   PieceType,
 } from '@michess/core-models';
-import { coordIterator } from './util/coordIterator';
+import { coordIterator } from './coordIterator';
 import { parseFenParts } from './parseFenParts';
-import { FenPiecePlacementPart, FenStr } from './types/FenStr';
-import { FenValidationError } from './types/FenValidationError';
+import { FenPiecePlacementPart, FenStr } from '../model/FenStr';
+import { FenValidationError } from '../model/FenValidationError';
 
 type PiecePlacement = {
   coord: Coordinate;

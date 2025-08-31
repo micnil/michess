@@ -1,4 +1,4 @@
-import { FenParser } from '@michess/core-fen';
+import { FenParser } from '@michess/core-models';
 import { Coordinate, GameState, Move } from '@michess/core-models';
 import { ChessGame } from '@michess/core-game';
 import {
