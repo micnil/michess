@@ -1,4 +1,4 @@
-import { Color } from './Color';
+import { Color } from './common/Color';
 import {
   SQUARE_COORDINATES_BLACK,
   SQUARE_COORDINATES_WHITE,

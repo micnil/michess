@@ -1,7 +1,6 @@
 import { Maybe } from '@michess/common-utils';
-import { ChessPosition } from './position/model/ChessPosition';
-import { Move } from './Move';
 import { ChessGameResult } from './ChessGameResult';
+import { ChessPosition, Move } from '@michess/core-models';
 
 export type GameState = ChessPosition & {
   result: Maybe<ChessGameResult>;

@@ -1,5 +1,7 @@
 import { Maybe } from '@michess/common-utils';
-import { ChessGameAction, ChessGameResult, Color } from '@michess/core-models';
+import { Color } from '@michess/core-models';
+import { ChessGameAction } from './model/ChessGameAction';
+import { ChessGameResult } from './model/ChessGameResult';
 
 export type ChessGameActions = {
   addAction: (action: ChessGameAction) => ChessGameActions;

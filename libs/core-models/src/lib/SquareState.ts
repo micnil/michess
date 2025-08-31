@@ -1,4 +1,4 @@
-import { Coordinate } from './Coordinate';
+import { Coordinate } from './common/Coordinate';
 import { Piece } from './common/Piece';
 
 export type SquareState = {

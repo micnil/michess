@@ -1,4 +1,4 @@
-import { Color } from './common/Color';
+import { Color } from '@michess/core-models';
 
 export type ChessGameActionType =
   | 'CLAIM_DRAW'

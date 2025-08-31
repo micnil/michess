@@ -1,7 +1,7 @@
 import { Maybe } from '@michess/common-utils';
 import { ChessGameResultType } from './ChessGameResultType';
 import { ChessGameAction } from './ChessGameAction';
-import { Color } from './Color';
+import { Color } from '@michess/core-models';
 
 export type ChessGameResult = {
   type: ChessGameResultType;

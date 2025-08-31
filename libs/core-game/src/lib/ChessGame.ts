@@ -2,12 +2,9 @@ import { assertDefined, Maybe } from '@michess/common-utils';
 import {
   CastlingAbility,
   CastlingRight,
-  ChessGameAction,
-  ChessGameResult,
   ChessPosition,
   Color,
   Coordinate,
-  GameState,
   Move,
   Piece,
   PiecePlacements,
@@ -19,6 +16,9 @@ import { MoveGenerator } from './MoveGenerator';
 import { ChessGameInternalState } from './model/ChessGameInternalState';
 import { GameStateHistoryItem } from './model/GameStateHistoryItem';
 import { MoveGeneratorResult } from './model/MoveGeneratorResult';
+import { GameState } from './model/GameState';
+import { ChessGameAction } from './model/ChessGameAction';
+import { ChessGameResult } from './model/ChessGameResult';
 
 export type ChessGame = {
   getState(): GameState;

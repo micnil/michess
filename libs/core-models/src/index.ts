@@ -1,7 +1,6 @@
 export * from './lib/position/model/PiecePlacements';
 export * from './lib/BoardState';
 export * from './lib/position/model/ChessPosition';
-export * from './lib/GameState';
 export * from './lib/common/Color';
 export * from './lib/ColoredPieceType';
 export * from './lib/common/Coordinate';
@@ -16,9 +15,6 @@ export * from './lib/mocks/PiecePlacements.mock';
 export * from './lib/mocks/Piece.mock';
 export * from './lib/mocks/BoardState.mock';
 export * from './lib/mocks/ChessPosition.mock';
-export * from './lib/ChessGameResult';
-export * from './lib/ChessGameResultType';
 export * from './lib/Move';
 export * from './lib//fen/util/FenParser';
 export * from './lib/fen/model/FenStr';
-export * from './lib/ChessGameAction';
