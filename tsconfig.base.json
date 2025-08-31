@@ -22,9 +22,9 @@
       "@michess/core-models": ["libs/core-models/src/index.ts"],
       "@michess/core-rules": ["libs/core-rules/src/index.ts"],
       "@michess/core-state": ["libs/core-state/src/index.ts"],
+      "@michess/hono-app": ["libs/hono-app/src/index.ts"],
       "@michess/react-chessboard": ["libs/react-chessboard/src/index.ts"],
-      "@michess/react-dnd": ["libs/react-dnd/src/index.ts"],
-      "hono-chess-api": ["libs/hono-chess-api/src/index.ts"]
+      "@michess/react-dnd": ["libs/react-dnd/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
