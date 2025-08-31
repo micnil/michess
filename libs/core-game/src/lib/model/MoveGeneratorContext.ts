@@ -5,7 +5,7 @@ import {
   Coordinate,
   ChessPosition,
   PiecePlacements,
-} from '@michess/core-models';
+} from '@michess/core-board';
 import { ChessBitboard } from '@michess/core-state';
 import { MoveMaskBitboards } from './MoveMaskBitboards';
 

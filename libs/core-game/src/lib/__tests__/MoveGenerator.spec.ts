@@ -8,7 +8,7 @@ import {
   CastlingRight,
   PieceType,
   Move,
-} from '@michess/core-models';
+} from '@michess/core-board';
 
 import { MoveGenerator } from '../MoveGenerator';
 

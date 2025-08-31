@@ -1,7 +1,7 @@
 import React from 'react';
 import { MoveOptionsMap } from '../move/model/MoveOptionsMap';
 import { Square } from '../model/Square';
-import { Coordinate } from '@michess/core-models';
+import { Coordinate } from '@michess/core-board';
 import { IReadOnlyChessboard } from '../model/IReadOnlyChessboard';
 import { MovePayload } from '../model/MovePayload';
 

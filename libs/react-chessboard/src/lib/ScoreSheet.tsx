@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Color } from '@michess/core-models';
+import { Color } from '@michess/core-board';
 import { GameStatusType } from './model/GameStatusType';
 
 const ScoreSheetContainer = styled.div`

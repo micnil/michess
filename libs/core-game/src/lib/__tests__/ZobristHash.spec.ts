@@ -3,7 +3,7 @@ import {
   CastlingAbility,
   Piece,
   Coordinate,
-} from '@michess/core-models';
+} from '@michess/core-board';
 import { ZobristHash } from '../ZobristHash';
 
 describe('ZobristHash', () => {

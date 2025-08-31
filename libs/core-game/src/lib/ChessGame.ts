@@ -9,7 +9,7 @@ import {
   Piece,
   PiecePlacements,
   PieceType,
-} from '@michess/core-models';
+} from '@michess/core-board';
 import { ChessGameActions } from './ChessGameActions';
 import { MoveGenerator } from './MoveGenerator';
 import { ChessGameInternalState } from './model/ChessGameInternalState';

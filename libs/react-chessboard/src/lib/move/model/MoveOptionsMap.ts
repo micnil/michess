@@ -1,4 +1,4 @@
-import { Coordinate } from '@michess/core-models';
+import { Coordinate } from '@michess/core-board';
 import { MoveOptions } from './MoveOptions';
 
 export type MoveOptionsMap = Partial<Record<Coordinate, MoveOptions>>;

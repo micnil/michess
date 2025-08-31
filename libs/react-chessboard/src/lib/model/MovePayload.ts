@@ -1,4 +1,4 @@
-import { Coordinate, PieceType } from '@michess/core-models';
+import { Coordinate, PieceType } from '@michess/core-board';
 
 export type MovePayload<TMeta = unknown> = {
   from: Coordinate;

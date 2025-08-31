@@ -7,7 +7,7 @@ import {
   Piece,
   PiecePlacements,
   PieceType,
-} from '@michess/core-models';
+} from '@michess/core-board';
 import { Bitboard } from './Bitboard';
 
 type PieceBitboard = {

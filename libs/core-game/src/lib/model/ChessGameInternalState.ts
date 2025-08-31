@@ -1,4 +1,4 @@
-import { ChessPosition } from '@michess/core-models';
+import { ChessPosition } from '@michess/core-board';
 import { GameStateHistoryItem } from './GameStateHistoryItem';
 import { Maybe } from '@michess/common-utils';
 import { ChessGameActions } from '../ChessGameActions';

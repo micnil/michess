@@ -3,7 +3,7 @@ import {
   BoardState,
   Coordinate,
   PiecePlacement,
-} from '@michess/core-models';
+} from '@michess/core-board';
 
 export interface IReadOnlyChessboard {
   getIndex(coord: Coordinate): number;

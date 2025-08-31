@@ -4,7 +4,7 @@ import {
   Coordinate,
   PiecePlacement,
   SquareState,
-} from '@michess/core-models';
+} from '@michess/core-board';
 import { MovePayload } from './MovePayload';
 import { IChessboard } from './IChessboard';
 

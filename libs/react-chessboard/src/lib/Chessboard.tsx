@@ -1,4 +1,4 @@
-import { Color, PiecePlacements } from '@michess/core-models';
+import { Color, PiecePlacements } from '@michess/core-board';
 import { DragDropContextProvider } from '@michess/react-dnd';
 import styled from 'styled-components';
 import { ChessboardView } from './ChessboardView';

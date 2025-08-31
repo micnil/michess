@@ -1,4 +1,4 @@
-import { PiecePlacements, PiecePlacementsMock } from '@michess/core-models';
+import { PiecePlacements, PiecePlacementsMock } from '@michess/core-board';
 import { ChessBitboard } from '../ChessBitboard';
 
 describe('ChessBitboard', () => {

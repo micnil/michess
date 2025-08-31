@@ -3,7 +3,7 @@ import {
   Coordinate,
   Move,
   PiecePlacements,
-} from '@michess/core-models';
+} from '@michess/core-board';
 import { ZobristHash } from '../ZobristHash';
 
 export type GameStateHistoryItem = {

@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Maybe, Position } from '@michess/common-utils';
 import { useDragDropContext, useDrop } from '@michess/react-dnd';
-import { Color, Coordinate, PieceType } from '@michess/core-models';
+import { Color, Coordinate, PieceType } from '@michess/core-board';
 import { useChessboardContext } from './context/hooks/useChessboardContext';
 import { useMoveOptions } from './context/hooks/useMoveOptions';
 import { canMoveTo } from './move/util/canMoveTo';

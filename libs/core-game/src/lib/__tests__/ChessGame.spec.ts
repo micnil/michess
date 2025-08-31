@@ -1,4 +1,4 @@
-import { FenParser, FenStr } from '@michess/core-models';
+import { FenParser, FenStr } from '@michess/core-board';
 import { ChessGame } from '../ChessGame';
 import { castlingTestCases } from './test-cases/castling';
 import { checkmatesTestCases } from './test-cases/checkmates';
@@ -12,7 +12,7 @@ import {
   Color,
   Coordinate,
   createChessPositionMock,
-} from '@michess/core-models';
+} from '@michess/core-board';
 
 const getAndApplyMoves = (chessGame: ChessGame): FenStr[] => {
   const moves = chessGame.getMoves();

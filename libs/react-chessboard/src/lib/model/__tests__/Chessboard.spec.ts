@@ -1,4 +1,4 @@
-import { Coordinate, createBoardStateMock } from '@michess/core-models';
+import { Coordinate, createBoardStateMock } from '@michess/core-board';
 import { Chessboard } from '../Chessboard';
 
 describe('Chessboard', () => {

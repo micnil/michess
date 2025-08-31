@@ -3,7 +3,7 @@ import {
   Coordinate,
   Piece,
   PieceType,
-} from '@michess/core-models';
+} from '@michess/core-board';
 import { coordIterator } from './coordIterator';
 import { parseFenParts } from './parseFenParts';
 import { FenPiecePlacementPart, FenStr } from '../model/FenStr';

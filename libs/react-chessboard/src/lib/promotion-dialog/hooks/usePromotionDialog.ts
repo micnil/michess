@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
-import { Coordinate, PieceType, Color } from '@michess/core-models';
+import { Coordinate, PieceType, Color } from '@michess/core-board';
 
 export type PromotionDialogState = {
   isOpen: boolean;

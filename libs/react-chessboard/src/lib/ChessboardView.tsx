@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Coordinate } from '@michess/core-models';
+import { Coordinate } from '@michess/core-board';
 import { PieceView } from './PieceView';
 import { useChessboardContext } from './context/hooks/useChessboardContext';
 import { SquareView } from './SquareView';

@@ -1,5 +1,5 @@
 import { Bitboard } from '../Bitboard';
-import { Coordinate } from '@michess/core-models';
+import { Coordinate } from '@michess/core-board';
 
 describe('Bitboard', () => {
   describe('constructor', () => {
@@ -164,11 +164,9 @@ describe('Bitboard', () => {
 
     it('returns the highest bit for a large number', () => {
       // 0b100...0 (bit 63 set)
-      expect(
-        new Bitboard(1n << 63n)
-          .getHighestSetBit()
-          .value()
-      ).toBe(1n << 63n);
+      expect(new Bitboard(1n << 63n).getHighestSetBit().value()).toBe(
+        1n << 63n
+      );
     });
   });
 

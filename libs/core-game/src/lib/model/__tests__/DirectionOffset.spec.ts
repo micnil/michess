@@ -1,4 +1,4 @@
-import { Coordinate } from '@michess/core-models';
+import { Coordinate } from '@michess/core-board';
 import { DirectionOffset } from '../DirectionOffset';
 
 describe('DirectionOffset', () => {

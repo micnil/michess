@@ -1,5 +1,5 @@
 import { Position } from '@michess/common-utils';
-import { ColoredPieceType, Coordinate, Piece } from '@michess/core-models';
+import { ColoredPieceType, Coordinate, Piece } from '@michess/core-board';
 import { useDrag } from '@michess/react-dnd';
 import React from 'react';
 import styled from 'styled-components';
@@ -16,7 +16,7 @@ type Props = {
 
 const StyledGroup = styled.g`
   cursor: pointer;
-`
+`;
 
 export const PieceView: React.FC<Props> = ({
   piece,

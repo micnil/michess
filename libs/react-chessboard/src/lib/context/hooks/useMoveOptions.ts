@@ -1,5 +1,5 @@
 import { Maybe } from '@michess/common-utils';
-import { Coordinate } from '@michess/core-models';
+import { Coordinate } from '@michess/core-board';
 import { useChessboardContext } from './useChessboardContext';
 import { MoveOptions } from '../../move/model/MoveOptions';
 

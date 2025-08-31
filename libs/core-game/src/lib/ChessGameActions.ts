@@ -1,5 +1,5 @@
 import { Maybe } from '@michess/common-utils';
-import { Color } from '@michess/core-models';
+import { Color } from '@michess/core-board';
 import { ChessGameAction } from './model/ChessGameAction';
 import { ChessGameResult } from './model/ChessGameResult';
 

@@ -1,7 +1,7 @@
 {
-  "name": "core-models",
+  "name": "core-board",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/core-models/src",
+  "sourceRoot": "libs/core-board/src",
   "projectType": "library",
   "tags": [],
   "targets": {
@@ -11,9 +11,9 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libs/core-models"],
+      "outputs": ["{workspaceRoot}/coverage/libs/core-board"],
       "options": {
-        "jestConfig": "libs/core-models/jest.config.ts"
+        "jestConfig": "libs/core-board/jest.config.ts"
       }
     }
   }

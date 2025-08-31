@@ -6,7 +6,7 @@ import {
   PieceType,
   CastlingAbility,
   Piece,
-} from '@michess/core-models';
+} from '@michess/core-board';
 
 // Zobrist hash constants - using pre-generated deterministic 64-bit values
 // These should be consistent across runs for reproducible hashing
