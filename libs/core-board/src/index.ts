@@ -6,7 +6,6 @@ export * from './lib/ColoredPieceType';
 export * from './lib/common/Coordinate';
 export * from './lib/common/Piece';
 export * from './lib/common/PieceType';
-export * from './lib/SquareState';
 export * from './lib/position/model/CastlingAbility';
 export * from './lib/BoardCoordinates';
 export * from './lib/position/model/PiecePlacement';

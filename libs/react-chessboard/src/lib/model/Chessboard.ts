@@ -2,11 +2,16 @@ import {
   BoardCoordinates,
   BoardState,
   Coordinate,
+  Piece,
   PiecePlacement,
-  SquareState,
 } from '@michess/core-board';
 import { MovePayload } from './MovePayload';
 import { IChessboard } from './IChessboard';
+
+type SquareState = {
+  coord: Coordinate;
+  piece?: Piece;
+};
 
 const movePiece = (board: BoardState, move: MovePayload): BoardState => {
   console.debug({ move });
