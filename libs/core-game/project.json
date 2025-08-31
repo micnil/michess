@@ -1,7 +1,7 @@
 {
-  "name": "core-rules",
+  "name": "core-game",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/core-rules/src",
+  "sourceRoot": "libs/core-game/src",
   "projectType": "library",
   "tags": [],
   "targets": {
@@ -11,9 +11,9 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libs/core-rules"],
+      "outputs": ["{workspaceRoot}/coverage/libs/core-game"],
       "options": {
-        "jestConfig": "libs/core-rules/jest.config.ts"
+        "jestConfig": "libs/core-game/jest.config.ts"
       }
     }
   }

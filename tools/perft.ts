@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { ChessPosition } from '@michess/core-models';
 import { FenParser, FenStr } from '@michess/core-fen';
-import { ChessGame } from '@michess/core-rules';
+import { ChessGame } from '@michess/core-game';
 
 // Default FEN for standard starting position
 const DEFAULT_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';

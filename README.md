@@ -22,7 +22,7 @@ A modern chess application built with React, Next.js, and TypeScript. Features a
 
 This is an Nx monorepo with the following key libraries:
 
-- `core-rules` - Chess game logic and move generation
+- `core-game` - Chess game logic and move generation
 - `react-chessboard` - React chessboard UI components
 - `web-chess` - Main Next.js application
 

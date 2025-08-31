@@ -1,6 +1,6 @@
 import { FenParser } from '@michess/core-fen';
 import { Coordinate, GameState, Move } from '@michess/core-models';
-import { ChessGame } from '@michess/core-rules';
+import { ChessGame } from '@michess/core-game';
 import {
   Chessboard as ChessboardView,
   GameStatusType,
