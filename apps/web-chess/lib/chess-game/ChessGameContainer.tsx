@@ -37,7 +37,7 @@ export const ChessGameContainer = () => {
 
   return (
     <ChessboardView<Move>
-      orientation={gameState.orientation}
+      orientation={'white'}
       size={500}
       piecePlacements={gameState.pieces}
       gameStatus={gameStatus}

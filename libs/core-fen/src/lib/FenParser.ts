@@ -6,7 +6,7 @@ import {
   ChessPosition,
   Piece,
 } from '@michess/core-models';
-import { boardStateFromFen } from './boardStateFromFen';
+import { piecePlacementsFromFen } from './piecePlacementsFromFen';
 import { parseFenParts } from './parseFenParts';
 import {
   FenCastlingAbilityPart,
@@ -62,7 +62,7 @@ const chessPositionFromFen = (fen: FenStr): ChessPosition => {
   const fenParts = parseFenParts(fen);
 
   return {
-    ...boardStateFromFen(fen),
+    pieces: piecePlacementsFromFen(fen),
     enPassant: enPassantCoordinateFromFenStr(fenParts.enPassantTargetSquare),
     turn: sideToMoveToColor(fenParts.sideToMove),
     castlingAbility: castlingAbilityFromFen(fenParts.castlingAbility),

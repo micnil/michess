@@ -288,7 +288,6 @@ const makeMove = (
     gameState: {
       initialPosition: gameState.initialPosition,
       result: gameState.result,
-      orientation: gameState.orientation,
       additionalActions,
       positionHash: newPositionHash,
       gameHistory,

@@ -32,7 +32,10 @@ export const ChessboardContextProvider = <TMoveMeta,>({
   size,
 }: Props<TMoveMeta>) => {
   const [chessboard, setChessboard] = useState<IChessboard>(() =>
-    Chessboard(FenParser.toChessPosition(startingFen))
+    Chessboard({
+      ...FenParser.toChessPosition(startingFen),
+      orientation: 'white',
+    })
   );
   const onMoveRef = useRef(onMove);
   onMoveRef.current = onMove;

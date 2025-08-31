@@ -1,6 +1,5 @@
 import {
   PiecePlacements,
-  BoardState,
   Coordinate,
   Piece,
   PieceType,
@@ -52,17 +51,14 @@ const piecePlacementsFromFenPiecePlacement = (
     });
 
   if (coordIter.isFinished()) {
-    return new Map(piecePlacements.map(p => [p.coord, p.piece]));
+    return new Map(piecePlacements.map((p) => [p.coord, p.piece]));
   } else {
     throw new FenValidationError('SquaresMissing');
   }
 };
 
-export const boardStateFromFen = (fen: FenStr): BoardState => {
+export const piecePlacementsFromFen = (fen: FenStr): PiecePlacements => {
   const fenParts = parseFenParts(fen);
 
-  return {
-    pieces: piecePlacementsFromFenPiecePlacement(fenParts.piecePlacement),
-    orientation: 'white',
-  };
+  return piecePlacementsFromFenPiecePlacement(fenParts.piecePlacement);
 };
