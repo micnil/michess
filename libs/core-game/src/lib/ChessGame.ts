@@ -10,7 +10,6 @@ import {
   PiecePlacements,
   PieceType,
 } from '@michess/core-models';
-import { ZobristHash } from '@michess/core-state';
 import { ChessGameActions } from './ChessGameActions';
 import { MoveGenerator } from './MoveGenerator';
 import { ChessGameInternalState } from './model/ChessGameInternalState';
@@ -19,6 +18,7 @@ import { MoveGeneratorResult } from './model/MoveGeneratorResult';
 import { GameState } from './model/GameState';
 import { ChessGameAction } from './model/ChessGameAction';
 import { ChessGameResult } from './model/ChessGameResult';
+import { ZobristHash } from './ZobristHash';
 
 export type ChessGame = {
   getState(): GameState;
