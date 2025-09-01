@@ -5,6 +5,17 @@
   "projectType": "library",
   "tags": [],
   "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/core-game",
+        "tsConfig": "libs/core-game/tsconfig.lib.json",
+        "packageJson": "libs/core-game/package.json",
+        "main": "libs/core-game/src/index.ts",
+        "assets": ["libs/core-game/*.md"]
+      }
+    },
     "lint": {
       "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"]

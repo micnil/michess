@@ -1,7 +1,7 @@
 {
-  "name": "hono-chess-api",
+  "name": "api-service",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/hono-app/src",
+  "sourceRoot": "libs/api-service/src",
   "projectType": "library",
   "tags": [],
   "targets": {
@@ -12,7 +12,7 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "libs/hono-app/jest.config.ts"
+        "jestConfig": "libs/api-service/jest.config.ts"
       }
     }
   }
