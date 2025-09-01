@@ -11,6 +11,9 @@ importers:
       '@hono/node-server':
         specifier: ^1.19.0
         version: 1.19.0(hono@4.9.4)
+      '@hono/zod-validator':
+        specifier: ^0.7.2
+        version: 0.7.2(hono@4.9.4)(zod@4.1.5)
       core-js:
         specifier: ^3.25.1
         version: 3.43.0
@@ -1215,6 +1218,12 @@ packages:
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
+
+  '@hono/zod-validator@0.7.2':
+    resolution: {integrity: sha512-ub5eL/NeZ4eLZawu78JpW/J+dugDAYhwqUIdp9KYScI6PZECij4Hx4UsrthlEUutqDDhPwRI0MscUfNkvn/mqQ==}
+    peerDependencies:
+      hono: '>=3.9.0'
+      zod: ^3.25.0 || ^4.0.0
 
   '@humanwhocodes/config-array@0.13.0':
     resolution: {integrity: sha512-DZLEEqFWQFiyK6h5YIeynKx7JlvCYWL0cImfSRXZ9l4Sg2efkFGTuFf6vzXjK1cq6IYkU+Eg/JizXw+TD2vRNw==}
@@ -8312,6 +8321,11 @@ snapshots:
   '@hono/node-server@1.19.0(hono@4.9.4)':
     dependencies:
       hono: 4.9.4
+
+  '@hono/zod-validator@0.7.2(hono@4.9.4)(zod@4.1.5)':
+    dependencies:
+      hono: 4.9.4
+      zod: 4.1.5
 
   '@humanwhocodes/config-array@0.13.0':
     dependencies:

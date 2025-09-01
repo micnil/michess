@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
+import { GamesController } from './games/GamesController';
 
-const HonoApp = new Hono();
-HonoApp.get('/', (c) => c.text('Hello Node.js!'));
+const HonoApp = new Hono().basePath('/api').route('/games', GamesController);
 
 export const App = HonoApp;

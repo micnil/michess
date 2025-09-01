@@ -1,1 +1,2 @@
-export * from './lib/api-schema';
+export * from './lib/chess-game/CreateGameV1Schema';
+export * from './lib/chess-game/CreateGameV1';
