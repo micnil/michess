@@ -1,1 +1,1 @@
-export * from './lib/DatabaseService';
+export * from './lib/repository/UserRepository';

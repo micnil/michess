@@ -5,17 +5,6 @@
   "projectType": "library",
   "tags": [],
   "targets": {
-    "build": {
-      "executor": "@nx/js:tsc",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "outputPath": "dist/libs/infra-db",
-        "tsConfig": "libs/infra-db/tsconfig.lib.json",
-        "packageJson": "libs/infra-db/package.json",
-        "main": "libs/infra-db/src/index.ts",
-        "assets": ["libs/infra-db/*.md"]
-      }
-    },
     "lint": {
       "executor": "@nx/eslint:lint"
     },
