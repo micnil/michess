@@ -1,9 +1,9 @@
-import { join } from 'path';
+import { join, relative } from 'path';
 import 'dotenv/config';
 import { defineConfig } from 'drizzle-kit';
 
 export default defineConfig({
-  out: join(__dirname, 'src/generated/migrations'),
+  out: relative(__dirname, './src/generated/migrations'),
   schema: join(__dirname, 'src/lib/schema'),
   dialect: 'postgresql',
   dbCredentials: {
