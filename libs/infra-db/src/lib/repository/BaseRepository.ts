@@ -1,6 +1,6 @@
 import { Sql } from 'postgres';
-import { DatabaseClient } from './DatabaseClient';
-import * as schema from './schema';
+import { DatabaseClient } from '../DatabaseClient';
+import * as schema from '../schema';
 import { PgInsertBuilder, PgUpdateBuilder } from 'drizzle-orm/pg-core';
 import { PostgresJsQueryResultHKT } from 'drizzle-orm/postgres-js';
 

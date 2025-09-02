@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { Maybe } from '@michess/common-utils';
-import { BaseRepository } from '../BaseRepository';
+import { BaseRepository } from './BaseRepository';
 import { InsertUser } from '../model/InsertUser';
 import { SelectUser } from '../model/SelectUser';
 import { users } from '../schema';
