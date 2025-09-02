@@ -10,7 +10,8 @@
     "typecheck": "tsc -p apps/web-chess --noEmit --jsx react-jsx",
     "perft": "tsx --tsconfig tools/tsconfig.tools.json tools/perft.ts",
     "perft:debug": "tsx --inspect-brk --tsconfig tools/tsconfig.tools.json tools/perft.ts",
-    "migration:generate": "dotenv -e ./apps/web-chess/.env -c -- drizzle-kit generate --config=libs/infra-db/drizzle.config.ts"
+    "migration:generate": "drizzle-kit generate --config=libs/infra-db/drizzle.config.ts",
+    "migration:run": "dotenv -e ./apps/node-chess/.env -c -- drizzle-kit migrate --config=libs/infra-db/drizzle.config.ts"
   },
   "private": true,
   "dependencies": {
