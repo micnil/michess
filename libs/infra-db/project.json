@@ -1,0 +1,30 @@
+{
+  "name": "infra-db",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/infra-db/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/infra-db",
+        "tsConfig": "libs/infra-db/tsconfig.lib.json",
+        "packageJson": "libs/infra-db/package.json",
+        "main": "libs/infra-db/src/index.ts",
+        "assets": ["libs/infra-db/*.md"]
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/infra-db/jest.config.ts"
+      }
+    }
+  }
+}
