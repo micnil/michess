@@ -1,4 +1,5 @@
 import { boolean, pgEnum, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { updatedAt } from './shared/updatedAt';
 import { users } from './users';
 
 const gameStatusEnum = pgEnum('game_status', [
@@ -37,10 +38,7 @@ export const games = pgTable('games', {
   resultReason: resultReasonEnum(),
 
   createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at')
-    .defaultNow()
-    .$onUpdate(() => new Date())
-    .notNull(),
+  updatedAt,
   startedAt: timestamp('started_at'),
   endedAt: timestamp('ended_at'),
 });
