@@ -1,25 +1,23 @@
-import { serve } from '@hono/node-server';
+import postgres from 'postgres';
 import { App } from '@michess/hono-app';
+import dotenv from 'dotenv';
+import { AppConfigService } from './config/service/AppConfigService';
+import { Api } from '@michess/api-service';
+import { Repositories } from '@michess/infra-db';
+import { Server } from './Server';
 
-const server = serve({
-  fetch: App.fetch,
-  port: 5000,
-}).on('listening', () => {
-  console.log('Server is running on:');
-  console.log(server.address());
-});
+dotenv.config();
 
-// graceful shutdown
-process.on('SIGINT', () => {
-  server.close();
-  process.exit(0);
-});
-process.on('SIGTERM', () => {
-  server.close((err) => {
-    if (err) {
-      console.error(err);
-      process.exit(1);
-    }
-    process.exit(0);
-  });
-});
+const main = () => {
+  const appConfig = AppConfigService.get();
+
+  const client = postgres(appConfig.database.url);
+
+  const repos = Repositories.from(client);
+  const api = Api.from(repos);
+  const app = App.from(api);
+
+  Server.start(app, appConfig);
+};
+
+main();
