@@ -1,9 +1,9 @@
-import postgres from 'postgres';
-import { App } from '@michess/hono-app';
-import dotenv from 'dotenv';
-import { AppConfigService } from './config/service/AppConfigService';
+import { App } from '@michess/api-router';
 import { Api } from '@michess/api-service';
 import { Repositories } from '@michess/infra-db';
+import dotenv from 'dotenv';
+import postgres from 'postgres';
+import { AppConfigService } from './config/service/AppConfigService';
 import { Server } from './Server';
 
 dotenv.config();
