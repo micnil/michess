@@ -1,5 +1,13 @@
-import { pgTable, uuid } from 'drizzle-orm/pg-core';
+import { boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { updatedAt } from './shared/updatedAt';
 
 export const users = pgTable('users', {
-  userId: uuid('user_id').primaryKey().defaultRandom(),
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  email: text('email').notNull().unique(),
+  emailVerified: boolean('email_verified').default(false).notNull(),
+  image: text('image'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt,
+  isAnonymous: boolean('is_anonymous'),
 });

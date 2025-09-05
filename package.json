@@ -4,6 +4,7 @@
   "license": "MIT",
   "scripts": {
     "start": "nx serve webchess",
+    "start:db": "dotenv -e ./apps/node-chess/.env -c -- docker-compose up -d postgres redis",
     "build": "nx build",
     "test": "nx test",
     "test:all": "nx run-many --target=test --all",
@@ -11,12 +12,14 @@
     "perft": "tsx --tsconfig tools/tsconfig.tools.json tools/perft.ts",
     "perft:debug": "tsx --inspect-brk --tsconfig tools/tsconfig.tools.json tools/perft.ts",
     "migration:generate": "drizzle-kit generate --config=libs/infra-db/drizzle.config.ts",
+    "better-auth:generate": "pnpx @better-auth/cli generate --config=libs/infra-db/auth.config.ts --output=libs/infra-db/src/lib/schema/auth.ts",
     "migration:run": "dotenv -e ./apps/node-chess/.env -c -- drizzle-kit migrate --config=libs/infra-db/drizzle.config.ts"
   },
   "private": true,
   "dependencies": {
     "@hono/node-server": "^1.19.0",
     "@hono/zod-validator": "^0.7.2",
+    "better-auth": "^1.3.8",
     "core-js": "^3.25.1",
     "dotenv": "^17.2.1",
     "dotenv-cli": "^10.0.0",
@@ -26,6 +29,7 @@
     "postgres": "^3.4.7",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "redis": "^5.8.2",
     "socket.io": "^4.8.1",
     "styled-components": "6.1.19",
     "zod": "^4.1.5"
