@@ -1,16 +1,18 @@
-import { ServerType } from '@hono/node-server/.';
 import { serve } from '@hono/node-server';
-import { Hono } from 'hono';
+import { ServerType } from '@hono/node-server/.';
+import { App } from '@michess/api-router';
 import { AppConfig } from './config/model/AppConfig';
 
-const start = (app: Hono, appConfig: AppConfig): ServerType => {
+const start = (app: App, appConfig: AppConfig): ServerType => {
   const server = serve({
-    fetch: app.fetch,
+    fetch: app.restRouter.fetch,
     port: appConfig.server.port,
   }).on('listening', () => {
     console.log('Server is running on:');
     console.log(server.address());
   });
+
+  app.socketRouter.attach(server);
 
   // graceful shutdown
   process.on('SIGINT', () => {
