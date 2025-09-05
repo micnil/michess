@@ -1,28 +1,29 @@
+import { PgInsertBuilder, PgUpdateBuilder } from 'drizzle-orm/pg-core';
+import { PostgresJsQueryResultHKT } from 'drizzle-orm/postgres-js';
 import { Sql } from 'postgres';
 import { DatabaseClient } from '../DatabaseClient';
 import * as schema from '../schema';
-import { PgInsertBuilder, PgUpdateBuilder } from 'drizzle-orm/pg-core';
-import { PostgresJsQueryResultHKT } from 'drizzle-orm/postgres-js';
+import * as tables from '../schema/tables';
 
+type Tables = typeof tables;
 type Schema = typeof schema;
-
 export class BaseRepository {
   protected db: DatabaseClient;
-  protected schema: typeof schema;
+  protected schema: Schema;
 
   constructor(pgClient: Sql) {
     this.db = DatabaseClient.from(pgClient);
     this.schema = schema;
   }
-  protected insert<T extends keyof Schema>(
+  protected insert<T extends keyof Tables>(
     table: T
-  ): PgInsertBuilder<Schema[T], PostgresJsQueryResultHKT> {
-    return this.db.insert(schema[table]);
+  ): PgInsertBuilder<Tables[T], PostgresJsQueryResultHKT> {
+    return this.db.insert(tables[table]);
   }
 
-  protected update<T extends keyof Schema>(
+  protected update<T extends keyof Tables>(
     table: T
-  ): PgUpdateBuilder<Schema[T], PostgresJsQueryResultHKT> {
-    return this.db.update(schema[table]);
+  ): PgUpdateBuilder<Tables[T], PostgresJsQueryResultHKT> {
+    return this.db.update(tables[table]);
   }
 }
