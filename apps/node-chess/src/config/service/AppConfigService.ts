@@ -14,6 +14,10 @@ const getConfig = (): AppConfig => {
     database: {
       url: DATABASE_URL,
     },
+    redis: {
+      password: process.env.REDIS_PASSWORD || undefined,
+      url: process.env.REDIS_URL || 'localhost',
+    },
     server: {
       port: parseInt(process.env.SERVER_PORT || '5000', 10),
     },
