@@ -1,24 +1,59 @@
-import { Api } from '@michess/api-service';
-import { Server } from 'socket.io';
+import { JoinGamePayloadV1Schema } from '@michess/api-schema';
+import { Api, Session } from '@michess/api-service';
+import { IncomingHttpHeaders } from 'http2';
+import { DefaultEventsMap, Server, Socket } from 'socket.io';
 
-type JoinRoomPayload = {
-  gameId: string;
-  userId?: string;
-  isPlayer?: boolean;
+const convertIncomingHeadersToHeaders = (
+  incomingHeaders: IncomingHttpHeaders
+): Headers => {
+  const headers = new Headers();
+
+  Object.entries(incomingHeaders).forEach(([key, value]) => {
+    if (value !== undefined) {
+      // IncomingHttpHeaders can have string | string[] values
+      const headerValue = Array.isArray(value) ? value.join(', ') : value;
+      headers.set(key.toLowerCase(), headerValue);
+    }
+  });
+
+  return headers;
 };
-
+type SocketData = {
+  session: Session;
+};
 const from = (api: Api) => {
-  const io = new Server({
+  const io = new Server<
+    DefaultEventsMap,
+    DefaultEventsMap,
+    DefaultEventsMap,
+    SocketData
+  >({
     cors: {
       origin: '*',
     },
   });
 
+  io.use((socket: Socket, next) => {
+    const headers = convertIncomingHeadersToHeaders(socket.handshake.headers);
+    api.auth
+      .getSession(headers)
+      .then((session) => {
+        socket.data.session = session;
+        next();
+      })
+      .catch((err) => {
+        console.error('Failed to authenticate socket:', err);
+        next(new Error('Unauthorized'));
+      });
+  });
+
   io.on('connection', (socket) => {
     console.log('a user connected');
 
-    socket.on('join-game', (payload: JoinRoomPayload) => {
-      console.log(`user joined game: ${payload.gameId}`);
+    socket.on('join-game', (payload: unknown) => {
+      const joinGamePayloadV1 = JoinGamePayloadV1Schema.parse(payload);
+      api.games.joinGame(socket.data.session, joinGamePayloadV1);
+      socket.join(joinGamePayloadV1.gameId);
     });
 
     socket.on('disconnect', (reason) => {

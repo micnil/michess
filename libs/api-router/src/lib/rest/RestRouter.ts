@@ -1,14 +1,32 @@
 import { Api } from '@michess/api-service';
 import { Hono } from 'hono';
+import { cors } from 'hono/cors';
+import { RestContext } from '../model/RestContext';
 import { GamesController } from './games/GamesController';
 
 export const RestRouter = {
   from: (api: Api) => {
     const gamesController = GamesController(api.games);
-    const HonoApp = new Hono()
-      .basePath('/api')
-      .route('/games', gamesController)
-      .on(['POST', 'GET'], '/api/auth/**', (c) => api.auth.handle(c.req.raw));
-    return HonoApp;
+    const honoApp = new Hono<RestContext>().basePath('/api');
+    honoApp.use('*', cors());
+
+    honoApp.on(['POST', 'GET'], '/auth/**', (c) => api.auth.handle(c.req.raw));
+
+    honoApp.use('*', async (c, next) => {
+      const session = await api.auth.getSession(c.req.raw.headers);
+      c.set('session', session);
+      await next();
+    });
+    honoApp.use('*', async (c, next) => {
+      if (!c.get('session')?.userId) {
+        c.status(401);
+        return c.json({ error: 'Unauthorized' });
+      }
+      await next();
+    });
+
+    honoApp.route('/games', gamesController);
+
+    return honoApp;
   },
 };

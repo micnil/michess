@@ -7,8 +7,7 @@ export const GameDetailsV1Schema = z.object({
   isPrivate: z.boolean(),
   variant: z.enum(['standard']),
   players: GamePlayersV1Schema,
-  initialPosition: z.string(),
+  initialPosition: z.string().optional(),
   moves: z.array(MoveV1Schema),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  startedAt: z.date().optional(),
 });

@@ -1,9 +1,10 @@
-import { eq } from 'drizzle-orm';
 import { Maybe } from '@michess/common-utils';
-import { BaseRepository } from './BaseRepository';
+import { eq } from 'drizzle-orm';
 import { InsertGame } from '../model/InsertGame';
-import { games } from '../schema';
 import { SelectGame } from '../model/SelectGame';
+import { SelectGameWithRelations } from '../model/SelectGameWithRelations';
+import { games } from '../schema';
+import { BaseRepository } from './BaseRepository';
 
 export class GameRepository extends BaseRepository {
   async findGameById(id: string): Promise<Maybe<SelectGame>> {
@@ -12,13 +13,23 @@ export class GameRepository extends BaseRepository {
     });
   }
 
+  async findGameWithRelationsById(
+    id: string
+  ): Promise<Maybe<SelectGameWithRelations>> {
+    return await this.db.query.games.findFirst({
+      where: eq(this.schema.games.gameId, id),
+      with: { moves: true, whitePlayer: true, blackPlayer: true },
+    });
+  }
+
   async createGame(data: InsertGame): Promise<SelectGame> {
-    const [game] = await this.insert('games').values(data).returning();
+    const [game] = await this.db.insert(games).values(data).returning();
     return game;
   }
 
   async updateGame(id: string, data: InsertGame): Promise<Maybe<SelectGame>> {
-    const [game] = await this.update('games')
+    const [game] = await this.db
+      .update(games)
       .set(data)
       .where(eq(this.schema.games.gameId, id))
       .returning();

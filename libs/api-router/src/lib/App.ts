@@ -5,7 +5,8 @@ import { RestRouter } from './rest/RestRouter';
 import { SocketRouter } from './socket/SocketRouter';
 
 export type App = {
-  restRouter: Hono;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  restRouter: Hono<any>;
   socketRouter: Server;
 };
 

@@ -1,5 +1,6 @@
+import { relations } from 'drizzle-orm';
 import { boolean, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
-
+import { moves } from './moves';
 import { gameStatusEnum } from './shared/gameStatusEnum';
 import { resultEnum } from './shared/resultEnum';
 import { resultReasonEnum } from './shared/resultReasonEnum';
@@ -24,3 +25,15 @@ export const games = pgTable('games', {
   startedAt: timestamp('started_at'),
   endedAt: timestamp('ended_at'),
 });
+
+export const gamesRelations = relations(games, ({ many, one }) => ({
+  moves: many(moves),
+  whitePlayer: one(users, {
+    fields: [games.whitePlayerId],
+    references: [users.id],
+  }),
+  blackPlayer: one(users, {
+    fields: [games.blackPlayerId],
+    references: [users.id],
+  }),
+}));
