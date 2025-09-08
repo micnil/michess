@@ -5,7 +5,7 @@ import {
   ChessPosition,
   Color,
   Coordinate,
-  MoveRecord,
+  Move,
   Piece,
   PiecePlacements,
   PieceType,
@@ -29,7 +29,7 @@ export type ChessGame = {
   makeMove(move: MoveOption): ChessGame;
   getPosition(): ChessPosition;
   unmakeMove(): ChessGame;
-  play(moveRecord: MoveRecord): ChessGame;
+  play(moveRecord: Move): ChessGame;
   setResult(result: ChessGameResult): ChessGame;
   perft: (depth: number) => {
     nodes: number;
@@ -440,14 +440,14 @@ const fromGameStateInternal = (
     getState,
     getMoves: () => moveGenResult.moves,
     makeMove: makeMoveAndUpdate,
-    play: (moveRecord: MoveRecord): ChessGame => {
+    play: (moveRecord: Move): ChessGame => {
       const move = moveGenResult.moves.find((m) =>
-        MoveRecord.isEqual(MoveOption.toMove(m), moveRecord)
+        Move.isEqual(MoveOption.toMove(m), moveRecord)
       );
       if (move) {
         return makeMoveAndUpdate(move);
       } else {
-        throw new Error(`Invalid move: ${MoveRecord.toString(moveRecord)}`);
+        throw new Error(`Invalid move: ${Move.toUci(moveRecord)}`);
       }
     },
     unmakeMove: () => {

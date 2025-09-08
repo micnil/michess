@@ -1,4 +1,4 @@
-import { FenParser, MoveRecord } from '@michess/core-board';
+import { FenParser, Move } from '@michess/core-board';
 import { ChessGame, GameState, MoveOption } from '@michess/core-game';
 import {
   Chessboard as ChessboardView,
@@ -36,7 +36,7 @@ export const ChessGameContainer = () => {
   const gameStatus = getGameStatus(gameState);
 
   return (
-    <ChessboardView<MoveRecord>
+    <ChessboardView<Move>
       orientation={'white'}
       size={500}
       piecePlacements={position.pieces}

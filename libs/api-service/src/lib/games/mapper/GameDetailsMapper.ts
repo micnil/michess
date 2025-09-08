@@ -1,5 +1,5 @@
 import { GameDetailsV1 } from '@michess/api-schema';
-import { ChessPosition, MoveRecord } from '@michess/core-board';
+import { ChessPosition, Move } from '@michess/core-board';
 import {
   ChessGameResultType,
   GameDetails,
@@ -73,7 +73,7 @@ export const GameDetailsMapper = {
             }
           : undefined,
       resultStr: game.result,
-      moveHistory: game.moves.map((move) => MoveRecord.fromUci(move.uci)),
+      moveHistory: game.moves.map((move) => Move.fromUci(move.uci)),
     };
   },
   toGameDetailsV1(game: GameDetails): GameDetailsV1 {
@@ -94,7 +94,7 @@ export const GameDetailsMapper = {
       variant: 'standard',
       isPrivate: game.isPrivate,
       moves: game.moveHistory.map((move) => ({
-        uci: MoveRecord.toString(move),
+        uci: Move.toUci(move),
       })),
       initialPosition: undefined,
       startedAt: game.startedAt ?? undefined,

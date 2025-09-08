@@ -1,7 +1,7 @@
 import {
   CastlingRight,
   Coordinate,
-  MoveRecord,
+  Move,
   PieceType,
 } from '@michess/core-board';
 
@@ -15,7 +15,7 @@ export type MoveOption = {
 };
 
 export const MoveOption = {
-  toMove: (move: MoveOption): MoveRecord => ({
+  toMove: (move: MoveOption): Move => ({
     from: Coordinate.fromIndex(move.start),
     to: Coordinate.fromIndex(move.target),
     promotion: move.promotion,

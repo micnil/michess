@@ -13,7 +13,7 @@ export * from './lib/mocks/BoardState.mock';
 export * from './lib/mocks/ChessPosition.mock';
 export * from './lib/mocks/Piece.mock';
 export * from './lib/mocks/PiecePlacements.mock';
-export * from './lib/move/MoveRecord';
+export * from './lib/move/Move';
 export * from './lib/position/model/CastlingAbility';
 export * from './lib/position/model/CastlingRight';
 export * from './lib/position/model/ChessPosition';
