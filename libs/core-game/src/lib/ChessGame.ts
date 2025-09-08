@@ -280,7 +280,6 @@ const makeMove = (
     piecePlacements: newPiecePlacements,
   });
 
-  // Pre-calculate values to avoid repeated computations
   const newTurn = gameState.turn === Color.White ? Color.Black : Color.White;
   const newFullMoves =
     gameState.turn === Color.Black
