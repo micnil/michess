@@ -6,18 +6,19 @@ import {
   Color,
   Coordinate,
   Move,
+  MoveRecord,
   Piece,
   PiecePlacements,
   PieceType,
 } from '@michess/core-board';
 import { ChessGameActions } from './ChessGameActions';
-import { MoveGenerator } from './MoveGenerator';
+import { ChessGameAction } from './model/ChessGameAction';
 import { ChessGameInternalState } from './model/ChessGameInternalState';
+import { ChessGameResult } from './model/ChessGameResult';
+import { GameState } from './model/GameState';
 import { GameStateHistoryItem } from './model/GameStateHistoryItem';
 import { MoveGeneratorResult } from './model/MoveGeneratorResult';
-import { GameState } from './model/GameState';
-import { ChessGameAction } from './model/ChessGameAction';
-import { ChessGameResult } from './model/ChessGameResult';
+import { MoveGenerator } from './MoveGenerator';
 import { ZobristHash } from './ZobristHash';
 
 export type ChessGame = {
@@ -26,7 +27,9 @@ export type ChessGame = {
   getAdditionalActions(): ChessGameAction[];
   makeAction(action: ChessGameAction, playerColor: Color): ChessGame;
   makeMove(move: Move): ChessGame;
+  getPosition(): ChessPosition;
   unmakeMove(): ChessGame;
+  play(moveRecord: MoveRecord): ChessGame;
   setResult(result: ChessGameResult): ChessGame;
   perft: (depth: number) => {
     nodes: number;
@@ -421,8 +424,14 @@ const fromGameStateInternal = (
   const getState = (): GameState => {
     return ChessGameInternalState.toGameState(gameStateInternal);
   };
+  const makeMoveAndUpdate = (move: Move): ChessGame => {
+    const { gameState } = makeMove(gameStateInternal, move);
+    const moveGenerator = MoveGenerator(gameState);
+    return fromGameStateInternal(gameState, moveGenerator.generateMoves());
+  };
 
   return {
+    getPosition: () => gameStateInternal,
     makeAction: (action: ChessGameAction, playerColor: Color): ChessGame =>
       fromGameStateInternal(
         makeAction(gameStateInternal, action, playerColor).gameState,
@@ -430,10 +439,16 @@ const fromGameStateInternal = (
       ),
     getState,
     getMoves: () => moveGenResult.moves,
-    makeMove: (move) => {
-      const { gameState } = makeMove(gameStateInternal, move);
-      const moveGenerator = MoveGenerator(gameState);
-      return fromGameStateInternal(gameState, moveGenerator.generateMoves());
+    makeMove: makeMoveAndUpdate,
+    play: (moveRecord: MoveRecord): ChessGame => {
+      const move = moveGenResult.moves.find((m) =>
+        MoveRecord.isEqual(MoveRecord.fromMove(m), moveRecord)
+      );
+      if (move) {
+        return makeMoveAndUpdate(move);
+      } else {
+        throw new Error(`Invalid move: ${MoveRecord.toString(moveRecord)}`);
+      }
     },
     unmakeMove: () => {
       const { gameState } = unmakeMove(gameStateInternal);
@@ -468,7 +483,7 @@ const fromGameState = (gameState: GameState): ChessGame => {
     moveGenerator.generateMoves()
   );
   const chessGame = gameState.moveHistory.reduce((chessGame, move) => {
-    return chessGame.makeMove(move);
+    return chessGame.play(move);
   }, initialChessGame);
 
   return gameState.result ? chessGame.setResult(gameState.result) : chessGame;

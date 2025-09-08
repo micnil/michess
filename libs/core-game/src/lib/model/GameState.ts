@@ -1,12 +1,12 @@
 import { Maybe } from '@michess/common-utils';
+import { ChessPosition, MoveRecord } from '@michess/core-board';
 import { ChessGameResult } from './ChessGameResult';
-import { ChessPosition, Move } from '@michess/core-board';
 
-export type GameState = ChessPosition & {
+export type GameState = {
   result: Maybe<ChessGameResult>;
   resultStr: string;
   initialPosition: ChessPosition;
-  moveHistory: Move[];
+  moveHistory: MoveRecord[];
 };
 
 export const GameState = {

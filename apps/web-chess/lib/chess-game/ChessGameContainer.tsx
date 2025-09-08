@@ -1,5 +1,4 @@
-import { FenParser } from '@michess/core-board';
-import { Coordinate, Move } from '@michess/core-board';
+import { Coordinate, FenParser, Move } from '@michess/core-board';
 import { ChessGame, GameState } from '@michess/core-game';
 import {
   Chessboard as ChessboardView,
@@ -32,6 +31,7 @@ export const ChessGameContainer = () => {
   );
 
   const gameState = chessGame.getState();
+  const position = chessGame.getPosition();
   const moves = chessGame.getMoves();
   const gameStatus = getGameStatus(gameState);
 
@@ -39,7 +39,7 @@ export const ChessGameContainer = () => {
     <ChessboardView<Move>
       orientation={'white'}
       size={500}
-      piecePlacements={gameState.pieces}
+      piecePlacements={position.pieces}
       gameStatus={gameStatus}
       winner={
         gameState.result?.type === 'black_win'
@@ -48,15 +48,10 @@ export const ChessGameContainer = () => {
           ? 'white'
           : undefined
       }
-      moveHistory={gameState.moveHistory.map((move) => ({
-        from: Coordinate.fromIndex(move.start),
-        to: Coordinate.fromIndex(move.target),
-        promotion: move.promotion,
-        meta: move,
-      }))}
+      moveHistory={gameState.moveHistory}
       onMove={(movePayload) => {
         console.log(movePayload);
-        setChessGame(chessGame.makeMove(movePayload.meta));
+        setChessGame(chessGame.play(movePayload));
       }}
       moveOptions={moves.map((move) => ({
         from: Coordinate.fromIndex(move.start),

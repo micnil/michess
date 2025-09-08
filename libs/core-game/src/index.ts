@@ -1,2 +1,7 @@
 export * from './lib/ChessGame';
+export * from './lib/model/ChessGameResultType';
+export * from './lib/model/GameDetails';
+export * from './lib/model/GameMeta';
+export * from './lib/model/GamePlayers';
 export * from './lib/model/GameState';
+export * from './lib/model/GameStatusType';
