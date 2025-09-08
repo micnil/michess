@@ -1,6 +1,5 @@
 import { Coordinate } from '../common/Coordinate';
 import { PieceType } from '../common/PieceType';
-import { MoveOption } from './MoveOption';
 
 export type MoveRecord = {
   from: Coordinate;
@@ -9,11 +8,6 @@ export type MoveRecord = {
 };
 
 export const MoveRecord = {
-  fromMove: (move: MoveOption): MoveRecord => ({
-    from: Coordinate.fromIndex(move.start),
-    to: Coordinate.fromIndex(move.target),
-    promotion: move.promotion,
-  }),
   isEqual: (a: MoveRecord, b: MoveRecord): boolean =>
     a.from === b.from && a.to === b.to && a.promotion === b.promotion,
   toString(move: MoveRecord): string {

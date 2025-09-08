@@ -1,6 +1,7 @@
 import { Maybe } from '@michess/common-utils';
-import { ChessPosition, MoveRecord } from '@michess/core-board';
+import { ChessPosition } from '@michess/core-board';
 import { ChessGameActions } from '../ChessGameActions';
+import { MoveOption } from '../move/MoveOption';
 import { ZobristHash } from '../ZobristHash';
 import { ChessGameResult } from './ChessGameResult';
 import { GameState } from './GameState';
@@ -18,7 +19,7 @@ const toGameState = (internalState: ChessGameInternalState): GameState => {
   return {
     ...internalState,
     moveHistory: internalState.gameHistory.map((item) =>
-      MoveRecord.fromMove(item.move)
+      MoveOption.toMove(item.move)
     ),
     resultStr: ChessGameResult.toResultString(internalState.result),
   };

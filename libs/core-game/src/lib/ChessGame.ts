@@ -5,7 +5,6 @@ import {
   ChessPosition,
   Color,
   Coordinate,
-  MoveOption,
   MoveRecord,
   Piece,
   PiecePlacements,
@@ -18,6 +17,7 @@ import { ChessGameResult } from './model/ChessGameResult';
 import { GameState } from './model/GameState';
 import { GameStateHistoryItem } from './model/GameStateHistoryItem';
 import { MoveGeneratorResult } from './model/MoveGeneratorResult';
+import { MoveOption } from './move/MoveOption';
 import { MoveGenerator } from './MoveGenerator';
 import { ZobristHash } from './ZobristHash';
 
@@ -442,7 +442,7 @@ const fromGameStateInternal = (
     makeMove: makeMoveAndUpdate,
     play: (moveRecord: MoveRecord): ChessGame => {
       const move = moveGenResult.moves.find((m) =>
-        MoveRecord.isEqual(MoveRecord.fromMove(m), moveRecord)
+        MoveRecord.isEqual(MoveOption.toMove(m), moveRecord)
       );
       if (move) {
         return makeMoveAndUpdate(move);

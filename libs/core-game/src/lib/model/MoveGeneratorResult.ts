@@ -1,4 +1,4 @@
-import { MoveOption } from '@michess/core-board';
+import { MoveOption } from '../move/MoveOption';
 
 export type MoveGeneratorResult = {
   moves: MoveOption[];

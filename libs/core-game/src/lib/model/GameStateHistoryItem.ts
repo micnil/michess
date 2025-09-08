@@ -1,10 +1,10 @@
 import {
   CastlingAbility,
   Coordinate,
-  MoveOption,
   PiecePlacements,
 } from '@michess/core-board';
 import { ZobristHash } from '../ZobristHash';
+import { MoveOption } from '../move/MoveOption';
 
 export type GameStateHistoryItem = {
   move: MoveOption;

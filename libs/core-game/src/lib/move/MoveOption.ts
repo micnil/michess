@@ -1,6 +1,9 @@
-import { Coordinate } from '../common/Coordinate';
-import { PieceType } from '../common/PieceType';
-import { CastlingRight } from '../position/model/CastlingRight';
+import {
+  CastlingRight,
+  Coordinate,
+  MoveRecord,
+  PieceType,
+} from '@michess/core-board';
 
 export type MoveOption = {
   start: number;
@@ -12,6 +15,11 @@ export type MoveOption = {
 };
 
 export const MoveOption = {
+  toMove: (move: MoveOption): MoveRecord => ({
+    from: Coordinate.fromIndex(move.start),
+    to: Coordinate.fromIndex(move.target),
+    promotion: move.promotion,
+  }),
   toUci(move: MoveOption): string {
     const fromSquare = Coordinate.fromIndex(move.start);
     const toSquare = Coordinate.fromIndex(move.target);
