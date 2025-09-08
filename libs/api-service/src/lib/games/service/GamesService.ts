@@ -4,9 +4,9 @@ import {
   JoinGamePayloadV1,
   MakeMovePayloadV1,
 } from '@michess/api-schema';
-import { assertDefined, isDefined, randomElement } from '@michess/common-utils';
+import { assertDefined } from '@michess/common-utils';
 import { ChessPosition, FenParser } from '@michess/core-board';
-import { ChessGame } from '@michess/core-game';
+import { ChessGame, ChessTable } from '@michess/core-game';
 import { GameRepository, MoveRepository } from '@michess/infra-db';
 import { Session } from '../../auth/model/Session';
 import { GameDetailsMapper } from '../mapper/GameDetailsMapper';
@@ -47,39 +47,22 @@ export class GamesService {
     );
     assertDefined(dbGame, `Game '${data.gameId}' not found`);
     const gameDetails = GameDetailsMapper.fromSelectGameWithRelations(dbGame);
-
-    const availableSides = [
-      'spectator',
-      gameDetails.players.white ? null : 'white',
-      gameDetails.players.black ? null : 'black',
-    ].filter(isDefined);
-    const sideToJoin = data.side ?? randomElement(availableSides);
-
-    if (sideToJoin === 'spectator') {
-      // Spectators can join without restrictions
+    const chessTable = ChessTable.fromGameDetails(gameDetails);
+    if (data.side === 'spectator') {
       return GameDetailsMapper.toGameDetailsV1(gameDetails);
-    } else if (sideToJoin === 'white' && dbGame.whitePlayerId === null) {
-      await this.gameRepository.updateGame(gameDetails.id, {
-        whitePlayerId: session.userId,
-        status: availableSides.includes('black') ? 'ready' : 'waiting',
-      });
-    } else if (sideToJoin === 'black' && gameDetails.players.black === null) {
-      // Allow joining as black if the slot is empty
-      await this.gameRepository.updateGame(gameDetails.id, {
-        blackPlayerId: session.userId,
-        status: availableSides.includes('white') ? 'ready' : 'waiting',
-      });
     } else {
-      throw new Error('Invalid side or side already taken');
+      const updatedTable = chessTable.joinGame(
+        // TODO
+        { id: session.userId, name: 'Anonymous' },
+        data.side
+      );
+      const updatedDetails = updatedTable.getGameDetails();
+      await this.gameRepository.updateGame(
+        gameDetails.id,
+        GameDetailsMapper.toInsertGame(updatedDetails)
+      );
+      return GameDetailsMapper.toGameDetailsV1(updatedDetails);
     }
-    const updatedGame = await this.gameRepository.findGameWithRelationsById(
-      gameDetails.id
-    );
-    assertDefined(updatedGame);
-    const updatedGameDetails =
-      GameDetailsMapper.fromSelectGameWithRelations(updatedGame);
-
-    return GameDetailsMapper.toGameDetailsV1(updatedGameDetails);
   }
 
   async makeMove(session: Session, data: MakeMovePayloadV1): Promise<void> {

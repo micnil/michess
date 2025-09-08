@@ -7,7 +7,7 @@ import {
   GamePlayers,
   GameStatusType,
 } from '@michess/core-game';
-import { SelectGameWithRelations } from '@michess/infra-db';
+import { InsertGame, SelectGameWithRelations } from '@michess/infra-db';
 
 const RESULT_TYPE_MAPPING: Record<
   SelectGameWithRelations['result'],
@@ -19,7 +19,7 @@ const RESULT_TYPE_MAPPING: Record<
   '0-0': 'draw',
 };
 
-const STATUS_TYPE_MAPPING: Record<
+const FROM_STATUS_TYPE_MAPPING: Record<
   SelectGameWithRelations['status'],
   GameStatusType
 > = {
@@ -30,6 +30,14 @@ const STATUS_TYPE_MAPPING: Record<
   end: 'ENDED',
 };
 
+const TO_STATUS_TYPE_MAPPING: Record<GameStatusType, InsertGame['status']> = {
+  EMPTY: 'empty',
+  READY: 'ready',
+  WAITING: 'waiting',
+  IN_PROGRESS: 'in-progress',
+  ENDED: 'end',
+};
+
 const toGameMeta = (game: SelectGameWithRelations): GameMeta => ({
   id: game.gameId,
   variant: game.variant ?? 'standard',
@@ -38,7 +46,7 @@ const toGameMeta = (game: SelectGameWithRelations): GameMeta => ({
   startedAt: game.startedAt ?? undefined,
   endedAt: game.endedAt ?? undefined,
   updatedAt: game.updatedAt,
-  status: STATUS_TYPE_MAPPING[game.status],
+  status: FROM_STATUS_TYPE_MAPPING[game.status],
 });
 
 const toGamePlayers = (game: SelectGameWithRelations): GamePlayers => ({
@@ -98,6 +106,15 @@ export const GameDetailsMapper = {
       })),
       initialPosition: undefined,
       startedAt: game.startedAt ?? undefined,
+    };
+  },
+
+  toInsertGame(game: GameDetails): InsertGame {
+    return {
+      isPrivate: game.isPrivate,
+      whitePlayerId: game.players.white ? game.players.white.id : null,
+      blackPlayerId: game.players.black ? game.players.black.id : null,
+      status: TO_STATUS_TYPE_MAPPING[game.status],
     };
   },
 };
