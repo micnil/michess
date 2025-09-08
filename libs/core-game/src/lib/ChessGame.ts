@@ -1,24 +1,20 @@
-import { assertDefined, Maybe } from '@michess/common-utils';
+import { Maybe } from '@michess/common-utils';
 import {
-  CastlingAbility,
-  CastlingRight,
   ChessPosition,
   Color,
-  Coordinate,
   Move,
   Piece,
   PiecePlacements,
   PieceType,
 } from '@michess/core-board';
+import { Chessboard } from './Chessboard';
 import { ChessGameActions } from './ChessGameActions';
 import { ChessGameAction } from './model/ChessGameAction';
 import { ChessGameInternalState } from './model/ChessGameInternalState';
 import { ChessGameResult } from './model/ChessGameResult';
 import { GameState } from './model/GameState';
 import { GameStateHistoryItem } from './model/GameStateHistoryItem';
-import { MoveGeneratorResult } from './model/MoveGeneratorResult';
 import { MoveOption } from './move/MoveOption';
-import { MoveGenerator } from './MoveGenerator';
 import { ZobristHash } from './ZobristHash';
 
 export type ChessGame = {
@@ -34,17 +30,6 @@ export type ChessGame = {
   perft: (depth: number) => {
     nodes: number;
   };
-};
-
-const rookStartingPositions: Record<CastlingAbility, Coordinate> = {
-  [CastlingAbility.BlackKing]: 'h8',
-  [CastlingAbility.BlackQueen]: 'a8',
-  [CastlingAbility.WhiteKing]: 'h1',
-  [CastlingAbility.WhiteQueen]: 'a1',
-} as const;
-
-const oneStepBackFromIndex = (index: number, color: Color): Coordinate => {
-  return Coordinate.fromIndex(color === Color.White ? index + 8 : index - 8);
 };
 
 const isFiftyMoveRule = (ply: number): boolean => {
@@ -84,120 +69,6 @@ const isThreeFoldRepetition = (
   return occurrences === 3;
 };
 
-const updatePiecePlacements = (
-  move: MoveOption,
-  piecePlacements: PiecePlacements
-): {
-  newPiecePlacements: PiecePlacements;
-  movedPiece: Piece;
-  capturedPiece?: Piece;
-  promotedPiece?: Piece;
-} => {
-  const fromCoord = Coordinate.fromIndex(move.start);
-  const toCoord = Coordinate.fromIndex(move.target);
-  const pieceToMove = piecePlacements.get(fromCoord);
-  assertDefined(pieceToMove, `No piece at ${fromCoord} to move`);
-  const turn = pieceToMove.color;
-
-  const captureCoord = move.enPassant
-    ? oneStepBackFromIndex(move.target, turn)
-    : toCoord;
-  const pieceToCapture = piecePlacements.get(captureCoord);
-  const promotedPiece = move.promotion
-    ? Piece.from(move.promotion, pieceToMove.color)
-    : undefined;
-
-  const newPiecePlacements: PiecePlacements = new Map(piecePlacements);
-
-  newPiecePlacements.delete(captureCoord);
-  newPiecePlacements.delete(fromCoord);
-  newPiecePlacements.set(toCoord, promotedPiece || pieceToMove);
-
-  if (move.castling) {
-    const castlingAbility = CastlingAbility.fromCastlingRight(
-      move.castling,
-      turn
-    );
-    const rookCoord = rookStartingPositions[castlingAbility];
-    const newRookIndex =
-      move.castling === CastlingRight.KingSide
-        ? move.target - 1
-        : move.target + 1;
-    const newRookCoord = Coordinate.fromIndex(newRookIndex);
-    const rook = newPiecePlacements.get(rookCoord);
-    rook && newPiecePlacements.set(newRookCoord, rook);
-    newPiecePlacements.delete(rookCoord);
-  }
-
-  return {
-    newPiecePlacements,
-    movedPiece: pieceToMove,
-    capturedPiece: pieceToCapture,
-    promotedPiece,
-  };
-};
-
-const isRookOnStartingSquare = (
-  castlingAbility: CastlingAbility,
-  oldPiecePlacements: PiecePlacements,
-  newPiecePlacements: PiecePlacements
-): boolean => {
-  const rookStartingPosition = rookStartingPositions[castlingAbility];
-  const pieceOnRookStartingPositionOld =
-    oldPiecePlacements.get(rookStartingPosition);
-  const pieceOnRookStartingPositionNew =
-    newPiecePlacements.get(rookStartingPosition);
-
-  return Piece.isEqual(
-    pieceOnRookStartingPositionOld,
-    pieceOnRookStartingPositionNew
-  );
-};
-
-const updateCastlingRights = (
-  move: MoveOption,
-  castlingAbility: Set<CastlingAbility>,
-  pieceToMove: Piece,
-  capturedPiece: Maybe<Piece>,
-  oldPiecePlacements: PiecePlacements,
-  newPiecePlacements: PiecePlacements
-): Set<CastlingAbility> => {
-  let newCastlingAbility = new Set(castlingAbility);
-
-  const ownAbilities = newCastlingAbility.intersection(
-    CastlingAbility.fromColor(pieceToMove.color)
-  );
-
-  if (move.castling) {
-    newCastlingAbility = newCastlingAbility.difference(ownAbilities);
-  } else if (pieceToMove.type === PieceType.King && ownAbilities.size > 0) {
-    newCastlingAbility = newCastlingAbility.difference(ownAbilities);
-  } else if (pieceToMove.type === PieceType.Rook && ownAbilities.size > 0) {
-    CastlingAbility.fromColor(pieceToMove.color).forEach((ability) => {
-      if (
-        !isRookOnStartingSquare(ability, oldPiecePlacements, newPiecePlacements)
-      ) {
-        newCastlingAbility.delete(ability);
-      }
-    });
-  }
-
-  if (
-    capturedPiece?.type === PieceType.Rook &&
-    newCastlingAbility.difference(ownAbilities).size > 0
-  ) {
-    CastlingAbility.fromColor(capturedPiece.color).forEach((ability) => {
-      if (
-        !isRookOnStartingSquare(ability, oldPiecePlacements, newPiecePlacements)
-      ) {
-        newCastlingAbility.delete(ability);
-      }
-    });
-  }
-
-  return newCastlingAbility;
-};
-
 const evalAdditionalActions = (
   previousActions: ChessGameActions,
   args: {
@@ -220,87 +91,6 @@ const evalAdditionalActions = (
       )
     : additionalActions;
   return additionalActions;
-};
-
-const makeMove = (
-  gameState: ChessGameInternalState,
-  move: MoveOption
-): {
-  gameState: ChessGameInternalState;
-} => {
-  if (move.start == move.target) {
-    return { gameState };
-  }
-
-  const { newPiecePlacements, movedPiece, capturedPiece, promotedPiece } =
-    updatePiecePlacements(move, gameState.pieces);
-
-  const historyItem: GameStateHistoryItem = {
-    move,
-    positionHash: gameState.positionHash,
-    ply: gameState.ply,
-    castlingAbility: gameState.castlingAbility,
-    enPassant: gameState.enPassant,
-    pieces: gameState.pieces,
-  };
-
-  const newCastlingAbilities = updateCastlingRights(
-    move,
-    gameState.castlingAbility,
-    movedPiece,
-    capturedPiece,
-    gameState.pieces,
-    newPiecePlacements
-  );
-
-  const captureOrPawnMove = move.capture || movedPiece.type === PieceType.Pawn;
-  const ply = captureOrPawnMove ? 0 : gameState.ply + 1;
-
-  const enPassant =
-    movedPiece.type === PieceType.Pawn &&
-    Math.abs(move.start - move.target) === 16
-      ? oneStepBackFromIndex(move.target, gameState.turn)
-      : undefined;
-
-  const newPositionHash = gameState.positionHash
-    .movePiece(movedPiece, move.start, move.target)
-    .capturePiece(capturedPiece, move.target)
-    .promotePawn(movedPiece, promotedPiece, move.target)
-    .updateEnPassant(gameState.enPassant, enPassant)
-    .updateCastlingRights(gameState.castlingAbility, newCastlingAbilities)
-    .toggleSideToMove();
-
-  const gameHistory = gameState.gameHistory.slice();
-  gameHistory.push(historyItem);
-
-  const additionalActions = evalAdditionalActions(gameState.additionalActions, {
-    positionHash: newPositionHash,
-    gameHistory,
-    ply,
-    piecePlacements: newPiecePlacements,
-  });
-
-  const newTurn = gameState.turn === Color.White ? Color.Black : Color.White;
-  const newFullMoves =
-    gameState.turn === Color.Black
-      ? gameState.fullMoves + 1
-      : gameState.fullMoves;
-
-  return {
-    gameState: {
-      initialPosition: gameState.initialPosition,
-      result: gameState.result,
-      additionalActions,
-      positionHash: newPositionHash,
-      gameHistory,
-      castlingAbility: newCastlingAbilities,
-      turn: newTurn,
-      fullMoves: newFullMoves,
-      ply,
-      pieces: newPiecePlacements,
-      enPassant,
-    },
-  };
 };
 
 const unmakeMove = (
@@ -395,64 +185,58 @@ const makeAction = (
   }
 };
 
-const perft = (
-  gameStateInternal: ChessGameInternalState,
-  depth: number
-): { nodes: number } => {
-  if (depth === 0) {
-    return { nodes: 1 };
-  }
-
-  const moveGenerator = MoveGenerator(gameStateInternal);
-  const moveGenResult = moveGenerator.generateMoves();
-  let nodes = 0;
-
-  for (const move of moveGenResult.moves) {
-    const { gameState } = makeMove(gameStateInternal, move);
-    const result = perft(gameState, depth - 1);
-    nodes += result.nodes;
-  }
-
-  return { nodes };
-};
-
 const fromGameStateInternal = (
-  gameStateInternal: ChessGameInternalState,
-  moveGenResult: MoveGeneratorResult
+  gameStateInternal: ChessGameInternalState
 ): ChessGame => {
+  const board = Chessboard.fromPosition(gameStateInternal);
   const getState = (): GameState => {
     return ChessGameInternalState.toGameState(gameStateInternal);
   };
-  const makeMoveAndUpdate = (move: MoveOption): ChessGame => {
-    const { gameState } = makeMove(gameStateInternal, move);
-    const moveGenerator = MoveGenerator(gameState);
-    return fromGameStateInternal(gameState, moveGenerator.generateMoves());
+
+  const playMove = (move: Move): ChessGame => {
+    const newBoard = board.playMove(move);
+    const newPosition = newBoard.position;
+    const historyCopy = gameStateInternal.gameHistory.slice();
+    historyCopy.push({
+      move,
+      positionHash: newBoard.positionHash,
+      castlingAbility: newPosition.castlingAbility,
+      pieces: newPosition.pieces,
+      ply: newPosition.ply,
+      enPassant: newPosition.enPassant,
+    });
+    return fromGameStateInternal({
+      ...gameStateInternal,
+      ...newPosition,
+      gameHistory: historyCopy,
+      additionalActions: evalAdditionalActions(
+        gameStateInternal.additionalActions,
+        {
+          positionHash: newBoard.positionHash,
+          gameHistory: historyCopy,
+          ply: newPosition.ply + 1,
+          piecePlacements: newPosition.pieces,
+        }
+      ),
+    });
   };
 
   return {
+    makeMove: (moveOption: MoveOption): ChessGame => {
+      const move = MoveOption.toMove(moveOption);
+      return playMove(move);
+    },
     getPosition: () => gameStateInternal,
     makeAction: (action: ChessGameAction, playerColor: Color): ChessGame =>
       fromGameStateInternal(
-        makeAction(gameStateInternal, action, playerColor).gameState,
-        moveGenResult
+        makeAction(gameStateInternal, action, playerColor).gameState
       ),
     getState,
-    getMoves: () => moveGenResult.moves,
-    makeMove: makeMoveAndUpdate,
-    play: (move: Move): ChessGame => {
-      const moveOption = moveGenResult.moves.find((m) =>
-        Move.isEqual(MoveOption.toMove(m), move)
-      );
-      if (moveOption) {
-        return makeMoveAndUpdate(moveOption);
-      } else {
-        throw new Error(`Invalid move: ${Move.toUci(move)}`);
-      }
-    },
+    getMoves: () => board.moveOptions,
+    play: playMove,
     unmakeMove: () => {
       const { gameState } = unmakeMove(gameStateInternal);
-      const moveGenerator = MoveGenerator(gameState);
-      return fromGameStateInternal(gameState, moveGenerator.generateMoves());
+      return fromGameStateInternal(gameState);
     },
     setResult: (result: ChessGameResult): ChessGame => {
       const newGameState = {
@@ -460,27 +244,23 @@ const fromGameStateInternal = (
         additionalActions: ChessGameActions.fromResult(result),
         result,
       };
-      return fromGameStateInternal(newGameState, moveGenResult);
+      return fromGameStateInternal(newGameState);
     },
     getAdditionalActions: () => gameStateInternal.additionalActions.value(),
-    perft: (depth: number) => perft(gameStateInternal, depth),
+    perft: (depth: number) => board.perft(depth),
   };
 };
 
 const fromGameState = (gameState: GameState): ChessGame => {
-  const moveGenerator = MoveGenerator(gameState.initialPosition);
-  const initialChessGame = fromGameStateInternal(
-    {
-      ...gameState.initialPosition,
-      result: undefined,
-      additionalActions: ChessGameActions.fromResult(undefined),
-      positionHash: ZobristHash.fromChessPosition(gameState.initialPosition),
-      gameHistory: [],
+  const initialChessGame = fromGameStateInternal({
+    ...gameState.initialPosition,
+    result: undefined,
+    additionalActions: ChessGameActions.fromResult(undefined),
+    positionHash: ZobristHash.fromChessPosition(gameState.initialPosition),
+    gameHistory: [],
 
-      initialPosition: gameState.initialPosition,
-    },
-    moveGenerator.generateMoves()
-  );
+    initialPosition: gameState.initialPosition,
+  });
   const chessGame = gameState.moveHistory.reduce((chessGame, move) => {
     return chessGame.play(move);
   }, initialChessGame);
