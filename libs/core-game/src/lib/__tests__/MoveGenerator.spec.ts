@@ -1,16 +1,15 @@
 import {
+  CastlingAbility,
+  CastlingRight,
   Color,
+  Coordinate,
   createChessPositionMock,
   p,
   P,
-  Coordinate,
-  CastlingAbility,
-  CastlingRight,
   PieceType,
-  Move,
 } from '@michess/core-board';
-
 import { MoveGenerator } from '../MoveGenerator';
+import { MoveOption } from '../move/MoveOption';
 
 describe('MoveGenerator', () => {
   describe('bishop', () => {
@@ -125,7 +124,7 @@ describe('MoveGenerator', () => {
 
       const { moves } = moveGenerator.generateMoves();
 
-      expect(moves).toEqual<Move[]>([
+      expect(moves).toEqual<MoveOption[]>([
         {
           capture: false,
           start: Coordinate.toIndex('c3'),
@@ -146,7 +145,7 @@ describe('MoveGenerator', () => {
 
       const { moves } = context.generateMoves();
 
-      expect(moves).toEqual<Move[]>([
+      expect(moves).toEqual<MoveOption[]>([
         {
           capture: false,
           start: Coordinate.toIndex('c3'),
@@ -166,7 +165,7 @@ describe('MoveGenerator', () => {
 
       const { moves } = context.generateMoves();
 
-      expect(moves).toEqual<Move[]>([
+      expect(moves).toEqual<MoveOption[]>([
         {
           capture: false,
           start: Coordinate.toIndex('c2'),
@@ -193,7 +192,7 @@ describe('MoveGenerator', () => {
       const { moves } = context.generateMoves();
 
       expect(moves).toEqual(
-        expect.arrayContaining<Move>([
+        expect.arrayContaining<MoveOption>([
           {
             capture: false,
             start: Coordinate.toIndex('c5'),
@@ -222,7 +221,7 @@ describe('MoveGenerator', () => {
 
       const { moves } = context.generateMoves();
 
-      expect(moves).toEqual<Move[]>([
+      expect(moves).toEqual<MoveOption[]>([
         {
           capture: false,
           start: Coordinate.toIndex('c5'),
@@ -1104,8 +1103,8 @@ describe('MoveGenerator', () => {
       const { moves } = context.generateMoves();
 
       expect(moves).not.toEqual(
-        expect.arrayContaining<Move>([
-          expect.objectContaining<Partial<Move>>({
+        expect.arrayContaining<MoveOption>([
+          expect.objectContaining<Partial<MoveOption>>({
             start: Coordinate.toIndex('d4'),
           }),
         ])
@@ -1141,12 +1140,12 @@ describe('MoveGenerator', () => {
       );
 
       expect(knightMoves).toEqual([
-        expect.objectContaining<Move>({
+        expect.objectContaining<MoveOption>({
           start: Coordinate.toIndex('g6'),
           target: Coordinate.toIndex('e7'),
           capture: false,
         }),
-        expect.objectContaining<Move>({
+        expect.objectContaining<MoveOption>({
           start: Coordinate.toIndex('g6'),
           target: Coordinate.toIndex('e5'),
           capture: true,
@@ -1180,7 +1179,7 @@ describe('MoveGenerator', () => {
       );
       const { moves } = context.generateMoves();
       expect(moves).toEqual(
-        expect.arrayContaining<Move>([
+        expect.arrayContaining<MoveOption>([
           {
             start: Coordinate.toIndex('e8'),
             target: Coordinate.toIndex('g8'),
@@ -1281,7 +1280,7 @@ describe('MoveGenerator', () => {
       const { moves } = context.generateMoves();
 
       expect(moves).toEqual(
-        expect.arrayContaining<Move>([
+        expect.arrayContaining<MoveOption>([
           {
             start: Coordinate.toIndex('d4'),
             target: Coordinate.toIndex('c5'),
@@ -1350,7 +1349,7 @@ describe('MoveGenerator', () => {
       const { moves } = context.generateMoves();
 
       expect(moves).toEqual(
-        expect.arrayContaining<Move>([
+        expect.arrayContaining<MoveOption>([
           {
             start: Coordinate.toIndex('d4'),
             target: Coordinate.toIndex('e4'),
@@ -1389,7 +1388,7 @@ describe('MoveGenerator', () => {
 
       // Should not include moves to e4 or e3
       expect(moves).not.toEqual(
-        expect.arrayContaining<Move>([
+        expect.arrayContaining<MoveOption>([
           {
             start: Coordinate.toIndex('d4'),
             target: Coordinate.toIndex('e4'),
@@ -1430,7 +1429,7 @@ describe('MoveGenerator', () => {
       const { moves } = context.generateMoves();
 
       expect(moves).toEqual(
-        expect.arrayContaining<Move>([
+        expect.arrayContaining<MoveOption>([
           {
             start: Coordinate.toIndex('e1'),
             target: Coordinate.toIndex('g1'),
@@ -1466,7 +1465,7 @@ describe('MoveGenerator', () => {
       const { moves } = context.generateMoves();
 
       expect(moves).toEqual(
-        expect.arrayContaining<Move>([
+        expect.arrayContaining<MoveOption>([
           {
             start: Coordinate.toIndex('e1'),
             target: Coordinate.toIndex('c1'),
@@ -1503,7 +1502,7 @@ describe('MoveGenerator', () => {
       const { moves } = context.generateMoves();
 
       expect(moves).not.toEqual(
-        expect.arrayContaining<Move>([
+        expect.arrayContaining<MoveOption>([
           {
             start: Coordinate.toIndex('e1'),
             target: Coordinate.toIndex('g1'),
@@ -1541,7 +1540,7 @@ describe('MoveGenerator', () => {
 
       // Should NOT include castling move to c1
       expect(moves).not.toEqual(
-        expect.arrayContaining<Move>([
+        expect.arrayContaining<MoveOption>([
           {
             start: Coordinate.toIndex('e1'),
             target: Coordinate.toIndex('c1'),
@@ -1580,7 +1579,7 @@ describe('MoveGenerator', () => {
       const { moves } = context.generateMoves();
 
       expect(moves).not.toEqual(
-        expect.arrayContaining<Move>([
+        expect.arrayContaining<MoveOption>([
           {
             start: Coordinate.toIndex('e1'),
             target: Coordinate.toIndex('g1'),
@@ -1618,7 +1617,7 @@ describe('MoveGenerator', () => {
       const { moves } = context.generateMoves();
 
       expect(moves).not.toEqual(
-        expect.arrayContaining<Move>([
+        expect.arrayContaining<MoveOption>([
           {
             start: Coordinate.toIndex('e1'),
             target: Coordinate.toIndex('g1'),
@@ -1656,7 +1655,7 @@ describe('MoveGenerator', () => {
       const { moves } = context.generateMoves();
 
       expect(moves).not.toEqual(
-        expect.arrayContaining<Move>([
+        expect.arrayContaining<MoveOption>([
           {
             start: Coordinate.toIndex('e1'),
             target: Coordinate.toIndex('g1'),
