@@ -2,16 +2,20 @@ import {
   CreateGameV1,
   GameDetailsV1,
   JoinGamePayloadV1,
+  MakeMovePayloadV1,
 } from '@michess/api-schema';
 import { assertDefined, isDefined, randomElement } from '@michess/common-utils';
 import { ChessPosition, FenParser } from '@michess/core-board';
 import { ChessGame } from '@michess/core-game';
-import { GameRepository } from '@michess/infra-db';
+import { GameRepository, MoveRepository } from '@michess/infra-db';
 import { Session } from '../../auth/model/Session';
 import { ChessGameMapper } from '../mapper/ChessGameMapper';
 
 export class GamesService {
-  constructor(private gameRepository: GameRepository) {}
+  constructor(
+    private gameRepository: GameRepository,
+    private moveRepository: MoveRepository
+  ) {}
 
   async createGame(data: CreateGameV1): Promise<GameDetailsV1> {
     const initialPosition = ChessPosition.standardInitial();
@@ -73,5 +77,9 @@ export class GamesService {
     assertDefined(gameDetails);
 
     return ChessGameMapper.toGameDetailsV1(gameDetails);
+  }
+
+  async makeMove(session: Session, data: MakeMovePayloadV1): Promise<void> {
+    throw new Error('Not implemented yet');
   }
 }

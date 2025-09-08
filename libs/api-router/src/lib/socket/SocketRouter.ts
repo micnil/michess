@@ -1,4 +1,7 @@
-import { JoinGamePayloadV1Schema } from '@michess/api-schema';
+import {
+  JoinGamePayloadV1Schema,
+  MakeMovePayloadV1Schema,
+} from '@michess/api-schema';
 import { Api, Session } from '@michess/api-service';
 import { IncomingHttpHeaders } from 'http2';
 import { DefaultEventsMap, Server, Socket } from 'socket.io';
@@ -54,6 +57,11 @@ const from = (api: Api) => {
       const joinGamePayloadV1 = JoinGamePayloadV1Schema.parse(payload);
       api.games.joinGame(socket.data.session, joinGamePayloadV1);
       socket.join(joinGamePayloadV1.gameId);
+    });
+
+    socket.on('make-move', (payload: unknown) => {
+      const makeMovePayloadV1 = MakeMovePayloadV1Schema.parse(payload);
+      api.games.makeMove(socket.data.session, makeMovePayloadV1);
     });
 
     socket.on('disconnect', (reason) => {
