@@ -1,4 +1,4 @@
-import { Coordinate, FenParser, Move } from '@michess/core-board';
+import { Coordinate, FenParser, MoveOption } from '@michess/core-board';
 import { ChessGame, GameState } from '@michess/core-game';
 import {
   Chessboard as ChessboardView,
@@ -36,7 +36,7 @@ export const ChessGameContainer = () => {
   const gameStatus = getGameStatus(gameState);
 
   return (
-    <ChessboardView<Move>
+    <ChessboardView<MoveOption>
       orientation={'white'}
       size={500}
       piecePlacements={position.pieces}

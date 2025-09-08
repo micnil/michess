@@ -2,7 +2,7 @@ import { Coordinate } from '../common/Coordinate';
 import { PieceType } from '../common/PieceType';
 import { CastlingRight } from '../position/model/CastlingRight';
 
-export type Move = {
+export type MoveOption = {
   start: number;
   target: number;
   capture: boolean;
@@ -11,8 +11,8 @@ export type Move = {
   promotion?: PieceType;
 };
 
-export const Move = {
-  toUci(move: Move): string {
+export const MoveOption = {
+  toUci(move: MoveOption): string {
     const fromSquare = Coordinate.fromIndex(move.start);
     const toSquare = Coordinate.fromIndex(move.target);
 

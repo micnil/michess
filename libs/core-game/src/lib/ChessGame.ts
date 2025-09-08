@@ -5,7 +5,7 @@ import {
   ChessPosition,
   Color,
   Coordinate,
-  Move,
+  MoveOption,
   MoveRecord,
   Piece,
   PiecePlacements,
@@ -23,10 +23,10 @@ import { ZobristHash } from './ZobristHash';
 
 export type ChessGame = {
   getState(): GameState;
-  getMoves(): Move[];
+  getMoves(): MoveOption[];
   getAdditionalActions(): ChessGameAction[];
   makeAction(action: ChessGameAction, playerColor: Color): ChessGame;
-  makeMove(move: Move): ChessGame;
+  makeMove(move: MoveOption): ChessGame;
   getPosition(): ChessPosition;
   unmakeMove(): ChessGame;
   play(moveRecord: MoveRecord): ChessGame;
@@ -85,7 +85,7 @@ const isThreeFoldRepetition = (
 };
 
 const updatePiecePlacements = (
-  move: Move,
+  move: MoveOption,
   piecePlacements: PiecePlacements
 ): {
   newPiecePlacements: PiecePlacements;
@@ -155,7 +155,7 @@ const isRookOnStartingSquare = (
 };
 
 const updateCastlingRights = (
-  move: Move,
+  move: MoveOption,
   castlingAbility: Set<CastlingAbility>,
   pieceToMove: Piece,
   capturedPiece: Maybe<Piece>,
@@ -224,7 +224,7 @@ const evalAdditionalActions = (
 
 const makeMove = (
   gameState: ChessGameInternalState,
-  move: Move
+  move: MoveOption
 ): {
   gameState: ChessGameInternalState;
 } => {
@@ -424,7 +424,7 @@ const fromGameStateInternal = (
   const getState = (): GameState => {
     return ChessGameInternalState.toGameState(gameStateInternal);
   };
-  const makeMoveAndUpdate = (move: Move): ChessGame => {
+  const makeMoveAndUpdate = (move: MoveOption): ChessGame => {
     const { gameState } = makeMove(gameStateInternal, move);
     const moveGenerator = MoveGenerator(gameState);
     return fromGameStateInternal(gameState, moveGenerator.generateMoves());

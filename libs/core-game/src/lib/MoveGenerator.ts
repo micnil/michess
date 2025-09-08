@@ -1,24 +1,24 @@
+import { isDefined } from '@michess/common-utils';
 import {
+  Bitboard,
   CastlingRight,
+  ChessBitboard,
+  ChessPosition,
   Color,
   Coordinate,
-  ChessPosition,
+  MoveOption,
   Piece,
   PiecePlacement,
   PieceType,
-  Move,
-  Bitboard,
-  ChessBitboard,
 } from '@michess/core-board';
-import { MoveGeneratorContext } from './model/MoveGeneratorContext';
-import { isDefined } from '@michess/common-utils';
 import { KingAttacks } from './bitboard/KingAttacks';
 import { KnightAttacks } from './bitboard/KnightAttacks';
 import { PawnAttacks } from './bitboard/PawnAttacks';
 import { SliderAttacks } from './bitboard/SliderAttacks';
 import { DirectionOffset } from './model/DirectionOffset';
-import { IndexBoardUtil } from './util/IndexBoardUtil';
+import { MoveGeneratorContext } from './model/MoveGeneratorContext';
 import { MoveGeneratorResult } from './model/MoveGeneratorResult';
+import { IndexBoardUtil } from './util/IndexBoardUtil';
 
 const SLIDERS_BY_DIRECTION: Record<DirectionOffset, PieceType[]> = {
   [DirectionOffset.N]: [PieceType.Rook, PieceType.Queen],
@@ -100,7 +100,7 @@ const movesFromBitboard = (
   context: MoveGeneratorContext,
   { piece, coord }: PiecePlacement,
   legalMoves: Bitboard
-): Move[] => {
+): MoveOption[] => {
   if (legalMoves.isEmpty()) {
     return [];
   } else {
@@ -129,7 +129,7 @@ const getSlidingAttacks = (
 const getSlidingMoves = (
   context: MoveGeneratorContext,
   { piece, coord }: PiecePlacement
-): Move[] => {
+): MoveOption[] => {
   const ownOccupancy = context.bitboards.getOwnOccupancy(piece.color);
   const attacks = getSlidingAttacks(context.bitboards, { piece, coord });
   const moves = attacks.exclude(ownOccupancy);
@@ -146,7 +146,7 @@ const getSlidingMoves = (
 const getMovesForKing = (
   context: MoveGeneratorContext,
   { coord, piece }: PiecePlacement
-): Move[] => {
+): MoveOption[] => {
   const ownOccupancy = context.bitboards.getOwnOccupancy(piece.color);
   const kingAttacks = KingAttacks.fromCoord(coord);
   const legalKingMoves = kingAttacks
@@ -190,7 +190,7 @@ const applyPinRestrictions = (
 const getMovesForKnight = (
   context: MoveGeneratorContext,
   { coord, piece }: PiecePlacement
-): Move[] => {
+): MoveOption[] => {
   const isPinned = context.moveMasks.pinnedPieces.isCoordSet(coord);
   // Knight can never move when pinned
   if (isPinned) {
@@ -211,7 +211,7 @@ const getRank = (index: number) => 8 - (index >> 3);
 const getMovesForPawn = (
   context: MoveGeneratorContext,
   { coord, piece }: PiecePlacement
-): Move[] => {
+): MoveOption[] => {
   const index = Coordinate.toIndex(coord);
   const isPinned = context.moveMasks.pinnedPieces.isCoordSet(coord);
   const pinMoveRestrictions = isPinned
@@ -261,9 +261,9 @@ const getMovesForPawn = (
   const currentRank = (index - (index % 8)) / 8;
   const isStartPosition = currentRank === startRank;
 
-  const moves: Move[] = attackMoves;
+  const moves: MoveOption[] = attackMoves;
   if (isOneStepLegal) {
-    const move: Move = {
+    const move: MoveOption = {
       start: index,
       target: oneStepIndex,
       capture: false,
@@ -458,7 +458,7 @@ const getKingXRayAttacks = (
 const getMovesFromSquare = (
   context: MoveGeneratorContext,
   piecePlacement: PiecePlacement
-): Move[] => {
+): MoveOption[] => {
   switch (piecePlacement.piece.type) {
     case PieceType.Pawn:
       return getMovesForPawn(context, piecePlacement);
@@ -475,7 +475,7 @@ const getMovesFromSquare = (
   }
 };
 
-const getCastlingMoves = (context: MoveGeneratorContext): Move[] => {
+const getCastlingMoves = (context: MoveGeneratorContext): MoveOption[] => {
   const kingBitboard = context.bitboards[context.turn][PieceType.King];
   const kingIndex = kingBitboard.scanForward();
   return context.castlingRights
@@ -574,11 +574,11 @@ const getPinnedPieces = (
   }
 };
 
-const generateMoves = (context: MoveGeneratorContext): Move[] => {
+const generateMoves = (context: MoveGeneratorContext): MoveOption[] => {
   const numKingAttackers = context.moveMasks.kingAttackers.countBits();
   const isDoubleCheck = numKingAttackers >= 2;
 
-  const moves: Move[] = [];
+  const moves: MoveOption[] = [];
   for (const [coord, piece] of context.piecePlacements) {
     if (piece.color !== context.turn) {
       continue;

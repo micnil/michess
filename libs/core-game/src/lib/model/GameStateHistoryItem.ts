@@ -1,13 +1,13 @@
 import {
   CastlingAbility,
   Coordinate,
-  Move,
+  MoveOption,
   PiecePlacements,
 } from '@michess/core-board';
 import { ZobristHash } from '../ZobristHash';
 
 export type GameStateHistoryItem = {
-  move: Move;
+  move: MoveOption;
   positionHash: ZobristHash;
   pieces: PiecePlacements;
   ply: number;

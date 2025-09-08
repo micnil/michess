@@ -1,7 +1,7 @@
-import { Move } from '@michess/core-board';
+import { MoveOption } from '@michess/core-board';
 
 export type MoveGeneratorResult = {
-  moves: Move[];
+  moves: MoveOption[];
   isCheckmate: boolean;
   isCheck: boolean;
 };
