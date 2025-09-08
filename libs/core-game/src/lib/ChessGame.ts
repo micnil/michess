@@ -440,14 +440,14 @@ const fromGameStateInternal = (
     getState,
     getMoves: () => moveGenResult.moves,
     makeMove: makeMoveAndUpdate,
-    play: (moveRecord: Move): ChessGame => {
-      const move = moveGenResult.moves.find((m) =>
-        Move.isEqual(MoveOption.toMove(m), moveRecord)
+    play: (move: Move): ChessGame => {
+      const moveOption = moveGenResult.moves.find((m) =>
+        Move.isEqual(MoveOption.toMove(m), move)
       );
-      if (move) {
-        return makeMoveAndUpdate(move);
+      if (moveOption) {
+        return makeMoveAndUpdate(moveOption);
       } else {
-        throw new Error(`Invalid move: ${Move.toUci(moveRecord)}`);
+        throw new Error(`Invalid move: ${Move.toUci(move)}`);
       }
     },
     unmakeMove: () => {
