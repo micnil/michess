@@ -1,4 +1,4 @@
-import { Color, createChessPositionMock, FenParser } from '@michess/core-board';
+import { Color, createChessPositionMock } from '@michess/core-board';
 import { ChessGame } from '../ChessGame';
 
 describe('ChessGame', () => {
@@ -125,101 +125,6 @@ describe('ChessGame', () => {
 
       const actions = chessGame.getAdditionalActions();
       expect(actions).toEqual([]);
-    });
-  });
-
-  describe('unmakeMove', () => {
-    it('should restore the position after unmaking a simple move', () => {
-      const initialPosition = createChessPositionMock({
-        pieces: {
-          e2: { color: 'white', type: 'p' },
-          e7: { color: 'black', type: 'p' },
-          e1: { color: 'white', type: 'k' },
-          e8: { color: 'black', type: 'k' },
-        },
-        turn: 'white',
-      });
-
-      let chessGame = ChessGame.fromChessPosition(initialPosition);
-      const originalFen = FenParser.toFenStr(chessGame.getPosition());
-
-      chessGame = chessGame.play({
-        from: 'e2',
-        to: 'e4',
-      });
-      const afterMoveFen = FenParser.toFenStr(chessGame.getPosition());
-
-      expect(afterMoveFen).not.toEqual(originalFen);
-      expect(chessGame.getPosition().turn).toBe('black');
-
-      chessGame = chessGame.unmakeMove();
-      const afterUnmakeFen = FenParser.toFenStr(chessGame.getPosition());
-
-      expect(afterUnmakeFen).toEqual(originalFen);
-      expect(chessGame.getPosition().turn).toBe('white');
-    });
-
-    it('should handle unmaking multiple moves correctly', () => {
-      const initialPosition = createChessPositionMock({
-        pieces: {
-          e2: { color: 'white', type: 'p' },
-          e7: { color: 'black', type: 'p' },
-          d2: { color: 'white', type: 'p' },
-          d7: { color: 'black', type: 'p' },
-          e1: { color: 'white', type: 'k' },
-          e8: { color: 'black', type: 'k' },
-        },
-        turn: 'white',
-      });
-
-      let chessGame = ChessGame.fromChessPosition(initialPosition);
-      const originalFen = FenParser.toFenStr(chessGame.getPosition());
-
-      // Make first move (e2-e4)
-      chessGame = chessGame.play({
-        from: 'e2',
-        to: 'e4',
-      });
-
-      // Make second move (e7-e5)
-      chessGame = chessGame.play({
-        from: 'e7',
-        to: 'e5',
-      });
-
-      // Make third move (d2-d4)
-      chessGame = chessGame.play({
-        from: 'd2',
-        to: 'd4',
-      });
-
-      // Unmake all three moves
-      chessGame = chessGame.unmakeMove(); // unmake d2-d4
-      chessGame = chessGame.unmakeMove(); // unmake e7-e5
-      chessGame = chessGame.unmakeMove(); // unmake e2-e4
-
-      const finalFen = FenParser.toFenStr(chessGame.getPosition());
-      expect(finalFen).toEqual(originalFen);
-      expect(chessGame.getPosition().turn).toBe('white');
-    });
-
-    it('should handle unmakeMove on initial position gracefully', () => {
-      const initialPosition = createChessPositionMock({
-        pieces: {
-          e1: { color: 'white', type: 'k' },
-          e8: { color: 'black', type: 'k' },
-        },
-        turn: 'white',
-      });
-
-      const chessGame = ChessGame.fromChessPosition(initialPosition);
-      const originalFen = FenParser.toFenStr(chessGame.getPosition());
-
-      const afterUnmake = chessGame.unmakeMove();
-      const afterUnmakeFen = FenParser.toFenStr(afterUnmake.getPosition());
-
-      expect(afterUnmakeFen).toEqual(originalFen);
-      expect(afterUnmake.getPosition().turn).toBe('white');
     });
   });
 });

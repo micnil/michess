@@ -1,4 +1,9 @@
-import { FenParser, FenStr, Move } from '@michess/core-board';
+import {
+  createChessPositionMock,
+  FenParser,
+  FenStr,
+  Move,
+} from '@michess/core-board';
 import { Chessboard } from '../Chessboard';
 import { MoveOption } from '../move/MoveOption';
 import { castlingTestCases } from './test-cases/castling';
@@ -187,7 +192,7 @@ describe('Chessboard', () => {
     });
   });
 
-  describe('threefold repetition', () => {
+  describe('isThreeFoldRepetition', () => {
     it('should detect threefold repetition when same position occurs three times', () => {
       const initialPosition = FenParser.toChessPosition(
         'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
@@ -281,6 +286,101 @@ describe('Chessboard', () => {
       expect(chessGame.perft(1).nodes).toBe(6);
       expect(chessGame.perft(2).nodes).toBe(264);
       expect(chessGame.perft(3).nodes).toBe(9467);
+    });
+  });
+
+  describe('unmakeMove', () => {
+    it('should restore the position after unmaking a simple move', () => {
+      const initialPosition = createChessPositionMock({
+        pieces: {
+          e2: { color: 'white', type: 'p' },
+          e7: { color: 'black', type: 'p' },
+          e1: { color: 'white', type: 'k' },
+          e8: { color: 'black', type: 'k' },
+        },
+        turn: 'white',
+      });
+
+      let board = Chessboard.fromPosition(initialPosition);
+      const originalFen = FenParser.toFenStr(board.position);
+
+      board = board.playMove({
+        from: 'e2',
+        to: 'e4',
+      });
+      const afterMoveFen = FenParser.toFenStr(board.position);
+
+      expect(afterMoveFen).not.toEqual(originalFen);
+      expect(board.position.turn).toBe('black');
+
+      board = board.unmakeMove();
+      const afterUnmakeFen = FenParser.toFenStr(board.position);
+
+      expect(afterUnmakeFen).toEqual(originalFen);
+      expect(board.position.turn).toBe('white');
+    });
+
+    it('should handle unmaking multiple moves correctly', () => {
+      const initialPosition = createChessPositionMock({
+        pieces: {
+          e2: { color: 'white', type: 'p' },
+          e7: { color: 'black', type: 'p' },
+          d2: { color: 'white', type: 'p' },
+          d7: { color: 'black', type: 'p' },
+          e1: { color: 'white', type: 'k' },
+          e8: { color: 'black', type: 'k' },
+        },
+        turn: 'white',
+      });
+
+      let board = Chessboard.fromPosition(initialPosition);
+      const originalFen = FenParser.toFenStr(board.position);
+
+      // Make first move (e2-e4)
+      board = board.playMove({
+        from: 'e2',
+        to: 'e4',
+      });
+
+      // Make second move (e7-e5)
+      board = board.playMove({
+        from: 'e7',
+        to: 'e5',
+      });
+
+      // Make third move (d2-d4)
+      board = board.playMove({
+        from: 'd2',
+        to: 'd4',
+      });
+
+      // Unmake all three moves
+      board = board.unmakeMove(); // unmake d2-d4
+      board = board.unmakeMove(); // unmake e7-e5
+      board = board.unmakeMove(); // unmake e2-e4
+
+      const finalFen = FenParser.toFenStr(board.position);
+      expect(finalFen).toEqual(originalFen);
+      expect(board.position.turn).toBe('white');
+    });
+
+    it('should handle unmakeMove on initial position gracefully', () => {
+      const initialPosition = createChessPositionMock({
+        pieces: {
+          e1: { color: 'white', type: 'k' },
+          e8: { color: 'black', type: 'k' },
+        },
+        turn: 'white',
+      });
+
+      const board = Chessboard.fromPosition(initialPosition);
+      const originalFen = FenParser.toFenStr(board.position);
+
+      const afterUnmake = board.unmakeMove();
+      const afterUnmakeFen = FenParser.toFenStr(afterUnmake.position);
+
+      expect(afterUnmakeFen).toEqual(originalFen);
+      expect(afterUnmake.position.turn).toBe('white');
     });
   });
 });
