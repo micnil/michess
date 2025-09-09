@@ -1,4 +1,4 @@
-import { FenParser, FenStr } from '@michess/core-board';
+import { FenParser, FenStr, Move } from '@michess/core-board';
 import { Chessboard } from '../Chessboard';
 import { MoveOption } from '../move/MoveOption';
 import { castlingTestCases } from './test-cases/castling';
@@ -184,6 +184,29 @@ describe('Chessboard', () => {
       const chessboard = Chessboard.fromPosition(multiplePiecesPosition);
 
       expect(chessboard.isInsufficientMaterial).toBe(false);
+    });
+  });
+
+  describe('threefold repetition', () => {
+    it('should detect threefold repetition when same position occurs three times', () => {
+      const initialPosition = FenParser.toChessPosition(
+        'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+      );
+
+      const moves: Move[] = [
+        { from: 'g1', to: 'f3' },
+        { from: 'g8', to: 'f6' },
+        { from: 'f3', to: 'g1' },
+        { from: 'f6', to: 'g8' },
+        { from: 'g1', to: 'f3' },
+        { from: 'g8', to: 'f6' },
+        { from: 'f3', to: 'g1' },
+        { from: 'f6', to: 'g8' },
+      ];
+
+      const chessboard = Chessboard.fromPosition(initialPosition, moves);
+
+      expect(chessboard.isThreeFoldRepetition).toBe(true);
     });
   });
 
