@@ -6,7 +6,7 @@ import {
 } from '@michess/api-schema';
 import { assertDefined } from '@michess/common-utils';
 import { ChessPosition, FenParser } from '@michess/core-board';
-import { ChessGame, ChessTable } from '@michess/core-game';
+import { ChessTable } from '@michess/core-game';
 import { GameRepository, MoveRepository } from '@michess/infra-db';
 import { Session } from '../../auth/model/Session';
 import { GameDetailsMapper } from '../mapper/GameDetailsMapper';
@@ -19,8 +19,6 @@ export class GamesService {
 
   async createGame(data: CreateGameV1): Promise<GameDetailsV1> {
     const initialPosition = ChessPosition.standardInitial();
-    const game = ChessGame.fromChessPosition(initialPosition);
-    const state = game.getState();
     const createdGame = await this.gameRepository.createGame({
       variant: 'standard',
     });
@@ -29,7 +27,7 @@ export class GamesService {
       variant: createdGame.variant ?? 'standard',
       id: createdGame.gameId,
       isPrivate: data.isPrivate ?? false,
-      initialPosition: FenParser.toFenStr(state.initialPosition),
+      initialPosition: FenParser.toFenStr(initialPosition),
       players: {
         black: undefined,
         white: undefined,

@@ -40,7 +40,7 @@ export const ChessGameContainer = () => {
       piecePlacements={position.pieces}
       gameStatus={undefined}
       winner={undefined}
-      moveHistory={chessboard.moveRecord}
+      moveHistory={chessboard.movesRecord}
       onMove={(move) => {
         console.log(move);
         setChessboard(chessboard.playMove(move));

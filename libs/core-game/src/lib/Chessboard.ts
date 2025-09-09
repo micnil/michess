@@ -31,7 +31,7 @@ export type Chessboard = BoardState & {
   isInsufficientMaterial: boolean;
   initialPosition: ChessPosition;
   moveOptions: MoveOption[];
-  moveRecord: Move[];
+  movesRecord: Move[];
   playMove: (move: Move) => Chessboard;
   unmakeMove: () => Chessboard;
   perft: (depth: number) => { nodes: number };
@@ -300,7 +300,7 @@ const from = (
     get moveOptions() {
       return moveGen.generateMoves().moves;
     },
-    get moveRecord() {
+    get movesRecord() {
       return history.map((item) => MoveOption.toMove(item.playedMove));
     },
     get initialPosition() {

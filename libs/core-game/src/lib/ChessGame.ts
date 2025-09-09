@@ -4,9 +4,15 @@ import { Chessboard } from './Chessboard';
 import { ChessGameActions } from './ChessGameActions';
 import { ChessGameAction } from './model/ChessGameAction';
 import { ChessGameResult } from './model/ChessGameResult';
+import { GameMeta } from './model/GameMeta';
+import { GamePlayers } from './model/GamePlayers';
 import { GameState } from './model/GameState';
+import { GameStatusType } from './model/GameStatusType';
 
 type GameStateInternal = {
+  meta: GameMeta;
+  players: GamePlayers;
+  status: GameStatusType;
   additionalActions: ChessGameActions;
   result: Maybe<ChessGameResult>;
   board: Chessboard;
@@ -17,7 +23,7 @@ export type ChessGame = {
   getAdditionalActions(): ChessGameAction[];
   makeAction(action: ChessGameAction, playerColor: Color): ChessGame;
   getPosition(): ChessPosition;
-  play(moveRecord: Move): ChessGame;
+  play(movesRecord: Move): ChessGame;
   setResult(result: ChessGameResult): ChessGame;
 };
 
@@ -106,8 +112,11 @@ const fromGameStateInternal = (
   const { board, additionalActions, result } = gameStateInternal;
   const getState = (): GameState => {
     return {
+      ...gameStateInternal.meta,
+      players: gameStateInternal.players,
+      status: gameStateInternal.status,
       initialPosition: board.initialPosition,
-      moveHistory: board.moveRecord,
+      movesRecord: board.movesRecord,
       result,
       resultStr: ChessGameResult.toResultString(result),
     };
@@ -118,6 +127,7 @@ const fromGameStateInternal = (
     } else {
       const newBoard = board.playMove(move);
       return fromGameStateInternal({
+        ...gameStateInternal,
         board: newBoard,
         result: evalResultFromBoard(newBoard),
         additionalActions: evalAdditionalActions(additionalActions, newBoard),
@@ -134,7 +144,7 @@ const fromGameStateInternal = (
     play: playMove,
     setResult: (result: ChessGameResult): ChessGame => {
       return fromGameStateInternal({
-        board,
+        ...gameStateInternal,
         result,
         additionalActions: ChessGameActions.fromResult(result),
       });
@@ -150,10 +160,13 @@ const fromChessPosition = (chessPosition: ChessPosition): ChessGame => {
 const fromGameState = (gameState: GameState): ChessGame => {
   const board = Chessboard.fromPosition(
     gameState.initialPosition,
-    gameState.moveHistory
+    gameState.movesRecord
   );
   const result = gameState.result || evalResultFromBoard(board);
   return fromGameStateInternal({
+    meta: { ...GameState.toMeta(gameState) },
+    players: gameState.players,
+    status: gameState.status,
     board,
     result,
     additionalActions: ChessGameActions.fromResult(result),

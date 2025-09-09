@@ -46,31 +46,31 @@ const toGameMeta = (game: SelectGameWithRelations): GameMeta => ({
   startedAt: game.startedAt ?? undefined,
   endedAt: game.endedAt ?? undefined,
   updatedAt: game.updatedAt,
-  status: FROM_STATUS_TYPE_MAPPING[game.status],
 });
 
 const toGamePlayers = (game: SelectGameWithRelations): GamePlayers => ({
-  players: {
-    white: game.whitePlayer
-      ? {
-          id: game.whitePlayer.id,
-          name: game.whitePlayer?.name ?? 'Anonymous',
-        }
-      : undefined,
-    black: game.blackPlayer
-      ? {
-          id: game.blackPlayer.id,
-          name: game.blackPlayer?.name ?? 'Anonymous',
-        }
-      : undefined,
-  },
+  white: game.whitePlayer
+    ? {
+        id: game.whitePlayer.id,
+        name: game.whitePlayer?.name ?? 'Anonymous',
+      }
+    : undefined,
+  black: game.blackPlayer
+    ? {
+        id: game.blackPlayer.id,
+        name: game.blackPlayer?.name ?? 'Anonymous',
+      }
+    : undefined,
 });
 
 export const GameDetailsMapper = {
   fromSelectGameWithRelations(game: SelectGameWithRelations): GameDetails {
     return {
       ...toGameMeta(game),
-      ...toGamePlayers(game),
+
+      players: toGamePlayers(game),
+
+      status: FROM_STATUS_TYPE_MAPPING[game.status],
       variant: game.variant ?? 'standard',
       isPrivate: game.isPrivate,
       initialPosition: ChessPosition.standardInitial(),
@@ -81,7 +81,7 @@ export const GameDetailsMapper = {
             }
           : undefined,
       resultStr: game.result,
-      moveHistory: game.moves.map((move) => Move.fromUci(move.uci)),
+      movesRecord: game.moves.map((move) => Move.fromUci(move.uci)),
     };
   },
   toGameDetailsV1(game: GameDetails): GameDetailsV1 {
@@ -101,7 +101,7 @@ export const GameDetailsMapper = {
       },
       variant: 'standard',
       isPrivate: game.isPrivate,
-      moves: game.moveHistory.map((move) => ({
+      moves: game.movesRecord.map((move) => ({
         uci: Move.toUci(move),
       })),
       initialPosition: undefined,
