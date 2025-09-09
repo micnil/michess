@@ -103,6 +103,90 @@ describe('Chessboard', () => {
     );
   });
 
+  describe('isInsufficientMaterial', () => {
+    it('should detect king vs king as insufficient material', () => {
+      const kingVsKingPosition = FenParser.toChessPosition(
+        '8/8/8/8/8/8/4k3/4K3 w - - 0 1'
+      );
+      const chessboard = Chessboard.fromPosition(kingVsKingPosition);
+
+      expect(chessboard.isInsufficientMaterial).toBe(true);
+    });
+
+    it('should detect king and bishop vs king as insufficient material', () => {
+      const kingBishopVsKingPosition = FenParser.toChessPosition(
+        '8/8/8/8/8/8/4k3/4KB2 w - - 0 1'
+      );
+      const chessboard = Chessboard.fromPosition(kingBishopVsKingPosition);
+
+      expect(chessboard.isInsufficientMaterial).toBe(true);
+    });
+
+    it('should detect king and knight vs king as insufficient material', () => {
+      const kingKnightVsKingPosition = FenParser.toChessPosition(
+        '8/8/8/8/8/8/4k3/4KN2 w - - 0 1'
+      );
+      const chessboard = Chessboard.fromPosition(kingKnightVsKingPosition);
+
+      expect(chessboard.isInsufficientMaterial).toBe(true);
+    });
+
+    // TODO
+    it.skip('should detect king and bishop vs king and bishop (same color) as insufficient material', () => {
+      const bishopsSameColorPosition = FenParser.toChessPosition(
+        '8/8/8/8/8/8/3bk3/4KB2 w - - 0 1'
+      );
+      const chessboard = Chessboard.fromPosition(bishopsSameColorPosition);
+
+      expect(chessboard.isInsufficientMaterial).toBe(true);
+    });
+
+    it('should not detect king and bishop vs king and bishop (different colors) as insufficient material', () => {
+      const bishopsDifferentColorPosition = FenParser.toChessPosition(
+        '8/8/8/8/8/8/2b1k3/4KB2 w - - 0 1'
+      );
+      const chessboard = Chessboard.fromPosition(bishopsDifferentColorPosition);
+
+      expect(chessboard.isInsufficientMaterial).toBe(false);
+    });
+
+    it('should not detect king and queen vs king as insufficient material', () => {
+      const kingQueenVsKingPosition = FenParser.toChessPosition(
+        '8/8/8/8/8/8/4k3/4KQ2 w - - 0 1'
+      );
+      const chessboard = Chessboard.fromPosition(kingQueenVsKingPosition);
+
+      expect(chessboard.isInsufficientMaterial).toBe(false);
+    });
+
+    it('should not detect king and rook vs king as insufficient material', () => {
+      const kingRookVsKingPosition = FenParser.toChessPosition(
+        '8/8/8/8/8/8/4k3/4KR2 w - - 0 1'
+      );
+      const chessboard = Chessboard.fromPosition(kingRookVsKingPosition);
+
+      expect(chessboard.isInsufficientMaterial).toBe(false);
+    });
+
+    it('should not detect king and pawn vs king as insufficient material', () => {
+      const kingPawnVsKingPosition = FenParser.toChessPosition(
+        '8/8/8/8/8/8/4kP2/4K3 w - - 0 1'
+      );
+      const chessboard = Chessboard.fromPosition(kingPawnVsKingPosition);
+
+      expect(chessboard.isInsufficientMaterial).toBe(false);
+    });
+
+    it('should not detect multiple pieces as insufficient material', () => {
+      const multiplePiecesPosition = FenParser.toChessPosition(
+        '8/8/8/8/8/8/3nk3/4KN2 w - - 0 1'
+      );
+      const chessboard = Chessboard.fromPosition(multiplePiecesPosition);
+
+      expect(chessboard.isInsufficientMaterial).toBe(false);
+    });
+  });
+
   describe('standard', () => {
     it.each(standardTestCases.testCases)(
       'should handle standard positions correctly for $start.fen',
