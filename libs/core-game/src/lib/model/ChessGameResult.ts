@@ -1,7 +1,7 @@
 import { Maybe } from '@michess/common-utils';
-import { ChessGameResultType } from './ChessGameResultType';
-import { ChessGameAction } from './ChessGameAction';
 import { Color } from '@michess/core-board';
+import { ChessGameAction } from './ChessGameAction';
+import { ChessGameResultType } from './ChessGameResultType';
 
 export type ChessGameResult = {
   type: ChessGameResultType;
@@ -45,5 +45,10 @@ export const ChessGameResult = {
     } else {
       return '0-0';
     }
+  },
+  toCheckmate: (winner: Color): ChessGameResult => {
+    return {
+      type: winner === Color.White ? 'white_win' : 'black_win',
+    };
   },
 };

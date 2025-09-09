@@ -1,28 +1,23 @@
 import { Maybe } from '@michess/common-utils';
-import {
-  ChessPosition,
-  Color,
-  Move,
-  Piece,
-  PiecePlacements,
-  PieceType,
-} from '@michess/core-board';
+import { ChessPosition, Color, Move } from '@michess/core-board';
 import { Chessboard } from './Chessboard';
 import { ChessGameActions } from './ChessGameActions';
 import { ChessGameAction } from './model/ChessGameAction';
-import { ChessGameInternalState } from './model/ChessGameInternalState';
 import { ChessGameResult } from './model/ChessGameResult';
 import { GameState } from './model/GameState';
-import { GameStateHistoryItem } from './model/GameStateHistoryItem';
 import { MoveOption } from './move/MoveOption';
-import { ZobristHash } from './ZobristHash';
+
+type GameStateInternal = {
+  additionalActions: ChessGameActions;
+  result: Maybe<ChessGameResult>;
+  board: Chessboard;
+};
 
 export type ChessGame = {
   getState(): GameState;
   getMoves(): MoveOption[];
   getAdditionalActions(): ChessGameAction[];
   makeAction(action: ChessGameAction, playerColor: Color): ChessGame;
-  makeMove(move: MoveOption): ChessGame;
   getPosition(): ChessPosition;
   unmakeMove(): ChessGame;
   play(moveRecord: Move): ChessGame;
@@ -32,60 +27,18 @@ export type ChessGame = {
   };
 };
 
-const isFiftyMoveRule = (ply: number): boolean => {
-  return ply >= 100; // 50 moves = 100 plies (half-moves)
-};
-
-const isInsufficientMaterial = (piecePlacements: PiecePlacements): boolean => {
-  const pieceCount = piecePlacements.size;
-  if (pieceCount <= 2) {
-    return true;
-  } else if (pieceCount === 3) {
-    const isKingOrMinorPiece = (piece: Maybe<Piece>) =>
-      piece?.type === PieceType.King ||
-      piece?.type === PieceType.Bishop ||
-      piece?.type === PieceType.Knight;
-    return Array.from(piecePlacements.values()).every(isKingOrMinorPiece);
-  } else {
-    return false;
-  }
-};
-
-const isThreeFoldRepetition = (
-  positionHash: ZobristHash,
-  gameState: GameStateHistoryItem[]
-): boolean => {
-  let occurrences = 1;
-  for (let index = gameState.length - 1; index >= 0; index--) {
-    const historyItem = gameState[index];
-    if (historyItem.positionHash.equals(positionHash)) {
-      occurrences++;
-    }
-
-    if (occurrences === 3) {
-      break;
-    }
-  }
-  return occurrences === 3;
-};
-
 const evalAdditionalActions = (
   previousActions: ChessGameActions,
-  args: {
-    positionHash: ZobristHash;
-    gameHistory: GameStateHistoryItem[];
-    ply: number;
-    piecePlacements: PiecePlacements;
-  }
+  board: Chessboard
 ): ChessGameActions => {
   let additionalActions = previousActions;
-  additionalActions = isThreeFoldRepetition(args.positionHash, args.gameHistory)
+  additionalActions = board.isThreeFoldRepetition
     ? additionalActions.addAction(ChessGameAction.claimDrawThreeFold())
     : additionalActions;
-  additionalActions = isFiftyMoveRule(args.ply)
+  additionalActions = board.isFiftyMoveRule
     ? additionalActions.addAction(ChessGameAction.claimDrawFiftyMoveRule())
     : additionalActions;
-  additionalActions = isInsufficientMaterial(args.piecePlacements)
+  additionalActions = board.isInsufficientMaterial
     ? additionalActions.addAction(
         ChessGameAction.claimDrawInsufficientMaterial()
       )
@@ -93,61 +46,12 @@ const evalAdditionalActions = (
   return additionalActions;
 };
 
-const unmakeMove = (
-  gameState: ChessGameInternalState
-): {
-  gameState: ChessGameInternalState;
-} => {
-  if (gameState.gameHistory.length === 0) {
-    return { gameState };
-  }
-
-  const lastHistoryItem =
-    gameState.gameHistory[gameState.gameHistory.length - 1];
-  const piecePlacements = lastHistoryItem.pieces;
-  const gameHistory = gameState.gameHistory.slice(0, -1);
-
-  let additionalActions = ChessGameActions.fromResult(undefined);
-  additionalActions = isThreeFoldRepetition(
-    lastHistoryItem.positionHash,
-    gameHistory
-  )
-    ? additionalActions.addAction(ChessGameAction.claimDrawThreeFold())
-    : additionalActions;
-  additionalActions = isFiftyMoveRule(lastHistoryItem.ply)
-    ? additionalActions.addAction(ChessGameAction.claimDrawFiftyMoveRule())
-    : additionalActions;
-  additionalActions = isInsufficientMaterial(piecePlacements)
-    ? additionalActions.addAction(
-        ChessGameAction.claimDrawInsufficientMaterial()
-      )
-    : additionalActions;
-
-  return {
-    gameState: {
-      ...gameState,
-      additionalActions,
-      positionHash: lastHistoryItem.positionHash,
-      gameHistory,
-      castlingAbility: lastHistoryItem.castlingAbility,
-      turn: gameState.turn === Color.White ? Color.Black : Color.White,
-      fullMoves:
-        gameState.turn === Color.White
-          ? gameState.fullMoves - 1
-          : gameState.fullMoves,
-      ply: lastHistoryItem.ply,
-      pieces: lastHistoryItem.pieces,
-      enPassant: lastHistoryItem.enPassant,
-    },
-  };
-};
-
 const makeAction = (
-  gameState: ChessGameInternalState,
+  gameState: GameStateInternal,
   action: ChessGameAction,
   playerColor: Color
 ): {
-  gameState: ChessGameInternalState;
+  gameState: GameStateInternal;
 } => {
   if (gameState.additionalActions.isActionAvailable(action, playerColor)) {
     const newActions = gameState.additionalActions.useAction(
@@ -161,7 +65,10 @@ const makeAction = (
         return {
           gameState: {
             ...gameState,
-            result: ChessGameResult.fromChessGameAction(action, gameState.turn),
+            result: ChessGameResult.fromChessGameAction(
+              action,
+              gameState.board.position.turn
+            ),
             additionalActions: newActions,
           },
         };
@@ -180,96 +87,93 @@ const makeAction = (
     }
   } else {
     throw new Error(
-      `Action ${action.type} is not available for turn ${gameState.turn}`
+      `Action ${action.type} is not available for turn ${gameState.board.position.turn}`
     );
   }
 };
 
+const evalResultFromBoard = (
+  board: Chessboard
+): ChessGameResult | undefined => {
+  if (board.isCheckmate) {
+    return ChessGameResult.toCheckmate(
+      board.position.turn === Color.White ? Color.Black : Color.White
+    );
+  } else if (board.isStalemate) {
+    return { type: 'draw' };
+  } else {
+    return undefined;
+  }
+};
+
 const fromGameStateInternal = (
-  gameStateInternal: ChessGameInternalState
+  gameStateInternal: GameStateInternal
 ): ChessGame => {
-  const board = Chessboard.fromPosition(gameStateInternal);
+  const { board, additionalActions, result } = gameStateInternal;
   const getState = (): GameState => {
-    return ChessGameInternalState.toGameState(gameStateInternal);
+    return {
+      initialPosition: board.initialPosition,
+      moveHistory: board.moveRecord,
+      result,
+      resultStr: ChessGameResult.toResultString(result),
+    };
   };
-
   const playMove = (move: Move): ChessGame => {
-    const newBoard = board.playMove(move);
-    const newPosition = newBoard.position;
-    const historyCopy = gameStateInternal.gameHistory.slice();
-    historyCopy.push({
-      move,
-      positionHash: newBoard.positionHash,
-      castlingAbility: newPosition.castlingAbility,
-      pieces: newPosition.pieces,
-      ply: newPosition.ply,
-      enPassant: newPosition.enPassant,
-    });
-    return fromGameStateInternal({
-      ...gameStateInternal,
-      ...newPosition,
-      gameHistory: historyCopy,
-      additionalActions: evalAdditionalActions(
-        gameStateInternal.additionalActions,
-        {
-          positionHash: newBoard.positionHash,
-          gameHistory: historyCopy,
-          ply: newPosition.ply + 1,
-          piecePlacements: newPosition.pieces,
-        }
-      ),
-    });
+    if (result) {
+      throw new Error('Game is already over');
+    } else {
+      const newBoard = board.playMove(move);
+      return fromGameStateInternal({
+        board: newBoard,
+        result: evalResultFromBoard(newBoard),
+        additionalActions: evalAdditionalActions(additionalActions, newBoard),
+      });
+    }
   };
-
   return {
-    makeMove: (moveOption: MoveOption): ChessGame => {
-      const move = MoveOption.toMove(moveOption);
-      return playMove(move);
+    getPosition: () => board.position,
+    makeAction: (action: ChessGameAction, playerColor: Color): ChessGame => {
+      const { gameState } = makeAction(gameStateInternal, action, playerColor);
+      return fromGameStateInternal(gameState);
     },
-    getPosition: () => gameStateInternal,
-    makeAction: (action: ChessGameAction, playerColor: Color): ChessGame =>
-      fromGameStateInternal(
-        makeAction(gameStateInternal, action, playerColor).gameState
-      ),
     getState,
     getMoves: () => board.moveOptions,
     play: playMove,
     unmakeMove: () => {
-      const { gameState } = unmakeMove(gameStateInternal);
-      return fromGameStateInternal(gameState);
+      const newBoard = board.unmakeMove();
+      return fromGameStateInternal({
+        board: newBoard,
+        result: evalResultFromBoard(newBoard),
+        additionalActions: evalAdditionalActions(additionalActions, newBoard),
+      });
     },
     setResult: (result: ChessGameResult): ChessGame => {
-      const newGameState = {
-        ...gameStateInternal,
-        additionalActions: ChessGameActions.fromResult(result),
+      return fromGameStateInternal({
+        board,
         result,
-      };
-      return fromGameStateInternal(newGameState);
+        additionalActions: ChessGameActions.fromResult(result),
+      });
     },
     getAdditionalActions: () => gameStateInternal.additionalActions.value(),
     perft: (depth: number) => board.perft(depth),
   };
 };
 
-const fromGameState = (gameState: GameState): ChessGame => {
-  const initialChessGame = fromGameStateInternal({
-    ...gameState.initialPosition,
-    result: undefined,
-    additionalActions: ChessGameActions.fromResult(undefined),
-    positionHash: ZobristHash.fromChessPosition(gameState.initialPosition),
-    gameHistory: [],
-
-    initialPosition: gameState.initialPosition,
-  });
-  const chessGame = gameState.moveHistory.reduce((chessGame, move) => {
-    return chessGame.play(move);
-  }, initialChessGame);
-
-  return gameState.result ? chessGame.setResult(gameState.result) : chessGame;
-};
-
 const fromChessPosition = (chessPosition: ChessPosition): ChessGame => {
   return fromGameState(GameState.fromChessPosition(chessPosition));
+};
+
+const fromGameState = (gameState: GameState): ChessGame => {
+  const board = Chessboard.fromPosition(
+    gameState.initialPosition,
+    gameState.moveHistory
+  );
+  const result = gameState.result || evalResultFromBoard(board);
+  return fromGameStateInternal({
+    board,
+    result,
+    additionalActions: ChessGameActions.fromResult(result),
+  });
 };
 
 export const ChessGame = {

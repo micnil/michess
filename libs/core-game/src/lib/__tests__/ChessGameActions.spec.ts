@@ -1,5 +1,6 @@
+import { Color } from '@michess/core-board';
 import { ChessGameActions } from '../ChessGameActions';
-import { ChessGameAction, Color } from '@michess/core-board';
+import { ChessGameAction } from '../model/ChessGameAction';
 
 describe('ChessGameActions', () => {
   describe('useAction', () => {

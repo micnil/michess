@@ -1,4 +1,4 @@
-import { assertDefined, lazyValue, Maybe } from '@michess/common-utils';
+import { assertDefined, Maybe } from '@michess/common-utils';
 import {
   CastlingAbility,
   CastlingRight,
@@ -14,20 +14,27 @@ import { MoveGenerator } from './MoveGenerator';
 import { ZobristHash } from './ZobristHash';
 import { MoveOption } from './move/MoveOption';
 
-export type Chessboard = {
+type BoardState = {
   position: ChessPosition;
   positionHash: ZobristHash;
+};
+type BoardStateHistoryItem = BoardState & {
+  playedMove: MoveOption;
+};
+
+export type Chessboard = BoardState & {
   isCheck: boolean;
   isCheckmate: boolean;
   isStalemate: boolean;
+  isThreeFoldRepetition: boolean;
+  isFiftyMoveRule: boolean;
+  isInsufficientMaterial: boolean;
+  initialPosition: ChessPosition;
   moveOptions: MoveOption[];
+  moveRecord: Move[];
   playMove: (move: Move) => Chessboard;
+  unmakeMove: () => Chessboard;
   perft: (depth: number) => { nodes: number };
-};
-
-type ChessboardState = {
-  position: ChessPosition;
-  positionHash: ZobristHash;
 };
 
 const rookStartingPositions: Record<CastlingAbility, Coordinate> = {
@@ -39,6 +46,39 @@ const rookStartingPositions: Record<CastlingAbility, Coordinate> = {
 
 const oneStepBackFromIndex = (index: number, color: Color): Coordinate => {
   return Coordinate.fromIndex(color === Color.White ? index + 8 : index - 8);
+};
+
+const isInsufficientMaterial = (piecePlacements: PiecePlacements): boolean => {
+  const pieceCount = piecePlacements.size;
+  if (pieceCount <= 2) {
+    return true;
+  } else if (pieceCount === 3) {
+    const isKingOrMinorPiece = (piece: Maybe<Piece>) =>
+      piece?.type === PieceType.King ||
+      piece?.type === PieceType.Bishop ||
+      piece?.type === PieceType.Knight;
+    return Array.from(piecePlacements.values()).every(isKingOrMinorPiece);
+  } else {
+    return false;
+  }
+};
+
+const isThreeFoldRepetition = (
+  positionHash: ZobristHash,
+  boardHistory: BoardStateHistoryItem[]
+): boolean => {
+  let occurrences = 1;
+  for (let index = boardHistory.length - 1; index >= 0; index--) {
+    const historyItem = boardHistory[index];
+    if (historyItem.positionHash.equals(positionHash)) {
+      occurrences++;
+    }
+
+    if (occurrences === 3) {
+      break;
+    }
+  }
+  return occurrences === 3;
 };
 
 const updatePiecePlacements = (
@@ -156,10 +196,10 @@ const updateCastlingRights = (
 };
 
 const makeMove = (
-  { position, positionHash }: ChessboardState,
+  { position, positionHash }: BoardState,
   move: MoveOption
 ): {
-  boardState: ChessboardState;
+  boardState: BoardState;
 } => {
   const { newPiecePlacements, movedPiece, capturedPiece, promotedPiece } =
     updatePiecePlacements(move, position.pieces);
@@ -209,10 +249,7 @@ const makeMove = (
   };
 };
 
-const perft = (
-  boardState: ChessboardState,
-  depth: number
-): { nodes: number } => {
+const perft = (boardState: BoardState, depth: number): { nodes: number } => {
   if (depth === 0) {
     return { nodes: 1 };
   }
@@ -229,9 +266,11 @@ const perft = (
   return { nodes };
 };
 
-const from = (state: ChessboardState): Chessboard => {
-  const moveGenerator = MoveGenerator(state.position);
-  const getMoveOptions = lazyValue(() => moveGenerator.generateMoves());
+const from = (
+  state: BoardState,
+  history: BoardStateHistoryItem[] = []
+): Chessboard => {
+  const moveGen = MoveGenerator(state.position);
   return {
     get position() {
       return state.position;
@@ -240,27 +279,59 @@ const from = (state: ChessboardState): Chessboard => {
       return state.positionHash;
     },
     get isCheck() {
-      return getMoveOptions().isCheck;
+      return moveGen.generateMoves().isCheck;
     },
     get isCheckmate() {
-      return getMoveOptions().isCheckmate;
+      return moveGen.generateMoves().isCheckmate;
     },
     get isStalemate() {
-      const moveOptions = getMoveOptions();
+      const moveOptions = moveGen.generateMoves();
       return moveOptions.moves.length === 0 && !moveOptions.isCheck;
     },
-    get moveOptions() {
-      return getMoveOptions().moves;
+    get isThreeFoldRepetition() {
+      return isThreeFoldRepetition(state.positionHash, history);
     },
+    get isInsufficientMaterial() {
+      return isInsufficientMaterial(state.position.pieces);
+    },
+    get isFiftyMoveRule() {
+      return state.position.ply >= 100;
+    },
+    get moveOptions() {
+      return moveGen.generateMoves().moves;
+    },
+    get moveRecord() {
+      return history.map((item) => MoveOption.toMove(item.playedMove));
+    },
+    get initialPosition() {
+      return history.length > 0 ? history[0].position : state.position;
+    },
+    unmakeMove: (): Chessboard => {
+      const lastHistoryItem = history[history.length - 1];
+      if (!lastHistoryItem) {
+        return from(state, history);
+      }
+      const newHistory = history.slice(0, -1);
+      return from(
+        {
+          position: lastHistoryItem.position,
+          positionHash: lastHistoryItem.positionHash,
+        },
+        newHistory
+      );
+    },
+
     perft: (depth: number) => {
       return perft(state, depth);
     },
     playMove: (move: Move): Chessboard => {
-      const moveOption = getMoveOptions().moves.find((m) =>
-        Move.isEqual(MoveOption.toMove(m), move)
-      );
+      const moveOption = moveGen
+        .generateMoves()
+        .moves.find((m) => Move.isEqual(MoveOption.toMove(m), move));
       if (moveOption) {
-        return from(makeMove(state, moveOption).boardState);
+        const newHistory = history.slice();
+        newHistory.push({ ...state, playedMove: moveOption });
+        return from(makeMove(state, moveOption).boardState, newHistory);
       } else {
         throw new Error(`Invalid move: ${Move.toUci(move)}`);
       }
@@ -268,12 +339,16 @@ const from = (state: ChessboardState): Chessboard => {
   };
 };
 
-const fromPosition = (position: ChessPosition): Chessboard => {
+const fromPosition = (
+  position: ChessPosition,
+  moves: Move[] = []
+): Chessboard => {
   const positionHash = ZobristHash.fromChessPosition(position);
-  return from({
-    position,
-    positionHash,
-  });
+  let board = from({ position, positionHash });
+  for (const move of moves) {
+    board = board.playMove(move);
+  }
+  return board;
 };
 
 export const Chessboard = {

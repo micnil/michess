@@ -1,4 +1,4 @@
-import { isDefined } from '@michess/common-utils';
+import { isDefined, lazyValue } from '@michess/common-utils';
 import {
   Bitboard,
   CastlingRight,
@@ -574,7 +574,9 @@ const getPinnedPieces = (
   }
 };
 
-const generateMoves = (context: MoveGeneratorContext): MoveOption[] => {
+const generateMovesFromContext = (
+  context: MoveGeneratorContext
+): MoveOption[] => {
   const numKingAttackers = context.moveMasks.kingAttackers.countBits();
   const isDoubleCheck = numKingAttackers >= 2;
 
@@ -599,50 +601,54 @@ const generateMoves = (context: MoveGeneratorContext): MoveOption[] => {
   return moves;
 };
 
+const generateMoves = (chessPosition: ChessPosition): MoveGeneratorResult => {
+  const chessBitboards = ChessBitboard(chessPosition.pieces);
+  const { kingAttackers, checkBlockPaths } = getKingAttackers(
+    chessBitboards,
+    chessPosition.turn
+  );
+  const pinnedPieces = getPinnedPieces(chessBitboards, chessPosition.turn);
+  const attackers = getAttackedSquares(
+    chessBitboards,
+    Color.opposite(chessPosition.turn)
+  );
+  const numKingAttackers = kingAttackers.countBits();
+  const isCheck = numKingAttackers > 0;
+
+  const checkEvasionMask =
+    numKingAttackers === 0
+      ? FULL_BITBOARD
+      : kingAttackers.union(checkBlockPaths);
+
+  const kingXRayAttacks = isCheck
+    ? getKingXRayAttacks(chessBitboards, chessPosition.turn)
+    : attackers;
+
+  const moves = generateMovesFromContext(
+    MoveGeneratorContext.from(chessPosition, chessBitboards, {
+      attacks: attackers,
+      pinnedPieces,
+      kingXRayAttacks,
+      kingAttackers,
+      checkEvasion: checkEvasionMask,
+    })
+  );
+  return {
+    moves,
+    isCheckmate: isCheck && moves.length === 0,
+    isCheck,
+  };
+};
+
 export type MoveGenerator = {
   generateMoves: () => MoveGeneratorResult;
 };
 
 export const MoveGenerator = (chessPosition: ChessPosition): MoveGenerator => {
+  const generateMovesCached = lazyValue(() => generateMoves(chessPosition));
   return {
     generateMoves: () => {
-      const chessBitboards = ChessBitboard(chessPosition.pieces);
-      const { kingAttackers, checkBlockPaths } = getKingAttackers(
-        chessBitboards,
-        chessPosition.turn
-      );
-      const pinnedPieces = getPinnedPieces(chessBitboards, chessPosition.turn);
-      const attackers = getAttackedSquares(
-        chessBitboards,
-        Color.opposite(chessPosition.turn)
-      );
-      const numKingAttackers = kingAttackers.countBits();
-      const isCheck = numKingAttackers > 0;
-
-      const checkEvasionMask =
-        numKingAttackers === 0
-          ? FULL_BITBOARD
-          : kingAttackers.union(checkBlockPaths);
-
-      const kingXRayAttacks = isCheck
-        ? getKingXRayAttacks(chessBitboards, chessPosition.turn)
-        : attackers;
-
-      const moves = generateMoves(
-        MoveGeneratorContext.from(chessPosition, chessBitboards, {
-          attacks: attackers,
-          pinnedPieces,
-          kingXRayAttacks,
-          kingAttackers,
-          checkEvasion: checkEvasionMask,
-        })
-      );
-      return {
-        moves,
-        isCheckmate: isCheck && moves.length === 0,
-        isStaleMate: !isCheck && moves.length === 0,
-        isCheck,
-      };
+      return generateMovesCached();
     },
   };
 };

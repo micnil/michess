@@ -1,23 +1,20 @@
 import { Maybe } from '@michess/common-utils';
-import { ChessPosition } from '@michess/core-board';
+import { Chessboard } from '../Chessboard';
 import { ChessGameActions } from '../ChessGameActions';
-import { ZobristHash } from '../ZobristHash';
 import { ChessGameResult } from './ChessGameResult';
 import { GameState } from './GameState';
-import { GameStateHistoryItem } from './GameStateHistoryItem';
 
 export type ChessGameInternalState = {
-  positionHash: ZobristHash;
   additionalActions: ChessGameActions;
-  gameHistory: GameStateHistoryItem[];
-  initialPosition: ChessPosition;
   result: Maybe<ChessGameResult>;
-} & ChessPosition;
+  board: Chessboard;
+};
 
 const toGameState = (internalState: ChessGameInternalState): GameState => {
   return {
-    ...internalState,
-    moveHistory: internalState.gameHistory.map((item) => item.move),
+    initialPosition: internalState.board.initialPosition,
+    result: internalState.result,
+    moveHistory: internalState.board.moveRecord,
     resultStr: ChessGameResult.toResultString(internalState.result),
   };
 };

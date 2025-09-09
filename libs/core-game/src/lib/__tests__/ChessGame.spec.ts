@@ -1,24 +1,25 @@
-import { FenParser, FenStr } from '@michess/core-board';
+import {
+  Color,
+  createChessPositionMock,
+  FenParser,
+  FenStr,
+} from '@michess/core-board';
 import { ChessGame } from '../ChessGame';
+import { MoveOption } from '../move/MoveOption';
 import { castlingTestCases } from './test-cases/castling';
 import { checkmatesTestCases } from './test-cases/checkmates';
 import { famousTestCases } from './test-cases/famous';
+import { pawnsTestCases } from './test-cases/pawns';
 import { promotionsTestCases } from './test-cases/promotions';
 import { stalematesTestCases } from './test-cases/stalemates';
 import { standardTestCases } from './test-cases/standard';
-import { pawnsTestCases } from './test-cases/pawns';
 import { taxingTestCases } from './test-cases/taxing';
-import {
-  Color,
-  Coordinate,
-  createChessPositionMock,
-} from '@michess/core-board';
 
 const getAndApplyMoves = (chessGame: ChessGame): FenStr[] => {
   const moves = chessGame.getMoves();
   return moves.map((move) => {
-    const newGameState = chessGame.makeMove(move);
-    return FenParser.toFenStr(newGameState.getState());
+    const newGameState = chessGame.play(MoveOption.toMove(move));
+    return FenParser.toFenStr(newGameState.getPosition());
   });
 };
 
@@ -148,57 +149,47 @@ describe('ChessGame', () => {
 
       // Bongcloud draw (magnus - hikaru game).
       const almostThreeFoldRepetition = chessGame
-        .makeMove({
-          start: Coordinate.toIndex('e2'),
-          target: Coordinate.toIndex('e4'),
-          capture: false,
+        .play({
+          from: 'e2',
+          to: 'e4',
         })
-        .makeMove({
-          start: Coordinate.toIndex('e7'),
-          target: Coordinate.toIndex('e5'),
-          capture: false,
+        .play({
+          from: 'e7',
+          to: 'e5',
         })
-        .makeMove({
-          start: Coordinate.toIndex('e1'),
-          target: Coordinate.toIndex('e2'),
-          capture: false,
+        .play({
+          from: 'e1',
+          to: 'e2',
         })
         // 1st occurance below
-        .makeMove({
-          start: Coordinate.toIndex('e8'),
-          target: Coordinate.toIndex('e7'),
-          capture: false,
+        .play({
+          from: 'e8',
+          to: 'e7',
         })
-        .makeMove({
-          start: Coordinate.toIndex('e2'),
-          target: Coordinate.toIndex('e1'),
-          capture: false,
+        .play({
+          from: 'e2',
+          to: 'e1',
         })
-        .makeMove({
-          start: Coordinate.toIndex('e7'),
-          target: Coordinate.toIndex('e8'),
-          capture: false,
+        .play({
+          from: 'e7',
+          to: 'e8',
         })
-        .makeMove({
-          start: Coordinate.toIndex('e1'),
-          target: Coordinate.toIndex('e2'),
-          capture: false,
+        .play({
+          from: 'e1',
+          to: 'e2',
         })
         // 2nd occurance below
-        .makeMove({
-          start: Coordinate.toIndex('e8'),
-          target: Coordinate.toIndex('e7'),
-          capture: false,
+        .play({
+          from: 'e8',
+          to: 'e7',
         })
-        .makeMove({
-          start: Coordinate.toIndex('e2'),
-          target: Coordinate.toIndex('e1'),
-          capture: false,
+        .play({
+          from: 'e2',
+          to: 'e1',
         })
-        .makeMove({
-          start: Coordinate.toIndex('e7'),
-          target: Coordinate.toIndex('e8'),
-          capture: false,
+        .play({
+          from: 'e7',
+          to: 'e8',
         });
 
       expect(
@@ -208,16 +199,14 @@ describe('ChessGame', () => {
       ).toHaveLength(0);
 
       const threeFoldRepetitionGame = almostThreeFoldRepetition
-        .makeMove({
-          start: Coordinate.toIndex('e1'),
-          target: Coordinate.toIndex('e2'),
-          capture: false,
+        .play({
+          from: 'e1',
+          to: 'e2',
         })
         // 3rd occurance below
-        .makeMove({
-          start: Coordinate.toIndex('e8'),
-          target: Coordinate.toIndex('e7'),
-          capture: false,
+        .play({
+          from: 'e8',
+          to: 'e7',
         });
 
       const claimDrawAction = threeFoldRepetitionGame
@@ -286,23 +275,22 @@ describe('ChessGame', () => {
       });
 
       let chessGame = ChessGame.fromChessPosition(initialPosition);
-      const originalFen = FenParser.toFenStr(chessGame.getState());
+      const originalFen = FenParser.toFenStr(chessGame.getPosition());
 
-      chessGame = chessGame.makeMove({
-        start: Coordinate.toIndex('e2'),
-        target: Coordinate.toIndex('e4'),
-        capture: false,
+      chessGame = chessGame.play({
+        from: 'e2',
+        to: 'e4',
       });
-      const afterMoveFen = FenParser.toFenStr(chessGame.getState());
+      const afterMoveFen = FenParser.toFenStr(chessGame.getPosition());
 
       expect(afterMoveFen).not.toEqual(originalFen);
-      expect(chessGame.getState().turn).toBe('black');
+      expect(chessGame.getPosition().turn).toBe('black');
 
       chessGame = chessGame.unmakeMove();
-      const afterUnmakeFen = FenParser.toFenStr(chessGame.getState());
+      const afterUnmakeFen = FenParser.toFenStr(chessGame.getPosition());
 
       expect(afterUnmakeFen).toEqual(originalFen);
-      expect(chessGame.getState().turn).toBe('white');
+      expect(chessGame.getPosition().turn).toBe('white');
     });
 
     it('should handle unmaking multiple moves correctly', () => {
@@ -319,27 +307,24 @@ describe('ChessGame', () => {
       });
 
       let chessGame = ChessGame.fromChessPosition(initialPosition);
-      const originalFen = FenParser.toFenStr(chessGame.getState());
+      const originalFen = FenParser.toFenStr(chessGame.getPosition());
 
       // Make first move (e2-e4)
-      chessGame = chessGame.makeMove({
-        start: Coordinate.toIndex('e2'),
-        target: Coordinate.toIndex('e4'),
-        capture: false,
+      chessGame = chessGame.play({
+        from: 'e2',
+        to: 'e4',
       });
 
       // Make second move (e7-e5)
-      chessGame = chessGame.makeMove({
-        start: Coordinate.toIndex('e7'),
-        target: Coordinate.toIndex('e5'),
-        capture: false,
+      chessGame = chessGame.play({
+        from: 'e7',
+        to: 'e5',
       });
 
       // Make third move (d2-d4)
-      chessGame = chessGame.makeMove({
-        start: Coordinate.toIndex('d2'),
-        target: Coordinate.toIndex('d4'),
-        capture: false,
+      chessGame = chessGame.play({
+        from: 'd2',
+        to: 'd4',
       });
 
       // Unmake all three moves
@@ -347,9 +332,9 @@ describe('ChessGame', () => {
       chessGame = chessGame.unmakeMove(); // unmake e7-e5
       chessGame = chessGame.unmakeMove(); // unmake e2-e4
 
-      const finalFen = FenParser.toFenStr(chessGame.getState());
+      const finalFen = FenParser.toFenStr(chessGame.getPosition());
       expect(finalFen).toEqual(originalFen);
-      expect(chessGame.getState().turn).toBe('white');
+      expect(chessGame.getPosition().turn).toBe('white');
     });
 
     it('should handle unmakeMove on initial position gracefully', () => {
@@ -362,13 +347,13 @@ describe('ChessGame', () => {
       });
 
       const chessGame = ChessGame.fromChessPosition(initialPosition);
-      const originalFen = FenParser.toFenStr(chessGame.getState());
+      const originalFen = FenParser.toFenStr(chessGame.getPosition());
 
       const afterUnmake = chessGame.unmakeMove();
-      const afterUnmakeFen = FenParser.toFenStr(afterUnmake.getState());
+      const afterUnmakeFen = FenParser.toFenStr(afterUnmake.getPosition());
 
       expect(afterUnmakeFen).toEqual(originalFen);
-      expect(afterUnmake.getState().turn).toBe('white');
+      expect(afterUnmake.getPosition().turn).toBe('white');
     });
   });
 
