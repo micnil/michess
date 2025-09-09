@@ -5,7 +5,6 @@ import { ChessGameActions } from './ChessGameActions';
 import { ChessGameAction } from './model/ChessGameAction';
 import { ChessGameResult } from './model/ChessGameResult';
 import { GameState } from './model/GameState';
-import { MoveOption } from './move/MoveOption';
 
 type GameStateInternal = {
   additionalActions: ChessGameActions;
@@ -15,16 +14,11 @@ type GameStateInternal = {
 
 export type ChessGame = {
   getState(): GameState;
-  getMoves(): MoveOption[];
   getAdditionalActions(): ChessGameAction[];
   makeAction(action: ChessGameAction, playerColor: Color): ChessGame;
   getPosition(): ChessPosition;
-  unmakeMove(): ChessGame;
   play(moveRecord: Move): ChessGame;
   setResult(result: ChessGameResult): ChessGame;
-  perft: (depth: number) => {
-    nodes: number;
-  };
 };
 
 const evalAdditionalActions = (
@@ -137,16 +131,7 @@ const fromGameStateInternal = (
       return fromGameStateInternal(gameState);
     },
     getState,
-    getMoves: () => board.moveOptions,
     play: playMove,
-    unmakeMove: () => {
-      const newBoard = board.unmakeMove();
-      return fromGameStateInternal({
-        board: newBoard,
-        result: evalResultFromBoard(newBoard),
-        additionalActions: evalAdditionalActions(additionalActions, newBoard),
-      });
-    },
     setResult: (result: ChessGameResult): ChessGame => {
       return fromGameStateInternal({
         board,
@@ -155,7 +140,6 @@ const fromGameStateInternal = (
       });
     },
     getAdditionalActions: () => gameStateInternal.additionalActions.value(),
-    perft: (depth: number) => board.perft(depth),
   };
 };
 

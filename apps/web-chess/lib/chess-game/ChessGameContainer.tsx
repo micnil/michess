@@ -1,5 +1,5 @@
 import { FenParser, Move } from '@michess/core-board';
-import { ChessGame, GameState, MoveOption } from '@michess/core-game';
+import { Chessboard, GameState, MoveOption } from '@michess/core-game';
 import {
   Chessboard as ChessboardView,
   GameStatusType,
@@ -22,36 +22,28 @@ const getGameStatus = (gameState: GameState): GameStatusType => {
 };
 
 export const ChessGameContainer = () => {
-  const [chessGame, setChessGame] = useState(() =>
-    ChessGame.fromChessPosition(
+  const [chessboard, setChessboard] = useState(() =>
+    Chessboard.fromPosition(
       FenParser.toChessPosition(
         'rnbq1b1r/pppPpk1p/5np1/5p2/8/8/PPPP1PPP/RNBQKBNR w KQ - 1 5'
       )
     )
   );
 
-  const gameState = chessGame.getState();
-  const position = chessGame.getPosition();
-  const moves = chessGame.getMoves();
-  const gameStatus = getGameStatus(gameState);
+  const position = chessboard.position;
+  const moves = chessboard.moveOptions;
 
   return (
     <ChessboardView<Move>
       orientation={'white'}
       size={500}
       piecePlacements={position.pieces}
-      gameStatus={gameStatus}
-      winner={
-        gameState.result?.type === 'black_win'
-          ? 'black'
-          : gameState.result?.type === 'white_win'
-          ? 'white'
-          : undefined
-      }
-      moveHistory={gameState.moveHistory}
-      onMove={(movePayload) => {
-        console.log(movePayload);
-        setChessGame(chessGame.play(movePayload));
+      gameStatus={undefined}
+      winner={undefined}
+      moveHistory={chessboard.moveRecord}
+      onMove={(move) => {
+        console.log(move);
+        setChessboard(chessboard.playMove(move));
       }}
       moveOptions={moves.map((move) => MoveOption.toMove(move))}
     />

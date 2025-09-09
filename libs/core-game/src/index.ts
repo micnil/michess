@@ -1,3 +1,4 @@
+export * from './lib/Chessboard';
 export * from './lib/ChessGame';
 export * from './lib/ChessTable';
 export * from './lib/model/ChessGameResultType';
