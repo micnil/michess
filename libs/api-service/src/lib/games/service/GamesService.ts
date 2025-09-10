@@ -5,7 +5,7 @@ import {
   MakeMovePayloadV1,
 } from '@michess/api-schema';
 import { assertDefined } from '@michess/common-utils';
-import { ChessPosition, FenParser } from '@michess/core-board';
+import { ChessPosition, FenParser, Move } from '@michess/core-board';
 import { ChessGame } from '@michess/core-game';
 import { GameRepository, MoveRepository } from '@michess/infra-db';
 import { Session } from '../../auth/model/Session';
@@ -65,6 +65,22 @@ export class GamesService {
   }
 
   async makeMove(session: Session, data: MakeMovePayloadV1): Promise<void> {
-    throw new Error('Not implemented yet');
+    const dbGame = await this.gameRepository.findGameWithRelationsById(
+      data.gameId
+    );
+    assertDefined(dbGame, `Game '${data.gameId}' not found`);
+    const moveToPlay = Move.fromUci(data.uci);
+    const gameDetails = GameDetailsMapper.fromSelectGameWithRelations(dbGame);
+    const chessGame = ChessGame.fromGameState(gameDetails);
+    const updatedGame = chessGame.play(session.userId, moveToPlay);
+    const updatedGameState = updatedGame.getState();
+    await this.gameRepository.updateGame(
+      gameDetails.id,
+      GameDetailsMapper.toInsertGame(updatedGameState)
+    );
+    await this.moveRepository.createMove({
+      gameId: gameDetails.id,
+      uci: data.uci,
+    });
   }
 }

@@ -13,7 +13,6 @@ const convertIncomingHeadersToHeaders = (
 
   Object.entries(incomingHeaders).forEach(([key, value]) => {
     if (value !== undefined) {
-      // IncomingHttpHeaders can have string | string[] values
       const headerValue = Array.isArray(value) ? value.join(', ') : value;
       headers.set(key.toLowerCase(), headerValue);
     }
@@ -53,15 +52,20 @@ const from = (api: Api) => {
   io.on('connection', (socket) => {
     console.log('a user connected');
 
-    socket.on('join-game', (payload: unknown) => {
+    socket.on('join-game', async (payload: unknown) => {
       const joinGamePayloadV1 = JoinGamePayloadV1Schema.parse(payload);
-      api.games.joinGame(socket.data.session, joinGamePayloadV1);
+      const gameState = await api.games.joinGame(
+        socket.data.session,
+        joinGamePayloadV1
+      );
       socket.join(joinGamePayloadV1.gameId);
+      io.to(joinGamePayloadV1.gameId).emit('user-joined', gameState);
     });
 
-    socket.on('make-move', (payload: unknown) => {
+    socket.on('make-move', async (payload: unknown) => {
       const makeMovePayloadV1 = MakeMovePayloadV1Schema.parse(payload);
-      api.games.makeMove(socket.data.session, makeMovePayloadV1);
+      await api.games.makeMove(socket.data.session, makeMovePayloadV1);
+      io.to(makeMovePayloadV1.gameId).emit('move-made', makeMovePayloadV1);
     });
 
     socket.on('disconnect', (reason) => {

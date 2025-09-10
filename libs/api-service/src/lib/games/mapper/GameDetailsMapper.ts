@@ -115,6 +115,8 @@ export const GameDetailsMapper = {
       whitePlayerId: game.players.white ? game.players.white.id : null,
       blackPlayerId: game.players.black ? game.players.black.id : null,
       status: TO_STATUS_TYPE_MAPPING[game.status],
+      startedAt: game.startedAt ?? null,
+      endedAt: game.endedAt ?? null,
     };
   },
 };
