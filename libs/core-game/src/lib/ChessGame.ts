@@ -22,9 +22,9 @@ type GameStateInternal = {
 export type ChessGame = {
   getState(): GameState;
   getAdditionalActions(): ChessGameAction[];
-  makeAction(action: ChessGameAction, playerColor: Color): ChessGame;
+  makeAction(playerId: string, action: ChessGameAction): ChessGame;
   getPosition(): ChessPosition;
-  play(movesRecord: Move): ChessGame;
+  play(playerId: string, movesRecord: Move): ChessGame;
   setResult(result: ChessGameResult): ChessGame;
   joinGame(playerInfo: PlayerInfo, side?: Color): ChessGame;
 };
@@ -50,47 +50,58 @@ const evalAdditionalActions = (
 
 const makeAction = (
   gameState: GameStateInternal,
-  action: ChessGameAction,
-  playerColor: Color
+  playerId: string,
+  action: ChessGameAction
 ): {
   gameState: GameStateInternal;
 } => {
-  if (gameState.additionalActions.isActionAvailable(action, playerColor)) {
-    const newActions = gameState.additionalActions.useAction(
-      action,
-      playerColor
-    );
-    switch (action.type) {
-      case 'CLAIM_DRAW':
-      case 'ACCEPT_DRAW':
-      case 'RESIGN':
-        return {
-          gameState: {
-            ...gameState,
-            result: ChessGameResult.fromChessGameAction(
-              action,
-              gameState.board.position.turn
-            ),
-            additionalActions: newActions,
-          },
-        };
-      case 'OFFER_DRAW':
-      case 'REJECT_DRAW':
-        return {
-          gameState: {
-            ...gameState,
-            additionalActions: newActions,
-          },
-        };
-      default:
-        return {
-          gameState,
-        };
+  const playerColor =
+    gameState.players.white?.id === playerId
+      ? Color.White
+      : gameState.players.black?.id === playerId
+      ? Color.Black
+      : undefined;
+
+  if (playerColor) {
+    if (gameState.additionalActions.isActionAvailable(action, playerColor)) {
+      const newActions = gameState.additionalActions.useAction(
+        action,
+        playerColor
+      );
+      switch (action.type) {
+        case 'CLAIM_DRAW':
+        case 'ACCEPT_DRAW':
+        case 'RESIGN':
+          return {
+            gameState: {
+              ...gameState,
+              result: ChessGameResult.fromChessGameAction(
+                action,
+                gameState.board.position.turn
+              ),
+              additionalActions: newActions,
+            },
+          };
+        case 'OFFER_DRAW':
+        case 'REJECT_DRAW':
+          return {
+            gameState: {
+              ...gameState,
+              additionalActions: newActions,
+            },
+          };
+        default:
+          return {
+            gameState,
+          };
+      }
+    } else {
+      throw new Error(
+        `Action ${action.type} is not available for turn ${gameState.board.position.turn}`
+      );
     }
   } else {
-    throw new Error(
-      `Action ${action.type} is not available for turn ${gameState.board.position.turn}`
-    );
+    throw new Error('Player is not part of the game');
   }
 };
 
@@ -151,9 +162,13 @@ const fromGameStateInternal = (
       resultStr: ChessGameResult.toResultString(result),
     };
   };
-  const playMove = (move: Move): ChessGame => {
+  const playMove = (playerId: string, move: Move): ChessGame => {
     if (result) {
       throw new Error('Game is already over');
+    } else if (
+      playerId !== gameStateInternal.players[board.position.turn]?.id
+    ) {
+      throw new Error('Not your turn');
     } else {
       const newBoard = board.playMove(move);
       return fromGameStateInternal({
@@ -166,8 +181,8 @@ const fromGameStateInternal = (
   };
   return {
     getPosition: () => board.position,
-    makeAction: (action: ChessGameAction, playerColor: Color): ChessGame => {
-      const { gameState } = makeAction(gameStateInternal, action, playerColor);
+    makeAction: (playerId: string, action: ChessGameAction): ChessGame => {
+      const { gameState } = makeAction(gameStateInternal, playerId, action);
       return fromGameStateInternal(gameState);
     },
     getState,

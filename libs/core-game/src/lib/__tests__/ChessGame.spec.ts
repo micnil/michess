@@ -1,11 +1,11 @@
 import { Color, createChessPositionMock } from '@michess/core-board';
 import { ChessGame } from '../ChessGame';
+import { GameStateMock } from '../model/__mocks__/GameState.mock';
 
 describe('ChessGame', () => {
   describe('getAdditionalActions', () => {
     it('should return three-fold repetition action when applicable', () => {
-      const position = createChessPositionMock();
-      const chessGame = ChessGame.fromChessPosition(position);
+      const chessGame = ChessGame.fromGameState(GameStateMock.fromPartial());
 
       expect(
         chessGame
@@ -15,45 +15,45 @@ describe('ChessGame', () => {
 
       // Bongcloud draw (magnus - hikaru game).
       const almostThreeFoldRepetition = chessGame
-        .play({
+        .play('player1', {
           from: 'e2',
           to: 'e4',
         })
-        .play({
+        .play('player2', {
           from: 'e7',
           to: 'e5',
         })
-        .play({
+        .play('player1', {
           from: 'e1',
           to: 'e2',
         })
         // 1st occurance below
-        .play({
+        .play('player2', {
           from: 'e8',
           to: 'e7',
         })
-        .play({
+        .play('player1', {
           from: 'e2',
           to: 'e1',
         })
-        .play({
+        .play('player2', {
           from: 'e7',
           to: 'e8',
         })
-        .play({
+        .play('player1', {
           from: 'e1',
           to: 'e2',
         })
         // 2nd occurance below
-        .play({
+        .play('player2', {
           from: 'e8',
           to: 'e7',
         })
-        .play({
+        .play('player1', {
           from: 'e2',
           to: 'e1',
         })
-        .play({
+        .play('player2', {
           from: 'e7',
           to: 'e8',
         });
@@ -65,12 +65,12 @@ describe('ChessGame', () => {
       ).toHaveLength(0);
 
       const threeFoldRepetitionGame = almostThreeFoldRepetition
-        .play({
+        .play('player1', {
           from: 'e1',
           to: 'e2',
         })
         // 3rd occurance below
-        .play({
+        .play('player2', {
           from: 'e8',
           to: 'e7',
         });
@@ -83,8 +83,8 @@ describe('ChessGame', () => {
 
       expect(threeFoldRepetitionGame.getState().result).toBeUndefined();
       const drawnGame = threeFoldRepetitionGame.makeAction(
-        claimDrawAction,
-        Color.White
+        'player1',
+        claimDrawAction
       );
       expect(drawnGame.getState().result?.type).toEqual('draw');
     });
