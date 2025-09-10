@@ -127,4 +127,112 @@ describe('ChessGame', () => {
       expect(actions).toEqual([]);
     });
   });
+
+  describe('joinGame', () => {
+    it('should allow a player to join as white when white slot is empty', () => {
+      const position = createChessPositionMock();
+      const chessGame = ChessGame.fromChessPosition(position);
+      const playerInfo = { id: 'player1', name: 'Player One' };
+
+      const gameWithPlayer = chessGame.joinGame(playerInfo, Color.White);
+      const gameState = gameWithPlayer.getState();
+
+      expect(gameState.players.white).toEqual(playerInfo);
+      expect(gameState.players.black).toBeUndefined();
+      expect(gameState.status).toBe('WAITING');
+    });
+
+    it('should allow a player to join as black when black slot is empty', () => {
+      const position = createChessPositionMock();
+      const chessGame = ChessGame.fromChessPosition(position);
+      const playerInfo = { id: 'player1', name: 'Player One' };
+
+      const gameWithPlayer = chessGame.joinGame(playerInfo, Color.Black);
+      const gameState = gameWithPlayer.getState();
+
+      expect(gameState.players.black).toEqual(playerInfo);
+      expect(gameState.players.white).toBeUndefined();
+      expect(gameState.status).toBe('WAITING');
+    });
+
+    it('should assign a random available side when no side is specified', () => {
+      const position = createChessPositionMock();
+      const chessGame = ChessGame.fromChessPosition(position);
+      const playerInfo = { id: 'player1', name: 'Player One' };
+
+      const gameWithPlayer = chessGame.joinGame(playerInfo);
+      const gameState = gameWithPlayer.getState();
+
+      // Should have assigned the player to either white or black
+      const hasWhite = gameState.players.white?.id === playerInfo.id;
+      const hasBlack = gameState.players.black?.id === playerInfo.id;
+      expect(hasWhite || hasBlack).toBe(true);
+      expect(gameState.status).toBe('WAITING');
+    });
+
+    it('should set status to READY when both players have joined', () => {
+      const position = createChessPositionMock();
+      const chessGame = ChessGame.fromChessPosition(position);
+      const player1 = { id: 'player1', name: 'Player One' };
+      const player2 = { id: 'player2', name: 'Player Two' };
+
+      const gameWithPlayer1 = chessGame.joinGame(player1, Color.White);
+      const gameWithBothPlayers = gameWithPlayer1.joinGame(
+        player2,
+        Color.Black
+      );
+      const gameState = gameWithBothPlayers.getState();
+
+      expect(gameState.players.white).toEqual(player1);
+      expect(gameState.players.black).toEqual(player2);
+      expect(gameState.status).toBe('READY');
+    });
+
+    it('should throw error when trying to join a side that is already taken', () => {
+      const position = createChessPositionMock();
+      const chessGame = ChessGame.fromChessPosition(position);
+      const player1 = { id: 'player1', name: 'Player One' };
+      const player2 = { id: 'player2', name: 'Player Two' };
+
+      const gameWithPlayer1 = chessGame.joinGame(player1, Color.White);
+
+      expect(() => {
+        gameWithPlayer1.joinGame(player2, Color.White);
+      }).toThrow('Invalid side or side already taken');
+    });
+
+    it('should throw error when trying to join a game where all sides are taken', () => {
+      const position = createChessPositionMock();
+      const chessGame = ChessGame.fromChessPosition(position);
+      const player1 = { id: 'player1', name: 'Player One' };
+      const player2 = { id: 'player2', name: 'Player Two' };
+      const player3 = { id: 'player3', name: 'Player Three' };
+
+      const gameWithPlayer1 = chessGame.joinGame(player1, Color.White);
+      const gameWithBothPlayers = gameWithPlayer1.joinGame(
+        player2,
+        Color.Black
+      );
+
+      expect(() => {
+        gameWithBothPlayers.joinGame(player3);
+      }).toThrow('Invalid side or side already taken');
+    });
+
+    it('should preserve existing game state when a player joins', () => {
+      const position = createChessPositionMock();
+      const chessGame = ChessGame.fromChessPosition(position);
+      const playerInfo = { id: 'player1', name: 'Player One' };
+
+      const gameWithPlayer = chessGame.joinGame(playerInfo, Color.White);
+
+      expect(gameWithPlayer.getPosition()).toEqual(chessGame.getPosition());
+      expect(gameWithPlayer.getState().movesRecord).toEqual(
+        chessGame.getState().movesRecord
+      );
+      expect(gameWithPlayer.getState().result).toEqual(
+        chessGame.getState().result
+      );
+    });
+  });
 });

@@ -1,4 +1,4 @@
-import { Maybe } from '@michess/common-utils';
+import { isDefined, Maybe } from '@michess/common-utils';
 import { ChessPosition, Color, Move } from '@michess/core-board';
 import { Chessboard } from './Chessboard';
 import { ChessGameActions } from './ChessGameActions';
@@ -8,6 +8,7 @@ import { GameMeta } from './model/GameMeta';
 import { GamePlayers } from './model/GamePlayers';
 import { GameState } from './model/GameState';
 import { GameStatusType } from './model/GameStatusType';
+import { PlayerInfo } from './model/PlayerInfo';
 
 type GameStateInternal = {
   meta: GameMeta;
@@ -25,6 +26,7 @@ export type ChessGame = {
   getPosition(): ChessPosition;
   play(movesRecord: Move): ChessGame;
   setResult(result: ChessGameResult): ChessGame;
+  joinGame(playerInfo: PlayerInfo, side?: Color): ChessGame;
 };
 
 const evalAdditionalActions = (
@@ -92,6 +94,34 @@ const makeAction = (
   }
 };
 
+const joinGame = (
+  players: GamePlayers,
+  playerInfo: PlayerInfo,
+  color?: Color
+): GamePlayers => {
+  const availableSides: Color[] = [
+    players.white ? null : ('white' as const),
+    players.black ? null : ('black' as const),
+  ].filter(isDefined);
+
+  const sideToJoin =
+    color ?? availableSides[Math.floor(Math.random() * availableSides.length)];
+
+  if (sideToJoin === 'white' && players.white === undefined) {
+    return {
+      ...players,
+      white: { id: playerInfo.id, name: playerInfo.name },
+    };
+  } else if (sideToJoin === 'black' && players.black === undefined) {
+    return {
+      ...players,
+      black: { id: playerInfo.id, name: playerInfo.name },
+    };
+  } else {
+    throw new Error('Invalid side or side already taken');
+  }
+};
+
 const evalResultFromBoard = (
   board: Chessboard
 ): ChessGameResult | undefined => {
@@ -150,6 +180,14 @@ const fromGameStateInternal = (
       });
     },
     getAdditionalActions: () => gameStateInternal.additionalActions.value(),
+    joinGame: (playerInfo: PlayerInfo, side?: Color): ChessGame => {
+      const newPlayers = joinGame(gameStateInternal.players, playerInfo, side);
+      return fromGameStateInternal({
+        ...gameStateInternal,
+        players: newPlayers,
+        status: newPlayers.black && newPlayers.white ? 'READY' : 'WAITING',
+      });
+    },
   };
 };
 

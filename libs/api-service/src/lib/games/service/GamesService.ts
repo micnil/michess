@@ -6,7 +6,7 @@ import {
 } from '@michess/api-schema';
 import { assertDefined } from '@michess/common-utils';
 import { ChessPosition, FenParser } from '@michess/core-board';
-import { ChessTable } from '@michess/core-game';
+import { ChessGame } from '@michess/core-game';
 import { GameRepository, MoveRepository } from '@michess/infra-db';
 import { Session } from '../../auth/model/Session';
 import { GameDetailsMapper } from '../mapper/GameDetailsMapper';
@@ -45,21 +45,22 @@ export class GamesService {
     );
     assertDefined(dbGame, `Game '${data.gameId}' not found`);
     const gameDetails = GameDetailsMapper.fromSelectGameWithRelations(dbGame);
-    const chessTable = ChessTable.fromGameDetails(gameDetails);
+    const chessGame = ChessGame.fromGameState(gameDetails);
+
     if (data.side === 'spectator') {
       return GameDetailsMapper.toGameDetailsV1(gameDetails);
     } else {
-      const updatedTable = chessTable.joinGame(
+      const updatedGame = chessGame.joinGame(
         // TODO
         { id: session.userId, name: 'Anonymous' },
         data.side
       );
-      const updatedDetails = updatedTable.getGameDetails();
+      const updatedGameState = updatedGame.getState();
       await this.gameRepository.updateGame(
         gameDetails.id,
-        GameDetailsMapper.toInsertGame(updatedDetails)
+        GameDetailsMapper.toInsertGame(updatedGameState)
       );
-      return GameDetailsMapper.toGameDetailsV1(updatedDetails);
+      return GameDetailsMapper.toGameDetailsV1(updatedGameState);
     }
   }
 
