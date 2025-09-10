@@ -9,7 +9,7 @@ export type Api = {
 };
 
 const from = (repos: Repositories, sql: Sql): Api => {
-  const gamesService = new GamesService(repos.game);
+  const gamesService = new GamesService(repos.game, repos.move);
   const authService = new AuthService(sql, repos.cache);
 
   return {
