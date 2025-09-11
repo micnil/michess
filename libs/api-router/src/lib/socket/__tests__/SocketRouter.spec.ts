@@ -2,6 +2,7 @@ import {
   GameDetailsV1,
   JoinGamePayloadV1,
   MakeMovePayloadV1,
+  MakeMoveResponseV1,
 } from '@michess/api-schema';
 import { Api, AuthService, GamesService, Session } from '@michess/api-service';
 import { createServer } from 'node:http';
@@ -21,10 +22,29 @@ function waitFor(socket: ServerSocket | ClientSocket, event: string) {
   });
 }
 
+const leaveAllRooms = (socket: ServerSocket) => {
+  socket.rooms.forEach((room) => {
+    if (room !== socket.id) {
+      socket.leave(room);
+    }
+  });
+};
+
+const connectClientSocket = (port: number, id: string): ClientSocket => {
+  return ioClient(`http://localhost:${port}`, {
+    transports: ['websocket'],
+    multiplex: false,
+    auth: {
+      token: id,
+    },
+  });
+};
 describe('SocketRouter', () => {
   let io: Server;
-  let clientSocket: ClientSocket;
-  let serverSocket: ServerSocket;
+  let clientSocket1: ClientSocket;
+  let clientSocket2: ClientSocket;
+  let serverSocket1: ServerSocket;
+  let serverSocket2: ServerSocket;
 
   let httpServer: ReturnType<typeof createServer>;
 
@@ -40,11 +60,8 @@ describe('SocketRouter', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    serverSocket.rooms.forEach((room) => {
-      if (room !== serverSocket.id) {
-        serverSocket.leave(room);
-      }
-    });
+    leaveAllRooms(serverSocket1);
+    leaveAllRooms(serverSocket2);
   });
   beforeAll((done) => {
     apiMock.auth.getSession = jest.fn().mockResolvedValue(sessionMock);
@@ -57,30 +74,31 @@ describe('SocketRouter', () => {
 
       const port = typeof address === 'object' && address ? address.port : 0;
       io.on('connection', (socket) => {
-        serverSocket = socket;
+        if (socket.handshake.auth.token === 'client1') {
+          serverSocket1 = socket;
+        } else {
+          serverSocket2 = socket;
+        }
       });
 
-      clientSocket = ioClient(`http://localhost:${port}`, {
-        autoConnect: false,
-        forceNew: true,
-        transports: ['websocket'],
-      });
-
-      clientSocket.on('connect', done);
-      clientSocket.connect();
+      clientSocket1 = connectClientSocket(port, 'client1');
+      clientSocket2 = connectClientSocket(port, 'client2');
+      clientSocket2.on('connect', done);
     });
   });
 
   afterAll(() => {
     io.close();
-    clientSocket.disconnect();
+    clientSocket1.disconnect();
+    clientSocket2.disconnect();
     if (httpServer) {
       httpServer.close();
     }
   });
 
   describe('join-game', () => {
-    it('should handle valid join-game event', (done) => {
+    it('should handle valid join-game event', async () => {
+      expect.assertions(4);
       const joinGamePayload: JoinGamePayloadV1 = {
         gameId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
         side: 'white',
@@ -92,38 +110,51 @@ describe('SocketRouter', () => {
         moves: [],
         variant: 'standard',
       };
+      serverSocket2.join(joinGamePayload.gameId);
 
       apiMock.games.joinGame = jest.fn().mockResolvedValue(mockGameState);
 
-      clientSocket.on('user-joined', (data) => {
+      clientSocket2.on('user-joined', (data) => {
         expect(data).toEqual(mockGameState);
-        expect(apiMock.games.joinGame).toHaveBeenCalled();
-        done();
       });
 
-      // Send the event
-      clientSocket.emit('join-game', joinGamePayload);
+      const response = await clientSocket1.emitWithAck(
+        'join-game',
+        joinGamePayload
+      );
+
+      expect(response.status).toEqual('ok');
+      expect(response.status === 'ok' && response.data).toEqual(mockGameState);
+      expect(apiMock.games.joinGame).toHaveBeenCalled();
     });
   });
 
   describe('make-move', () => {
-    it('should handle valid make-move event', (done) => {
+    it('should handle valid make-move event', async () => {
+      expect.assertions(4);
       const makeMovePayload: MakeMovePayloadV1 = {
         gameId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
         uci: 'e2e4',
       };
-      serverSocket.join(makeMovePayload.gameId);
+      serverSocket1.join(makeMovePayload.gameId);
+      serverSocket2.join(makeMovePayload.gameId);
 
       apiMock.games.makeMove = jest.fn().mockResolvedValue(undefined);
 
-      clientSocket.on('move-made', (data) => {
+      clientSocket2.once('move-made', (data) => {
         expect(data).toEqual(makeMovePayload);
-        expect(apiMock.games.makeMove).toHaveBeenCalled();
-        done();
       });
 
-      // Send the event
-      clientSocket.emit('make-move', makeMovePayload);
+      const response: MakeMoveResponseV1 = await clientSocket1.emitWithAck(
+        'make-move',
+        makeMovePayload
+      );
+
+      expect(response.status).toEqual('ok');
+      expect(response.status === 'ok' && response.data).toEqual(
+        makeMovePayload
+      );
+      expect(apiMock.games.makeMove).toHaveBeenCalled();
     });
   });
 });

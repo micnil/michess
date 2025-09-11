@@ -9,3 +9,4 @@ export * from './lib/game/JoinGamePayloadV1';
 export * from './lib/game/JoinGamePayloadV1Schema';
 export * from './lib/game/MakeMovePayloadV1';
 export * from './lib/game/MakeMovePayloadV1Schema';
+export * from './lib/game/MakeMoveResponseV1';
