@@ -73,10 +73,6 @@ const from = (api: Api) => {
     });
   });
 
-  io.engine.on('connection_error', (err) => {
-    console.log(`${err.code}: ${err.message}`);
-  });
-
   return io;
 };
 

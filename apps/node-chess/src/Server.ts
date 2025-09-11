@@ -14,6 +14,10 @@ const start = (app: App, appConfig: AppConfig): ServerType => {
 
   app.socketRouter.attach(server);
 
+  app.socketRouter.engine.on('connection_error', (err) => {
+    console.log(`${err.code}: ${err.message}`);
+  });
+
   // graceful shutdown
   process.on('SIGINT', () => {
     server.close();
