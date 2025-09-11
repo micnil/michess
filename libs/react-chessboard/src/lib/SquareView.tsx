@@ -1,12 +1,12 @@
+import { Maybe, Position } from '@michess/common-utils';
+import { Color, Coordinate, PieceType } from '@michess/core-board';
+import { useDragDropContext, useDrop } from '@michess/react-dnd';
 import React from 'react';
 import styled from 'styled-components';
-import { Maybe, Position } from '@michess/common-utils';
-import { useDragDropContext, useDrop } from '@michess/react-dnd';
-import { Color, Coordinate, PieceType } from '@michess/core-board';
 import { useChessboardContext } from './context/hooks/useChessboardContext';
 import { useMoveOptions } from './context/hooks/useMoveOptions';
-import { canMoveTo } from './move/util/canMoveTo';
 import { MovePayload } from './model/MovePayload';
+import { canMoveTo } from './move/util/canMoveTo';
 
 type RectProps = {
   color: Color;
@@ -17,13 +17,13 @@ const StyledRect = styled.rect<RectProps>`
 `;
 
 type OverlayRectProps = {
-  highlight: boolean;
-  color: 'green' | 'yellow';
+  $highlight: boolean;
+  $color: 'green' | 'yellow';
 };
 const StyledOverlayRect = styled.rect<OverlayRectProps>`
-  fill: ${({ highlight, color }) =>
-    highlight
-      ? color === 'green'
+  fill: ${({ $highlight, $color }) =>
+    $highlight
+      ? $color === 'green'
         ? 'rgba(20,85,30,0.5)'
         : 'rgba(254,254,51,0.2)'
       : 'rgba(20,85,30,0.0)'};
@@ -31,11 +31,11 @@ const StyledOverlayRect = styled.rect<OverlayRectProps>`
 `;
 
 type LatestMoveOverlayProps = {
-  highlight: boolean;
+  $highlight: boolean;
 };
 const StyledLatestMoveOverlay = styled.rect<LatestMoveOverlayProps>`
-  fill: ${({ highlight }) =>
-    highlight ? 'rgba(255,255,0,0.3)' : 'rgba(255,255,0,0.0)'};
+  fill: ${({ $highlight }) =>
+    $highlight ? 'rgba(255,255,0,0.3)' : 'rgba(255,255,0,0.0)'};
   pointer-events: none;
 `;
 
@@ -104,14 +104,14 @@ export const SquareView: React.FC<Props> = ({
         {...position}
         width={size}
         height={size}
-        highlight={!!isLatestMoveSquare}
+        $highlight={!!isLatestMoveSquare}
       />
       <StyledOverlayRect
         {...position}
         width={size}
         height={size}
-        highlight={higlightSquare}
-        color={isHovering ? 'green' : 'yellow'}
+        $highlight={higlightSquare}
+        $color={isHovering ? 'green' : 'yellow'}
       />
     </>
   );
