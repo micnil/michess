@@ -1,10 +1,12 @@
 import {
+  EventResponse,
   JoinGamePayloadV1Schema,
   MakeMovePayloadV1Schema,
 } from '@michess/api-schema';
 import { Api, Session } from '@michess/api-service';
 import { IncomingHttpHeaders } from 'http2';
 import { DefaultEventsMap, Server, Socket } from 'socket.io';
+import { ApiErrorMapper } from './util/ApiErrorMapper';
 
 const convertIncomingHeadersToHeaders = (
   incomingHeaders: IncomingHttpHeaders
@@ -52,20 +54,32 @@ const from = (api: Api) => {
   io.on('connection', (socket) => {
     console.log('a user connected');
 
-    socket.on('join-game', async (payload: unknown) => {
-      const joinGamePayloadV1 = JoinGamePayloadV1Schema.parse(payload);
-      const gameState = await api.games.joinGame(
-        socket.data.session,
-        joinGamePayloadV1
-      );
-      socket.join(joinGamePayloadV1.gameId);
-      io.to(joinGamePayloadV1.gameId).emit('user-joined', gameState);
+    socket.on('join-game', async (payload: unknown, callback) => {
+      try {
+        const joinGamePayloadV1 = JoinGamePayloadV1Schema.parse(payload);
+        const gameState = await api.games.joinGame(
+          socket.data.session,
+          joinGamePayloadV1
+        );
+        socket.join(joinGamePayloadV1.gameId);
+        socket.to(joinGamePayloadV1.gameId).emit('user-joined', gameState);
+        callback(EventResponse.ok(gameState));
+      } catch (error) {
+        callback(EventResponse.error(ApiErrorMapper.from(error)));
+      }
     });
 
-    socket.on('make-move', async (payload: unknown) => {
-      const makeMovePayloadV1 = MakeMovePayloadV1Schema.parse(payload);
-      await api.games.makeMove(socket.data.session, makeMovePayloadV1);
-      io.to(makeMovePayloadV1.gameId).emit('move-made', makeMovePayloadV1);
+    socket.on('make-move', async (payload: unknown, callback) => {
+      try {
+        const makeMovePayloadV1 = MakeMovePayloadV1Schema.parse(payload);
+        await api.games.makeMove(socket.data.session, makeMovePayloadV1);
+        socket
+          .to(makeMovePayloadV1.gameId)
+          .emit('move-made', makeMovePayloadV1);
+        callback(EventResponse.ok(makeMovePayloadV1));
+      } catch (error) {
+        callback(EventResponse.error(ApiErrorMapper.from(error)));
+      }
     });
 
     socket.on('disconnect', (reason) => {
