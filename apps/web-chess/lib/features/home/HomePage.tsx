@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
+import { GameLobby } from '../lobby/GameLobby';
 import { QuickPairing } from '../quick-pairing/QuickPairing';
 import { StatsSection } from '../stats/StatsSection';
-import { GameLobby } from './GameLobby';
 
 const HomeContainer = styled.div`
   max-width: 1200px;

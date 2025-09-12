@@ -1,5 +1,5 @@
 import { Container } from '../lib/components/Container';
-import { HomePage } from '../lib/features/lobby/HomePage';
+import { HomePage } from '../lib/features/home/HomePage';
 
 export function Home() {
   const handleQuickPlay = (timeControl: {
