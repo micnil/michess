@@ -53,8 +53,8 @@ const GameList = styled.div`
 
 const GameCard = styled.div`
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 1rem;
   padding: 0.75rem 1rem;
   background-color: #fafafa;
   border-radius: 6px;
@@ -67,49 +67,16 @@ const GameCard = styled.div`
   }
 `;
 
-const PlayerInfo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex: 1;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
-  }
-`;
-
-const PlayerName = styled.div`
+const PlayerColumn = styled.div`
   font-weight: 600;
   color: #374151;
   min-width: 120px;
 `;
 
-const GameDetails = styled.div`
-  display: flex;
-  gap: 1rem;
+const GameModeColumn = styled.div`
   font-size: 0.875rem;
   color: #6b7280;
-  align-items: center;
-
-  @media (max-width: 768px) {
-    gap: 0.75rem;
-  }
-`;
-
-const GameMode = styled.span``;
-
-const TimeControl = styled.span``;
-
-const PlayerRating = styled.span``;
-
-const OnlineIndicator = styled.span`
-  &:before {
-    content: '●';
-    color: #10b981;
-    margin-right: 0.25rem;
-  }
+  flex: 1;
 `;
 
 const JoinButton = styled.button`
@@ -131,10 +98,7 @@ const JoinButton = styled.button`
 type GameLobbyEntry = {
   id: string;
   playerName: string;
-  rating: number;
   gameMode: string;
-  timeControl: string;
-  isOnline: boolean;
 };
 
 type Props = {
@@ -147,34 +111,22 @@ const mockGames: GameLobbyEntry[] = [
   {
     id: '1',
     playerName: 'ChessMaster2024',
-    rating: 1845,
     gameMode: 'Standard',
-    timeControl: '10+0',
-    isOnline: true,
   },
   {
     id: '2',
     playerName: 'KnightRider',
-    rating: 1623,
     gameMode: 'Standard',
-    timeControl: '5+3',
-    isOnline: true,
   },
   {
     id: '3',
     playerName: 'QueenGambit',
-    rating: 1987,
     gameMode: 'King of the Hill',
-    timeControl: '15+10',
-    isOnline: false,
   },
   {
     id: '4',
     playerName: 'PawnStorm',
-    rating: 1456,
     gameMode: 'Standard',
-    timeControl: '3+2',
-    isOnline: true,
   },
 ];
 
@@ -193,15 +145,8 @@ export const GameLobby: React.FC<Props> = ({
       <GameList>
         {games.map((game) => (
           <GameCard key={game.id}>
-            <PlayerInfo>
-              <PlayerName>{game.playerName}</PlayerName>
-              <GameDetails>
-                <GameMode>{game.gameMode}</GameMode>
-                <TimeControl>{game.timeControl}</TimeControl>
-                <PlayerRating>{game.rating}</PlayerRating>
-                {game.isOnline && <OnlineIndicator />}
-              </GameDetails>
-            </PlayerInfo>
+            <PlayerColumn>{game.playerName}</PlayerColumn>
+            <GameModeColumn>{game.gameMode}</GameModeColumn>
             <JoinButton onClick={() => onJoinGame?.(game.id)}>Join</JoinButton>
           </GameCard>
         ))}
