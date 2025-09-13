@@ -1,7 +1,9 @@
 import {
+  ClientToServerEvents,
   EventResponse,
   JoinGamePayloadV1Schema,
   MakeMovePayloadV1Schema,
+  ServerToClientEvents,
 } from '@michess/api-schema';
 import { Api, Session } from '@michess/api-service';
 import { IncomingHttpHeaders } from 'http2';
@@ -27,8 +29,8 @@ type SocketData = {
 };
 const from = (api: Api) => {
   const io = new Server<
-    DefaultEventsMap,
-    DefaultEventsMap,
+    ClientToServerEvents,
+    ServerToClientEvents,
     DefaultEventsMap,
     SocketData
   >({

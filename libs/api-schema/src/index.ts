@@ -1,3 +1,4 @@
+export * from './lib/ClientToServerEvents';
 export * from './lib/common/ApiError';
 export * from './lib/common/EventResponse';
 export * from './lib/game/CreateGameV1';
@@ -10,3 +11,4 @@ export * from './lib/game/JoinGamePayloadV1Schema';
 export * from './lib/game/MakeMovePayloadV1';
 export * from './lib/game/MakeMovePayloadV1Schema';
 export * from './lib/game/MakeMoveResponseV1';
+export * from './lib/ServerToClientEvents';
