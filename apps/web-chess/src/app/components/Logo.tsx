@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import { FC } from 'react';
 import styled from 'styled-components';
 
@@ -13,7 +12,7 @@ const LogoContainer = styled.div`
 export const Logo: FC = () => {
   return (
     <LogoContainer>
-      <Image src="/knightv2.svg" height={40} width={40} alt="logo" />
+      <img src="/knightv2.svg" height={40} width={40} alt="logo" />
       <span>michess</span>
     </LogoContainer>
   );
