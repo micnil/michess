@@ -2,9 +2,10 @@
   "generators": {
     "@nx/react": {
       "application": {
+        "babel": true,
         "style": "styled-components",
         "linter": "eslint",
-        "babel": true
+        "bundler": "vite"
       },
       "component": {
         "style": "styled-components"
@@ -60,6 +61,15 @@
       "cache": true,
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
+    },
+    "@nx/vite:test": {
+      "cache": true,
+      "inputs": ["default", "^production"]
+    },
+    "@nx/vite:build": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
     }
   },
   "namedInputs": {
@@ -68,7 +78,9 @@
     "production": [
       "default",
       "!{projectRoot}/.eslintrc.json",
-      "!{projectRoot}/src/test-setup.[jt]s"
+      "!{projectRoot}/src/test-setup.[jt]s",
+      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+      "!{projectRoot}/tsconfig.spec.json"
     ]
   },
   "parallel": 1,
