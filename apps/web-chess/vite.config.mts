@@ -11,7 +11,7 @@ export default defineConfig({
     port: 4200,
     host: 'localhost',
     proxy: {
-      '/api': 'http://localhost:5000/api',
+      '/api': 'http://localhost:5000',
     },
   },
   preview: {
