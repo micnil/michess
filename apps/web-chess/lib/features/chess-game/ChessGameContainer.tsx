@@ -21,7 +21,7 @@ const getGameStatus = (gameState: GameState): GameStatusType => {
   }
 };
 
-export const ChessGameContainer = () => {
+export const ChessGameContainer = ({ gameId }: { gameId?: string }) => {
   const [chessboard, setChessboard] = useState(() =>
     Chessboard.fromPosition(
       FenParser.toChessPosition(
@@ -29,6 +29,10 @@ export const ChessGameContainer = () => {
       )
     )
   );
+
+  // TODO: Load game state from API using gameId
+  // For now, we'll use the default position
+  console.log('Loading game with ID:', gameId);
 
   const position = chessboard.position;
   const moves = chessboard.moveOptions;

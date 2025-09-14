@@ -1,5 +1,7 @@
+import { useRouter } from 'next/router';
 import React from 'react';
 import styled from 'styled-components';
+import { useApi } from '../../api/hooks';
 import { GameLobby } from '../lobby/GameLobby';
 import { QuickPairing } from '../quick-pairing/QuickPairing';
 import { StatsSection } from '../stats/StatsSection';
@@ -36,6 +38,9 @@ export const HomePage: React.FC<Props> = ({
   onCreateGame,
   onJoinGame,
 }) => {
+  const router = useRouter();
+  const api = useApi(); // Call hook during render
+
   const handleQuickPlay = (timeControl: {
     id: string;
     type: string;
@@ -45,9 +50,21 @@ export const HomePage: React.FC<Props> = ({
     onQuickPlay?.(timeControl);
   };
 
-  const handleCreateGame = () => {
-    console.log('Creating new game');
-    onCreateGame?.();
+  const handleCreateGame = async () => {
+    try {
+      console.log('Creating new game...');
+      const gameDetails = await api.games.createGame(false); // Create public game
+
+      console.log('Game created:', gameDetails);
+
+      // Navigate to the game page
+      await router.push(`/game/${gameDetails.id}`);
+
+      onCreateGame?.();
+    } catch (error) {
+      console.error('Failed to create game:', error);
+      // TODO: Show error message to user
+    }
   };
 
   const handleJoinGame = (gameId: string) => {
