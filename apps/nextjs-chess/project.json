@@ -1,7 +1,7 @@
 {
   "name": "web-chess",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/web-chess",
+  "sourceRoot": "apps/nextjs-chess",
   "projectType": "application",
   "tags": [],
   "targets": {
@@ -10,11 +10,11 @@
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
-        "outputPath": "dist/apps/web-chess"
+        "outputPath": "dist/apps/nextjs-chess"
       },
       "configurations": {
         "development": {
-          "outputPath": "apps/web-chess"
+          "outputPath": "apps/nextjs-chess"
         },
         "production": {}
       }
@@ -25,7 +25,7 @@
       "options": {
         "buildTarget": "web-chess:build",
         "dev": true,
-        "proxyConfig": "apps/web-chess/proxy.conf.json"
+        "proxyConfig": "apps/nextjs-chess/proxy.conf.json"
       },
       "configurations": {
         "development": {
@@ -47,9 +47,9 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/apps/web-chess"],
+      "outputs": ["{workspaceRoot}/coverage/apps/nextjs-chess"],
       "options": {
-        "jestConfig": "apps/web-chess/jest.config.ts"
+        "jestConfig": "apps/nextjs-chess/jest.config.ts"
       }
     },
     "lint": {
