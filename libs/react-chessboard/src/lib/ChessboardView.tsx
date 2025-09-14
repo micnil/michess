@@ -1,12 +1,12 @@
+import { Coordinate } from '@michess/core-board';
+import { useDragDropContext } from '@michess/react-dnd';
 import React from 'react';
 import styled from 'styled-components';
-import { Coordinate } from '@michess/core-board';
 import { PieceView } from './PieceView';
-import { useChessboardContext } from './context/hooks/useChessboardContext';
 import { SquareView } from './SquareView';
+import { useChessboardContext } from './context/hooks/useChessboardContext';
 import { PromotionDialog } from './promotion-dialog/components/PromotionDialog';
 import { usePromotionDialog } from './promotion-dialog/hooks/usePromotionDialog';
-import { useDragDropContext } from '@michess/react-dnd';
 
 const Board = styled.svg`
   overflow: visible;
@@ -35,7 +35,6 @@ export const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
 
   const boardState = chessboard.getState();
   const squareSize = size / 8;
-
   return (
     <BoardContainer>
       <Board width={size} height={size}>
@@ -54,7 +53,7 @@ export const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
           })}
         </Squares>
         <Pieces>
-          {Object.entries(boardState.pieces).map(([coord, piece]) => {
+          {Array.from(boardState.pieces.entries()).map(([coord, piece]) => {
             const square = squares[chessboard.getIndex(coord as Coordinate)];
             return (
               <PieceView

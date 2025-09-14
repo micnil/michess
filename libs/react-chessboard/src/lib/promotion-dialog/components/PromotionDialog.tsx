@@ -1,7 +1,7 @@
+import { Position } from '@michess/common-utils';
+import { Color, ColoredPieceType, PieceType } from '@michess/core-board';
 import React from 'react';
 import styled from 'styled-components';
-import { Position } from '@michess/common-utils';
-import { ColoredPieceType, PieceType, Color } from '@michess/core-board';
 import pieceSprite from '../../../assets/chessboard-sprite-staunty.svg';
 
 const DEFAULT_SPRITE_SIZE = 40;
@@ -127,7 +127,7 @@ export const PromotionDialog: React.FC<Props> = ({
                   viewBox={`0 0 ${squareSize} ${squareSize}`}
                 >
                   <use
-                    href={`${pieceSprite.src}#${coloredPieceType}`}
+                    href={`${pieceSprite}#${coloredPieceType}`}
                     transform={`scale(${scaling} ${scaling})`}
                   />
                 </svg>

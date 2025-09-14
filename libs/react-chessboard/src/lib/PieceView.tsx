@@ -29,7 +29,6 @@ export const PieceView: React.FC<Props> = ({
   const { register, registerPreview, isDragging } = useDrag({
     id: coord,
   });
-
   return (
     <>
       <StyledGroup
@@ -37,7 +36,7 @@ export const PieceView: React.FC<Props> = ({
         transform={`translate(${initialPosition.x} ${initialPosition.y})`}
       >
         <use
-          href={`${pieceSprite.src}#${pieceAndColor}`}
+          href={`${pieceSprite}#${pieceAndColor}`}
           transform={`scale(${scaling} ${scaling})`}
         />
         <rect
@@ -53,7 +52,7 @@ export const PieceView: React.FC<Props> = ({
           transform={`translate(${initialPosition.x} ${initialPosition.y})`}
         >
           <use
-            href={`${pieceSprite.src}#${pieceAndColor}`}
+            href={`${pieceSprite}#${pieceAndColor}`}
             transform={`scale(${scaling} ${scaling})`}
           />
           <rect width={squareSize} height={squareSize} fill="#ffffff00" />
