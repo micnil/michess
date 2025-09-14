@@ -83,6 +83,9 @@
       "!{projectRoot}/tsconfig.spec.json"
     ]
   },
+  "tui": {
+    "enabled": false
+  },
   "parallel": 1,
   "useInferencePlugins": false,
   "defaultBase": "main"
