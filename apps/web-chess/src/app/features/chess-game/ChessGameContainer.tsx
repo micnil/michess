@@ -1,4 +1,4 @@
-import { FenParser, Move } from '@michess/core-board';
+import { Color, FenParser, Move } from '@michess/core-board';
 import { Chessboard, GameState } from '@michess/core-game';
 import {
   Chessboard as ChessboardView,
@@ -21,7 +21,13 @@ const getGameStatus = (gameState: GameState): GameStatusType => {
   }
 };
 
-export const ChessGameContainer = ({ gameId }: { gameId?: string }) => {
+export const ChessGameContainer = ({
+  gameId,
+  orientation,
+}: {
+  gameId?: string;
+  orientation?: Color;
+}) => {
   const [chessboard, setChessboard] = useState(() =>
     Chessboard.fromPosition(
       FenParser.toChessPosition(
@@ -36,7 +42,7 @@ export const ChessGameContainer = ({ gameId }: { gameId?: string }) => {
 
   return (
     <ChessboardView<Move>
-      orientation={'black'}
+      orientation={orientation}
       size={500}
       gameStatus={undefined}
       winner={undefined}

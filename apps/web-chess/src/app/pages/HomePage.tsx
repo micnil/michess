@@ -37,8 +37,8 @@ export const HomePage: React.FC = () => {
 
   const handleCreateGame = async () => {
     try {
-      console.log('Creating new game...');
-      const gameDetails = await api.games.createGame(false); // Create public game
+      const gameDetails = await api.games.createGame(false);
+      await api.games.joinGame(gameDetails.id, 'white');
 
       console.log('Game created:', gameDetails);
 

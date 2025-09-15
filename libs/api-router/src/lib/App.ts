@@ -13,7 +13,7 @@ export type App = {
 
 const from = (api: Api, routerConfig: RouterConfig): App => {
   const restRouter = RestRouter.from(api, routerConfig);
-  const socketRouter = SocketRouter.from(api);
+  const socketRouter = SocketRouter.from(api, routerConfig);
   return { restRouter, socketRouter };
 };
 export const App = {

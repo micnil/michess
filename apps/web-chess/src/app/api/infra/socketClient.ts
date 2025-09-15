@@ -4,8 +4,9 @@ import {
 } from '@michess/api-schema';
 import { io, Socket } from 'socket.io-client';
 
-export const socketClient: Socket<ServerToClientEvents, ClientToServerEvents> =
-  io({
-    autoConnect: false,
-    reconnection: false,
-  });
+export type SocketClient = Socket<ServerToClientEvents, ClientToServerEvents>;
+
+export const socketClient: SocketClient = io({
+  autoConnect: false,
+  reconnection: false,
+});

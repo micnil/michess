@@ -2,6 +2,7 @@ import { Maybe } from '@michess/common-utils';
 import { anonymousClient } from 'better-auth/client/plugins';
 import { createAuthClient } from 'better-auth/react';
 import { authClient } from './infra/authClient';
+import { SocketClient } from './infra/socketClient';
 import { AuthState } from './model/AuthState';
 
 type AuthClient = ReturnType<
@@ -34,11 +35,15 @@ export class AuthService {
     };
   }
 
-  constructor(private authClient: AuthClient) {}
+  constructor(
+    private authClient: AuthClient,
+    private socketClient: SocketClient
+  ) {}
 
   async getSession(): Promise<Maybe<AuthState>> {
     const { data, error } = await this.authClient.getSession();
     if (data) {
+      this.socketClient.connect();
       return this.toAuthState(data);
     } else if (error) {
       throw new Error('Failed to retrieve session data', { cause: error });

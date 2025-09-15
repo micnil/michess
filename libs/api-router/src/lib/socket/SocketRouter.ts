@@ -8,6 +8,7 @@ import {
 import { Api, Session } from '@michess/api-service';
 import { IncomingHttpHeaders } from 'http2';
 import { DefaultEventsMap, Server, Socket } from 'socket.io';
+import { RouterConfig } from '../model/RouterConfig';
 import { ApiErrorMapper } from './util/ApiErrorMapper';
 
 const convertIncomingHeadersToHeaders = (
@@ -27,7 +28,7 @@ const convertIncomingHeadersToHeaders = (
 type SocketData = {
   session: Session;
 };
-const from = (api: Api) => {
+const from = (api: Api, config: RouterConfig) => {
   const io = new Server<
     ClientToServerEvents,
     ServerToClientEvents,
@@ -35,7 +36,7 @@ const from = (api: Api) => {
     SocketData
   >({
     cors: {
-      origin: '*',
+      origin: config.cors.origins,
     },
   });
 

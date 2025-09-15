@@ -1,3 +1,4 @@
+import { Color } from '@michess/core-board';
 import {
   createRootRoute,
   createRoute,
@@ -46,10 +47,10 @@ const indexRoute = createRoute({
 
 const gameWithIdRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/game/$gameId',
+  path: '/game/$gameId/{-$side}',
   component: function GameWithIdComponent() {
-    const { gameId } = gameWithIdRoute.useParams();
-    return <GamePage gameId={gameId} />;
+    const { gameId, side } = gameWithIdRoute.useParams();
+    return <GamePage gameId={gameId} side={side as Color} />;
   },
 });
 
