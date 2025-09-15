@@ -7,7 +7,7 @@ import { MoveOptionsMap } from '../move/model/MoveOptionsMap';
 
 export type ChessboardContextState<TMoveMeta = unknown> = {
   chessboard: Chessboard;
-  squares: Square[];
+  squares: Record<Coordinate, Square>;
   moveOptionsMap?: MoveOptionsMap;
   latestMove?: { from: Coordinate; to: Coordinate };
   movePiece: (payload: MovePayload<TMoveMeta>) => void;

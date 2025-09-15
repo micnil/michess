@@ -25,7 +25,7 @@ export const ChessGameContainer = ({ gameId }: { gameId?: string }) => {
   const [chessboard, setChessboard] = useState(() =>
     Chessboard.fromPosition(
       FenParser.toChessPosition(
-        'rnbq1b1r/pppPpk1p/5np1/5p2/8/8/PPPP1PPP/RNBQKBNR w KQ - 1 5'
+        'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
       )
     )
   );
@@ -36,7 +36,7 @@ export const ChessGameContainer = ({ gameId }: { gameId?: string }) => {
 
   return (
     <ChessboardView<Move>
-      orientation={'white'}
+      orientation={'black'}
       size={500}
       gameStatus={undefined}
       winner={undefined}

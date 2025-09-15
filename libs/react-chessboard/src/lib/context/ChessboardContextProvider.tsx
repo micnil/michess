@@ -1,6 +1,7 @@
 import {
   BoardCoordinates,
   Color,
+  Coordinate,
   FenParser,
   PiecePlacements,
 } from '@michess/core-board';
@@ -44,16 +45,20 @@ export const ChessboardContextProvider = <TMoveMeta,>({
   onMoveRef.current = onMove;
 
   const squareSize = size / 8;
-  const squareCoordinates = BoardCoordinates.createWhite();
-  const squares: Square[] = squareCoordinates.map((coordinate, i) => ({
-    size: squareSize,
-    color: ((9 * i) & 8) === 0 ? 'white' : 'black',
-    coordinate,
-    position: {
-      x: (i % 8) * squareSize,
-      y: Math.floor(i / 8) * squareSize,
-    },
-  }));
+  const squareCoordinates = BoardCoordinates.fromOrientation(orientation);
+
+  const squares: Record<Coordinate, Square> = {} as Record<Coordinate, Square>;
+  squareCoordinates.forEach((coordinate, i) => {
+    squares[coordinate] = {
+      size: squareSize,
+      color: ((9 * i) & 8) === 0 ? 'white' : 'black',
+      coordinate,
+      position: {
+        x: (i % 8) * squareSize,
+        y: Math.floor(i / 8) * squareSize,
+      },
+    };
+  });
 
   useEffect(() => {
     if (moveHistory) {

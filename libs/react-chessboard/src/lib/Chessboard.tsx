@@ -27,7 +27,7 @@ type Props<TMoveMeta = unknown> = {
   onMove?: (move: MovePayload<TMoveMeta>) => Promise<boolean>;
 };
 export const Chessboard = <TMoveMeta,>({
-  orientation,
+  orientation = 'white',
   size = 500,
   fromPositionFen,
   gameStatus = 'active',
