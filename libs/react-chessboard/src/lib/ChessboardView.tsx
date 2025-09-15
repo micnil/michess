@@ -33,7 +33,7 @@ export const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
     handlePromotionCancel,
   } = usePromotionDialog();
 
-  const boardState = chessboard.getState();
+  const boardState = chessboard.position;
   const squareSize = size / 8;
   return (
     <BoardContainer>
@@ -54,7 +54,7 @@ export const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
         </Squares>
         <Pieces>
           {Array.from(boardState.pieces.entries()).map(([coord, piece]) => {
-            const square = squares[chessboard.getIndex(coord as Coordinate)];
+            const square = squares[Coordinate.toIndex(coord as Coordinate)];
             return (
               <PieceView
                 key={coord}
@@ -76,7 +76,7 @@ export const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
             color={promotionDialog.color}
             squareSize={squareSize}
             position={
-              squares[chessboard.getIndex(promotionDialog.coordinate)].position
+              squares[Coordinate.toIndex(promotionDialog.coordinate)].position
             }
             onClick={handlePromotionSelect}
             onCancel={handlePromotionCancel}

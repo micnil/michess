@@ -64,7 +64,7 @@ export const SquareView: React.FC<Props> = ({
   const handleDrop = async (draggableId: string) => {
     const fromCoord = draggableId as Coordinate;
     const options = moveOptions?.filter((option) => option.to === coordinate);
-    const color = chessboard.getState().pieces.get(fromCoord)?.color;
+    const color = chessboard.position.pieces.get(fromCoord)?.color;
 
     let move: Maybe<MovePayload>;
     if (options && options.length > 1 && color) {

@@ -1,5 +1,5 @@
 import { FenParser, Move } from '@michess/core-board';
-import { Chessboard, GameState, MoveOption } from '@michess/core-game';
+import { Chessboard, GameState } from '@michess/core-game';
 import {
   Chessboard as ChessboardView,
   GameStatusType,
@@ -34,8 +34,6 @@ export const ChessGameContainer = ({ gameId }: { gameId?: string }) => {
   // For now, we'll use the default position
   console.log('Loading game with ID:', gameId);
 
-  const moves = chessboard.moveOptions;
-
   return (
     <ChessboardView<Move>
       orientation={'white'}
@@ -48,7 +46,6 @@ export const ChessGameContainer = ({ gameId }: { gameId?: string }) => {
         setChessboard(chessboard.playMove(move));
         return true;
       }}
-      moveOptions={moves.map((move) => MoveOption.toMove(move))}
     />
   );
 };

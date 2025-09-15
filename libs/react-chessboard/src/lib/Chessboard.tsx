@@ -29,7 +29,6 @@ type Props<TMoveMeta = unknown> = {
 export const Chessboard = <TMoveMeta,>({
   orientation,
   size = 500,
-  moveOptions,
   fromPositionFen,
   gameStatus = 'active',
   winner,
@@ -41,7 +40,6 @@ export const Chessboard = <TMoveMeta,>({
       <ChessboardContextProvider
         size={size}
         orientation={orientation}
-        moveOptions={moveOptions}
         fromPositionFen={fromPositionFen}
         gameStatus={gameStatus}
         moveHistory={moveHistory}

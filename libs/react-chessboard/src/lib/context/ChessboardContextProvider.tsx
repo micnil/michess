@@ -4,12 +4,11 @@ import {
   FenParser,
   PiecePlacements,
 } from '@michess/core-board';
-import { Chessboard } from '@michess/core-game';
+import { Chessboard, MoveOption } from '@michess/core-game';
 import { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { GameStatusType } from '../model/GameStatusType';
 import { MovePayload } from '../model/MovePayload';
 import { Square } from '../model/Square';
-import { MoveOptions } from '../move/model/MoveOptions';
 import { MoveOptionsMap } from '../move/model/MoveOptionsMap';
 import { ChessboardContext } from './ChessboardContext';
 
@@ -18,7 +17,6 @@ type Props<TMoveMeta = unknown> = {
   orientation?: Color;
   fromPositionFen?: string;
   piecePlacements?: PiecePlacements;
-  moveOptions?: MoveOptions<TMoveMeta>;
   gameStatus: GameStatusType;
   moveHistory?: MovePayload<TMoveMeta>[];
   onMove?: (move: MovePayload<TMoveMeta>) => Promise<boolean>;
@@ -31,7 +29,6 @@ export const ChessboardContextProvider = <TMoveMeta,>({
   gameStatus,
   fromPositionFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
   onMove,
-  moveOptions,
   moveHistory,
   size,
 }: Props<TMoveMeta>) => {
@@ -89,9 +86,9 @@ export const ChessboardContextProvider = <TMoveMeta,>({
         squares,
         chessboard,
         movePiece: movePiece as (payload: MovePayload<unknown>) => void,
-        moveOptionsMap: moveOptions
-          ? MoveOptionsMap.fromMoveOptions(moveOptions)
-          : undefined,
+        moveOptionsMap: MoveOptionsMap.fromMoveOptions(
+          chessboard.moveOptions.map((option) => MoveOption.toMove(option))
+        ),
         latestMove,
       }}
     >
