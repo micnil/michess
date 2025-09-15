@@ -1,24 +1,27 @@
-import { FenStr, FenParser } from '@michess/core-board';
-import { Color, PiecePlacements } from '@michess/core-board';
-import { ReactNode, useCallback, useRef, useState } from 'react';
+import {
+  BoardCoordinates,
+  Color,
+  FenParser,
+  PiecePlacements,
+} from '@michess/core-board';
+import { Chessboard } from '@michess/core-game';
+import { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import { GameStatusType } from '../model/GameStatusType';
+import { MovePayload } from '../model/MovePayload';
+import { Square } from '../model/Square';
 import { MoveOptions } from '../move/model/MoveOptions';
 import { MoveOptionsMap } from '../move/model/MoveOptionsMap';
 import { ChessboardContext } from './ChessboardContext';
-import { GameStatusType } from '../model/GameStatusType';
-import { Square } from '../model/Square';
-import { MovePayload } from '../model/MovePayload';
-import { IChessboard } from '../model/IChessboard';
-import { Chessboard } from '../model/Chessboard';
 
 type Props<TMoveMeta = unknown> = {
   size: number;
   orientation?: Color;
-  startingFen?: FenStr;
+  fromPositionFen?: string;
   piecePlacements?: PiecePlacements;
   moveOptions?: MoveOptions<TMoveMeta>;
   gameStatus: GameStatusType;
   moveHistory?: MovePayload<TMoveMeta>[];
-  onMove?: (move: MovePayload<TMoveMeta>) => void;
+  onMove?: (move: MovePayload<TMoveMeta>) => Promise<boolean>;
   children: ReactNode;
 };
 
@@ -26,28 +29,25 @@ export const ChessboardContextProvider = <TMoveMeta,>({
   children,
   orientation = 'white',
   gameStatus,
-  startingFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+  fromPositionFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
   onMove,
-  piecePlacements,
   moveOptions,
   moveHistory,
   size,
 }: Props<TMoveMeta>) => {
-  const [chessboard, setChessboard] = useState<IChessboard>(() =>
-    Chessboard({
-      ...FenParser.toChessPosition(startingFen),
-      orientation: 'white',
-    })
-  );
+  const [chessboard, setChessboard] = useState<Chessboard>(() => {
+    return Chessboard.fromPosition(
+      {
+        ...FenParser.toChessPosition(fromPositionFen),
+      },
+      moveHistory
+    );
+  });
   const onMoveRef = useRef(onMove);
   onMoveRef.current = onMove;
 
-  const contextChessboard = piecePlacements
-    ? Chessboard({ pieces: piecePlacements, orientation }) // Consumer owned
-    : chessboard; // Internally owned
-
   const squareSize = size / 8;
-  const squareCoordinates = chessboard.getCoordinates();
+  const squareCoordinates = BoardCoordinates.createWhite();
   const squares: Square[] = squareCoordinates.map((coordinate, i) => ({
     size: squareSize,
     color: ((9 * i) & 8) === 0 ? 'white' : 'black',
@@ -58,11 +58,27 @@ export const ChessboardContextProvider = <TMoveMeta,>({
     },
   }));
 
-  const movePiece = useCallback((payload: MovePayload<TMoveMeta>) => {
-    onMoveRef.current?.(payload);
+  useEffect(() => {
+    if (moveHistory) {
+      setChessboard((prevChessboard) =>
+        prevChessboard.updateMoves(moveHistory || [])
+      );
+    }
+  }, [moveHistory]);
+
+  const movePiece = useCallback(async (payload: MovePayload<TMoveMeta>) => {
     setChessboard((prevChessboard) => {
-      return prevChessboard.movePiece(payload);
+      return prevChessboard.playMove(payload);
     });
+    if (onMoveRef.current) {
+      const result = await onMoveRef.current(payload);
+      if (!result) {
+        // Revert the move if not accepted
+        setChessboard((prevChessboard) => {
+          return prevChessboard.unmakeMove();
+        });
+      }
+    }
   }, []);
 
   const latestMove = moveHistory?.[moveHistory.length - 1];
@@ -71,7 +87,7 @@ export const ChessboardContextProvider = <TMoveMeta,>({
     <ChessboardContext.Provider
       value={{
         squares,
-        chessboard: contextChessboard,
+        chessboard,
         movePiece: movePiece as (payload: MovePayload<unknown>) => void,
         moveOptionsMap: moveOptions
           ? MoveOptionsMap.fromMoveOptions(moveOptions)

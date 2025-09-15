@@ -33,7 +33,9 @@ export type Chessboard = BoardState & {
   moveOptions: MoveOption[];
   movesRecord: Move[];
   playMove: (move: Move) => Chessboard;
-  unmakeMove: () => Chessboard;
+  playMoves: (moves: Move[]) => Chessboard;
+  updateMoves: (moves: Move[]) => Chessboard;
+  unmakeMove: (toMoveNumber?: number) => Chessboard;
   perft: (depth: number) => { nodes: number };
 };
 
@@ -306,16 +308,16 @@ const from = (
     get initialPosition() {
       return history.length > 0 ? history[0].position : state.position;
     },
-    unmakeMove: (): Chessboard => {
-      const lastHistoryItem = history[history.length - 1];
-      if (!lastHistoryItem) {
+    unmakeMove: (toMoveNumber = history.length): Chessboard => {
+      const newPosition = history[toMoveNumber - 1];
+      if (!newPosition) {
         return from(state, history);
       }
-      const newHistory = history.slice(0, -1);
+      const newHistory = history.slice(0, toMoveNumber - 1);
       return from(
         {
-          position: lastHistoryItem.position,
-          positionHash: lastHistoryItem.positionHash,
+          position: newPosition.position,
+          positionHash: newPosition.positionHash,
         },
         newHistory
       );
@@ -335,6 +337,58 @@ const from = (
       } else {
         throw new Error(`Invalid move: ${Move.toUci(move)}`);
       }
+    },
+    playMoves: (moves: Move[]): Chessboard => {
+      let board = from(state, history);
+      for (const move of moves) {
+        board = board.playMove(move);
+      }
+      return board;
+    },
+    updateMoves: (moves: Move[]): Chessboard => {
+      // Find the first move that doesn't match between current history and target moves
+      const indexOfFirstNonMatchingMove = history.findIndex((item, index) => {
+        return (
+          index >= moves.length ||
+          !Move.isEqual(moves[index], MoveOption.toMove(item.playedMove))
+        );
+      });
+
+      // If all current moves match and we have the exact same number of moves, no change needed
+      if (
+        indexOfFirstNonMatchingMove === -1 &&
+        moves.length === history.length
+      ) {
+        return from(state, history);
+      }
+
+      // Determine the sync point - either where moves diverge or where current history ends
+      const syncPoint =
+        indexOfFirstNonMatchingMove === -1
+          ? history.length // No divergence found, sync from end of current history
+          : indexOfFirstNonMatchingMove; // Divergence found, sync from that point
+
+      // Get the initial position (before any moves were played)
+      const initialPosition =
+        history.length > 0 ? history[0].position : state.position;
+      const initialPositionHash =
+        history.length > 0 ? history[0].positionHash : state.positionHash;
+      const initialBoard = from(
+        { position: initialPosition, positionHash: initialPositionHash },
+        []
+      );
+
+      // If syncPoint is 0, start from initial position, otherwise play moves up to syncPoint
+      const syncedBoard =
+        syncPoint === 0
+          ? initialBoard
+          : initialBoard.playMoves(moves.slice(0, syncPoint));
+
+      // Apply the remaining moves from the input array starting from sync point
+      const remainingMoves = moves.slice(syncPoint);
+      return remainingMoves.length > 0
+        ? syncedBoard.playMoves(remainingMoves)
+        : syncedBoard;
     },
   };
 };

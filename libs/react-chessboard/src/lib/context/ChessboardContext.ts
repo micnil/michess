@@ -1,12 +1,12 @@
-import React from 'react';
-import { MoveOptionsMap } from '../move/model/MoveOptionsMap';
-import { Square } from '../model/Square';
 import { Coordinate } from '@michess/core-board';
-import { IReadOnlyChessboard } from '../model/IReadOnlyChessboard';
+import { Chessboard } from '@michess/core-game';
+import React from 'react';
 import { MovePayload } from '../model/MovePayload';
+import { Square } from '../model/Square';
+import { MoveOptionsMap } from '../move/model/MoveOptionsMap';
 
 export type ChessboardContextState<TMoveMeta = unknown> = {
-  chessboard: IReadOnlyChessboard;
+  chessboard: Chessboard;
   squares: Square[];
   moveOptionsMap?: MoveOptionsMap;
   latestMove?: { from: Coordinate; to: Coordinate };

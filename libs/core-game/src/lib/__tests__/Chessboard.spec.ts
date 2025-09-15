@@ -383,4 +383,204 @@ describe('Chessboard', () => {
       expect(afterUnmake.position.turn).toBe('white');
     });
   });
+
+  describe('updateMoves', () => {
+    it('should handle empty moves array by returning to initial position', () => {
+      const initialPosition = createChessPositionMock({
+        pieces: {
+          e1: { color: 'white', type: 'k' },
+          e8: { color: 'black', type: 'k' },
+          e2: { color: 'white', type: 'p' },
+          e7: { color: 'black', type: 'p' },
+        },
+        turn: 'white',
+      });
+
+      // Start with some moves played
+      const board = Chessboard.fromPosition(initialPosition, [
+        { from: 'e2', to: 'e4' },
+        { from: 'e7', to: 'e5' },
+      ]);
+
+      // Update with empty moves array should return to initial position
+      const updatedBoard = board.updateMoves([]);
+      const initialFen = FenParser.toFenStr(initialPosition);
+      const updatedFen = FenParser.toFenStr(updatedBoard.position);
+
+      expect(updatedFen).toEqual(initialFen);
+      expect(updatedBoard.movesRecord).toHaveLength(0);
+    });
+
+    it('should handle identical moves by returning the same board state', () => {
+      const initialPosition = createChessPositionMock({
+        pieces: {
+          e1: { color: 'white', type: 'k' },
+          e8: { color: 'black', type: 'k' },
+          e2: { color: 'white', type: 'p' },
+          e7: { color: 'black', type: 'p' },
+        },
+        turn: 'white',
+      });
+
+      // Start with some moves played
+      const moves: Move[] = [
+        { from: 'e2', to: 'e4' },
+        { from: 'e7', to: 'e5' },
+      ];
+      const board = Chessboard.fromPosition(initialPosition, moves);
+
+      const originalFen = FenParser.toFenStr(board.position);
+
+      // Update with same moves should return identical board
+      const updatedBoard = board.updateMoves(moves);
+      const updatedFen = FenParser.toFenStr(updatedBoard.position);
+
+      expect(updatedFen).toEqual(originalFen);
+      expect(updatedBoard.movesRecord).toEqual(moves);
+    });
+
+    it('should handle adding new moves to existing sequence', () => {
+      const initialPosition = createChessPositionMock({
+        pieces: {
+          e1: { color: 'white', type: 'k' },
+          e8: { color: 'black', type: 'k' },
+          e2: { color: 'white', type: 'p' },
+          e7: { color: 'black', type: 'p' },
+          d2: { color: 'white', type: 'p' },
+          d7: { color: 'black', type: 'p' },
+        },
+        turn: 'white',
+      });
+
+      // Start with some moves played
+      const board = Chessboard.fromPosition(initialPosition, [
+        { from: 'e2', to: 'e4' },
+        { from: 'e7', to: 'e5' },
+      ]);
+
+      // Update with additional moves
+      const newMoves: Move[] = [
+        { from: 'e2', to: 'e4' },
+        { from: 'e7', to: 'e5' },
+        { from: 'd2', to: 'd4' },
+        { from: 'd7', to: 'd6' },
+      ];
+
+      const updatedBoard = board.updateMoves(newMoves);
+
+      expect(updatedBoard.movesRecord).toEqual(newMoves);
+      expect(updatedBoard.movesRecord).toHaveLength(4);
+    });
+
+    it('should handle replacing moves from divergence point', () => {
+      const initialPosition = createChessPositionMock({
+        pieces: {
+          e1: { color: 'white', type: 'k' },
+          e8: { color: 'black', type: 'k' },
+          e2: { color: 'white', type: 'p' },
+          e7: { color: 'black', type: 'p' },
+          d2: { color: 'white', type: 'p' },
+          d7: { color: 'black', type: 'p' },
+          f2: { color: 'white', type: 'p' },
+          f7: { color: 'black', type: 'p' },
+        },
+        turn: 'white',
+      });
+
+      // Start with some moves played
+      const board = Chessboard.fromPosition(initialPosition, [
+        { from: 'e2', to: 'e4' },
+        { from: 'e7', to: 'e5' },
+        { from: 'd2', to: 'd4' },
+      ]);
+
+      // Update with moves that diverge at second move
+      const newMoves: Move[] = [
+        { from: 'e2', to: 'e4' },
+        { from: 'd7', to: 'd6' }, // Different from e7-e5
+        { from: 'f2', to: 'f4' }, // Different continuation
+      ];
+
+      const updatedBoard = board.updateMoves(newMoves);
+
+      expect(updatedBoard.movesRecord).toEqual(newMoves);
+      expect(updatedBoard.movesRecord).toHaveLength(3);
+
+      // Verify the position reflects the new move sequence
+      const expectedBoard = Chessboard.fromPosition(initialPosition)
+        .playMove({ from: 'e2', to: 'e4' })
+        .playMove({ from: 'd7', to: 'd6' })
+        .playMove({ from: 'f2', to: 'f4' });
+
+      const expectedFen = FenParser.toFenStr(expectedBoard.position);
+      const actualFen = FenParser.toFenStr(updatedBoard.position);
+      expect(actualFen).toEqual(expectedFen);
+    });
+
+    it('should handle removing moves (shorter sequence)', () => {
+      const initialPosition = createChessPositionMock({
+        pieces: {
+          e1: { color: 'white', type: 'k' },
+          e8: { color: 'black', type: 'k' },
+          e2: { color: 'white', type: 'p' },
+          e7: { color: 'black', type: 'p' },
+          d2: { color: 'white', type: 'p' },
+          d7: { color: 'black', type: 'p' },
+        },
+        turn: 'white',
+      });
+
+      // Start with several moves played
+      const board = Chessboard.fromPosition(initialPosition, [
+        { from: 'e2', to: 'e4' },
+        { from: 'e7', to: 'e5' },
+        { from: 'd2', to: 'd4' },
+        { from: 'd7', to: 'd6' },
+      ]);
+
+      // Update with fewer moves
+      const shorterMoves: Move[] = [
+        { from: 'e2', to: 'e4' },
+        { from: 'e7', to: 'e5' },
+      ];
+
+      const updatedBoard = board.updateMoves(shorterMoves);
+
+      expect(updatedBoard.movesRecord).toEqual(shorterMoves);
+      expect(updatedBoard.movesRecord).toHaveLength(2);
+
+      // Verify the position reflects the shorter sequence
+      const expectedBoard = Chessboard.fromPosition(initialPosition)
+        .playMove({ from: 'e2', to: 'e4' })
+        .playMove({ from: 'e7', to: 'e5' });
+
+      const expectedFen = FenParser.toFenStr(expectedBoard.position);
+      const actualFen = FenParser.toFenStr(updatedBoard.position);
+      expect(actualFen).toEqual(expectedFen);
+    });
+
+    it('should preserve board properties after update', () => {
+      const initialPosition = createChessPositionMock({
+        pieces: {
+          e1: { color: 'white', type: 'k' },
+          e8: { color: 'black', type: 'k' },
+          e2: { color: 'white', type: 'p' },
+          e7: { color: 'black', type: 'p' },
+        },
+        turn: 'white',
+      });
+
+      const board = Chessboard.fromPosition(initialPosition);
+      const moves: Move[] = [{ from: 'e2', to: 'e4' }];
+      const updatedBoard = board.updateMoves(moves);
+
+      // Verify that board properties are properly calculated
+      expect(updatedBoard.position.turn).toBe('black');
+      expect(updatedBoard.isCheck).toBeDefined();
+      expect(updatedBoard.isCheckmate).toBeDefined();
+      expect(updatedBoard.isStalemate).toBeDefined();
+      expect(updatedBoard.moveOptions).toBeDefined();
+      expect(updatedBoard.moveOptions.length).toBeGreaterThan(0);
+    });
+  });
 });

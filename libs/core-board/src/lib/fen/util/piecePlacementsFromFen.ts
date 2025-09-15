@@ -1,13 +1,11 @@
-import {
-  PiecePlacements,
-  Coordinate,
-  Piece,
-  PieceType,
-} from '@michess/core-board';
+import { Coordinate } from '../../common/Coordinate';
+import { Piece } from '../../common/Piece';
+import { PieceType } from '../../common/PieceType';
+import { PiecePlacements } from '../../position/model/PiecePlacements';
+import { FenPiecePlacementPart } from '../model/FenStr';
+import { FenValidationError } from '../model/FenValidationError';
 import { coordIterator } from './coordIterator';
 import { parseFenParts } from './parseFenParts';
-import { FenPiecePlacementPart, FenStr } from '../model/FenStr';
-import { FenValidationError } from '../model/FenValidationError';
 
 type PiecePlacement = {
   coord: Coordinate;
@@ -57,7 +55,7 @@ const piecePlacementsFromFenPiecePlacement = (
   }
 };
 
-export const piecePlacementsFromFen = (fen: FenStr): PiecePlacements => {
+export const piecePlacementsFromFen = (fen: string): PiecePlacements => {
   const fenParts = parseFenParts(fen);
 
   return piecePlacementsFromFenPiecePlacement(fenParts.piecePlacement);

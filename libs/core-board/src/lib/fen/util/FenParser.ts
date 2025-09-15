@@ -1,6 +1,9 @@
 import { Maybe } from '@michess/common-utils';
-import { piecePlacementsFromFen } from './piecePlacementsFromFen';
-import { parseFenParts } from './parseFenParts';
+import { Color } from '../../common/Color';
+import { Coordinate } from '../../common/Coordinate';
+import { Piece } from '../../common/Piece';
+import { CastlingAbility } from '../../position/model/CastlingAbility';
+import { ChessPosition } from '../../position/model/ChessPosition';
 import {
   FenCastlingAbilityPart,
   FenEnPassantTargetSquarePart,
@@ -9,11 +12,8 @@ import {
 } from '../model/FenStr';
 import { FenValidationError } from '../model/FenValidationError';
 import { coordIterator } from './coordIterator';
-import { CastlingAbility } from '../../position/model/CastlingAbility';
-import { Color } from '../../common/Color';
-import { Coordinate } from '../../common/Coordinate';
-import { ChessPosition } from '../../position/model/ChessPosition';
-import { Piece } from '../../common/Piece';
+import { parseFenParts } from './parseFenParts';
+import { piecePlacementsFromFen } from './piecePlacementsFromFen';
 
 const sideToMoveToColor = (sideToMove: FenSideToMovePart): Color => {
   return sideToMove === 'w' ? 'white' : 'black';
@@ -56,7 +56,7 @@ const enPassantCoordinateFromFenStr = (
     return fenEnPassantTargetSquare as Coordinate;
   }
 };
-const chessPositionFromFen = (fen: FenStr): ChessPosition => {
+const chessPositionFromFen = (fen: string): ChessPosition => {
   const fenParts = parseFenParts(fen);
 
   return {

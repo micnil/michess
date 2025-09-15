@@ -34,20 +34,19 @@ export const ChessGameContainer = ({ gameId }: { gameId?: string }) => {
   // For now, we'll use the default position
   console.log('Loading game with ID:', gameId);
 
-  const position = chessboard.position;
   const moves = chessboard.moveOptions;
 
   return (
     <ChessboardView<Move>
       orientation={'white'}
       size={500}
-      piecePlacements={position.pieces}
       gameStatus={undefined}
       winner={undefined}
       moveHistory={chessboard.movesRecord}
-      onMove={(move) => {
+      onMove={async (move) => {
         console.log(move);
         setChessboard(chessboard.playMove(move));
+        return true;
       }}
       moveOptions={moves.map((move) => MoveOption.toMove(move))}
     />

@@ -1,12 +1,12 @@
-import { Color, PiecePlacements } from '@michess/core-board';
+import { Color } from '@michess/core-board';
 import { DragDropContextProvider } from '@michess/react-dnd';
 import styled from 'styled-components';
 import { ChessboardView } from './ChessboardView';
 import { ChessboardContextProvider } from './context/ChessboardContextProvider';
-import { MoveOptions } from './move/model/MoveOptions';
 import { GameStatusType } from './model/GameStatusType';
-import { ScoreSheet } from './ScoreSheet';
 import { MovePayload } from './model/MovePayload';
+import { MoveOptions } from './move/model/MoveOptions';
+import { ScoreSheet } from './ScoreSheet';
 
 const ChessboardContainer = styled.div`
   display: flex;
@@ -19,18 +19,18 @@ const ChessboardContainer = styled.div`
 type Props<TMoveMeta = unknown> = {
   orientation?: Color;
   size?: number;
-  piecePlacements?: PiecePlacements;
+  fromPositionFen?: string;
   moveOptions?: MoveOptions<TMoveMeta>;
   gameStatus?: GameStatusType;
   winner?: Color;
   moveHistory?: MovePayload<TMoveMeta>[];
-  onMove?: (move: MovePayload<TMoveMeta>) => void;
+  onMove?: (move: MovePayload<TMoveMeta>) => Promise<boolean>;
 };
 export const Chessboard = <TMoveMeta,>({
   orientation,
   size = 500,
   moveOptions,
-  piecePlacements,
+  fromPositionFen,
   gameStatus = 'active',
   winner,
   moveHistory,
@@ -42,7 +42,7 @@ export const Chessboard = <TMoveMeta,>({
         size={size}
         orientation={orientation}
         moveOptions={moveOptions}
-        piecePlacements={piecePlacements}
+        fromPositionFen={fromPositionFen}
         gameStatus={gameStatus}
         moveHistory={moveHistory}
         onMove={onMove}

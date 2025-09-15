@@ -1,4 +1,4 @@
-import { PiecePlacementsMock } from '@michess/core-board';
+import { PiecePlacementsMock } from '../../../mocks/PiecePlacements.mock';
 import { piecePlacementsFromFen } from '../piecePlacementsFromFen';
 
 describe('boardStateFromFen', () => {
