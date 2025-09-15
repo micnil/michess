@@ -10,9 +10,9 @@ export const GamesController = (
   return new Hono<GamesControllerContext>().post(
     '/',
     zValidator('json', CreateGameV1Schema),
-    (c) => {
+    async (c) => {
       const body: CreateGameV1 = c.req.valid('json');
-      const response = gameService.createGame(body);
+      const response = await gameService.createGame(body);
       return c.json(response);
     }
   );
