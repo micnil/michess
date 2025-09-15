@@ -1,7 +1,6 @@
+import { ChessPosition, FenParser, FenStr } from '@michess/core-board';
+import { Chessboard } from '@michess/core-game';
 import { Command } from 'commander';
-import { ChessPosition } from '@michess/core-board';
-import { FenParser, FenStr } from '@michess/core-board';
-import { ChessGame } from '@michess/core-game';
 
 // Default FEN for standard starting position
 const DEFAULT_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
@@ -74,13 +73,13 @@ Known test positions:
       options.fen as FenStr
     );
 
-    const chessGame = ChessGame.fromChessPosition(chessPosition);
+    const board = Chessboard.fromPosition(chessPosition);
 
     console.log('Running perft...');
 
     const startTime = performance.now();
 
-    const result = chessGame.perft(options.depth);
+    const result = board.perft(options.depth);
 
     const endTime = performance.now();
     const elapsed = endTime - startTime;

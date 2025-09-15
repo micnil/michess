@@ -21,6 +21,9 @@ const getConfig = (): AppConfig => {
     server: {
       port: parseInt(process.env.SERVER_PORT || '5000', 10),
     },
+    cors: {
+      origins: (process.env.CORS_ORIGINS || 'http://localhost:4200').split(','),
+    },
   };
 };
 

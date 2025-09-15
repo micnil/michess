@@ -3,6 +3,8 @@ import { Api } from '../Api';
 import { authClient } from '../infra/authClient';
 import { restClient } from '../infra/restClient';
 import { ApiContext } from './ApiContext';
+import { AuthProvider } from './AuthProvider';
+import { QueryProvider } from './QueryProvider';
 
 interface ApiProviderProps {
   children: ReactNode;
@@ -11,5 +13,11 @@ interface ApiProviderProps {
 export const ApiProvider: React.FC<ApiProviderProps> = ({ children }) => {
   const api = Api.create(restClient, authClient);
 
-  return <ApiContext.Provider value={api}>{children}</ApiContext.Provider>;
+  return (
+    <QueryProvider>
+      <ApiContext.Provider value={api}>
+        <AuthProvider>{children}</AuthProvider>
+      </ApiContext.Provider>
+    </QueryProvider>
+  );
 };

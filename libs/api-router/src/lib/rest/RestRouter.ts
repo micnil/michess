@@ -2,13 +2,20 @@ import { Api } from '@michess/api-service';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { RestContext } from '../model/RestContext';
+import { RouterConfig } from '../model/RouterConfig';
 import { GamesController } from './games/GamesController';
 
 export const RestRouter = {
-  from: (api: Api) => {
+  from: (api: Api, config: RouterConfig) => {
     const gamesController = GamesController(api.games);
     const honoApp = new Hono<RestContext>().basePath('/api');
-    honoApp.use('*', cors());
+    honoApp.use(
+      '*',
+      cors({
+        credentials: true,
+        origin: config.cors.origins,
+      })
+    );
 
     honoApp.on(['POST', 'GET'], '/auth/**', (c) => api.auth.handle(c.req.raw));
 

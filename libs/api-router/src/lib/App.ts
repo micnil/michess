@@ -1,6 +1,7 @@
 import { Api } from '@michess/api-service';
 import { Hono } from 'hono';
 import { Server } from 'socket.io';
+import { RouterConfig } from './model/RouterConfig';
 import { RestRouter } from './rest/RestRouter';
 import { SocketRouter } from './socket/SocketRouter';
 
@@ -10,8 +11,8 @@ export type App = {
   socketRouter: Server;
 };
 
-const from = (api: Api): App => {
-  const restRouter = RestRouter.from(api);
+const from = (api: Api, routerConfig: RouterConfig): App => {
+  const restRouter = RestRouter.from(api, routerConfig);
   const socketRouter = SocketRouter.from(api);
   return { restRouter, socketRouter };
 };

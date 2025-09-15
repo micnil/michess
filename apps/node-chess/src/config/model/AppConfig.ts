@@ -9,4 +9,7 @@ export type AppConfig = {
   server: {
     port: number;
   };
+  cors: {
+    origins: string[];
+  };
 };

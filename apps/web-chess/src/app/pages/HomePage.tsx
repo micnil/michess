@@ -1,7 +1,7 @@
 import { useNavigate } from '@tanstack/react-router';
 import React from 'react';
 import styled from 'styled-components';
-import { useApi } from '../api/hooks';
+import { useApi } from '../api/hooks/useApi';
 import { GameLobby } from '../features/lobby/GameLobby';
 import { QuickPairing } from '../features/quick-pairing/QuickPairing';
 import { StatsSection } from '../features/stats/StatsSection';

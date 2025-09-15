@@ -9,19 +9,24 @@ import { Server } from './Server';
 
 dotenv.config();
 
-const main = () => {
+const main = async () => {
   const appConfig = AppConfigService.get();
 
   const client = postgres(appConfig.database.url);
+
   const redis = createClient({
     url: appConfig.redis.url,
   });
+  await redis.connect();
 
   const repos = Repositories.from(client, redis as RedisClientType);
   const api = Api.from(repos, client);
-  const app = App.from(api);
+  const app = App.from(api, { cors: appConfig.cors });
 
   Server.start(app, appConfig);
 };
 
-main();
+main().catch((error) => {
+  console.error('Failed to start server:', error);
+  process.exit(1);
+});
