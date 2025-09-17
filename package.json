@@ -6,6 +6,7 @@
     "start:web": "nx serve web-chess",
     "start:node": "nx serve node-chess | pino-pretty",
     "start:db": "dotenv -e ./apps/node-chess/.env -c -- docker-compose up -d postgres redis",
+    "clean:db": "docker-compose down -v && pnpm run start:db && pnpm run migration:run",
     "build": "nx build",
     "test": "nx test",
     "test:all": "nx run-many --target=test --all",
@@ -17,7 +18,8 @@
     "perft:debug": "tsx --inspect-brk --tsconfig tools/tsconfig.tools.json tools/perft.ts",
     "migration:generate": "drizzle-kit generate --config=libs/infra-db/drizzle.config.ts",
     "better-auth:generate": "pnpx @better-auth/cli generate --config=libs/infra-db/auth.config.ts --output=libs/infra-db/src/lib/schema/auth.ts",
-    "migration:run": "dotenv -e ./apps/node-chess/.env -c -- drizzle-kit migrate --config=libs/infra-db/drizzle.config.ts"
+    "migration:run": "dotenv -e ./apps/node-chess/.env -c -- drizzle-kit migrate --config=libs/infra-db/drizzle.config.ts",
+    "migration:push": "dotenv -e ./apps/node-chess/.env -c -- drizzle-kit push --config=libs/infra-db/drizzle.config.ts --force"
   },
   "private": true,
   "dependencies": {

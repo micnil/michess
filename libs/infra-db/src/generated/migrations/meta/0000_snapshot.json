@@ -1,5 +1,5 @@
 {
-  "id": "660ce647-3133-4fa7-a119-c28abf7b4b31",
+  "id": "5d443cd0-c966-40e3-b77d-86222df5a3ec",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -248,18 +248,11 @@
           "name": "game_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "uci": {
           "name": "uci",
           "type": "varchar(10)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "color": {
-          "name": "color",
-          "type": "color",
-          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
         },
@@ -283,7 +276,7 @@
           "columnsTo": [
             "game_id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -418,6 +411,14 @@
     }
   },
   "enums": {
+    "public.color": {
+      "name": "color",
+      "schema": "public",
+      "values": [
+        "white",
+        "black"
+      ]
+    },
     "public.game_status": {
       "name": "game_status",
       "schema": "public",
@@ -455,14 +456,6 @@
       "schema": "public",
       "values": [
         "standard"
-      ]
-    },
-    "public.color": {
-      "name": "color",
-      "schema": "public",
-      "values": [
-        "white",
-        "black"
       ]
     }
   },

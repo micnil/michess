@@ -61,6 +61,9 @@ const from = (api: Api, config: RouterConfig) => {
     socket.on('join-game', async (payload: unknown, callback) => {
       try {
         const joinGamePayloadV1 = JoinGamePayloadV1Schema.parse(payload);
+        logger.info(
+          `User ${socket.data.session.userId} joining game ${joinGamePayloadV1.gameId} as ${joinGamePayloadV1.side}`
+        );
         const gameState = await api.games.joinGame(
           socket.data.session,
           joinGamePayloadV1
