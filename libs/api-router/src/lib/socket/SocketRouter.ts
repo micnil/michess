@@ -61,6 +61,7 @@ const from = (api: Api, config: RouterConfig) => {
     socket.on('join-game', async (payload: unknown, callback) => {
       try {
         const joinGamePayloadV1 = JoinGamePayloadV1Schema.parse(payload);
+
         logger.info(
           `User ${socket.data.session.userId} joining game ${joinGamePayloadV1.gameId} as ${joinGamePayloadV1.side}`
         );
@@ -68,8 +69,11 @@ const from = (api: Api, config: RouterConfig) => {
           socket.data.session,
           joinGamePayloadV1
         );
-        socket.join(joinGamePayloadV1.gameId);
-        socket.to(joinGamePayloadV1.gameId).emit('user-joined', gameState);
+        if (!socket.rooms.has(joinGamePayloadV1.gameId)) {
+          socket.join(joinGamePayloadV1.gameId);
+          socket.to(joinGamePayloadV1.gameId).emit('user-joined', gameState);
+        }
+
         callback(EventResponse.ok(gameState));
       } catch (error) {
         logger.error(error);

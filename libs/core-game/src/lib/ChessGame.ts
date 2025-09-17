@@ -118,7 +118,13 @@ const joinGame = (
   const sideToJoin =
     color ?? availableSides[Math.floor(Math.random() * availableSides.length)];
 
-  if (sideToJoin === 'white' && players.white === undefined) {
+  if (
+    playerInfo.id === players.white?.id ||
+    playerInfo.id === players.black?.id
+  ) {
+    // Player has already joined
+    return players;
+  } else if (sideToJoin === 'white' && players.white === undefined) {
     return {
       ...players,
       white: { id: playerInfo.id, name: playerInfo.name },
