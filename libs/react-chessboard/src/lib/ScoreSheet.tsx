@@ -1,6 +1,6 @@
+import { Color } from '@michess/core-board';
 import React from 'react';
 import styled from 'styled-components';
-import { Color } from '@michess/core-board';
 import { GameStatusType } from './model/GameStatusType';
 
 const ScoreSheetContainer = styled.div`
@@ -13,6 +13,13 @@ const ScoreSheetContainer = styled.div`
   width: 200px;
   min-height: 300px;
   font-family: 'Arial', sans-serif;
+
+  /* Responsive: take full width on mobile when below the board */
+  @media (max-width: 768px) {
+    width: 90%;
+
+    min-height: 200px;
+  }
 `;
 
 const Title = styled.h3`

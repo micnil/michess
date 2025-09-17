@@ -33,6 +33,7 @@ export const ChessGameContainer = ({
   playerSide?: Color;
 }) => {
   const { games } = useApi();
+
   const { data } = useQuery({
     queryKey: ['game', gameId],
     queryFn: async () => {
@@ -51,7 +52,7 @@ export const ChessGameContainer = ({
   return (
     <ChessboardView<Move>
       orientation={orientation}
-      size={500}
+      maxSize={600}
       gameStatus={undefined}
       winner={undefined}
       playableTurn={

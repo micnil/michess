@@ -4,6 +4,7 @@ import { DragDropContextProvider } from '@michess/react-dnd';
 import styled from 'styled-components';
 import { ChessboardView } from './ChessboardView';
 import { ChessboardContextProvider } from './context/ChessboardContextProvider';
+import { useResponsiveBoardSize } from './hooks/useResponsiveBoardSize';
 import { GameStatusType } from './model/GameStatusType';
 import { MovePayload } from './model/MovePayload';
 import { MoveOptions } from './move/model/MoveOptions';
@@ -15,11 +16,18 @@ const ChessboardContainer = styled.div`
   align-items: flex-start;
   justify-content: center;
   width: 100%;
+
+  /* Responsive layout: score sheet moves below board on smaller screens */
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
 `;
 
 type Props<TMoveMeta = unknown> = {
   orientation?: Color;
-  size?: number;
+  maxSize?: number;
   fromPositionFen?: string;
   moveOptions?: MoveOptions<TMoveMeta>;
   gameStatus?: GameStatusType;
@@ -32,7 +40,7 @@ type Props<TMoveMeta = unknown> = {
 };
 export const Chessboard = <TMoveMeta,>({
   orientation = 'white',
-  size = 500,
+  maxSize = 600,
   fromPositionFen,
   gameStatus = 'active',
   winner,
@@ -42,10 +50,13 @@ export const Chessboard = <TMoveMeta,>({
   moveObservable,
   onMove,
 }: Props<TMoveMeta>) => {
+  // Use the responsive board size hook
+  const boardSize = useResponsiveBoardSize({ maxSize });
+
   return (
     <ChessboardContainer>
       <ChessboardContextProvider
-        size={size}
+        size={boardSize}
         orientation={orientation}
         fromPositionFen={fromPositionFen}
         gameStatus={gameStatus}
@@ -56,7 +67,7 @@ export const Chessboard = <TMoveMeta,>({
         onMove={onMove}
       >
         <DragDropContextProvider>
-          <ChessboardView size={size} />
+          <ChessboardView size={boardSize} />
         </DragDropContextProvider>
       </ChessboardContextProvider>
       <ScoreSheet gameStatus={gameStatus} winner={winner} />
