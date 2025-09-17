@@ -26,9 +26,11 @@ const getGameStatus = (gameState: GameState): GameStatusType => {
 export const ChessGameContainer = ({
   gameId,
   orientation,
+  playerSide,
 }: {
   gameId?: string;
   orientation?: Color;
+  playerSide?: Color;
 }) => {
   const { games } = useApi();
   const { data } = useQuery({
@@ -36,9 +38,7 @@ export const ChessGameContainer = ({
     queryFn: async () => {
       if (!gameId) return null;
       const gameDetails = await games.joinGame(gameId);
-      return {
-        moves: gameDetails.moves.map((m) => Move.fromUci(m.uci)),
-      };
+      return gameDetails;
     },
     enabled: !!gameId,
   });
@@ -46,17 +46,7 @@ export const ChessGameContainer = ({
     if (!gameId) return undefined;
     return games.observeMovesForGame(gameId);
   }, [gameId, games]);
-  // const [chessboard, setChessboard] = useState(() =>
-  //   Chessboard.fromPosition(
-  //     FenParser.toChessPosition(
-  //       'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-  //     )
-  //   )
-  // );
-
-  // TODO: Load game state from API using gameId
-  // For now, we'll use the default position
-  console.log('Loading game with ID:', gameId);
+  console.log({ orientation });
 
   return (
     <ChessboardView<Move>
@@ -64,6 +54,10 @@ export const ChessGameContainer = ({
       size={500}
       gameStatus={undefined}
       winner={undefined}
+      playableTurn={
+        data?.playerSide === 'spectator' ? undefined : data?.playerSide
+      }
+      readonly={data?.playerSide === 'spectator'}
       moveHistory={data?.moves}
       moveObservable={moveObservable || undefined}
       onMove={async (move) => {

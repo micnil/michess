@@ -21,7 +21,7 @@ export const PieceType = Object.freeze({
     PieceTypeEnum.Knight,
   ],
   fromColoredPiece: (coloredPiece: ColoredPieceType): PieceType => {
-    const pieceLetter = coloredPiece[coloredPiece.length - 1];
+    const pieceLetter = coloredPiece.at(1);
     switch (pieceLetter) {
       case 'p':
         return PieceType.Pawn;

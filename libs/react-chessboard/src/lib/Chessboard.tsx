@@ -24,6 +24,8 @@ type Props<TMoveMeta = unknown> = {
   moveOptions?: MoveOptions<TMoveMeta>;
   gameStatus?: GameStatusType;
   winner?: Color;
+  playableTurn?: Color;
+  readonly?: boolean;
   moveHistory?: MovePayload<TMoveMeta>[];
   moveObservable?: Observable<MovePayload<TMoveMeta>>;
   onMove?: (move: MovePayload<TMoveMeta>) => Promise<boolean>;
@@ -34,6 +36,8 @@ export const Chessboard = <TMoveMeta,>({
   fromPositionFen,
   gameStatus = 'active',
   winner,
+  readonly,
+  playableTurn,
   moveHistory,
   moveObservable,
   onMove,
@@ -45,7 +49,9 @@ export const Chessboard = <TMoveMeta,>({
         orientation={orientation}
         fromPositionFen={fromPositionFen}
         gameStatus={gameStatus}
+        readonly={readonly}
         moveHistory={moveHistory}
+        playableTurn={playableTurn}
         moveObservable={moveObservable}
         onMove={onMove}
       >

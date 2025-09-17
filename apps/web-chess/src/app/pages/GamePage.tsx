@@ -10,14 +10,14 @@ export const GamePage = ({ gameId, side }: Props) => {
   if (!gameId) {
     return (
       <Container>
-        <ChessGameContainer />
+        <ChessGameContainer orientation={side} />
       </Container>
     );
   }
 
   return (
     <Container>
-      <ChessGameContainer gameId={gameId} />
+      <ChessGameContainer gameId={gameId} orientation={side} />
     </Container>
   );
 };

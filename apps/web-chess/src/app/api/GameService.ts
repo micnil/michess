@@ -1,14 +1,34 @@
 import { GameDetailsV1, MakeMovePayloadV1 } from '@michess/api-schema';
-import { Observable } from '@michess/common-utils';
+import { Maybe, Observable } from '@michess/common-utils';
 import { Move } from '@michess/core-board';
+import { AuthService } from './AuthService';
 import { RestClient } from './infra/RestClient';
 import { SocketClient } from './infra/SocketClient';
+import { ParticipantGameDetails } from './model/ParticipantGameDetails';
 
 export class GameService {
   constructor(
     private restClient: RestClient,
-    private socketClient: SocketClient
+    private socketClient: SocketClient,
+    private auth: AuthService
   ) {}
+
+  toParticipantGameDetails(
+    gameDetails: GameDetailsV1,
+    playerId: Maybe<string>
+  ): ParticipantGameDetails {
+    // Perhaps move to backend.
+    const playerSide =
+      gameDetails.players.white?.id === playerId
+        ? 'white'
+        : gameDetails.players.black?.id === playerId
+        ? 'black'
+        : 'spectator';
+    return {
+      playerSide,
+      moves: gameDetails.moves.map((m) => Move.fromUci(m.uci)),
+    };
+  }
 
   async createGame(isPrivate: boolean): Promise<GameDetailsV1> {
     const response = await this.restClient
@@ -24,7 +44,8 @@ export class GameService {
   async joinGame(
     gameId: string,
     side?: 'white' | 'black' | 'spectator'
-  ): Promise<GameDetailsV1> {
+  ): Promise<ParticipantGameDetails> {
+    const authState = await this.auth.getSession();
     const response = await this.socketClient.emitWithAck('join-game', {
       gameId,
       side,
@@ -32,7 +53,7 @@ export class GameService {
     if (response.status === 'error') {
       throw new Error(response.error.message, { cause: response.error });
     } else {
-      return response.data;
+      return this.toParticipantGameDetails(response.data, authState?.user.id);
     }
   }
 

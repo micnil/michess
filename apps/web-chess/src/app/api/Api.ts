@@ -15,9 +15,11 @@ export const Api = {
     authClient: AuthClient,
     socketClient: SocketClient
   ): Api {
+    const auth = new AuthService(authClient, socketClient);
+    const games = new GameService(restClient, socketClient, auth);
     return {
-      games: new GameService(restClient, socketClient),
-      auth: new AuthService(authClient, socketClient),
+      games,
+      auth,
     };
   },
 };
