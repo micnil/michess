@@ -37,13 +37,15 @@ export const HomePage: React.FC = () => {
 
   const handleCreateGame = async () => {
     try {
+      console.log('Creating a new game...');
       const gameDetails = await api.games.createGame(false);
-      await api.games.joinGame(gameDetails.id, 'white');
 
       console.log('Game created:', gameDetails);
+      await api.games.joinGame(gameDetails.id, 'white');
+      console.log('Joined game:', gameDetails.id);
 
       // Navigate to the game page
-      await navigate({ to: `/game/${gameDetails.id}` });
+      await navigate({ to: `/game/${gameDetails.id}/` });
     } catch (error) {
       console.error('Failed to create game:', error);
       // TODO: Show error message to user

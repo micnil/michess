@@ -1,12 +1,12 @@
 import { GameDetailsV1, MakeMovePayloadV1 } from '@michess/api-schema';
 import { Observable } from '@michess/common-utils';
 import { Move } from '@michess/core-board';
-import { KyInstance } from 'ky';
-import { SocketClient } from './infra/socketClient';
+import { RestClient } from './infra/RestClient';
+import { SocketClient } from './infra/SocketClient';
 
 export class GameService {
   constructor(
-    private restClient: KyInstance,
+    private restClient: RestClient,
     private socketClient: SocketClient
   ) {}
 
@@ -21,7 +21,10 @@ export class GameService {
     return response;
   }
 
-  async joinGame(gameId: string, side?: 'white' | 'black' | 'spectator') {
+  async joinGame(
+    gameId: string,
+    side?: 'white' | 'black' | 'spectator'
+  ): Promise<GameDetailsV1> {
     const response = await this.socketClient.emitWithAck('join-game', {
       gameId,
       side,
@@ -45,11 +48,6 @@ export class GameService {
     }
   }
 
-  /**
-   * Observe moves for a specific game
-   * @param gameId The game ID to observe moves for
-   * @returns Observable of Move objects for the specified game
-   */
   observeMovesForGame(gameId: string): Observable<Move> {
     return {
       subscribe: (callback: (move: Move) => void) => {

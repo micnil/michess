@@ -1,3 +1,4 @@
+import { Observable } from '@michess/common-utils';
 import {
   BoardCoordinates,
   Color,
@@ -20,6 +21,7 @@ type Props<TMoveMeta = unknown> = {
   piecePlacements?: PiecePlacements;
   gameStatus: GameStatusType;
   moveHistory?: MovePayload<TMoveMeta>[];
+  moveObservable?: Observable<MovePayload<TMoveMeta>>;
   onMove?: (move: MovePayload<TMoveMeta>) => Promise<boolean>;
   children: ReactNode;
 };
@@ -28,6 +30,7 @@ export const ChessboardContextProvider = <TMoveMeta,>({
   children,
   orientation = 'white',
   gameStatus,
+  moveObservable,
   fromPositionFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
   onMove,
   moveHistory,
@@ -67,6 +70,15 @@ export const ChessboardContextProvider = <TMoveMeta,>({
       );
     }
   }, [moveHistory]);
+
+  useEffect(() => {
+    if (moveObservable) {
+      return moveObservable.subscribe((move) => {
+        setChessboard((currentBoard) => currentBoard.playMove(move));
+      });
+    }
+    return;
+  }, [moveObservable]);
 
   const movePiece = useCallback(async (payload: MovePayload<TMoveMeta>) => {
     setChessboard((prevChessboard) => {

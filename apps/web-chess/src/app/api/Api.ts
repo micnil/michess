@@ -1,8 +1,8 @@
-import { KyInstance } from 'ky';
 import { AuthService } from './AuthService';
 import { GameService } from './GameService';
-import { AuthClient } from './infra/authClient';
-import { SocketClient } from './infra/socketClient';
+import { AuthClient } from './infra/AuthClient';
+import { RestClient } from './infra/RestClient';
+import { SocketClient } from './infra/SocketClient';
 
 export type Api = {
   games: GameService;
@@ -11,7 +11,7 @@ export type Api = {
 
 export const Api = {
   create(
-    restClient: KyInstance,
+    restClient: RestClient,
     authClient: AuthClient,
     socketClient: SocketClient
   ): Api {

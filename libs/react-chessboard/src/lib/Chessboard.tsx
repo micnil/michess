@@ -1,3 +1,4 @@
+import { Observable } from '@michess/common-utils';
 import { Color } from '@michess/core-board';
 import { DragDropContextProvider } from '@michess/react-dnd';
 import styled from 'styled-components';
@@ -24,6 +25,7 @@ type Props<TMoveMeta = unknown> = {
   gameStatus?: GameStatusType;
   winner?: Color;
   moveHistory?: MovePayload<TMoveMeta>[];
+  moveObservable?: Observable<MovePayload<TMoveMeta>>;
   onMove?: (move: MovePayload<TMoveMeta>) => Promise<boolean>;
 };
 export const Chessboard = <TMoveMeta,>({
@@ -33,6 +35,7 @@ export const Chessboard = <TMoveMeta,>({
   gameStatus = 'active',
   winner,
   moveHistory,
+  moveObservable,
   onMove,
 }: Props<TMoveMeta>) => {
   return (
@@ -43,6 +46,7 @@ export const Chessboard = <TMoveMeta,>({
         fromPositionFen={fromPositionFen}
         gameStatus={gameStatus}
         moveHistory={moveHistory}
+        moveObservable={moveObservable}
         onMove={onMove}
       >
         <DragDropContextProvider>

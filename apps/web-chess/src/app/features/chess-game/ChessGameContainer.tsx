@@ -1,10 +1,12 @@
-import { Color, FenParser, Move } from '@michess/core-board';
-import { Chessboard, GameState } from '@michess/core-game';
+import { Color, Move } from '@michess/core-board';
+import { GameState } from '@michess/core-game';
 import {
   Chessboard as ChessboardView,
   GameStatusType,
 } from '@michess/react-chessboard';
-import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
+import { useApi } from '../../api/hooks/useApi';
 
 const getGameStatus = (gameState: GameState): GameStatusType => {
   if (!gameState.result) {
@@ -28,13 +30,29 @@ export const ChessGameContainer = ({
   gameId?: string;
   orientation?: Color;
 }) => {
-  const [chessboard, setChessboard] = useState(() =>
-    Chessboard.fromPosition(
-      FenParser.toChessPosition(
-        'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-      )
-    )
-  );
+  const { games } = useApi();
+  const { data } = useQuery({
+    queryKey: ['game', gameId],
+    queryFn: async () => {
+      if (!gameId) return null;
+      const gameDetails = await games.joinGame(gameId);
+      return {
+        moves: gameDetails.moves.map((m) => Move.fromUci(m.uci)),
+      };
+    },
+    enabled: !!gameId,
+  });
+  const moveObservable = useMemo(() => {
+    if (!gameId) return undefined;
+    return games.observeMovesForGame(gameId);
+  }, [gameId, games]);
+  // const [chessboard, setChessboard] = useState(() =>
+  //   Chessboard.fromPosition(
+  //     FenParser.toChessPosition(
+  //       'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+  //     )
+  //   )
+  // );
 
   // TODO: Load game state from API using gameId
   // For now, we'll use the default position
@@ -46,11 +64,18 @@ export const ChessGameContainer = ({
       size={500}
       gameStatus={undefined}
       winner={undefined}
-      moveHistory={chessboard.movesRecord}
+      moveHistory={data?.moves}
+      moveObservable={moveObservable || undefined}
       onMove={async (move) => {
         console.log(move);
-        setChessboard(chessboard.playMove(move));
-        return true;
+        if (!gameId) return true;
+        try {
+          await games.makeMove(gameId, Move.toUci(move));
+          return true;
+        } catch (error) {
+          console.error('Error making move:', error);
+          return false;
+        }
       }}
     />
   );

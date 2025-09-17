@@ -90,11 +90,13 @@ export const GameDetailsMapper = {
       players: {
         white: game.players.white
           ? {
+              id: game.players.white.id,
               name: game.players.white.name,
             }
           : undefined,
         black: game.players.black
           ? {
+              id: game.players.black.id,
               name: game.players.black.name,
             }
           : undefined,

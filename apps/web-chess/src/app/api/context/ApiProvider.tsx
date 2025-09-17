@@ -1,8 +1,8 @@
 import React, { ReactNode } from 'react';
 import { Api } from '../Api';
-import { authClient } from '../infra/authClient';
-import { restClient } from '../infra/restClient';
-import { socketClient } from '../infra/socketClient';
+import { AuthClient } from '../infra/AuthClient';
+import { RestClient } from '../infra/RestClient';
+import { SocketClient } from '../infra/SocketClient';
 import { ApiContext } from './ApiContext';
 import { AuthProvider } from './AuthProvider';
 import { QueryProvider } from './QueryProvider';
@@ -12,7 +12,11 @@ interface ApiProviderProps {
 }
 
 export const ApiProvider: React.FC<ApiProviderProps> = ({ children }) => {
-  const api = Api.create(restClient, authClient, socketClient);
+  const api = Api.create(
+    RestClient.create(),
+    AuthClient.create(),
+    SocketClient.create()
+  );
 
   return (
     <QueryProvider>

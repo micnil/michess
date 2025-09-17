@@ -1,15 +1,9 @@
 import { Maybe } from '@michess/common-utils';
-import { anonymousClient } from 'better-auth/client/plugins';
-import { createAuthClient } from 'better-auth/react';
-import { authClient } from './infra/authClient';
-import { SocketClient } from './infra/socketClient';
+import { AuthClient } from './infra/AuthClient';
+import { SocketClient } from './infra/SocketClient';
 import { AuthState } from './model/AuthState';
 
-type AuthClient = ReturnType<
-  typeof createAuthClient<{ plugins: [ReturnType<typeof anonymousClient>] }>
->;
-
-type BetterAuthSessionData = typeof authClient.$Infer.Session;
+type BetterAuthSessionData = AuthClient['$Infer']['Session'];
 
 export class AuthService {
   toAuthState(sessionData: BetterAuthSessionData): AuthState {

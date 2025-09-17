@@ -5,7 +5,11 @@ export type AuthClient = ReturnType<
   typeof createAuthClient<{ plugins: [ReturnType<typeof anonymousClient>] }>
 >;
 
-export const authClient = createAuthClient({
-  baseURL: 'http://localhost:5000', // The base URL of your auth server
-  plugins: [anonymousClient()],
-});
+export const AuthClient = {
+  create: (): AuthClient => {
+    return createAuthClient({
+      baseURL: 'http://localhost:5000', // The base URL of your auth server
+      plugins: [anonymousClient()],
+    });
+  },
+};

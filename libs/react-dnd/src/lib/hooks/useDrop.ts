@@ -1,6 +1,6 @@
+import { assertDefined, Position } from '@michess/common-utils';
 import { useCallback, useRef } from 'react';
 import { useDragDropContext } from './useDragDropContext';
-import { assertDefined, Position } from '@michess/common-utils';
 
 type Drop = {
   register(ref: Element | null): void;
@@ -26,7 +26,7 @@ const mouseEventWithinElement = (evt: MouseEvent, element: SVGElement) => {
 };
 
 export const useDrop = ({ id, onDrop }: Options): Drop => {
-  const elementRef = useRef<SVGGraphicsElement>();
+  const elementRef = useRef<SVGGraphicsElement | null>(null);
   const onDropRef = useRef(onDrop);
   onDropRef.current = onDrop;
   const { state, enterDroppable, leaveDroppable } = useDragDropContext();
@@ -109,7 +109,7 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
           'mouseup',
           handleMouseUp
         );
-        elementRef.current = undefined;
+        elementRef.current = null;
       }
     },
     [handleMouseDown, handleMouseMove, handleMouseUp]
