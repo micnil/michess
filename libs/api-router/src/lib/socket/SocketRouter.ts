@@ -6,6 +6,7 @@ import {
   ServerToClientEvents,
 } from '@michess/api-schema';
 import { Api, Session } from '@michess/api-service';
+import { logger } from '@michess/be-utils';
 import { IncomingHttpHeaders } from 'http2';
 import { DefaultEventsMap, Server, Socket } from 'socket.io';
 import { RouterConfig } from '../model/RouterConfig';
@@ -68,6 +69,7 @@ const from = (api: Api, config: RouterConfig) => {
         socket.to(joinGamePayloadV1.gameId).emit('user-joined', gameState);
         callback(EventResponse.ok(gameState));
       } catch (error) {
+        logger.error(error);
         callback(EventResponse.error(ApiErrorMapper.from(error)));
       }
     });
@@ -81,6 +83,7 @@ const from = (api: Api, config: RouterConfig) => {
           .emit('move-made', makeMovePayloadV1);
         callback(EventResponse.ok(makeMovePayloadV1));
       } catch (error) {
+        logger.error(error);
         callback(EventResponse.error(ApiErrorMapper.from(error)));
       }
     });
