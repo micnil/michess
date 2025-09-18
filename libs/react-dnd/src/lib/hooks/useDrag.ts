@@ -35,8 +35,8 @@ export const useDrag = ({ id }: Options): Drag => {
   const { state, startDragging, stopDragging } = useDragDropContext();
   const { mousePosRef, draggingId } = state;
 
-  const handleMouseMove = useCallback(
-    (_: MouseEvent) => {
+  const handleDragMove = useCallback(
+    (_: MouseEvent | TouchEvent) => {
       if (draggingId === id && previewRef.current) {
         const element = previewRef.current;
         assertDefined(element, 'No elements registered 1');
@@ -50,16 +50,17 @@ export const useDrag = ({ id }: Options): Drag => {
     [draggingId, id, mousePosRef]
   );
 
-  const handleMouseDown = useCallback(
-    (_: MouseEvent) => {
+  const handleStartDragging = useCallback(
+    (e: MouseEvent | TouchEvent) => {
+      e.preventDefault();
       console.debug('startDragging');
       startDragging(id);
     },
     [id, startDragging]
   );
 
-  const handleMouseUp = useCallback(
-    (_: Event) => {
+  const handleDragEnd = useCallback(
+    (_: Event | TouchEvent) => {
       if (draggingId === id) {
         console.debug('stopDragging: ', id);
         stopDragging(id);
@@ -70,28 +71,38 @@ export const useDrag = ({ id }: Options): Drag => {
 
   useEffect(() => {
     const unregister = () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('mousemove', handleDragMove);
+      window.removeEventListener('mouseup', handleDragEnd);
+      window.removeEventListener('touchmove', handleDragMove);
+      window.removeEventListener('touchend', handleDragEnd);
+      window.removeEventListener('touchcancel', handleDragEnd);
     };
     if (draggingId === id) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
+      window.addEventListener('mousemove', handleDragMove);
+      window.addEventListener('mouseup', handleDragEnd);
+      window.addEventListener('touchmove', handleDragMove, { passive: false });
+      window.addEventListener('touchend', handleDragEnd);
+      window.addEventListener('touchcancel', handleDragEnd);
     } else {
       unregister();
     }
     return unregister;
-  }, [draggingId, handleMouseMove, handleMouseUp, id]);
+  }, [draggingId, handleDragEnd, handleDragMove, id]);
 
   const register = useCallback(
     (element: SVGGraphicsElement | null) => {
       if (element) {
-        element.addEventListener('mousedown', handleMouseDown);
+        element.addEventListener('mousedown', handleStartDragging);
+        element.addEventListener('touchstart', handleStartDragging, {
+          passive: false,
+        });
       } else {
-        dragRef.current?.removeEventListener('mousedown', handleMouseDown);
+        dragRef.current?.removeEventListener('mousedown', handleStartDragging);
+        dragRef.current?.removeEventListener('touchstart', handleStartDragging);
       }
       dragRef.current = element;
     },
-    [handleMouseDown]
+    [handleStartDragging]
   );
 
   const registerPreview = useCallback(

@@ -16,6 +16,7 @@ const Pieces = styled.g``;
 
 const BoardContainer = styled.div`
   position: relative;
+  touch-action: none;
 `;
 
 type Props = {

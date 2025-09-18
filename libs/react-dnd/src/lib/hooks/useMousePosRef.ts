@@ -7,17 +7,42 @@ export const useMousePosRef = (): MutableRefObject<Position> => {
     y: 0,
   });
 
-  const handleMouseMove = useCallback((evt: MouseEvent) => {
+  const updatePosition = useCallback((x: number, y: number) => {
     mousePosRef.current = {
-      x: evt.clientX,
-      y: evt.clientY,
+      x,
+      y,
     };
   }, []);
 
+  const handleMouseMove = useCallback(
+    (evt: MouseEvent) => {
+      updatePosition(evt.clientX, evt.clientY);
+    },
+    [updatePosition]
+  );
+
+  const handleTouchMove = useCallback(
+    (evt: TouchEvent) => {
+      // Use the first touch point
+      const touch = evt.touches[0];
+      if (touch) {
+        updatePosition(touch.clientX, touch.clientY);
+      }
+    },
+    [updatePosition]
+  );
+
   useEffect(() => {
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [handleMouseMove]);
+    window.addEventListener('touchmove', handleTouchMove);
+    window.addEventListener('touchstart', handleTouchMove, true);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchstart', handleTouchMove);
+    };
+  }, [handleMouseMove, handleTouchMove]);
 
   return mousePosRef;
 };
