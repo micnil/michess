@@ -18,8 +18,14 @@ const positionWithinDomRect = (position: Position, domRect: DOMRect) => {
     : false;
 };
 
-const mouseEventWithinElement = (evt: MouseEvent, element: SVGElement) => {
-  const mousePos: Position = { x: evt.clientX, y: evt.clientY };
+const mouseEventWithinElement = (
+  evt: MouseEvent | TouchEvent,
+  element: SVGElement
+) => {
+  const mousePos: Position =
+    'touches' in evt
+      ? { x: evt.touches[0].clientX, y: evt.touches[0].clientY }
+      : { x: evt.clientX, y: evt.clientY };
   const elementDomRect = element.getBoundingClientRect();
 
   return positionWithinDomRect(mousePos, elementDomRect);
@@ -31,8 +37,8 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
   onDropRef.current = onDrop;
   const { state, enterDroppable, leaveDroppable } = useDragDropContext();
 
-  const handleMouseDown = useCallback(
-    (evt: MouseEvent) => {
+  const handleDragStart = useCallback(
+    (evt: MouseEvent | TouchEvent) => {
       assertDefined(
         elementRef.current,
         'drop zone not defined in eventhandler'
@@ -41,10 +47,8 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
       if (!svg) {
         throw new Error('Must register svg elements');
       }
-      const mousePos: Position = { x: evt.clientX, y: evt.clientY };
-      const elementDomRect = elementRef.current.getBoundingClientRect();
 
-      if (positionWithinDomRect(mousePos, elementDomRect)) {
+      if (mouseEventWithinElement(evt, elementRef.current)) {
         enterDroppable(id);
         console.debug('dragging from: ', id);
       }
@@ -53,8 +57,8 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
   );
 
   const isOverMe = state.overDroppableId === id;
-  const handleMouseUp = useCallback(
-    (_: MouseEvent) => {
+  const handleDrop = useCallback(
+    (_: MouseEvent | TouchEvent) => {
       if (isOverMe && state.draggingId) {
         console.debug('dropped on ', id);
         leaveDroppable(id);
@@ -64,8 +68,8 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
     [id, leaveDroppable, state.draggingId, isOverMe]
   );
 
-  const handleMouseMove = useCallback(
-    (evt: MouseEvent) => {
+  const handleDrag = useCallback(
+    (evt: MouseEvent | TouchEvent) => {
       assertDefined(
         elementRef.current,
         'drop zone not defined in eventhandler'
@@ -92,27 +96,53 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
   const register = useCallback(
     (element: SVGGraphicsElement | null) => {
       if (element) {
-        element.ownerSVGElement?.addEventListener('mousedown', handleMouseDown);
-        element.ownerSVGElement?.addEventListener('mousemove', handleMouseMove);
-        element.ownerDocument.addEventListener('mouseup', handleMouseUp);
+        element.ownerSVGElement?.addEventListener('mousedown', handleDragStart);
+        element.ownerSVGElement?.addEventListener('mousemove', handleDrag);
+        element.ownerDocument.addEventListener('mouseup', handleDrop);
+
+        element.ownerSVGElement?.addEventListener(
+          'touchstart',
+          handleDragStart
+        );
+        element.ownerSVGElement?.addEventListener('touchmove', handleDrag);
+        element.ownerDocument.addEventListener('touchend', handleDrop);
+        element.ownerDocument.addEventListener('touchcancel', handleDrop);
         elementRef.current = element;
       } else {
         elementRef.current?.ownerSVGElement?.removeEventListener(
           'mousedown',
-          handleMouseDown
+          handleDragStart
         );
         elementRef.current?.ownerSVGElement?.removeEventListener(
           'mousemove',
-          handleMouseMove
+          handleDrag
         );
         elementRef.current?.ownerDocument?.removeEventListener(
           'mouseup',
-          handleMouseUp
+          handleDrop
         );
+
+        elementRef.current?.ownerSVGElement?.removeEventListener(
+          'touchstart',
+          handleDragStart
+        );
+        elementRef.current?.ownerSVGElement?.removeEventListener(
+          'touchmove',
+          handleDrag
+        );
+        elementRef.current?.ownerDocument?.removeEventListener(
+          'touchend',
+          handleDrop
+        );
+        elementRef.current?.ownerDocument?.removeEventListener(
+          'touchcancel',
+          handleDrop
+        );
+
         elementRef.current = null;
       }
     },
-    [handleMouseDown, handleMouseMove, handleMouseUp]
+    [handleDragStart, handleDrag, handleDrop]
   );
 
   return {
