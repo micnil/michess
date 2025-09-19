@@ -34,12 +34,12 @@ export const useMousePosRef = (): MutableRefObject<Position> => {
 
   useEffect(() => {
     window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('touchmove', handleTouchMove);
+    window.addEventListener('touchmove', handleTouchMove, true);
     window.addEventListener('touchstart', handleTouchMove, true);
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchmove', handleTouchMove, true);
       window.removeEventListener('touchstart', handleTouchMove, true);
     };
   }, [handleMouseMove, handleTouchMove]);

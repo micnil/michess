@@ -1,4 +1,4 @@
-import { assertDefined, Position } from '@michess/common-utils';
+import { assertDefined, Maybe, Position } from '@michess/common-utils';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { clientToSvgPosition } from '../utils/clientToSvgPosition';
 import { useDragDropContext } from './useDragDropContext';
@@ -30,7 +30,12 @@ const setTranslate = (
 };
 
 export const useDrag = ({ id }: Options): Drag => {
-  const dragRef = useRef<SVGGraphicsElement | null>(null);
+  const dragRef = useRef<
+    Maybe<{
+      element: SVGGraphicsElement;
+      unsubscribeEvents: () => void;
+    }>
+  >(undefined);
   const previewRef = useRef<SVGGraphicsElement | null>(null);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [isPressing, setIsPressing] = useState<boolean>(false);
@@ -102,16 +107,25 @@ export const useDrag = ({ id }: Options): Drag => {
 
   const register = useCallback(
     (element: SVGGraphicsElement | null) => {
+      dragRef.current?.unsubscribeEvents();
+      dragRef.current = undefined;
       if (element) {
+        const unsubscribeEvents = () => {
+          dragRef.current?.element.removeEventListener(
+            'mousedown',
+            handlePress
+          );
+          dragRef.current?.element.removeEventListener(
+            'touchstart',
+            handlePress
+          );
+        };
         element.addEventListener('mousedown', handlePress);
         element.addEventListener('touchstart', handlePress, {
           passive: false,
         });
-      } else {
-        dragRef.current?.removeEventListener('mousedown', handlePress);
-        dragRef.current?.removeEventListener('touchstart', handlePress);
+        dragRef.current = { element, unsubscribeEvents };
       }
-      dragRef.current = element;
     },
     [handlePress]
   );
