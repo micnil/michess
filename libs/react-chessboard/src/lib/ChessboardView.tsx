@@ -10,6 +10,8 @@ import { usePromotionDialog } from './promotion-dialog/hooks/usePromotionDialog'
 
 const Board = styled.svg`
   overflow: visible;
+  max-width: 100vw;
+  height: auto;
 `;
 const Squares = styled.g``;
 const Pieces = styled.g``;
@@ -17,6 +19,8 @@ const Pieces = styled.g``;
 const BoardContainer = styled.div`
   position: relative;
   touch-action: none;
+  max-width: 100vw;
+  overflow: hidden;
 `;
 
 type Props = {

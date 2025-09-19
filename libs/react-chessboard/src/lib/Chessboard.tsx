@@ -16,12 +16,16 @@ const ChessboardContainer = styled.div`
   align-items: flex-start;
   justify-content: center;
   width: 100%;
+  max-width: 100vw;
+  overflow: hidden;
 
   /* Responsive layout: score sheet moves below board on smaller screens */
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: center;
     gap: 16px;
+    padding: 0 8px;
+    box-sizing: border-box;
   }
 `;
 

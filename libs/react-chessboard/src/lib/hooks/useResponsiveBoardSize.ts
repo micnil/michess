@@ -4,30 +4,45 @@ type UseResponsiveBoardSizeOptions = {
   maxSize: number;
 };
 
+const calculateBoardSize = (maxSize: number): number => {
+  if (typeof window === 'undefined') return maxSize;
+
+  const viewportWidth = window.innerWidth;
+  const padding = 16;
+
+  // On mobile, use most of the viewport width
+  if (viewportWidth < maxSize) {
+    const mobileSize = Math.min(viewportWidth - padding, maxSize);
+    return Math.floor(mobileSize);
+  } else {
+    return maxSize;
+  }
+};
+
 export const useResponsiveBoardSize = ({
   maxSize,
 }: UseResponsiveBoardSizeOptions) => {
-  const [boardSize, setBoardSize] = useState(maxSize);
+  const [boardSize, setBoardSize] = useState(() => calculateBoardSize(maxSize));
 
   useEffect(() => {
-    const calculateSize = () => {
-      if (typeof window === 'undefined') return;
-
-      const viewportWidth = window.innerWidth;
-      const padding = 8; // Account for page padding
-
-      // On mobile, use most of the viewport width
-      if (viewportWidth < 768) {
-        const mobileSize = Math.min(viewportWidth - padding, maxSize);
-        setBoardSize(Math.floor(mobileSize));
-      } else {
-        setBoardSize(maxSize);
-      }
+    const handleResize = () => {
+      const newSize = calculateBoardSize(maxSize);
+      setBoardSize(newSize);
     };
+    handleResize();
 
-    calculateSize();
-    window.addEventListener('resize', calculateSize);
-    return () => window.removeEventListener('resize', calculateSize);
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+
+    // Listen for viewport changes (helps with DevTools)
+    const mediaQuery = window.matchMedia('(max-width: 768px)');
+    mediaQuery.addEventListener('change', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+      mediaQuery.removeEventListener('change', handleResize);
+    };
   }, [maxSize]);
 
   return boardSize;
