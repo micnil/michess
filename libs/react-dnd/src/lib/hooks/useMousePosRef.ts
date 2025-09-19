@@ -40,7 +40,7 @@ export const useMousePosRef = (): MutableRefObject<Position> => {
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('touchmove', handleTouchMove);
-      window.removeEventListener('touchstart', handleTouchMove);
+      window.removeEventListener('touchstart', handleTouchMove, true);
     };
   }, [handleMouseMove, handleTouchMove]);
 

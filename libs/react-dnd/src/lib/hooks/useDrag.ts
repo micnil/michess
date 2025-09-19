@@ -1,5 +1,5 @@
 import { assertDefined, Position } from '@michess/common-utils';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { clientToSvgPosition } from '../utils/clientToSvgPosition';
 import { useDragDropContext } from './useDragDropContext';
 
@@ -32,12 +32,15 @@ const setTranslate = (
 export const useDrag = ({ id }: Options): Drag => {
   const dragRef = useRef<SVGGraphicsElement | null>(null);
   const previewRef = useRef<SVGGraphicsElement | null>(null);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [isPressing, setIsPressing] = useState<boolean>(false);
   const { state, startDragging, stopDragging } = useDragDropContext();
   const { mousePosRef, draggingId } = state;
 
   const handleDragMove = useCallback(
     (_: MouseEvent | TouchEvent) => {
       if (draggingId === id && previewRef.current) {
+        setIsDragging(true);
         const element = previewRef.current;
         assertDefined(element, 'No elements registered 1');
         const svg = element.ownerSVGElement;
@@ -50,23 +53,31 @@ export const useDrag = ({ id }: Options): Drag => {
     [draggingId, id, mousePosRef]
   );
 
-  const handleStartDragging = useCallback(
+  const handlePress = useCallback(
     (e: MouseEvent | TouchEvent) => {
       e.preventDefault();
-      console.debug('startDragging');
-      startDragging(id);
+      setIsPressing(true);
+      if (draggingId === id) {
+        console.debug('stopDragging (click): ', id);
+        stopDragging(id);
+      } else {
+        console.debug('startDragging');
+        startDragging(id);
+      }
     },
-    [id, startDragging]
+    [draggingId, id, startDragging, stopDragging]
   );
 
   const handleDragEnd = useCallback(
     (_: Event | TouchEvent) => {
-      if (draggingId === id) {
+      setIsPressing(false);
+      if (draggingId === id && isDragging) {
         console.debug('stopDragging: ', id);
+        setIsDragging(false);
         stopDragging(id);
       }
     },
-    [id, draggingId, stopDragging]
+    [draggingId, id, isDragging, stopDragging]
   );
 
   useEffect(() => {
@@ -92,17 +103,17 @@ export const useDrag = ({ id }: Options): Drag => {
   const register = useCallback(
     (element: SVGGraphicsElement | null) => {
       if (element) {
-        element.addEventListener('mousedown', handleStartDragging);
-        element.addEventListener('touchstart', handleStartDragging, {
+        element.addEventListener('mousedown', handlePress);
+        element.addEventListener('touchstart', handlePress, {
           passive: false,
         });
       } else {
-        dragRef.current?.removeEventListener('mousedown', handleStartDragging);
-        dragRef.current?.removeEventListener('touchstart', handleStartDragging);
+        dragRef.current?.removeEventListener('mousedown', handlePress);
+        dragRef.current?.removeEventListener('touchstart', handlePress);
       }
       dragRef.current = element;
     },
-    [handleStartDragging]
+    [handlePress]
   );
 
   const registerPreview = useCallback(
@@ -124,6 +135,6 @@ export const useDrag = ({ id }: Options): Drag => {
   return {
     register,
     registerPreview,
-    isDragging: draggingId === id,
+    isDragging: draggingId === id && isPressing,
   };
 };
