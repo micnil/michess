@@ -86,7 +86,7 @@ export const useDrag = ({ id }: Options): Drag => {
   );
 
   useEffect(() => {
-    const unregister = () => {
+    const unsubscribe = () => {
       window.removeEventListener('mousemove', handleDragMove);
       window.removeEventListener('mouseup', handleDragEnd);
       window.removeEventListener('touchmove', handleDragMove);
@@ -100,9 +100,9 @@ export const useDrag = ({ id }: Options): Drag => {
       window.addEventListener('touchend', handleDragEnd);
       window.addEventListener('touchcancel', handleDragEnd);
     } else {
-      unregister();
+      unsubscribe();
     }
-    return unregister;
+    return unsubscribe;
   }, [draggingId, handleDragEnd, handleDragMove, id]);
 
   const register = useCallback(
