@@ -33,16 +33,37 @@ const StyledOverlayRect = styled.rect<OverlayRectProps>`
 type PossibleMoveIndicatorProps = {
   $show: boolean;
   $hasPiece: boolean;
+  $x: number;
+  $y: number;
+  $size: number;
 };
 const StyledPossibleMoveIndicator = styled.circle<PossibleMoveIndicatorProps>`
   fill: ${({ $show }) => ($show ? 'rgba(50,50,50,0.3)' : 'transparent')};
   pointer-events: none;
 `;
 
-const StyledPossibleMoveBorder = styled.circle<PossibleMoveIndicatorProps>`
-  fill: transparent;
-  stroke-width: ${({ $show }) => ($show ? '6' : '0')};
-  stroke: ${({ $show }) => ($show ? 'rgba(50,50,50,0.3)' : 'transparent')};
+const StyledCornerCuts = styled.path.attrs<PossibleMoveIndicatorProps>(
+  ({ $show, $x, $y, $size }) => ({
+    d: $show
+      ? `M ${$x} ${$y}
+       L ${$x + $size * 0.2} ${$y}
+       L ${$x} ${$y + $size * 0.2} Z
+
+       M ${$x + $size} ${$y}
+       L ${$x + $size * 0.8} ${$y}
+       L ${$x + $size} ${$y + $size * 0.2} Z
+
+       M ${$x} ${$y + $size}
+       L ${$x + $size * 0.2} ${$y + $size}
+       L ${$x} ${$y + $size * 0.8} Z
+
+       M ${$x + $size} ${$y + $size}
+       L ${$x + $size * 0.8} ${$y + $size}
+       L ${$x + $size} ${$y + $size * 0.8} Z`
+      : '',
+  })
+)<PossibleMoveIndicatorProps>`
+  fill: ${({ $show }) => ($show ? 'rgba(50,50,50,0.3)' : 'transparent')};
   pointer-events: none;
 `;
 
@@ -132,14 +153,14 @@ export const SquareView: React.FC<Props> = ({
         $highlight={showHoverHighlight}
         $color="green"
       />
-      {/* Show bigger circle for squares with pieces, smaller circle for empty squares */}
+      {/* Show corner cuts for squares with pieces, circle for empty squares */}
       {hasPiece ? (
-        <StyledPossibleMoveBorder
-          cx={position.x + size / 2}
-          cy={position.y + size / 2}
-          r={size * 0.4}
+        <StyledCornerCuts
           $show={showPossibleMoveIndicator}
           $hasPiece={hasPiece}
+          $x={position.x}
+          $y={position.y}
+          $size={size}
         />
       ) : (
         <StyledPossibleMoveIndicator
@@ -148,6 +169,9 @@ export const SquareView: React.FC<Props> = ({
           r={size * 0.15}
           $show={showPossibleMoveIndicator}
           $hasPiece={hasPiece}
+          $x={position.x}
+          $y={position.y}
+          $size={size}
         />
       )}
     </>
