@@ -25,8 +25,16 @@ const StyledOverlayRect = styled.rect<OverlayRectProps>`
     $highlight
       ? $color === 'green'
         ? 'rgba(20,85,30,0.5)'
-        : 'rgba(254,254,51,0.2)'
+        : 'rgba(0,0,0,0.08)'
       : 'rgba(20,85,30,0.0)'};
+  pointer-events: none;
+`;
+
+type PossibleMoveIndicatorProps = {
+  $show: boolean;
+};
+const StyledPossibleMoveIndicator = styled.circle<PossibleMoveIndicatorProps>`
+  fill: ${({ $show }) => ($show ? 'rgba(50,50,50,0.4)' : 'transparent')};
   pointer-events: none;
 `;
 
@@ -85,8 +93,8 @@ export const SquareView: React.FC<Props> = ({
     onDrop: handleDrop,
   });
 
-  const higlightSquare =
-    (!!moveOptions && canMoveHere) || (isHovering && canMoveHere);
+  const showPossibleMoveIndicator = !!moveOptions && canMoveHere && !isHovering;
+  const showHoverHighlight = isHovering && canMoveHere;
 
   const isLatestMoveSquare =
     latestMove &&
@@ -111,8 +119,14 @@ export const SquareView: React.FC<Props> = ({
         {...position}
         width={size}
         height={size}
-        $highlight={higlightSquare}
-        $color={isHovering ? 'green' : 'yellow'}
+        $highlight={showHoverHighlight}
+        $color="green"
+      />
+      <StyledPossibleMoveIndicator
+        cx={position.x + size / 2}
+        cy={position.y + size / 2}
+        r={size * 0.15}
+        $show={showPossibleMoveIndicator}
       />
     </>
   );
