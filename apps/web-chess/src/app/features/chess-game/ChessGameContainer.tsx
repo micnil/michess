@@ -47,7 +47,6 @@ export const ChessGameContainer = ({
     if (!gameId) return undefined;
     return games.observeMovesForGame(gameId);
   }, [gameId, games]);
-  console.log({ orientation });
 
   return (
     <ChessboardView<Move>
