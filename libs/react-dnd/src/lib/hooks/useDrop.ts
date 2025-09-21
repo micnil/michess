@@ -42,30 +42,27 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
       dropzoneRef.current?.unsubscribeEvents();
       dropzoneRef.current = undefined;
       if (element) {
+        element.dataset.dropzoneId = id;
         const ownerSVGElement = element.ownerSVGElement;
         assertDefined(ownerSVGElement, 'Must register svg elements');
         const handlePressEvent = (evt: PointerEvent) => {
-          if (eventWithinElement(evt, element)) {
-            if (draggingId && eventWithinElement(evt, element)) {
-              console.debug('dropped on ', id);
-              onDropRef.current?.(draggingId);
-            }
-            console.log(evt);
-            console.log('pressed on ', id);
-            handlePress(id === draggingId ? undefined : id);
+          evt.preventDefault();
+          if (draggingId) {
+            onDropRef.current?.(draggingId);
+          }
+          if (evt.isTrusted) {
+            handlePress(undefined);
           }
         };
 
         const handleReleaseEvent = (evt: PointerEvent) => {
           if (draggingId && eventWithinElement(evt, element)) {
-            console.debug('dropped on ', id);
             onDropRef.current?.(draggingId);
           }
         };
 
         const unsubscribeEvents = () => {
-          console.debug('unsubscribing drop events');
-          ownerSVGElement.removeEventListener('pointerdown', handlePressEvent);
+          element.removeEventListener('pointerdown', handlePressEvent);
           ownerSVGElement.removeEventListener('pointerup', handleReleaseEvent);
           ownerSVGElement.removeEventListener(
             'pointercancel',
@@ -73,7 +70,7 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
           );
         };
 
-        ownerSVGElement.addEventListener('pointerdown', handlePressEvent);
+        element.addEventListener('pointerdown', handlePressEvent);
         ownerSVGElement.addEventListener('pointerup', handleReleaseEvent);
         ownerSVGElement.addEventListener('pointercancel', handleReleaseEvent);
         dropzoneRef.current = { element, unsubscribeEvents };

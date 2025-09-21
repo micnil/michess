@@ -4,6 +4,7 @@ import { create } from 'zustand';
 type DragDropStoreState = {
   isPressing: boolean;
   isDragging: boolean;
+  previousDraggingId: Maybe<string>;
   draggingId: Maybe<string>;
 };
 
@@ -19,13 +20,14 @@ export const useDragDropStore = create<DragDropStore>()((set) => ({
   isPressing: false,
   isDragging: false,
   draggingId: undefined,
+  previousDraggingId: undefined,
   handlePress: (id) => {
-    console.log('handlePress', { id });
-    set({
+    set((state) => ({
       isPressing: true,
       isDragging: false,
       draggingId: id,
-    });
+      previousDraggingId: state.draggingId,
+    }));
   },
   handleMove: () =>
     set((state) => ({ isDragging: state.isPressing && !!state.draggingId })),
@@ -33,13 +35,19 @@ export const useDragDropStore = create<DragDropStore>()((set) => ({
     set((state) => ({
       isPressing: false,
       isDragging: false,
-      draggingId: state.isDragging ? undefined : state.draggingId,
+      draggingId: state.isDragging
+        ? undefined
+        : state.previousDraggingId === state.draggingId
+        ? undefined
+        : state.draggingId,
     })),
 }));
+
 useDragDropStore.subscribe((store) =>
-  console.log({
+  console.debug({
     isPressing: store.isPressing,
     isDragging: store.isDragging,
     draggingId: store.draggingId,
+    previousDraggingId: store.previousDraggingId,
   })
 );

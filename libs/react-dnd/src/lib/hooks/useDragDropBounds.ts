@@ -32,7 +32,6 @@ export const useDragDropBounds = (): DragDropBounds => {
           const pos = eventToPosition(evt);
           setPosition(pos);
           if (!positionWithinElement(pos, element)) {
-            console.log('not within element');
             handlePress(undefined);
           }
         };
@@ -49,7 +48,6 @@ export const useDragDropBounds = (): DragDropBounds => {
         };
 
         const unsubscribeEvents = () => {
-          console.debug('unsubscribing drop events');
           element.ownerDocument.removeEventListener(
             'pointerdown',
             handlePressEvent

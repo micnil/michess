@@ -27,7 +27,7 @@ const StyledOverlayRect = styled.rect<OverlayRectProps>`
         ? 'rgba(20,85,30,0.5)'
         : 'rgba(254,254,51,0.2)'
       : 'rgba(20,85,30,0.0)'};
-  pointer-events: all;
+  pointer-events: none;
 `;
 
 type LatestMoveOverlayProps = {
