@@ -48,6 +48,7 @@ export const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
           {Object.values(squares).map((square) => {
             return (
               <SquareView
+                hasPiece={!!boardState.pieces.get(square.coordinate)}
                 draggingFromCoord={draggingId as Maybe<Coordinate>}
                 showPromotionDialog={showPromotionDialog}
                 coordinate={square.coordinate}

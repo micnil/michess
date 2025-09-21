@@ -32,9 +32,17 @@ const StyledOverlayRect = styled.rect<OverlayRectProps>`
 
 type PossibleMoveIndicatorProps = {
   $show: boolean;
+  $hasPiece: boolean;
 };
 const StyledPossibleMoveIndicator = styled.circle<PossibleMoveIndicatorProps>`
-  fill: ${({ $show }) => ($show ? 'rgba(50,50,50,0.4)' : 'transparent')};
+  fill: ${({ $show }) => ($show ? 'rgba(50,50,50,0.3)' : 'transparent')};
+  pointer-events: none;
+`;
+
+const StyledPossibleMoveBorder = styled.circle<PossibleMoveIndicatorProps>`
+  fill: transparent;
+  stroke-width: ${({ $show }) => ($show ? '6' : '0')};
+  stroke: ${({ $show }) => ($show ? 'rgba(50,50,50,0.3)' : 'transparent')};
   pointer-events: none;
 `;
 
@@ -57,6 +65,7 @@ type Props = {
   color: Color;
   position: Position;
   size: number;
+  hasPiece: boolean;
 };
 
 export const SquareView: React.FC<Props> = ({
@@ -66,6 +75,7 @@ export const SquareView: React.FC<Props> = ({
   color,
   position,
   size,
+  hasPiece,
 }) => {
   const { movePiece, chessboard, latestMove } = useChessboardContext();
   const moveOptions = useMoveOptions(draggingFromCoord);
@@ -122,12 +132,24 @@ export const SquareView: React.FC<Props> = ({
         $highlight={showHoverHighlight}
         $color="green"
       />
-      <StyledPossibleMoveIndicator
-        cx={position.x + size / 2}
-        cy={position.y + size / 2}
-        r={size * 0.15}
-        $show={showPossibleMoveIndicator}
-      />
+      {/* Show bigger circle for squares with pieces, smaller circle for empty squares */}
+      {hasPiece ? (
+        <StyledPossibleMoveBorder
+          cx={position.x + size / 2}
+          cy={position.y + size / 2}
+          r={size * 0.4}
+          $show={showPossibleMoveIndicator}
+          $hasPiece={hasPiece}
+        />
+      ) : (
+        <StyledPossibleMoveIndicator
+          cx={position.x + size / 2}
+          cy={position.y + size / 2}
+          r={size * 0.15}
+          $show={showPossibleMoveIndicator}
+          $hasPiece={hasPiece}
+        />
+      )}
     </>
   );
 };
