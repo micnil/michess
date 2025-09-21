@@ -43,19 +43,20 @@ export const useDrag = ({ id }: Options): Drag => {
   const handlePress = useDragDropStore((state) => state.handlePress);
 
   const isPressing = useDragDropStore((state) => state.isPressing);
-  const cursorPosition = usePointerStore((state) => state.position);
+  const previewPosition: Maybe<Position> = usePointerStore((state) =>
+    draggingId === id && !!previewRef.current ? state.position : undefined
+  );
 
   useEffect(() => {
-    if (draggingId === id && previewRef.current) {
+    if (previewPosition && previewRef.current) {
       const element = previewRef.current;
-      assertDefined(element, 'No elements registered');
       const svg = element.ownerSVGElement;
       assertDefined(svg, 'Must register svg elements');
 
-      const mousePos = clientToSvgPosition(svg, cursorPosition);
+      const mousePos = clientToSvgPosition(svg, previewPosition);
       setTranslate(element, mousePos);
     }
-  }, [draggingId, id, cursorPosition]);
+  }, [previewPosition]);
 
   const handlePressEvent = useCallback(
     (e: PointerEvent) => {
