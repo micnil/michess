@@ -10,9 +10,4 @@ export const MainArea = styled.main`
   justify-content: center;
   width: 100%;
   min-height: 0; /* Allow flexbox to control height */
-
-  /* Desktop: add some padding */
-  @media (min-width: 1024px) {
-    padding: 1rem;
-  }
 `;

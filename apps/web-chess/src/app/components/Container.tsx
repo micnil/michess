@@ -9,8 +9,4 @@ export const Container = styled.div`
   min-height: 100%;
   padding: 0rem;
   box-sizing: border-box;
-
-  @media (min-width: 768px) {
-    padding: 1rem;
-  }
 `;
