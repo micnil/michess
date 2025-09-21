@@ -125,7 +125,8 @@ export const SquareView: React.FC<Props> = ({
   });
 
   const showPossibleMoveIndicator = !!moveOptions && canMoveHere && !isHovering;
-  const showHoverHighlight = isHovering && canMoveHere;
+  const showHoverHighlight =
+    (isHovering && canMoveHere) || draggingFromCoord === coordinate;
 
   const isLatestMoveSquare =
     latestMove &&
