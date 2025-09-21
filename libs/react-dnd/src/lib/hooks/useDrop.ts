@@ -1,5 +1,5 @@
 import { assertDefined, Maybe, Position } from '@michess/common-utils';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { useDragDropStore } from '../state/useDragDropStore';
 import { usePointerStore } from '../state/usePointerStore';
 import { eventToPosition } from '../utils/eventToPosition';
@@ -26,16 +26,15 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
     useRef<
       Maybe<{ element: SVGGraphicsElement; unsubscribeEvents: () => void }>
     >(undefined);
-  const cursorPosition = usePointerStore((state) => state.position);
+
+  const isOverMe = usePointerStore((state) => {
+    const element = dropzoneRef.current?.element;
+    return element ? positionWithinElement(state.position, element) : false;
+  });
   const onDropRef = useRef(onDrop);
   onDropRef.current = onDrop;
   const draggingId = useDragDropStore((state) => state.draggingId);
   const handlePress = useDragDropStore((state) => state.handlePress);
-
-  const isOverMe = useMemo(() => {
-    const element = dropzoneRef.current?.element;
-    return element ? positionWithinElement(cursorPosition, element) : false;
-  }, [cursorPosition]);
 
   const register = useCallback(
     (element: SVGGraphicsElement | null) => {
