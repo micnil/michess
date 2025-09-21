@@ -1,6 +1,6 @@
 import { Maybe, Position } from '@michess/common-utils';
 import { Color, Coordinate, PieceType } from '@michess/core-board';
-import { useDragDropContext, useDrop } from '@michess/react-dnd';
+import { useDrop } from '@michess/react-dnd';
 import React from 'react';
 import styled from 'styled-components';
 import { useChessboardContext } from './context/hooks/useChessboardContext';
@@ -41,6 +41,7 @@ const StyledLatestMoveOverlay = styled.rect<LatestMoveOverlayProps>`
 
 type Props = {
   coordinate: Coordinate;
+  draggingFromCoord?: Maybe<Coordinate>;
   showPromotionDialog: (
     coordinate: Coordinate,
     color: Color
@@ -53,13 +54,13 @@ type Props = {
 export const SquareView: React.FC<Props> = ({
   coordinate,
   showPromotionDialog,
+  draggingFromCoord,
   color,
   position,
   size,
 }) => {
   const { movePiece, chessboard, latestMove } = useChessboardContext();
-  const { state } = useDragDropContext();
-  const moveOptions = useMoveOptions(state.draggingId as Coordinate);
+  const moveOptions = useMoveOptions(draggingFromCoord);
   const canMoveHere = canMoveTo(moveOptions, coordinate);
   const handleDrop = async (draggableId: string) => {
     const fromCoord = draggableId as Coordinate;
@@ -74,7 +75,7 @@ export const SquareView: React.FC<Props> = ({
       move = options?.[0];
     }
     if (move) {
-      console.debug(`moving from ${draggableId} to coordinate ${move.to}`);
+      console.debug(`moving from ${fromCoord} to coordinate ${move.to}`);
       movePiece(move);
     }
   };

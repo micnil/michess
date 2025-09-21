@@ -1,5 +1,6 @@
+import { Maybe } from '@michess/common-utils';
 import { Coordinate } from '@michess/core-board';
-import { useDragDropContext } from '@michess/react-dnd';
+import { useDragDropBounds } from '@michess/react-dnd';
 import React from 'react';
 import styled from 'styled-components';
 import { PieceView } from './PieceView';
@@ -29,7 +30,7 @@ type Props = {
 
 export const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
   const { chessboard, squares } = useChessboardContext();
-  const { state } = useDragDropContext();
+  const { register, draggingId } = useDragDropBounds();
 
   const {
     promotionDialog,
@@ -42,11 +43,12 @@ export const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
   const squareSize = size / 8;
   return (
     <BoardContainer>
-      <Board width={size} height={size}>
+      <Board width={size} height={size} ref={register}>
         <Squares>
           {Object.values(squares).map((square) => {
             return (
               <SquareView
+                draggingFromCoord={draggingId as Maybe<Coordinate>}
                 showPromotionDialog={showPromotionDialog}
                 coordinate={square.coordinate}
                 key={square.coordinate}
@@ -71,7 +73,7 @@ export const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
             );
           })}
         </Pieces>
-        {state.draggingId && <use href={`#${state.draggingId}`} />}
+        {draggingId && <use href={`#${draggingId}`} />}
       </Board>
 
       {promotionDialog.isOpen &&

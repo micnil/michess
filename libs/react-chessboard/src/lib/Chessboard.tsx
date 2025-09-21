@@ -1,6 +1,5 @@
 import { Observable } from '@michess/common-utils';
 import { Color } from '@michess/core-board';
-import { DragDropContextProvider } from '@michess/react-dnd';
 import styled from 'styled-components';
 import { ChessboardView } from './ChessboardView';
 import { ChessboardContextProvider } from './context/ChessboardContextProvider';
@@ -70,9 +69,7 @@ export const Chessboard = <TMoveMeta,>({
         moveObservable={moveObservable}
         onMove={onMove}
       >
-        <DragDropContextProvider>
-          <ChessboardView size={boardSize} />
-        </DragDropContextProvider>
+        <ChessboardView size={boardSize} />
       </ChessboardContextProvider>
       <ScoreSheet gameStatus={gameStatus} winner={winner} />
     </ChessboardContainer>
