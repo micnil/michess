@@ -7,7 +7,6 @@ import { useResponsiveBoardSize } from './hooks/useResponsiveBoardSize';
 import { GameStatusType } from './model/GameStatusType';
 import { MovePayload } from './model/MovePayload';
 import { MoveOptions } from './move/model/MoveOptions';
-import { ScoreSheet } from './ScoreSheet';
 
 const ChessboardContainer = styled.div`
   display: flex;
@@ -17,20 +16,6 @@ const ChessboardContainer = styled.div`
   width: 100%;
   max-width: 100vw;
   overflow: hidden;
-
-  /* Responsive layout: score sheet moves below board on smaller screens */
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    padding: 0 8px;
-    box-sizing: border-box;
-  }
-
-  /* Desktop: Ensure ScoreSheet matches chessboard height */
-  @media (min-width: 769px) {
-    align-items: stretch; /* Make both children same height */
-  }
 `;
 
 type Props<TMoveMeta = unknown> = {
@@ -76,11 +61,6 @@ export const Chessboard = <TMoveMeta,>({
       >
         <ChessboardView size={boardSize} />
       </ChessboardContextProvider>
-      <ScoreSheet
-        gameStatus={gameStatus}
-        winner={winner}
-        moveHistory={moveHistory}
-      />
     </ChessboardContainer>
   );
 };
