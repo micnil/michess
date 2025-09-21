@@ -1,7 +1,7 @@
 import { assertDefined, Maybe, Position } from '@michess/common-utils';
 import { useCallback, useMemo, useRef } from 'react';
-import { useCursorPositionStore } from '../state/useCursorPositionStore';
 import { useDragDropStore } from '../state/useDragDropStore';
+import { usePointerStore } from '../state/usePointerStore';
 import { eventToPosition } from '../utils/eventToPosition';
 import { positionWithinElement } from '../utils/positionWithinElement';
 
@@ -15,10 +15,7 @@ type Options = {
   onDrop?: (id: string) => void;
 };
 
-const eventWithinElement = (
-  evt: MouseEvent | TouchEvent,
-  element: SVGElement
-) => {
+const eventWithinElement = (evt: PointerEvent, element: SVGElement) => {
   const mousePos: Position = eventToPosition(evt);
 
   return positionWithinElement(mousePos, element);
@@ -29,7 +26,7 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
     useRef<
       Maybe<{ element: SVGGraphicsElement; unsubscribeEvents: () => void }>
     >(undefined);
-  const cursorPosition = useCursorPositionStore((state) => state.position);
+  const cursorPosition = usePointerStore((state) => state.position);
   const onDropRef = useRef(onDrop);
   onDropRef.current = onDrop;
   const draggingId = useDragDropStore((state) => state.draggingId);
@@ -47,7 +44,7 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
       if (element) {
         const ownerSVGElement = element.ownerSVGElement;
         assertDefined(ownerSVGElement, 'Must register svg elements');
-        const handlePressEvent = (evt: MouseEvent | TouchEvent) => {
+        const handlePressEvent = (evt: PointerEvent) => {
           if (eventWithinElement(evt, element)) {
             if (draggingId && eventWithinElement(evt, element)) {
               console.debug('dropped on ', id);
@@ -59,7 +56,7 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
           }
         };
 
-        const handleReleaseEvent = (evt: MouseEvent | TouchEvent) => {
+        const handleReleaseEvent = (evt: PointerEvent) => {
           if (draggingId && eventWithinElement(evt, element)) {
             console.debug('dropped on ', id);
             onDropRef.current?.(draggingId);
@@ -68,23 +65,17 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
 
         const unsubscribeEvents = () => {
           console.debug('unsubscribing drop events');
-          ownerSVGElement.removeEventListener('mousedown', handlePressEvent);
-          ownerSVGElement.removeEventListener('mouseup', handleReleaseEvent);
-
-          ownerSVGElement.removeEventListener('touchstart', handlePressEvent);
-          ownerSVGElement.removeEventListener('touchend', handleReleaseEvent);
+          ownerSVGElement.removeEventListener('pointerdown', handlePressEvent);
+          ownerSVGElement.removeEventListener('pointerup', handleReleaseEvent);
           ownerSVGElement.removeEventListener(
-            'touchcancel',
+            'pointercancel',
             handleReleaseEvent
           );
         };
 
-        ownerSVGElement.addEventListener('mousedown', handlePressEvent);
-        ownerSVGElement.addEventListener('mouseup', handleReleaseEvent);
-
-        ownerSVGElement.addEventListener('touchstart', handlePressEvent);
-        ownerSVGElement.addEventListener('touchend', handleReleaseEvent);
-        ownerSVGElement.addEventListener('touchcancel', handleReleaseEvent);
+        ownerSVGElement.addEventListener('pointerdown', handlePressEvent);
+        ownerSVGElement.addEventListener('pointerup', handleReleaseEvent);
+        ownerSVGElement.addEventListener('pointercancel', handleReleaseEvent);
         dropzoneRef.current = { element, unsubscribeEvents };
       }
     },

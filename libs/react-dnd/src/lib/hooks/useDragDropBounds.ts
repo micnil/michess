@@ -1,7 +1,7 @@
 import { assertDefined, Maybe } from '@michess/common-utils';
 import { useCallback, useRef } from 'react';
-import { useCursorPositionStore } from '../state/useCursorPositionStore';
 import { useDragDropStore } from '../state/useDragDropStore';
+import { usePointerStore } from '../state/usePointerStore';
 import { eventToPosition } from '../utils/eventToPosition';
 import { positionWithinElement } from '../utils/positionWithinElement';
 
@@ -16,7 +16,7 @@ export const useDragDropBounds = (): DragDropBounds => {
       Maybe<{ element: SVGGraphicsElement; unsubscribeEvents: () => void }>
     >(undefined);
 
-  const setPosition = useCursorPositionStore((state) => state.setPosition);
+  const setPosition = usePointerStore((state) => state.setPosition);
   const draggingId = useDragDropStore((state) => state.draggingId);
   const handleRelease = useDragDropStore((state) => state.handleRelease);
   const handlePress = useDragDropStore((state) => state.handlePress);
@@ -28,7 +28,7 @@ export const useDragDropBounds = (): DragDropBounds => {
       dropzoneRef.current = undefined;
       if (element) {
         assertDefined(element, 'Must register svg element');
-        const handlePressEvent = (evt: MouseEvent | TouchEvent) => {
+        const handlePressEvent = (evt: PointerEvent) => {
           const pos = eventToPosition(evt);
           setPosition(pos);
           if (!positionWithinElement(pos, element)) {
@@ -37,13 +37,13 @@ export const useDragDropBounds = (): DragDropBounds => {
           }
         };
 
-        const handleMoveEvent = (evt: MouseEvent | TouchEvent) => {
+        const handleMoveEvent = (evt: PointerEvent) => {
           const pos = eventToPosition(evt);
           setPosition(pos);
           handleMove(pos);
         };
 
-        const handleReleaseEvent = (evt: MouseEvent | TouchEvent) => {
+        const handleReleaseEvent = (evt: PointerEvent) => {
           setPosition(eventToPosition(evt));
           handleRelease();
         };
@@ -51,45 +51,29 @@ export const useDragDropBounds = (): DragDropBounds => {
         const unsubscribeEvents = () => {
           console.debug('unsubscribing drop events');
           element.ownerDocument.removeEventListener(
-            'mousedown',
+            'pointerdown',
             handlePressEvent
           );
           element.ownerDocument.removeEventListener(
-            'mousemove',
+            'pointermove',
             handleMoveEvent
           );
           element.ownerDocument.removeEventListener(
-            'mouseup',
+            'pointerup',
             handleReleaseEvent
           );
 
           element.ownerDocument.removeEventListener(
-            'touchstart',
-            handlePressEvent
-          );
-          element.ownerDocument.removeEventListener(
-            'touchmove',
-            handleMoveEvent
-          );
-          element.ownerDocument.removeEventListener(
-            'touchend',
-            handleReleaseEvent
-          );
-          element.ownerDocument.removeEventListener(
-            'touchcancel',
+            'pointercancel',
             handleReleaseEvent
           );
         };
 
-        element.ownerDocument.addEventListener('mousedown', handlePressEvent);
-        element.ownerDocument.addEventListener('mousemove', handleMoveEvent);
-        element.ownerDocument.addEventListener('mouseup', handleReleaseEvent);
-
-        element.ownerDocument.addEventListener('touchstart', handlePressEvent);
-        element.ownerDocument.addEventListener('touchmove', handleMoveEvent);
-        element.ownerDocument.addEventListener('touchend', handleReleaseEvent);
+        element.ownerDocument.addEventListener('pointerdown', handlePressEvent);
+        element.ownerDocument.addEventListener('pointermove', handleMoveEvent);
+        element.ownerDocument.addEventListener('pointerup', handleReleaseEvent);
         element.ownerDocument.addEventListener(
-          'touchcancel',
+          'pointercancel',
           handleReleaseEvent
         );
         dropzoneRef.current = { element, unsubscribeEvents };

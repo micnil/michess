@@ -1,7 +1,7 @@
 import { assertDefined, Maybe, Position } from '@michess/common-utils';
 import { useCallback, useEffect, useRef } from 'react';
-import { useCursorPositionStore } from '../state/useCursorPositionStore';
 import { useDragDropStore } from '../state/useDragDropStore';
+import { usePointerStore } from '../state/usePointerStore';
 import { clientToSvgPosition } from '../utils/clientToSvgPosition';
 
 type Drag = {
@@ -43,7 +43,7 @@ export const useDrag = ({ id }: Options): Drag => {
   //const handlePress = useDragDropStore((state) => state.handlePress);
 
   const isPressing = useDragDropStore((state) => state.isPressing);
-  const cursorPosition = useCursorPositionStore((state) => state.position);
+  const cursorPosition = usePointerStore((state) => state.position);
 
   useEffect(() => {
     if (draggingId === id && previewRef.current) {
@@ -70,18 +70,11 @@ export const useDrag = ({ id }: Options): Drag => {
       if (element) {
         const unsubscribeEvents = () => {
           dragRef.current?.element.removeEventListener(
-            'mousedown',
-            handlePressEvent
-          );
-          dragRef.current?.element.removeEventListener(
-            'touchstart',
+            'pointerdown',
             handlePressEvent
           );
         };
-        element.addEventListener('mousedown', handlePressEvent);
-        element.addEventListener('touchstart', handlePressEvent, {
-          passive: false,
-        });
+        element.addEventListener('pointerdown', handlePressEvent);
         dragRef.current = { element, unsubscribeEvents };
       }
     },
