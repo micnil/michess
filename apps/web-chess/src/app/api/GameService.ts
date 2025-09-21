@@ -27,6 +27,18 @@ export class GameService {
     return {
       playerSide,
       moves: gameDetails.moves.map((m) => Move.fromUci(m.uci)),
+      blackPlayer: gameDetails.players.black
+        ? {
+            username: gameDetails.players.black.name,
+            avatar: undefined,
+          }
+        : undefined,
+      whitePlayer: gameDetails.players.white
+        ? {
+            username: gameDetails.players.white.name,
+            avatar: undefined,
+          }
+        : undefined,
     };
   }
 

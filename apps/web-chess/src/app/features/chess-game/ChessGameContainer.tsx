@@ -60,6 +60,14 @@ export const ChessGameContainer = ({
       readonly={data?.playerSide === 'spectator'}
       moveHistory={data?.moves}
       moveObservable={moveObservable || undefined}
+      whitePlayer={{
+        username: data?.whitePlayer?.username || 'Player 1',
+        avatar: data?.whitePlayer?.avatar,
+      }}
+      blackPlayer={{
+        username: data?.blackPlayer?.username || 'Player 2',
+        avatar: data?.blackPlayer?.avatar,
+      }}
       onMove={async (move) => {
         console.log(move);
         if (!gameId) return true;
