@@ -45,7 +45,7 @@ export class GamesService {
         page,
         pageSize: limit,
       },
-      status: ['READY'],
+      status: ['WAITING'],
       private: false,
     });
     const gameDetails = games.map(
