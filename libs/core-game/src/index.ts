@@ -6,4 +6,5 @@ export * from './lib/model/GameMeta';
 export * from './lib/model/GamePlayers';
 export * from './lib/model/GameState';
 export * from './lib/model/GameStatusType';
+export * from './lib/model/PlayerInfo';
 export * from './lib/move/MoveOption';

@@ -2,7 +2,9 @@ import {
   CreateGameV1,
   GameDetailsV1,
   JoinGamePayloadV1,
+  LobbyPageResponseV1,
   MakeMovePayloadV1,
+  PaginationQueryV1,
 } from '@michess/api-schema';
 import { assertDefined } from '@michess/common-utils';
 import { ChessPosition, FenParser, Move } from '@michess/core-board';
@@ -33,6 +35,29 @@ export class GamesService {
         white: undefined,
       },
       moves: [],
+    };
+  }
+
+  async queryLobby(query: PaginationQueryV1): Promise<LobbyPageResponseV1> {
+    const { page, limit } = query;
+    const { games, totalCount } = await this.gameRepository.queryGames({
+      page: {
+        page,
+        pageSize: limit,
+      },
+      status: ['READY'],
+    });
+    const gameDetails = games.map(
+      GameDetailsMapper.fromSelectGameWithRelations
+    );
+
+    return {
+      items: gameDetails.map((game) =>
+        GameDetailsMapper.toLobbyGameItemV1(game)
+      ),
+      totalPages: Math.ceil(totalCount / limit),
+      currentPage: page,
+      pageSize: games.length,
     };
   }
 

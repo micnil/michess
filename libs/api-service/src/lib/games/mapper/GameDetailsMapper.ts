@@ -1,4 +1,8 @@
-import { GameDetailsV1 } from '@michess/api-schema';
+import {
+  GameDetailsV1,
+  GameVariantV1,
+  LobbyGameItemV1,
+} from '@michess/api-schema';
 import { ChessPosition, Move } from '@michess/core-board';
 import {
   ChessGameResultType,
@@ -6,6 +10,7 @@ import {
   GameMeta,
   GamePlayers,
   GameStatusType,
+  PlayerInfo,
 } from '@michess/core-game';
 import { InsertGame, SelectGameWithRelations } from '@michess/infra-db';
 
@@ -48,19 +53,17 @@ const toGameMeta = (game: SelectGameWithRelations): GameMeta => ({
   updatedAt: game.updatedAt,
 });
 
+const toPlayerInfo = (player: {
+  id: string;
+  name: string | null;
+}): PlayerInfo => ({
+  id: player.id,
+  name: player.name ?? 'Anonymous',
+});
+
 const toGamePlayers = (game: SelectGameWithRelations): GamePlayers => ({
-  white: game.whitePlayer
-    ? {
-        id: game.whitePlayer.id,
-        name: game.whitePlayer?.name ?? 'Anonymous',
-      }
-    : undefined,
-  black: game.blackPlayer
-    ? {
-        id: game.blackPlayer.id,
-        name: game.blackPlayer?.name ?? 'Anonymous',
-      }
-    : undefined,
+  white: game.whitePlayer ? toPlayerInfo(game.whitePlayer) : undefined,
+  black: game.blackPlayer ? toPlayerInfo(game.blackPlayer) : undefined,
 });
 
 export const GameDetailsMapper = {
@@ -82,6 +85,27 @@ export const GameDetailsMapper = {
           : undefined,
       resultStr: game.result,
       movesRecord: game.moves.map((move) => Move.fromUci(move.uci)),
+    };
+  },
+
+  toLobbyGameItemV1(game: GameDetails): LobbyGameItemV1 {
+    return {
+      id: game.id,
+      opponent: game.players.white
+        ? game.players.white
+        : game.players.black
+        ? game.players.black
+        : {
+            id: 'anon',
+            name: 'Anonymous',
+          },
+      variant: game.variant as GameVariantV1,
+      createdAt: game.createdAt.toISOString(),
+      availableColor: !game.players.white
+        ? 'white'
+        : !game.players.black
+        ? 'black'
+        : 'spectator',
     };
   },
   toGameDetailsV1(game: GameDetails): GameDetailsV1 {
