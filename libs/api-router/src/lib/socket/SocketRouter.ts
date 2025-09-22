@@ -36,6 +36,10 @@ const from = (api: Api, config: RouterConfig) => {
     DefaultEventsMap,
     SocketData
   >({
+    connectionStateRecovery: {
+      maxDisconnectionDuration: 15000,
+      skipMiddlewares: true,
+    },
     cors: {
       origin: config.cors.origins,
     },
@@ -50,20 +54,31 @@ const from = (api: Api, config: RouterConfig) => {
         next();
       })
       .catch((err) => {
-        console.error('Failed to authenticate socket:', err);
+        logger.error(err, 'Failed to authenticate socket');
         next(new Error('Unauthorized'));
       });
   });
 
   io.on('connection', (socket) => {
-    console.log('a user connected');
+    logger.debug(
+      {
+        socketId: socket.id,
+        recovered: socket.recovered,
+      },
+      'User connected'
+    );
 
     socket.on('join-game', async (payload: unknown, callback) => {
       try {
         const joinGamePayloadV1 = JoinGamePayloadV1Schema.parse(payload);
 
         logger.info(
-          `User ${socket.data.session.userId} joining game ${joinGamePayloadV1.gameId} as ${joinGamePayloadV1.side}`
+          {
+            userId: socket.data.session.userId,
+            gameId: joinGamePayloadV1.gameId,
+            side: joinGamePayloadV1.side,
+          },
+          `User joining game`
         );
         const gameState = await api.games.joinGame(
           socket.data.session,
@@ -96,6 +111,13 @@ const from = (api: Api, config: RouterConfig) => {
     });
 
     socket.on('disconnect', (reason) => {
+      logger.debug(
+        {
+          socketId: socket.id,
+          reason,
+        },
+        'User disconnected'
+      );
       console.log(`user disconnected: ${reason}`);
     });
   });

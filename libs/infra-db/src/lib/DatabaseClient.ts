@@ -7,9 +7,10 @@ import * as schema from './schema';
 type Schema = typeof schema;
 
 const dbLogger: Logger = {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  logQuery: (query: string, _: unknown[]) => {
-    logger.debug(`Executing query: ${query}}`);
+  logQuery: (query: string, params: unknown[]) => {
+    logger.trace(
+      `Executing query: ${query}, with params: ${JSON.stringify(params)}`
+    );
   },
 };
 
