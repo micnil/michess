@@ -26,11 +26,9 @@ const getGameStatus = (gameState: GameState): GameStatusType => {
 export const ChessGameContainer = ({
   gameId,
   orientation,
-  playerSide,
 }: {
   gameId?: string;
   orientation?: Color;
-  playerSide?: Color;
 }) => {
   const { games } = useApi();
 
