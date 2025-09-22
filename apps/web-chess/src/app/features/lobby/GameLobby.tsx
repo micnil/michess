@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import React, { use } from 'react';
 import styled from 'styled-components';
 import { ApiContext } from '../../api/context/ApiContext';
+import { Button } from '../../components';
 
 const GameLobbyContainer = styled.div`
   padding: 1.5rem;
@@ -23,28 +24,6 @@ const SectionTitle = styled.h2`
   font-weight: 600;
   color: #374151;
   margin: 0;
-`;
-
-const CreateGameButton = styled.button`
-  background-color: #374151;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: #4b5563;
-  }
-
-  &:before {
-    content: '+';
-    margin-right: 0.5rem;
-    font-weight: 700;
-  }
 `;
 
 const GameList = styled.div`
@@ -118,22 +97,6 @@ const EmptyState = styled.div`
   color: #6b7280;
 `;
 
-const JoinButton = styled.button`
-  background-color: #374151;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: #4b5563;
-  }
-`;
-
 type Props = {
   onCreateGame?: () => void;
   onJoinGame?: (gameId: string) => void;
@@ -149,12 +112,15 @@ export const GameLobby: React.FC<Props> = ({ onCreateGame, onJoinGame }) => {
   } = useQuery({
     queryKey: ['lobby-games'],
     queryFn: () => api.games.getLobbyGames(1),
+    refetchInterval: 5000,
   });
 
   const renderHeader = () => (
     <SectionHeader>
       <SectionTitle>Game Lobby</SectionTitle>
-      <CreateGameButton onClick={onCreateGame}>Create Game</CreateGameButton>
+      <Button withIcon onClick={onCreateGame}>
+        Create Game
+      </Button>
     </SectionHeader>
   );
 
@@ -191,7 +157,7 @@ export const GameLobby: React.FC<Props> = ({ onCreateGame, onJoinGame }) => {
               <ColorLabel>{game.availableColor}</ColorLabel>
             </ColorColumn>
             <VariantColumn>{game.variant}</VariantColumn>
-            <JoinButton onClick={() => onJoinGame?.(game.id)}>Join</JoinButton>
+            <Button onClick={() => onJoinGame?.(game.id)}>Join</Button>
           </GameCard>
         ))}
         {games.length === 0 && (

@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Button } from '../../components';
 
 const QuickPairingContainer = styled.div`
   padding: 1.5rem;
@@ -94,22 +95,6 @@ const TimeValue = styled.div`
   color: #374151;
 `;
 
-const PlayButton = styled.button`
-  width: 100%;
-  background-color: #374151;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 0.75rem 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: #4b5563;
-  }
-`;
-
 type TimeControlOption = {
   id: string;
   label: string;
@@ -157,9 +142,13 @@ export const QuickPairing: React.FC<Props> = ({ onTimeControlSelect }) => {
                 <TimeLabel>{timeControl.label}</TimeLabel>
                 <TimeValue>{timeControl.time}</TimeValue>
               </TimeFormat>
-              <PlayButton onClick={() => handleTimeControlClick(timeControl)}>
+              <Button
+                size="large"
+                fullWidth
+                onClick={() => handleTimeControlClick(timeControl)}
+              >
                 Play
-              </PlayButton>
+              </Button>
             </CardComponent>
           );
         })}
