@@ -1,4 +1,8 @@
-import { GameDetailsV1, MakeMovePayloadV1 } from '@michess/api-schema';
+import {
+  GameDetailsV1,
+  LobbyPageResponseV1,
+  MakeMovePayloadV1,
+} from '@michess/api-schema';
 import { Maybe, Observable } from '@michess/common-utils';
 import { Move } from '@michess/core-board';
 import { AuthService } from './AuthService';
@@ -49,6 +53,16 @@ export class GameService {
           isPrivate,
         },
       })
+      .json();
+    return response;
+  }
+
+  async getLobbyGames(page: number) {
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+    });
+    const response = await this.restClient
+      .get<LobbyPageResponseV1>(`games/lobby`, { searchParams: queryParams })
       .json();
     return response;
   }
