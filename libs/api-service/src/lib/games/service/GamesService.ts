@@ -46,6 +46,7 @@ export class GamesService {
         pageSize: limit,
       },
       status: ['READY'],
+      private: false,
     });
     const gameDetails = games.map(
       GameDetailsMapper.fromSelectGameWithRelations
