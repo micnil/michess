@@ -7,6 +7,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useApi } from '../../api/hooks/useApi';
+import { useUnmount } from '../../util/useUnmount';
 
 const getGameStatus = (gameState: GameState): GameStatusType => {
   if (!gameState.result) {
@@ -45,6 +46,12 @@ export const ChessGameContainer = ({
     if (!gameId) return undefined;
     return games.observeMovesForGame(gameId);
   }, [gameId, games]);
+
+  useUnmount(() => {
+    if (gameId) {
+      games.leaveGame(gameId);
+    }
+  });
 
   return (
     <ChessboardView<Move>
