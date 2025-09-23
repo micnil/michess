@@ -6,6 +6,7 @@ import { AuthState } from './model/AuthState';
 type BetterAuthSessionData = AuthClient['$Infer']['Session'];
 
 export class AuthService {
+  private currentAuthState: Maybe<AuthState> = undefined;
   toAuthState(sessionData: BetterAuthSessionData): AuthState {
     return {
       session: {
@@ -35,14 +36,19 @@ export class AuthService {
   ) {}
 
   async getSession(): Promise<Maybe<AuthState>> {
-    const { data, error } = await this.authClient.getSession();
-    if (data) {
-      this.socketClient.connect();
-      return this.toAuthState(data);
-    } else if (error) {
-      throw new Error('Failed to retrieve session data', { cause: error });
+    if (this.currentAuthState) {
+      return this.currentAuthState;
     } else {
-      return undefined;
+      const { data, error } = await this.authClient.getSession();
+      if (data) {
+        this.socketClient.connect();
+        this.currentAuthState = this.toAuthState(data);
+        return this.currentAuthState;
+      } else if (error) {
+        throw new Error('Failed to retrieve session data', { cause: error });
+      } else {
+        return undefined;
+      }
     }
   }
 

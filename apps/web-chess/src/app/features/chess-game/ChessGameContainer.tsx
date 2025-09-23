@@ -38,12 +38,7 @@ export const ChessGameContainer = ({
   const queryClient = useQueryClient();
   const { data } = useQuery({
     queryKey: ['game', gameId],
-    queryFn: async () => {
-      if (!gameId) return null;
-      const gameDetails = await games.joinGame(gameId);
-      return gameDetails;
-    },
-    enabled: !!gameId,
+    queryFn: async () => games.joinGame(gameId),
   });
   const moveObservable = useMemo(() => {
     if (!gameId) return undefined;
