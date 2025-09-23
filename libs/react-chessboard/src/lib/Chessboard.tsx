@@ -75,35 +75,35 @@ export const Chessboard = <TMoveMeta,>({
 
   return (
     <ChessboardContainer>
-      <PlayerInfo
-        username={topPlayer?.username}
-        color={topPlayerColor}
-        avatar={topPlayer?.avatar}
+      <ChessboardContextProvider
         size={boardSize}
-      />
-
-      <BoardWrapper>
-        <ChessboardContextProvider
+        orientation={orientation}
+        fromPositionFen={fromPositionFen}
+        gameStatus={gameStatus}
+        readonly={readonly}
+        moveHistory={moveHistory}
+        playableTurn={playableTurn}
+        moveObservable={moveObservable}
+        onMove={onMove}
+      >
+        <PlayerInfo
+          username={topPlayer?.username}
+          color={topPlayerColor}
+          avatar={topPlayer?.avatar}
           size={boardSize}
-          orientation={orientation}
-          fromPositionFen={fromPositionFen}
-          gameStatus={gameStatus}
-          readonly={readonly}
-          moveHistory={moveHistory}
-          playableTurn={playableTurn}
-          moveObservable={moveObservable}
-          onMove={onMove}
-        >
-          <ChessboardView size={boardSize} />
-        </ChessboardContextProvider>
-      </BoardWrapper>
+        />
 
-      <PlayerInfo
-        username={bottomPlayer?.username}
-        color={bottomPlayerColor}
-        avatar={bottomPlayer?.avatar}
-        size={boardSize}
-      />
+        <BoardWrapper>
+          <ChessboardView size={boardSize} />
+        </BoardWrapper>
+
+        <PlayerInfo
+          username={bottomPlayer?.username}
+          color={bottomPlayerColor}
+          avatar={bottomPlayer?.avatar}
+          size={boardSize}
+        />
+      </ChessboardContextProvider>
     </ChessboardContainer>
   );
 };

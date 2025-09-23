@@ -1,6 +1,7 @@
 import { Color } from '@michess/core-board';
 import React from 'react';
 import styled from 'styled-components';
+import { useChessboardContext } from './context/hooks/useChessboardContext';
 
 const PlayerInfoContainer = styled.div<{ $color: Color; $size?: number }>`
   display: flex;
@@ -54,10 +55,12 @@ const Username = styled.div`
   text-overflow: ellipsis;
 `;
 
-const ColorLabel = styled.div<{ $color: Color }>`
+const ColorLabel = styled.div<{ $color: Color; $isPlayerTurn?: boolean }>`
   font-size: 12px;
-  color: #666;
+  color: ${(props) => (props.$isPlayerTurn ? '#374151' : '#666')};
   text-transform: capitalize;
+  font-weight: ${(props) => (props.$isPlayerTurn ? '600' : '400')};
+  position: relative;
 
   &::before {
     content: '';
@@ -71,6 +74,28 @@ const ColorLabel = styled.div<{ $color: Color }>`
       ${(props) => (props.$color === 'white' ? '#dee2e6' : '#495057')};
     margin-right: 6px;
   }
+
+  ${(props) =>
+    props.$isPlayerTurn &&
+    `
+    &::after {
+      content: '';
+      position: absolute;
+      left: -4px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3px;
+      height: 100%;
+      background-color: #f59e0b;
+      border-radius: 2px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+  `}
 `;
 
 type PlayerInfoProps = {
@@ -86,6 +111,10 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
   avatar,
   size,
 }) => {
+  const { chessboard } = useChessboardContext();
+  const currentTurn = chessboard.position.turn;
+  const isPlayerTurn = currentTurn === color;
+
   // Generate avatar initials from username
   const getInitials = (name: string): string => {
     return name
@@ -116,7 +145,9 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
       </Avatar>
       <PlayerDetails>
         <Username title={displayUsername}>{displayUsername}</Username>
-        <ColorLabel $color={color}>Playing {color}</ColorLabel>
+        <ColorLabel $color={color} $isPlayerTurn={isPlayerTurn}>
+          Playing {color} {isPlayerTurn && '• Turn to play'}
+        </ColorLabel>
       </PlayerDetails>
     </PlayerInfoContainer>
   );
