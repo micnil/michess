@@ -83,6 +83,12 @@ export class GameService {
     }
   }
 
+  leaveGame(gameId: string): void {
+    this.socketClient.emit('leave-game', {
+      gameId,
+    });
+  }
+
   async makeMove(gameId: string, uci: string) {
     const response = await this.socketClient.emitWithAck('make-move', {
       gameId,

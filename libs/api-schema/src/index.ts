@@ -12,6 +12,8 @@ export * from './lib/game/GameDetailsV1Schema';
 export * from './lib/game/GameVariantV1';
 export * from './lib/game/JoinGamePayloadV1';
 export * from './lib/game/JoinGamePayloadV1Schema';
+export * from './lib/game/LeaveGamePayloadV1';
+export * from './lib/game/LeaveGamePayloadV1Schema';
 export * from './lib/game/MakeMovePayloadV1';
 export * from './lib/game/MakeMovePayloadV1Schema';
 export * from './lib/game/MakeMoveResponseV1';

@@ -27,6 +27,8 @@ export type ChessGame = {
   play(playerId: string, movesRecord: Move): ChessGame;
   setResult(result: ChessGameResult): ChessGame;
   joinGame(playerInfo: PlayerInfo, side?: Color): ChessGame;
+  leaveGame(playerId: string): ChessGame;
+  isPlayerInGame(playerId: string): boolean;
 };
 
 const evalAdditionalActions = (
@@ -168,6 +170,12 @@ const fromGameStateInternal = (
       resultStr: ChessGameResult.toResultString(result),
     };
   };
+
+  const getPlayerEntry = (playerId: string): Maybe<[Color, PlayerInfo]> => {
+    return Object.entries(gameStateInternal.players).find(([_, player]) => {
+      return player?.id === playerId;
+    }) as Maybe<[Color, PlayerInfo]>;
+  };
   const playMove = (playerId: string, move: Move): ChessGame => {
     if (result) {
       throw new Error('Game is already over');
@@ -180,6 +188,10 @@ const fromGameStateInternal = (
       return fromGameStateInternal({
         ...gameStateInternal,
         board: newBoard,
+        status:
+          gameStateInternal.status === 'READY'
+            ? 'IN_PROGRESS'
+            : gameStateInternal.status,
         result: evalResultFromBoard(newBoard),
         additionalActions: evalAdditionalActions(additionalActions, newBoard),
       });
@@ -208,6 +220,27 @@ const fromGameStateInternal = (
         players: newPlayers,
         status: newPlayers.black && newPlayers.white ? 'READY' : 'WAITING',
       });
+    },
+    isPlayerInGame: (playerId: string): boolean => {
+      return getPlayerEntry(playerId) !== undefined;
+    },
+    leaveGame: (playerId: string): ChessGame => {
+      const playerEntry = getPlayerEntry(playerId);
+      const allowedToLeave: GameStatusType[] = ['WAITING', 'READY'];
+      if (playerEntry && allowedToLeave.includes(gameStateInternal.status)) {
+        gameStateInternal.players[playerEntry[0] as Color] = undefined;
+        return fromGameStateInternal({
+          ...gameStateInternal,
+          status:
+            gameStateInternal.status === 'READY'
+              ? 'WAITING'
+              : gameStateInternal.status === 'WAITING'
+              ? 'EMPTY'
+              : gameStateInternal.status,
+        });
+      } else {
+        return fromGameStateInternal(gameStateInternal);
+      }
     },
   };
 };

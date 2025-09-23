@@ -2,11 +2,12 @@ import {
   CreateGameV1,
   GameDetailsV1,
   JoinGamePayloadV1,
+  LeaveGamePayloadV1,
   LobbyPageResponseV1,
   MakeMovePayloadV1,
   PaginationQueryV1,
 } from '@michess/api-schema';
-import { assertDefined } from '@michess/common-utils';
+import { assertDefined, Maybe } from '@michess/common-utils';
 import { ChessPosition, FenParser, Move } from '@michess/core-board';
 import { ChessGame } from '@michess/core-game';
 import { GameRepository, MoveRepository } from '@michess/infra-db';
@@ -81,6 +82,27 @@ export class GamesService {
         { id: session.userId, name: 'Anonymous' },
         data.side
       );
+      const updatedGameState = updatedGame.getState();
+      await this.gameRepository.updateGame(
+        gameDetails.id,
+        GameDetailsMapper.toInsertGame(updatedGameState)
+      );
+      return GameDetailsMapper.toGameDetailsV1(updatedGameState);
+    }
+  }
+
+  async leaveGame(
+    session: Session,
+    data: LeaveGamePayloadV1
+  ): Promise<Maybe<GameDetailsV1>> {
+    const dbGame = await this.gameRepository.findGameWithRelationsById(
+      data.gameId
+    );
+    assertDefined(dbGame, `Game '${data.gameId}' not found`);
+    const gameDetails = GameDetailsMapper.fromSelectGameWithRelations(dbGame);
+    const chessGame = ChessGame.fromGameState(gameDetails);
+    if (chessGame.isPlayerInGame(session.userId)) {
+      const updatedGame = chessGame.leaveGame(session.userId);
       const updatedGameState = updatedGame.getState();
       await this.gameRepository.updateGame(
         gameDetails.id,

@@ -2,6 +2,7 @@ import {
   ClientToServerEvents,
   EventResponse,
   JoinGamePayloadV1Schema,
+  LeaveGamePayloadV1Schema,
   MakeMovePayloadV1Schema,
   ServerToClientEvents,
 } from '@michess/api-schema';
@@ -96,9 +97,37 @@ const from = (api: Api, config: RouterConfig) => {
       }
     });
 
+    socket.on('leave-game', async (payload: unknown) => {
+      try {
+        const leaveGamePayloadV1 = LeaveGamePayloadV1Schema.parse(payload);
+        logger.debug(
+          {
+            userId: socket.data.session.userId,
+            gameId: leaveGamePayloadV1.gameId,
+          },
+          `User leaving game`
+        );
+        const gameState = await api.games.leaveGame(
+          socket.data.session,
+          leaveGamePayloadV1
+        );
+
+        socket.leave(leaveGamePayloadV1.gameId);
+        if (gameState) {
+          socket.to(leaveGamePayloadV1.gameId).emit('user-left', gameState);
+        }
+      } catch (error) {
+        logger.error(error);
+      }
+    });
+
     socket.on('make-move', async (payload: unknown, callback) => {
       try {
         const makeMovePayloadV1 = MakeMovePayloadV1Schema.parse(payload);
+        logger.debug(
+          { ...makeMovePayloadV1, rooms: Array.from(socket.rooms) },
+          'Received make-move event'
+        );
         await api.games.makeMove(socket.data.session, makeMovePayloadV1);
         socket
           .to(makeMovePayloadV1.gameId)
@@ -110,15 +139,24 @@ const from = (api: Api, config: RouterConfig) => {
       }
     });
 
-    socket.on('disconnect', (reason) => {
+    socket.on('disconnecting', (reason) => {
       logger.debug(
         {
           socketId: socket.id,
           reason,
+          socketRooms: Array.from(socket.rooms),
         },
-        'User disconnected'
+        'User disconnecting'
       );
-      console.log(`user disconnected: ${reason}`);
+    });
+    socket.on('error', (error) => {
+      logger.error(
+        {
+          socketId: socket.id,
+          error,
+        },
+        'Socket error'
+      );
     });
   });
 
