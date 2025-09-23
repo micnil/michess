@@ -9,7 +9,6 @@ import { useMemo } from 'react';
 import { useApi } from '../../api/hooks/useApi';
 import { ParticipantGameViewModel } from '../../api/model/ParticipantGameViewModel';
 import { useObservable } from '../../util/useObservable';
-import { useUnmount } from '../../util/useUnmount';
 
 const getGameStatus = (gameState: GameState): GameStatusType => {
   if (!gameState.result) {
@@ -39,33 +38,36 @@ export const ChessGameContainer = ({
   const { data } = useQuery({
     queryKey: ['game', gameId],
     queryFn: async () => games.joinGame(gameId),
+    gcTime: Infinity,
+    staleTime: Infinity,
+    refetchOnMount: 'always',
   });
+  const { data: gameObservable } = useQuery({
+    queryKey: ['game', gameId, 'observable'],
+    queryFn: async () => games.observeGameState(gameId),
+    gcTime: Infinity,
+    staleTime: Infinity,
+    refetchOnMount: 'always',
+  });
+
+  useObservable(
+    gameObservable,
+    (gameState) => {
+      queryClient.setQueryData<ParticipantGameViewModel>(
+        ['game', gameId],
+        () => {
+          return gameState;
+        }
+      );
+    },
+    () => {
+      games.leaveGame(gameId);
+    }
+  );
   const moveObservable = useMemo(() => {
     if (!gameId) return undefined;
     return games.observeMovesForGame(gameId);
   }, [gameId, games]);
-
-  useObservable(
-    () => games.observeGameState(gameId),
-    (gameState) => {
-      queryClient.setQueryData<ParticipantGameViewModel>(
-        ['game', gameId],
-        (oldData) => {
-          if (!oldData) return oldData;
-          return {
-            ...oldData,
-            ...gameState,
-          };
-        }
-      );
-    }
-  );
-
-  useUnmount(() => {
-    if (gameId) {
-      games.leaveGame(gameId);
-    }
-  });
 
   return (
     <ChessboardView<Move>

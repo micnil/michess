@@ -86,7 +86,10 @@ export class GameService {
     if (response.status === 'error') {
       throw new Error(response.error.message, { cause: response.error });
     } else {
-      return this.toParticipantGameViewModel(response.data, authState?.user.id);
+      return this.toParticipantGameViewModel(
+        response.data,
+        authState?.session.id
+      );
     }
   }
 
@@ -108,12 +111,22 @@ export class GameService {
     }
   }
 
-  observeGameState(gameId: string): Observable<GameViewModel> {
+  async observeGameState(
+    gameId: string
+  ): Promise<Observable<ParticipantGameViewModel>> {
+    const session = await this.auth.getSession();
     return {
-      subscribe: (callback: (move: GameViewModel) => void) => {
+      subscribe: (
+        callback: (gameViewModel: ParticipantGameViewModel) => void
+      ) => {
         const handleGameDetails = (gameDetails: GameDetailsV1) => {
           if (gameDetails.id === gameId) {
-            callback(this.toGameViewModel(gameDetails));
+            callback(
+              this.toParticipantGameViewModel(
+                gameDetails,
+                session?.session.userId
+              )
+            );
           }
         };
 
