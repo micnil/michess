@@ -52,8 +52,10 @@ export const HomePage: React.FC = () => {
     }
   };
 
-  const handleJoinGame = (gameId: string) => {
+  const handleJoinGame = async (gameId: string) => {
     console.log('Joining game:', gameId);
+    // Navigate to the game page
+    await navigate({ to: `/game/${gameId}/` });
   };
 
   return (
