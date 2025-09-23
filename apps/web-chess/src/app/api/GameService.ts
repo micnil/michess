@@ -8,7 +8,8 @@ import { Move } from '@michess/core-board';
 import { AuthService } from './AuthService';
 import { RestClient } from './infra/RestClient';
 import { SocketClient } from './infra/SocketClient';
-import { ParticipantGameDetails } from './model/ParticipantGameDetails';
+import { GameViewModel } from './model/GameViewModel';
+import { ParticipantGameViewModel } from './model/ParticipantGameViewModel';
 
 export class GameService {
   constructor(
@@ -17,19 +18,8 @@ export class GameService {
     private auth: AuthService
   ) {}
 
-  toParticipantGameDetails(
-    gameDetails: GameDetailsV1,
-    playerId: Maybe<string>
-  ): ParticipantGameDetails {
-    // Perhaps move to backend.
-    const playerSide =
-      gameDetails.players.white?.id === playerId
-        ? 'white'
-        : gameDetails.players.black?.id === playerId
-        ? 'black'
-        : 'spectator';
+  toGameViewModel(gameDetails: GameDetailsV1): GameViewModel {
     return {
-      playerSide,
       moves: gameDetails.moves.map((m) => Move.fromUci(m.uci)),
       blackPlayer: gameDetails.players.black
         ? {
@@ -43,6 +33,23 @@ export class GameService {
             avatar: undefined,
           }
         : undefined,
+    };
+  }
+
+  toParticipantGameViewModel(
+    gameDetails: GameDetailsV1,
+    playerId: Maybe<string>
+  ): ParticipantGameViewModel {
+    // Perhaps move to backend.
+    const playerSide =
+      gameDetails.players.white?.id === playerId
+        ? 'white'
+        : gameDetails.players.black?.id === playerId
+        ? 'black'
+        : 'spectator';
+    return {
+      playerSide,
+      ...this.toGameViewModel(gameDetails),
     };
   }
 
@@ -70,7 +77,7 @@ export class GameService {
   async joinGame(
     gameId: string,
     side?: 'white' | 'black' | 'spectator'
-  ): Promise<ParticipantGameDetails> {
+  ): Promise<ParticipantGameViewModel> {
     const authState = await this.auth.getSession();
     const response = await this.socketClient.emitWithAck('join-game', {
       gameId,
@@ -79,7 +86,7 @@ export class GameService {
     if (response.status === 'error') {
       throw new Error(response.error.message, { cause: response.error });
     } else {
-      return this.toParticipantGameDetails(response.data, authState?.user.id);
+      return this.toParticipantGameViewModel(response.data, authState?.user.id);
     }
   }
 
@@ -99,6 +106,27 @@ export class GameService {
     } else {
       return response.data;
     }
+  }
+
+  observeGameState(gameId: string): Observable<GameViewModel> {
+    return {
+      subscribe: (callback: (move: GameViewModel) => void) => {
+        const handleGameDetails = (gameDetails: GameDetailsV1) => {
+          if (gameDetails.id === gameId) {
+            callback(this.toGameViewModel(gameDetails));
+          }
+        };
+
+        this.socketClient.on('user-left', handleGameDetails);
+        this.socketClient.on('user-joined', handleGameDetails);
+
+        // Return unsubscribe function
+        return () => {
+          this.socketClient.off('user-left', handleGameDetails);
+          this.socketClient.off('user-joined', handleGameDetails);
+        };
+      },
+    };
   }
 
   observeMovesForGame(gameId: string): Observable<Move> {

@@ -4,9 +4,11 @@ import {
   Chessboard as ChessboardView,
   GameStatusType,
 } from '@michess/react-chessboard';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useApi } from '../../api/hooks/useApi';
+import { ParticipantGameViewModel } from '../../api/model/ParticipantGameViewModel';
+import { useObservable } from '../../util/useObservable';
 import { useUnmount } from '../../util/useUnmount';
 
 const getGameStatus = (gameState: GameState): GameStatusType => {
@@ -28,11 +30,12 @@ export const ChessGameContainer = ({
   gameId,
   orientation,
 }: {
-  gameId?: string;
+  gameId: string;
   orientation?: Color;
 }) => {
   const { games } = useApi();
 
+  const queryClient = useQueryClient();
   const { data } = useQuery({
     queryKey: ['game', gameId],
     queryFn: async () => {
@@ -46,6 +49,22 @@ export const ChessGameContainer = ({
     if (!gameId) return undefined;
     return games.observeMovesForGame(gameId);
   }, [gameId, games]);
+
+  useObservable(
+    () => games.observeGameState(gameId),
+    (gameState) => {
+      queryClient.setQueryData<ParticipantGameViewModel>(
+        ['game', gameId],
+        (oldData) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            ...gameState,
+          };
+        }
+      );
+    }
+  );
 
   useUnmount(() => {
     if (gameId) {
@@ -65,14 +84,8 @@ export const ChessGameContainer = ({
       readonly={data?.playerSide === 'spectator'}
       moveHistory={data?.moves}
       moveObservable={moveObservable || undefined}
-      whitePlayer={{
-        username: data?.whitePlayer?.username || 'Player 1',
-        avatar: data?.whitePlayer?.avatar,
-      }}
-      blackPlayer={{
-        username: data?.blackPlayer?.username || 'Player 2',
-        avatar: data?.blackPlayer?.avatar,
-      }}
+      whitePlayer={data?.whitePlayer}
+      blackPlayer={data?.blackPlayer}
       onMove={async (move) => {
         console.log(move);
         if (!gameId) return true;

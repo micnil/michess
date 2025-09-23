@@ -74,7 +74,7 @@ const ColorLabel = styled.div<{ $color: Color }>`
 `;
 
 type PlayerInfoProps = {
-  username: string;
+  username?: string;
   color: Color;
   avatar?: string; // Optional avatar URL/image
   size?: number; // Width to match chessboard
@@ -96,21 +96,26 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
       .slice(0, 2);
   };
 
+  const displayUsername = username || 'Waiting for player';
+  const isWaiting = !username;
+
   return (
     <PlayerInfoContainer $color={color} $size={size}>
       <Avatar $color={color}>
         {avatar ? (
           <img
             src={avatar}
-            alt={`${username} avatar`}
+            alt={`${displayUsername} avatar`}
             style={{ width: '100%', height: '100%', borderRadius: '50%' }}
           />
+        ) : isWaiting ? (
+          '?'
         ) : (
           getInitials(username)
         )}
       </Avatar>
       <PlayerDetails>
-        <Username title={username}>{username}</Username>
+        <Username title={displayUsername}>{displayUsername}</Username>
         <ColorLabel $color={color}>Playing {color}</ColorLabel>
       </PlayerDetails>
     </PlayerInfoContainer>

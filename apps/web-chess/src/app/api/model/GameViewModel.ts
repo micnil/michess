@@ -1,7 +1,6 @@
 import { Move } from '@michess/core-board';
 
-export type ParticipantGameDetails = {
-  playerSide: 'white' | 'black' | 'spectator';
+export type GameViewModel = {
   moves: Move[];
   blackPlayer?: {
     username: string;

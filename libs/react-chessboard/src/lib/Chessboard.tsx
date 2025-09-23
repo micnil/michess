@@ -61,8 +61,8 @@ export const Chessboard = <TMoveMeta,>({
   moveHistory,
   moveObservable,
   onMove,
-  whitePlayer = { username: 'White Player' },
-  blackPlayer = { username: 'Black Player' },
+  whitePlayer,
+  blackPlayer,
 }: Props<TMoveMeta>) => {
   // Use the responsive board size hook
   const boardSize = useResponsiveBoardSize({ maxSize });
@@ -76,9 +76,9 @@ export const Chessboard = <TMoveMeta,>({
   return (
     <ChessboardContainer>
       <PlayerInfo
-        username={topPlayer.username}
+        username={topPlayer?.username}
         color={topPlayerColor}
-        avatar={topPlayer.avatar}
+        avatar={topPlayer?.avatar}
         size={boardSize}
       />
 
@@ -99,9 +99,9 @@ export const Chessboard = <TMoveMeta,>({
       </BoardWrapper>
 
       <PlayerInfo
-        username={bottomPlayer.username}
+        username={bottomPlayer?.username}
         color={bottomPlayerColor}
-        avatar={bottomPlayer.avatar}
+        avatar={bottomPlayer?.avatar}
         size={boardSize}
       />
     </ChessboardContainer>
