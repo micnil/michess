@@ -1,59 +1,10 @@
 import { Position } from '@michess/common-utils';
 import { Color, ColoredPieceType, PieceType } from '@michess/core-board';
 import React from 'react';
-import styled from 'styled-components';
 import pieceSprite from '../../../assets/chessboard-sprite-staunty.svg';
+import styles from './PromotionDialog.module.css';
 
 const DEFAULT_SPRITE_SIZE = 40;
-
-const DialogOverlay = styled.div`
-  position: absolute;
-  z-index: 1000;
-  pointer-events: all;
-`;
-
-const DialogContainer = styled.div`
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 4px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-`;
-
-const PieceButton = styled.button`
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 2px;
-  cursor: pointer;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  box-sizing: border-box;
-
-  &:hover {
-    background: rgba(139, 69, 19, 0.1);
-    border-color: #8b4513;
-  }
-
-  &:active {
-    background: rgba(139, 69, 19, 0.2);
-  }
-`;
-
-const CancelOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 999;
-  background: transparent;
-  cursor: pointer;
-`;
 
 type Props = {
   color: Color;
@@ -101,10 +52,10 @@ export const PromotionDialog: React.FC<Props> = ({
 
   return (
     <>
-      <CancelOverlay onClick={handleCancelClick} />
+      <div className={styles.cancelOverlay} onClick={handleCancelClick} />
 
-      <DialogOverlay style={dialogStyle}>
-        <DialogContainer>
+      <div className={styles.dialogOverlay} style={dialogStyle}>
+        <div className={styles.dialogContainer}>
           {promotionPieces.map((pieceType) => {
             const coloredPieceType = ColoredPieceType.fromPiece({
               type: pieceType,
@@ -112,8 +63,9 @@ export const PromotionDialog: React.FC<Props> = ({
             });
 
             return (
-              <PieceButton
+              <button
                 key={pieceType}
+                className={styles.pieceButton}
                 onClick={() => handlePieceClick(pieceType)}
                 style={{
                   width: squareSize,
@@ -131,11 +83,11 @@ export const PromotionDialog: React.FC<Props> = ({
                     transform={`scale(${scaling} ${scaling})`}
                   />
                 </svg>
-              </PieceButton>
+              </button>
             );
           })}
-        </DialogContainer>
-      </DialogOverlay>
+        </div>
+      </div>
     </>
   );
 };

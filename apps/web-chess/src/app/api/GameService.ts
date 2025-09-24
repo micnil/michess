@@ -88,7 +88,7 @@ export class GameService {
     } else {
       return this.toParticipantGameViewModel(
         response.data,
-        authState?.session.id
+        authState?.session.userId
       );
     }
   }
