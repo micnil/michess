@@ -1,29 +1,12 @@
 import { Color, Move } from '@michess/core-board';
-import { GameState } from '@michess/core-game';
-import {
-  Chessboard as ChessboardView,
-  GameStatusType,
-} from '@michess/react-chessboard';
+import { Chessboard as ChessboardView } from '@michess/react-chessboard';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useApi } from '../../api/hooks/useApi';
 import { ParticipantGameViewModel } from '../../api/model/ParticipantGameViewModel';
 import { useObservable } from '../../util/useObservable';
-
-const getGameStatus = (gameState: GameState): GameStatusType => {
-  if (!gameState.result) {
-    return 'active';
-  } else if (gameState.result.type === 'draw') {
-    return 'draw';
-  } else if (
-    gameState.result.type === 'white_win' ||
-    gameState.result.type === 'black_win'
-  ) {
-    return 'checkmate';
-  } else {
-    return 'active';
-  }
-};
+import styles from './ChessGameContainer.module.css';
+import { PlayerInfo } from './components';
 
 export const ChessGameContainer = ({
   gameId,
@@ -69,31 +52,61 @@ export const ChessGameContainer = ({
     return games.observeMovesForGame(gameId);
   }, [gameId, games]);
 
-  return (
-    <ChessboardView<Move>
-      orientation={orientation}
-      maxSize={600}
-      gameStatus={undefined}
-      winner={undefined}
-      playableTurn={
-        data?.playerSide === 'spectator' ? undefined : data?.playerSide
-      }
-      readonly={data?.playerSide === 'spectator'}
-      moveHistory={data?.moves}
-      moveObservable={moveObservable || undefined}
-      whitePlayer={data?.whitePlayer}
-      blackPlayer={data?.blackPlayer}
-      onMove={async (move) => {
-        console.log(move);
-        if (!gameId) return true;
-        try {
-          await games.makeMove(gameId, Move.toUci(move));
-          return true;
-        } catch (error) {
-          console.error('Error making move:', error);
-          return false;
-        }
-      }}
+  const whitePlayerInfo = (
+    <PlayerInfo
+      username={data?.whitePlayer?.username}
+      avatar={data?.whitePlayer?.avatar}
+      color={Color.White}
+      isPlayerTurn={data ? data.moves.length % 2 === 0 : false}
     />
+  );
+
+  const blackPlayerInfo = (
+    <PlayerInfo
+      username={data?.blackPlayer?.username}
+      avatar={data?.blackPlayer?.avatar}
+      color={Color.Black}
+      isPlayerTurn={data ? data.moves.length % 2 === 1 : false}
+    />
+  );
+
+  // Position players based on board orientation
+  // The player matching the orientation should always be on the bottom (your perspective)
+  // White orientation: Black on top, White on bottom
+  // Black orientation: White on top, Black on bottom
+  const currentOrientation = orientation || Color.White; // Default to white orientation
+  const topPlayerInfo =
+    currentOrientation === Color.White ? blackPlayerInfo : whitePlayerInfo;
+  const bottomPlayerInfo =
+    currentOrientation === Color.White ? whitePlayerInfo : blackPlayerInfo;
+
+  return (
+    <div className={styles.gameContainer}>
+      <div className={styles.playerInfo}>{topPlayerInfo}</div>
+      <ChessboardView<Move>
+        orientation={orientation}
+        maxSize={600}
+        gameStatus={undefined}
+        winner={undefined}
+        playableTurn={
+          data?.playerSide === 'spectator' ? undefined : data?.playerSide
+        }
+        readonly={data?.playerSide === 'spectator'}
+        moveHistory={data?.moves}
+        moveObservable={moveObservable || undefined}
+        onMove={async (move) => {
+          console.log(move);
+          if (!gameId) return true;
+          try {
+            await games.makeMove(gameId, Move.toUci(move));
+            return true;
+          } catch (error) {
+            console.error('Error making move:', error);
+            return false;
+          }
+        }}
+      />
+      <div className={styles.playerInfo}>{bottomPlayerInfo}</div>
+    </div>
   );
 };
