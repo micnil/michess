@@ -1,101 +1,34 @@
+import { Box, Button, Card, Flex, Heading, Text } from '@radix-ui/themes';
 import { useQuery } from '@tanstack/react-query';
 import React, { use } from 'react';
-import styled from 'styled-components';
 import { ApiContext } from '../../api/context/ApiContext';
-import { Button } from '../../components';
 
-const GameLobbyContainer = styled.div`
-  padding: 1.5rem;
-  background-color: #ffffff;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-`;
+const ColorIndicator: React.FC<{ color: 'white' | 'black' | 'spectator' }> = ({
+  color,
+}) => {
+  const getStyle = () => {
+    const baseStyle = {
+      width: '16px',
+      height: '16px',
+      borderRadius: '50%',
+      border: '2px solid #333',
+    };
 
-const SectionHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-`;
+    if (color === 'white') {
+      return { ...baseStyle, backgroundColor: '#ffffff' };
+    } else if (color === 'black') {
+      return { ...baseStyle, backgroundColor: '#333333' };
+    } else {
+      return {
+        ...baseStyle,
+        background: 'linear-gradient(45deg, #333 50%, #fff 50%)',
+        backgroundColor: 'transparent',
+      };
+    }
+  };
 
-const SectionTitle = styled.h2`
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #374151;
-  margin: 0;
-`;
-
-const GameList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
-`;
-
-const GameCard = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.75rem 1rem;
-  background-color: #fafafa;
-  border-radius: 6px;
-  border: 1px solid #f0f0f0;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background-color: #f5f5f5;
-    border-color: #e5e5e5;
-  }
-`;
-
-const PlayerColumn = styled.div`
-  font-weight: 600;
-  color: #374151;
-  min-width: 120px;
-`;
-
-const ColorColumn = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 100px;
-`;
-
-const ColorIndicator = styled.div<{ $color: 'white' | 'black' | 'spectator' }>`
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 2px solid #333;
-  background-color: ${(props) =>
-    props.$color === 'white'
-      ? '#ffffff'
-      : props.$color === 'black'
-      ? '#333333'
-      : 'transparent'};
-  ${(props) =>
-    props.$color === 'spectator' &&
-    `
-    background: linear-gradient(45deg, #333 50%, #fff 50%);
-  `}
-`;
-
-const ColorLabel = styled.span`
-  font-size: 0.875rem;
-  color: #6b7280;
-  text-transform: capitalize;
-`;
-
-const VariantColumn = styled.div`
-  font-size: 0.875rem;
-  color: #6b7280;
-  flex: 1;
-`;
-
-const EmptyState = styled.div`
-  text-align: center;
-  padding: 2rem;
-  color: #6b7280;
-`;
+  return <div style={getStyle()} />;
+};
 
 type Props = {
   onCreateGame?: () => void;
@@ -116,56 +49,80 @@ export const GameLobby: React.FC<Props> = ({ onCreateGame, onJoinGame }) => {
   });
 
   const renderHeader = () => (
-    <SectionHeader>
-      <SectionTitle>Game Lobby</SectionTitle>
-      <Button withIcon onClick={onCreateGame}>
-        Create Game
-      </Button>
-    </SectionHeader>
+    <Flex justify="between" align="center" mb="4">
+      <Heading size="4" weight="medium">
+        Game Lobby
+      </Heading>
+      <Button onClick={onCreateGame}>+ Create Game</Button>
+    </Flex>
   );
 
   if (isLoading) {
     return (
-      <GameLobbyContainer>
+      <Card size="3" style={{ padding: '24px' }}>
         {renderHeader()}
-        <EmptyState>Loading games...</EmptyState>
-      </GameLobbyContainer>
+        <Box style={{ textAlign: 'center', padding: '32px', color: '#6b7280' }}>
+          <Text>Loading games...</Text>
+        </Box>
+      </Card>
     );
   }
 
   if (error) {
     return (
-      <GameLobbyContainer>
+      <Card size="3" style={{ padding: '24px' }}>
         {renderHeader()}
-        <EmptyState>Error loading games: {(error as Error).message}</EmptyState>
-      </GameLobbyContainer>
+        <Box style={{ textAlign: 'center', padding: '32px', color: '#6b7280' }}>
+          <Text>Error loading games: {(error as Error).message}</Text>
+        </Box>
+      </Card>
     );
   }
 
   const games = lobbyData?.items || [];
 
   return (
-    <GameLobbyContainer>
+    <Card size="3" style={{ padding: '24px' }}>
       {renderHeader()}
 
-      <GameList>
+      <Flex direction="column" gap="2">
         {games.map((game) => (
-          <GameCard key={game.id}>
-            <PlayerColumn>{game.opponent.name}</PlayerColumn>
-            <ColorColumn>
-              <ColorIndicator $color={game.availableColor} />
-              <ColorLabel>{game.availableColor}</ColorLabel>
-            </ColorColumn>
-            <VariantColumn>{game.variant}</VariantColumn>
-            <Button onClick={() => onJoinGame?.(game.id)}>Join</Button>
-          </GameCard>
+          <Card key={game.id} variant="surface" size="2">
+            <Flex align="center" gap="4" p="3">
+              <Box style={{ minWidth: '120px' }}>
+                <Text weight="medium" size="3">
+                  {game.opponent.name}
+                </Text>
+              </Box>
+              <Flex align="center" gap="2" style={{ minWidth: '100px' }}>
+                <ColorIndicator color={game.availableColor} />
+                <Text
+                  size="2"
+                  color="gray"
+                  style={{ textTransform: 'capitalize' }}
+                >
+                  {game.availableColor}
+                </Text>
+              </Flex>
+              <Box flexGrow="1">
+                <Text size="2" color="gray">
+                  {game.variant}
+                </Text>
+              </Box>
+              <Button size="2" onClick={() => onJoinGame?.(game.id)}>
+                Join
+              </Button>
+            </Flex>
+          </Card>
         ))}
         {games.length === 0 && (
-          <EmptyState>
-            No games available. Create one to get started!
-          </EmptyState>
+          <Box
+            style={{ textAlign: 'center', padding: '32px', color: '#6b7280' }}
+          >
+            <Text>No games available. Create one to get started!</Text>
+          </Box>
         )}
-      </GameList>
-    </GameLobbyContainer>
+      </Flex>
+    </Card>
   );
 };
