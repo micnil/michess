@@ -1,4 +1,3 @@
-import { Container } from '../components/Container';
 import { ChessGameContainer } from '../features/chess-game/ChessGameContainer';
 
 type Props = {
@@ -8,19 +7,10 @@ type Props = {
 
 export const GamePage = ({ gameId, side }: Props) => {
   if (!gameId) {
-    return (
-      <Container>
-        {/** TODO Display local game container*/}
-        <ChessGameContainer orientation={side} gameId={'gameId'} />
-      </Container>
-    );
+    return <ChessGameContainer orientation={side} gameId={'gameId'} />;
   }
 
-  return (
-    <Container>
-      <ChessGameContainer gameId={gameId} orientation={side} />
-    </Container>
-  );
+  return <ChessGameContainer gameId={gameId} orientation={side} />;
 };
 
 export default GamePage;
