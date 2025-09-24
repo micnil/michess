@@ -10,7 +10,7 @@ export const GamePage = ({ gameId, side }: Props) => {
   if (!gameId) {
     return (
       <Container>
-        {/** Make loading state instead of using fake ID */}
+        {/** TODO Display local game container*/}
         <ChessGameContainer orientation={side} gameId={'gameId'} />
       </Container>
     );
