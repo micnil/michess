@@ -2,27 +2,12 @@ import { Maybe } from '@michess/common-utils';
 import { Coordinate } from '@michess/core-board';
 import { useDragDropBounds } from '@michess/react-dnd';
 import React from 'react';
-import styled from 'styled-components';
+import styles from './ChessboardView.module.css';
 import { PieceView } from './PieceView';
 import { SquareView } from './SquareView';
 import { useChessboardContext } from './context/hooks/useChessboardContext';
 import { PromotionDialog } from './promotion-dialog/components/PromotionDialog';
 import { usePromotionDialog } from './promotion-dialog/hooks/usePromotionDialog';
-
-const Board = styled.svg`
-  overflow: visible;
-  max-width: 100vw;
-  height: auto;
-`;
-const Squares = styled.g``;
-const Pieces = styled.g``;
-
-const BoardContainer = styled.div`
-  position: relative;
-  touch-action: none;
-  max-width: 100vw;
-  overflow: hidden;
-`;
 
 type Props = {
   size: number;
@@ -42,9 +27,9 @@ export const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
   const boardState = chessboard.position;
   const squareSize = size / 8;
   return (
-    <BoardContainer>
-      <Board width={size} height={size} ref={register}>
-        <Squares>
+    <div className={styles.boardContainer}>
+      <svg className={styles.board} width={size} height={size} ref={register}>
+        <g>
           {Object.values(squares).map((square) => {
             return (
               <SquareView
@@ -59,8 +44,8 @@ export const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
               />
             );
           })}
-        </Squares>
-        <Pieces>
+        </g>
+        <g>
           {Array.from(boardState.pieces.entries()).map(([coord, piece]) => {
             const square = squares[coord as Coordinate];
             return (
@@ -73,9 +58,9 @@ export const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
               />
             );
           })}
-        </Pieces>
+        </g>
         {draggingId && <use href={`#${draggingId}`} />}
-      </Board>
+      </svg>
 
       {promotionDialog.isOpen &&
         promotionDialog.coordinate &&
@@ -88,6 +73,6 @@ export const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
             onCancel={handlePromotionCancel}
           />
         )}
-    </BoardContainer>
+    </div>
   );
 };

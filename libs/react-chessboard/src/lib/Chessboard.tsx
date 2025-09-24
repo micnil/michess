@@ -1,6 +1,6 @@
 import { Observable } from '@michess/common-utils';
 import { Color } from '@michess/core-board';
-import styled from 'styled-components';
+import styles from './Chessboard.module.css';
 import { ChessboardView } from './ChessboardView';
 import { ChessboardContextProvider } from './context/ChessboardContextProvider';
 import { useResponsiveBoardSize } from './hooks/useResponsiveBoardSize';
@@ -8,26 +8,6 @@ import { GameStatusType } from './model/GameStatusType';
 import { MovePayload } from './model/MovePayload';
 import { MoveOptions } from './move/model/MoveOptions';
 import { PlayerInfo } from './PlayerInfo';
-
-const ChessboardContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: 100vw;
-`;
-
-const BoardWrapper = styled.div`
-  display: flex;
-  gap: 24px;
-  align-items: flex-start;
-  justify-content: center;
-  width: 100%;
-  max-width: 100vw;
-  overflow: hidden;
-`;
 
 type Props<TMoveMeta = unknown> = {
   orientation?: Color;
@@ -55,7 +35,7 @@ export const Chessboard = <TMoveMeta,>({
   maxSize = 600,
   fromPositionFen,
   gameStatus = 'active',
-  winner,
+  winner: _winner,
   readonly,
   playableTurn,
   moveHistory,
@@ -74,7 +54,7 @@ export const Chessboard = <TMoveMeta,>({
   const bottomPlayerColor: Color = orientation === 'white' ? 'white' : 'black';
 
   return (
-    <ChessboardContainer>
+    <div className={styles.chessboardContainer}>
       <ChessboardContextProvider
         size={boardSize}
         orientation={orientation}
@@ -93,9 +73,9 @@ export const Chessboard = <TMoveMeta,>({
           size={boardSize}
         />
 
-        <BoardWrapper>
+        <div className={styles.boardWrapper}>
           <ChessboardView size={boardSize} />
-        </BoardWrapper>
+        </div>
 
         <PlayerInfo
           username={bottomPlayer?.username}
@@ -104,6 +84,6 @@ export const Chessboard = <TMoveMeta,>({
           size={boardSize}
         />
       </ChessboardContextProvider>
-    </ChessboardContainer>
+    </div>
   );
 };

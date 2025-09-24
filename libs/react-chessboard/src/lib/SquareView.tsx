@@ -2,79 +2,11 @@ import { Maybe, Position } from '@michess/common-utils';
 import { Color, Coordinate, PieceType } from '@michess/core-board';
 import { useDrop } from '@michess/react-dnd';
 import React from 'react';
-import styled from 'styled-components';
+import styles from './SquareView.module.css';
 import { useChessboardContext } from './context/hooks/useChessboardContext';
 import { useMoveOptions } from './context/hooks/useMoveOptions';
 import { MovePayload } from './model/MovePayload';
 import { canMoveTo } from './move/util/canMoveTo';
-
-type RectProps = {
-  color: Color;
-};
-const StyledRect = styled.rect<RectProps>`
-  fill: ${({ color }) => (color === 'white' ? '#ecdab9' : '#c5a076')};
-  pointer-events: all;
-`;
-
-type OverlayRectProps = {
-  $highlight: boolean;
-  $color: 'green' | 'yellow';
-};
-const StyledOverlayRect = styled.rect<OverlayRectProps>`
-  fill: ${({ $highlight, $color }) =>
-    $highlight
-      ? $color === 'green'
-        ? 'rgba(20,85,30,0.5)'
-        : 'rgba(0,0,0,0.08)'
-      : 'rgba(20,85,30,0.0)'};
-  pointer-events: none;
-`;
-
-type PossibleMoveIndicatorProps = {
-  $show: boolean;
-  $hasPiece: boolean;
-  $x: number;
-  $y: number;
-  $size: number;
-};
-const StyledPossibleMoveIndicator = styled.circle<PossibleMoveIndicatorProps>`
-  fill: ${({ $show }) => ($show ? 'rgba(50,50,50,0.3)' : 'transparent')};
-  pointer-events: none;
-`;
-
-const StyledCornerCuts = styled.path.attrs<PossibleMoveIndicatorProps>(
-  ({ $show, $x, $y, $size }) => ({
-    d: $show
-      ? `M ${$x} ${$y}
-       L ${$x + $size * 0.2} ${$y}
-       L ${$x} ${$y + $size * 0.2} Z
-
-       M ${$x + $size} ${$y}
-       L ${$x + $size * 0.8} ${$y}
-       L ${$x + $size} ${$y + $size * 0.2} Z
-
-       M ${$x} ${$y + $size}
-       L ${$x + $size * 0.2} ${$y + $size}
-       L ${$x} ${$y + $size * 0.8} Z
-
-       M ${$x + $size} ${$y + $size}
-       L ${$x + $size * 0.8} ${$y + $size}
-       L ${$x + $size} ${$y + $size * 0.8} Z`
-      : '',
-  })
-)<PossibleMoveIndicatorProps>`
-  fill: ${({ $show }) => ($show ? 'rgba(50,50,50,0.3)' : 'transparent')};
-  pointer-events: none;
-`;
-
-type LatestMoveOverlayProps = {
-  $highlight: boolean;
-};
-const StyledLatestMoveOverlay = styled.rect<LatestMoveOverlayProps>`
-  fill: ${({ $highlight }) =>
-    $highlight ? 'rgba(255,255,0,0.3)' : 'rgba(255,255,0,0.0)'};
-  pointer-events: none;
-`;
 
 type Props = {
   coordinate: Coordinate;
@@ -132,47 +64,79 @@ export const SquareView: React.FC<Props> = ({
     latestMove &&
     (latestMove.from === coordinate || latestMove.to === coordinate);
 
+  // Helper function to get corner cuts path
+  const getCornerCutsPath = (
+    show: boolean,
+    x: number,
+    y: number,
+    size: number
+  ) => {
+    if (!show) return '';
+    return `M ${x} ${y}
+       L ${x + size * 0.2} ${y}
+       L ${x} ${y + size * 0.2} Z
+
+       M ${x + size} ${y}
+       L ${x + size * 0.8} ${y}
+       L ${x + size} ${y + size * 0.2} Z
+
+       M ${x} ${y + size}
+       L ${x + size * 0.2} ${y + size}
+       L ${x} ${y + size * 0.8} Z
+
+       M ${x + size} ${y + size}
+       L ${x + size * 0.8} ${y + size}
+       L ${x + size} ${y + size * 0.8} Z`;
+  };
+
   return (
     <>
-      <StyledRect
+      <rect
         {...position}
-        color={color}
+        className={`${styles.square} ${styles[color]}`}
         width={size}
         height={size}
         ref={register}
       />
-      <StyledLatestMoveOverlay
+      <rect
         {...position}
+        className={`${styles.latestMoveOverlay} ${
+          isLatestMoveSquare ? styles.highlight : styles.noHighlight
+        }`}
         width={size}
         height={size}
-        $highlight={!!isLatestMoveSquare}
       />
-      <StyledOverlayRect
+      <rect
         {...position}
+        className={`${styles.overlayRect} ${
+          showHoverHighlight
+            ? `${styles.highlight} ${styles.green}`
+            : styles.noHighlight
+        }`}
         width={size}
         height={size}
-        $highlight={showHoverHighlight}
-        $color="green"
       />
       {/* Show corner cuts for squares with pieces, circle for empty squares */}
       {hasPiece ? (
-        <StyledCornerCuts
-          $show={showPossibleMoveIndicator}
-          $hasPiece={hasPiece}
-          $x={position.x}
-          $y={position.y}
-          $size={size}
+        <path
+          className={`${styles.cornerCuts} ${
+            showPossibleMoveIndicator ? styles.show : styles.hide
+          }`}
+          d={getCornerCutsPath(
+            showPossibleMoveIndicator,
+            position.x,
+            position.y,
+            size
+          )}
         />
       ) : (
-        <StyledPossibleMoveIndicator
+        <circle
+          className={`${styles.possibleMoveIndicator} ${
+            showPossibleMoveIndicator ? styles.show : styles.hide
+          }`}
           cx={position.x + size / 2}
           cy={position.y + size / 2}
           r={size * 0.15}
-          $show={showPossibleMoveIndicator}
-          $hasPiece={hasPiece}
-          $x={position.x}
-          $y={position.y}
-          $size={size}
         />
       )}
     </>

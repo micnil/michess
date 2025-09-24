@@ -1,0 +1,63 @@
+.square {
+  pointer-events: all;
+}
+
+.square.white {
+  fill: #ecdab9;
+}
+
+.square.black {
+  fill: #c5a076;
+}
+
+.overlayRect {
+  pointer-events: none;
+}
+
+.overlayRect.highlight.green {
+  fill: rgba(20, 85, 30, 0.5);
+}
+
+.overlayRect.highlight.yellow {
+  fill: rgba(0, 0, 0, 0.08);
+}
+
+.overlayRect.noHighlight {
+  fill: rgba(20, 85, 30, 0.0);
+}
+
+.possibleMoveIndicator {
+  pointer-events: none;
+}
+
+.possibleMoveIndicator.show {
+  fill: rgba(50, 50, 50, 0.3);
+}
+
+.possibleMoveIndicator.hide {
+  fill: transparent;
+}
+
+.cornerCuts {
+  pointer-events: none;
+}
+
+.cornerCuts.show {
+  fill: rgba(50, 50, 50, 0.3);
+}
+
+.cornerCuts.hide {
+  fill: transparent;
+}
+
+.latestMoveOverlay {
+  pointer-events: none;
+}
+
+.latestMoveOverlay.highlight {
+  fill: rgba(255, 255, 0, 0.3);
+}
+
+.latestMoveOverlay.noHighlight {
+  fill: rgba(255, 255, 0, 0.0);
+}
