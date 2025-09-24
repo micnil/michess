@@ -8,8 +8,7 @@ import {
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { ApiProvider } from './app/api/context/ApiProvider';
-import { Logo } from './app/components/Logo';
-import { Navbar } from './app/components/Navbar';
+import { Navbar } from './app/features/navbar/Navbar';
 import GamePage from './app/pages/GamePage';
 import { HomePage } from './app/pages/HomePage';
 
@@ -19,9 +18,7 @@ const RootLayout = () => (
       <ApiProvider>
         <Container asChild>
           <header>
-            <Navbar>
-              <Logo />
-            </Navbar>
+            <Navbar />
           </header>
         </Container>
 
