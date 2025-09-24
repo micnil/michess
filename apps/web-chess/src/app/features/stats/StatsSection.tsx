@@ -1,39 +1,5 @@
+import { Box, Card, Flex, Grid, Text } from '@radix-ui/themes';
 import React from 'react';
-import styled from 'styled-components';
-
-const StatsContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  padding: 1.5rem;
-  background-color: #ffffff;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-
-  @media (max-width: 768px) {
-    gap: 1rem;
-    padding: 1rem;
-  }
-`;
-
-const StatCard = styled.div`
-  text-align: center;
-  padding: 1rem;
-`;
-
-const StatNumber = styled.div`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #374151;
-  margin-bottom: 0.5rem;
-`;
-
-const StatLabel = styled.div`
-  font-size: 0.875rem;
-  color: #6b7280;
-  font-weight: 500;
-`;
 
 type StatsData = {
   activePlayers: number;
@@ -57,21 +23,61 @@ export const StatsSection: React.FC<Props> = ({ stats = defaultStats }) => {
   };
 
   return (
-    <StatsContainer>
-      <StatCard>
-        <StatNumber>{formatNumber(stats.activePlayers)}</StatNumber>
-        <StatLabel>Active Players</StatLabel>
-      </StatCard>
+    <Card variant="surface" size="3">
+      <Box p="6">
+        <Grid
+          columns={{ initial: '1', sm: '3' }}
+          gap={{ initial: '3', sm: '4' }}
+        >
+          <Flex direction="column" align="center" p="4">
+            <Text
+              as="div"
+              size="8"
+              weight="bold"
+              color="gray"
+              highContrast
+              mb="2"
+            >
+              {formatNumber(stats.activePlayers)}
+            </Text>
+            <Text size="2" weight="medium" color="gray">
+              Active Players
+            </Text>
+          </Flex>
 
-      <StatCard>
-        <StatNumber>{formatNumber(stats.gamesInLobby)}</StatNumber>
-        <StatLabel>Games in Lobby</StatLabel>
-      </StatCard>
+          <Flex direction="column" align="center" p="4">
+            <Text
+              as="div"
+              size="8"
+              weight="bold"
+              color="gray"
+              highContrast
+              mb="2"
+            >
+              {formatNumber(stats.gamesInLobby)}
+            </Text>
+            <Text size="2" weight="medium" color="gray">
+              Games in Lobby
+            </Text>
+          </Flex>
 
-      <StatCard>
-        <StatNumber>{formatNumber(stats.gamesToday)}</StatNumber>
-        <StatLabel>Games Today</StatLabel>
-      </StatCard>
-    </StatsContainer>
+          <Flex direction="column" align="center" p="4">
+            <Text
+              as="div"
+              size="8"
+              weight="bold"
+              color="gray"
+              highContrast
+              mb="2"
+            >
+              {formatNumber(stats.gamesToday)}
+            </Text>
+            <Text size="2" weight="medium" color="gray">
+              Games Today
+            </Text>
+          </Flex>
+        </Grid>
+      </Box>
+    </Card>
   );
 };
