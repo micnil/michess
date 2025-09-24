@@ -1,11 +1,11 @@
 import { Color, Move } from '@michess/core-board';
 import { Chessboard as ChessboardView } from '@michess/react-chessboard';
+import { Box, Card, Grid, Inset } from '@radix-ui/themes';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useApi } from '../../api/hooks/useApi';
 import { ParticipantGameViewModel } from '../../api/model/ParticipantGameViewModel';
 import { useObservable } from '../../util/useObservable';
-import styles from './ChessGameContainer.module.css';
 import { PlayerInfo } from './components';
 
 export const ChessGameContainer = ({
@@ -70,43 +70,45 @@ export const ChessGameContainer = ({
     />
   );
 
-  // Position players based on board orientation
-  // The player matching the orientation should always be on the bottom (your perspective)
-  // White orientation: Black on top, White on bottom
-  // Black orientation: White on top, Black on bottom
-  const currentOrientation = orientation || Color.White; // Default to white orientation
+  const currentOrientation = orientation || Color.White;
   const topPlayerInfo =
     currentOrientation === Color.White ? blackPlayerInfo : whitePlayerInfo;
   const bottomPlayerInfo =
     currentOrientation === Color.White ? whitePlayerInfo : blackPlayerInfo;
 
   return (
-    <div className={styles.gameContainer}>
-      <div className={styles.playerInfo}>{topPlayerInfo}</div>
-      <ChessboardView<Move>
-        orientation={orientation}
-        maxSize={600}
-        gameStatus={undefined}
-        winner={undefined}
-        playableTurn={
-          data?.playerSide === 'spectator' ? undefined : data?.playerSide
-        }
-        readonly={data?.playerSide === 'spectator'}
-        moveHistory={data?.moves}
-        moveObservable={moveObservable || undefined}
-        onMove={async (move) => {
-          console.log(move);
-          if (!gameId) return true;
-          try {
-            await games.makeMove(gameId, Move.toUci(move));
-            return true;
-          } catch (error) {
-            console.error('Error making move:', error);
-            return false;
-          }
-        }}
-      />
-      <div className={styles.playerInfo}>{bottomPlayerInfo}</div>
-    </div>
+    <Grid columns={'1fr auto 1fr'} style={{ justifyItems: 'center' }} gap="4">
+      <Box display={'inline-block'} gridColumn={'2'}>
+        <Card size={'1'}>
+          <Inset>
+            {topPlayerInfo}
+            <ChessboardView<Move>
+              orientation={orientation}
+              maxSize={600}
+              gameStatus={undefined}
+              winner={undefined}
+              playableTurn={
+                data?.playerSide === 'spectator' ? undefined : data?.playerSide
+              }
+              readonly={data?.playerSide === 'spectator'}
+              moveHistory={data?.moves}
+              moveObservable={moveObservable || undefined}
+              onMove={async (move) => {
+                console.log(move);
+                if (!gameId) return true;
+                try {
+                  await games.makeMove(gameId, Move.toUci(move));
+                  return true;
+                } catch (error) {
+                  console.error('Error making move:', error);
+                  return false;
+                }
+              }}
+            />
+            {bottomPlayerInfo}
+          </Inset>
+        </Card>
+      </Box>
+    </Grid>
   );
 };

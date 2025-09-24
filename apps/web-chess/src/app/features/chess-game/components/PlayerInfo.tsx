@@ -1,23 +1,20 @@
 import { Color } from '@michess/core-board';
-import { Avatar, Badge, Card, Flex, Text } from '@radix-ui/themes';
+import { Avatar, Badge, Flex, Text } from '@radix-ui/themes';
 import React from 'react';
 
 type PlayerInfoProps = {
   username?: string;
   color: Color;
-  avatar?: string; // Optional avatar URL/image
-  size?: number; // Width to match chessboard
-  isPlayerTurn?: boolean; // Pass this from parent since we don't have chessboard context
+  avatar?: string;
+  isPlayerTurn?: boolean;
 };
 
 export const PlayerInfo: React.FC<PlayerInfoProps> = ({
   username,
   color,
   avatar,
-  size,
   isPlayerTurn = false,
 }) => {
-  // Generate avatar initials from username
   const getInitials = (name: string): string => {
     return name
       .split(' ')
@@ -31,53 +28,42 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
   const isWaiting = !username;
 
   return (
-    <Card
-      variant="surface"
-      size="2"
-      style={{
-        width: size ? `${size}px` : 'auto',
-      }}
-    >
-      <Flex align="center" gap="3" p="3">
-        {/* Avatar */}
-        <Avatar
+    <Flex align="center" gap="3" p="3">
+      <Avatar
+        size="3"
+        src={avatar}
+        fallback={isWaiting ? '?' : getInitials(username)}
+        alt={`${displayUsername} avatar`}
+      />
+      <Flex direction="column" gap="1" style={{ flex: 1, minWidth: 0 }}>
+        <Text
           size="3"
-          src={avatar}
-          fallback={isWaiting ? '?' : getInitials(username)}
-          alt={`${displayUsername} avatar`}
-        />
+          weight="bold"
+          color="gray"
+          highContrast
+          trim="both"
+          title={displayUsername}
+        >
+          {displayUsername}
+        </Text>
 
-        {/* Player Details */}
-        <Flex direction="column" gap="1" style={{ flex: 1, minWidth: 0 }}>
-          <Text
-            size="3"
-            weight="bold"
-            color="gray"
-            highContrast
-            trim="both"
-            title={displayUsername}
+        <Flex align="center" gap="2">
+          <Badge
+            color={color === 'white' ? 'gray' : 'blue'}
+            variant="soft"
+            size="1"
           >
-            {displayUsername}
+            {color}
+          </Badge>
+          <Text
+            size="2"
+            weight={isPlayerTurn ? 'bold' : 'medium'}
+            color={isPlayerTurn ? 'amber' : 'gray'}
+          >
+            {isPlayerTurn ? 'Turn to play' : 'Waiting'}
           </Text>
-
-          <Flex align="center" gap="2">
-            <Badge
-              color={color === 'white' ? 'gray' : 'blue'}
-              variant="soft"
-              size="1"
-            >
-              {color}
-            </Badge>
-            <Text
-              size="2"
-              weight={isPlayerTurn ? 'bold' : 'medium'}
-              color={isPlayerTurn ? 'amber' : 'gray'}
-            >
-              {isPlayerTurn ? 'Turn to play' : 'Waiting'}
-            </Text>
-          </Flex>
         </Flex>
       </Flex>
-    </Card>
+    </Flex>
   );
 };
