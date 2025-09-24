@@ -77,8 +77,12 @@ export const ChessGameContainer = ({
     currentOrientation === Color.White ? whitePlayerInfo : blackPlayerInfo;
 
   return (
-    <Grid columns={'1fr auto 1fr'} style={{ justifyItems: 'center' }} gap="4">
-      <Box display={'inline-block'} gridColumn={'2'}>
+    <Grid
+      columns={{ initial: '1', sm: '1fr auto 1fr' }}
+      style={{ justifyItems: 'center' }}
+      gap={{ initial: '1', sm: '4' }}
+    >
+      <Box display={'inline-block'} gridColumn={{ initial: '1', sm: '2' }}>
         <Card size={'1'}>
           <Inset>
             {topPlayerInfo}

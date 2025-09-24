@@ -26,8 +26,7 @@ export const useResponsiveBoardSize = ({
 
   useEffect(() => {
     const handleResize = () => {
-      const newSize = calculateBoardSize(maxSize);
-      setBoardSize(newSize);
+      setBoardSize(calculateBoardSize(maxSize));
     };
     handleResize();
 

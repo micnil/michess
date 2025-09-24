@@ -1,7 +1,5 @@
 import { Observable } from '@michess/common-utils';
 import { Color } from '@michess/core-board';
-import React from 'react';
-import styles from './Chessboard.module.css';
 import { ChessboardView } from './ChessboardView';
 import { ChessboardContextProvider } from './context/ChessboardContextProvider';
 import { useResponsiveBoardSize } from './hooks/useResponsiveBoardSize';
@@ -21,7 +19,6 @@ type Props<TMoveMeta = unknown> = {
   moveHistory?: MovePayload<TMoveMeta>[];
   moveObservable?: Observable<MovePayload<TMoveMeta>>;
   onMove?: (move: MovePayload<TMoveMeta>) => Promise<boolean>;
-  children?: React.ReactNode; // Allow custom content around the board
 };
 export const Chessboard = <TMoveMeta,>({
   orientation = 'white',
@@ -34,29 +31,22 @@ export const Chessboard = <TMoveMeta,>({
   moveHistory,
   moveObservable,
   onMove,
-  children,
 }: Props<TMoveMeta>) => {
-  // Use the responsive board size hook
   const boardSize = useResponsiveBoardSize({ maxSize });
 
   return (
-    <div className={styles['chessboardContainer']}>
-      <ChessboardContextProvider
-        size={boardSize}
-        orientation={orientation}
-        fromPositionFen={fromPositionFen}
-        gameStatus={gameStatus}
-        readonly={readonly}
-        moveHistory={moveHistory}
-        playableTurn={playableTurn}
-        moveObservable={moveObservable}
-        onMove={onMove}
-      >
-        {children}
-        <div className={styles['boardWrapper']}>
-          <ChessboardView size={boardSize} />
-        </div>
-      </ChessboardContextProvider>
-    </div>
+    <ChessboardContextProvider
+      size={boardSize}
+      orientation={orientation}
+      fromPositionFen={fromPositionFen}
+      gameStatus={gameStatus}
+      readonly={readonly}
+      moveHistory={moveHistory}
+      playableTurn={playableTurn}
+      moveObservable={moveObservable}
+      onMove={onMove}
+    >
+      <ChessboardView size={boardSize} />
+    </ChessboardContextProvider>
   );
 };
