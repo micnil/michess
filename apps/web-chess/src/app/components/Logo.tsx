@@ -1,22 +1,18 @@
+import { Flex, Reset, Text } from '@radix-ui/themes';
 import { Link } from '@tanstack/react-router';
 import { FC } from 'react';
-import styled from 'styled-components';
-
-const LogoContainer = styled(Link)`
-  display: flex;
-  align-items: center;
-  font-size: 1.25rem;
-  padding: 0.25rem;
-  gap: 0.25rem;
-  text-decoration: none;
-  color: inherit;
-`;
 
 export const Logo: FC = () => {
   return (
-    <LogoContainer to="/">
-      <img src="/knightv2.svg" height={32} width={32} alt="logo" />
-      <span>michess</span>
-    </LogoContainer>
+    <Reset>
+      <Flex asChild gap={'2'} align={'center'}>
+        <Link to="/">
+          <img src="/knightv2.svg" height={42} width={42} alt="logo" />
+          <Text size={'4'} weight={'bold'}>
+            chess monky
+          </Text>
+        </Link>
+      </Flex>
+    </Reset>
   );
 };
