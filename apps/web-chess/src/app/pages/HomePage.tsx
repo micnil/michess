@@ -1,27 +1,10 @@
+import { Box, Flex } from '@radix-ui/themes';
 import { useNavigate } from '@tanstack/react-router';
 import React from 'react';
-import styled from 'styled-components';
 import { useApi } from '../api/hooks/useApi';
 import { GameLobby } from '../features/lobby/GameLobby';
 import { QuickPairing } from '../features/quick-pairing/QuickPairing';
 import { StatsSection } from '../features/stats/StatsSection';
-
-const HomeContainer = styled.div`
-  max-width: 1200px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 2rem;
-
-  @media (max-width: 768px) {
-    padding: 1rem;
-  }
-`;
-
-const MainContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-`;
 
 export const HomePage: React.FC = () => {
   const api = useApi();
@@ -59,15 +42,21 @@ export const HomePage: React.FC = () => {
   };
 
   return (
-    <HomeContainer>
-      <MainContent>
+    <Flex direction="column" gap={'4'} width={'100%'}>
+      <Box>
         <QuickPairing onTimeControlSelect={handleQuickPlay} />
+      </Box>
+
+      <Box>
         <GameLobby
           onCreateGame={handleCreateGame}
           onJoinGame={handleJoinGame}
         />
+      </Box>
+
+      <Box>
         <StatsSection />
-      </MainContent>
-    </HomeContainer>
+      </Box>
+    </Flex>
   );
 };

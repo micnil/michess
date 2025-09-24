@@ -1,5 +1,5 @@
 import { Color } from '@michess/core-board';
-import { Box, Container, Flex, Theme } from '@radix-ui/themes';
+import { Box, Container, Theme } from '@radix-ui/themes';
 import {
   createRootRoute,
   createRoute,
@@ -17,23 +17,21 @@ const RootLayout = () => (
   <Theme>
     <Box minHeight="100vh">
       <ApiProvider>
-        <header>
-          <Container>
+        <Container asChild>
+          <header>
             <Navbar>
               <Logo />
             </Navbar>
-          </Container>
-        </header>
+          </header>
+        </Container>
 
-        <Container asChild>
+        <Container asChild mt={'6'}>
           <main>
-            <Flex direction="column" align="center" justify="center">
-              <Outlet />
-            </Flex>
+            <Outlet />
           </main>
         </Container>
 
-        <Container size="4" px={{ initial: '2', md: '4' }} py="2" asChild>
+        <Container asChild>
           <footer>{/* Footer content can be added here */}</footer>
         </Container>
       </ApiProvider>
