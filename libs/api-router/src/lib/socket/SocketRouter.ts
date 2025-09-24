@@ -2,6 +2,7 @@ import {
   ClientToServerEvents,
   EventResponse,
   JoinGamePayloadV1Schema,
+  LeaveGamePayloadV1,
   LeaveGamePayloadV1Schema,
   MakeMovePayloadV1Schema,
   ServerToClientEvents,
@@ -10,6 +11,7 @@ import { Api, Session } from '@michess/api-service';
 import { logger } from '@michess/be-utils';
 import { IncomingHttpHeaders } from 'http2';
 import { DefaultEventsMap, Server, Socket } from 'socket.io';
+import z from 'zod';
 import { RouterConfig } from '../model/RouterConfig';
 import { ApiErrorMapper } from './util/ApiErrorMapper';
 
@@ -27,6 +29,23 @@ const convertIncomingHeadersToHeaders = (
 
   return headers;
 };
+
+const leaveGame = async (
+  socket: Socket,
+  api: Api,
+  leaveGamePayloadV1: LeaveGamePayloadV1
+) => {
+  const gameState = await api.games.leaveGame(
+    socket.data.session,
+    leaveGamePayloadV1
+  );
+
+  socket.leave(leaveGamePayloadV1.gameId);
+  if (gameState) {
+    socket.to(leaveGamePayloadV1.gameId).emit('user-left', gameState);
+  }
+};
+
 type SocketData = {
   session: Session;
 };
@@ -107,15 +126,7 @@ const from = (api: Api, config: RouterConfig) => {
           },
           `User leaving game`
         );
-        const gameState = await api.games.leaveGame(
-          socket.data.session,
-          leaveGamePayloadV1
-        );
-
-        socket.leave(leaveGamePayloadV1.gameId);
-        if (gameState) {
-          socket.to(leaveGamePayloadV1.gameId).emit('user-left', gameState);
-        }
+        await leaveGame(socket, api, leaveGamePayloadV1);
       } catch (error) {
         logger.error(error);
       }
@@ -139,7 +150,7 @@ const from = (api: Api, config: RouterConfig) => {
       }
     });
 
-    socket.on('disconnecting', (reason) => {
+    socket.on('disconnecting', async (reason) => {
       logger.debug(
         {
           socketId: socket.id,
@@ -147,6 +158,13 @@ const from = (api: Api, config: RouterConfig) => {
           socketRooms: Array.from(socket.rooms),
         },
         'User disconnecting'
+      );
+      const gameIds = Array.from(socket.rooms)
+        .map((room) => z.uuid().safeParse(room))
+        .filter((result) => result.success)
+        .map((result) => result.data);
+      await Promise.all(
+        gameIds.map((gameId) => leaveGame(socket, api, { gameId }))
       );
     });
     socket.on('error', (error) => {
