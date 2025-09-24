@@ -3,21 +3,21 @@
     "@nx/react": {
       "application": {
         "babel": true,
-        "style": "styled-components",
+        "style": "css",
         "linter": "eslint",
         "bundler": "vite"
       },
       "component": {
-        "style": "styled-components"
+        "style": "css"
       },
       "library": {
-        "style": "styled-components",
+        "style": "css",
         "linter": "eslint"
       }
     },
     "@nx/next": {
       "application": {
-        "style": "styled-components",
+        "style": "css",
         "linter": "eslint"
       }
     }
