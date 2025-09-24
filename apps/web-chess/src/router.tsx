@@ -1,5 +1,5 @@
 import { Color } from '@michess/core-board';
-import { Theme } from '@radix-ui/themes';
+import { Box, Container, Flex, Theme } from '@radix-ui/themes';
 import {
   createRootRoute,
   createRoute,
@@ -8,10 +8,6 @@ import {
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { ApiProvider } from './app/api/context/ApiProvider';
-import { FooterArea } from './app/components/layout/FooterArea';
-import { HeaderArea } from './app/components/layout/HeaderArea';
-import { MainArea } from './app/components/layout/MainArea';
-import { PageLayout } from './app/components/layout/PageLayout';
 import { Logo } from './app/components/Logo';
 import { Navbar } from './app/components/Navbar';
 import GamePage from './app/pages/GamePage';
@@ -19,20 +15,30 @@ import { HomePage } from './app/pages/HomePage';
 
 const RootLayout = () => (
   <Theme>
-    <PageLayout>
+    <Box minHeight="100vh">
       <ApiProvider>
-        <HeaderArea>
-          <Navbar>
-            <Logo />
-          </Navbar>
-        </HeaderArea>
-        <MainArea>
-          <Outlet />
-        </MainArea>
-        <FooterArea />
+        <header>
+          <Container>
+            <Navbar>
+              <Logo />
+            </Navbar>
+          </Container>
+        </header>
+
+        <Container asChild>
+          <main>
+            <Flex direction="column" align="center" justify="center">
+              <Outlet />
+            </Flex>
+          </main>
+        </Container>
+
+        <Container size="4" px={{ initial: '2', md: '4' }} py="2" asChild>
+          <footer>{/* Footer content can be added here */}</footer>
+        </Container>
       </ApiProvider>
       <TanStackRouterDevtools />
-    </PageLayout>
+    </Box>
   </Theme>
 );
 
