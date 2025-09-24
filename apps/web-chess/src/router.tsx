@@ -1,4 +1,5 @@
 import { Color } from '@michess/core-board';
+import { Theme } from '@radix-ui/themes';
 import {
   createRootRoute,
   createRoute,
@@ -17,20 +18,22 @@ import GamePage from './app/pages/GamePage';
 import { HomePage } from './app/pages/HomePage';
 
 const RootLayout = () => (
-  <PageLayout>
-    <ApiProvider>
-      <HeaderArea>
-        <Navbar>
-          <Logo />
-        </Navbar>
-      </HeaderArea>
-      <MainArea>
-        <Outlet />
-      </MainArea>
-      <FooterArea />
-    </ApiProvider>
-    <TanStackRouterDevtools />
-  </PageLayout>
+  <Theme>
+    <PageLayout>
+      <ApiProvider>
+        <HeaderArea>
+          <Navbar>
+            <Logo />
+          </Navbar>
+        </HeaderArea>
+        <MainArea>
+          <Outlet />
+        </MainArea>
+        <FooterArea />
+      </ApiProvider>
+      <TanStackRouterDevtools />
+    </PageLayout>
+  </Theme>
 );
 
 const rootRoute = createRootRoute({
