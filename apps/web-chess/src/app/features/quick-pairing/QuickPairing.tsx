@@ -1,99 +1,48 @@
+import { Box, Button, Card, Flex, Grid, Text } from '@radix-ui/themes';
 import React from 'react';
-import styled from 'styled-components';
-import { Button } from '../../components';
 
-const QuickPairingContainer = styled.div`
-  padding: 1.5rem;
-  background-color: #ffffff;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-`;
+const TimeControlCard: React.FC<{
+  type: 'bullet' | 'blitz' | 'rapid';
+  children: React.ReactNode;
+  onClick: () => void;
+}> = ({ type, children, onClick }) => {
+  const getCardStyle = () => {
+    const baseStyle = {
+      cursor: 'pointer',
+      transition: 'all 0.2s ease',
+      textAlign: 'center' as const,
+    };
 
-const SectionTitle = styled.h2`
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 1rem;
-  margin-top: 0;
-`;
+    switch (type) {
+      case 'bullet':
+        return {
+          ...baseStyle,
+          backgroundColor: '#fef2f2',
+          borderColor: '#fecaca',
+        };
+      case 'blitz':
+        return {
+          ...baseStyle,
+          backgroundColor: '#fffbeb',
+          borderColor: '#fed7aa',
+        };
+      case 'rapid':
+        return {
+          ...baseStyle,
+          backgroundColor: '#f0fdf4',
+          borderColor: '#bbf7d0',
+        };
+      default:
+        return baseStyle;
+    }
+  };
 
-const TimeControlsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-  }
-`;
-
-const TimeControlCard = styled.div`
-  border-radius: 6px;
-  padding: 1.25rem;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: 1px solid #e5e7eb;
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border-color: #d1d5db;
-  }
-`;
-
-const BulletCard = styled(TimeControlCard)`
-  background-color: #fef2f2;
-  border-color: #fecaca;
-
-  &:hover {
-    background-color: #fee2e2;
-    border-color: #fca5a5;
-  }
-`;
-
-const BlitzCard = styled(TimeControlCard)`
-  background-color: #fffbeb;
-  border-color: #fed7aa;
-
-  &:hover {
-    background-color: #fef3c7;
-    border-color: #fbbf24;
-  }
-`;
-
-const RapidCard = styled(TimeControlCard)`
-  background-color: #f0fdf4;
-  border-color: #bbf7d0;
-
-  &:hover {
-    background-color: #dcfce7;
-    border-color: #86efac;
-  }
-`;
-
-const TimeFormat = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-`;
-
-const TimeLabel = styled.span`
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  color: #6b7280;
-`;
-
-const TimeValue = styled.div`
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #374151;
-`;
+  return (
+    <Card variant="surface" size="3" style={getCardStyle()} onClick={onClick}>
+      <Box p="4">{children}</Box>
+    </Card>
+  );
+};
 
 type TimeControlOption = {
   id: string;
@@ -117,42 +66,49 @@ export const QuickPairing: React.FC<Props> = ({ onTimeControlSelect }) => {
     onTimeControlSelect?.(timeControl);
   };
 
-  const getCardComponent = (type: string) => {
-    switch (type) {
-      case 'bullet':
-        return BulletCard;
-      case 'blitz':
-        return BlitzCard;
-      case 'rapid':
-        return RapidCard;
-      default:
-        return TimeControlCard;
-    }
-  };
-
   return (
-    <QuickPairingContainer>
-      <SectionTitle>Quick Pairing</SectionTitle>
-      <TimeControlsGrid>
-        {timeControls.map((timeControl) => {
-          const CardComponent = getCardComponent(timeControl.type);
-          return (
-            <CardComponent key={timeControl.id}>
-              <TimeFormat>
-                <TimeLabel>{timeControl.label}</TimeLabel>
-                <TimeValue>{timeControl.time}</TimeValue>
-              </TimeFormat>
+    <Card variant="surface" size="3" style={{ padding: '1.5rem' }}>
+      <Text size="4" weight="bold" mb="4" style={{ color: '#374151' }}>
+        Quick Pairing
+      </Text>
+      <Grid columns={{ initial: '1', md: '3' }} gap="4">
+        {timeControls.map((timeControl) => (
+          <TimeControlCard
+            key={timeControl.id}
+            type={timeControl.type}
+            onClick={() => handleTimeControlClick(timeControl)}
+          >
+            <Flex direction="column" align="center" justify="center" gap="3">
+              <Flex align="center" justify="center" gap="2">
+                <Text
+                  size="2"
+                  weight="medium"
+                  style={{
+                    textTransform: 'uppercase',
+                    color: '#6b7280',
+                  }}
+                >
+                  {timeControl.label}
+                </Text>
+                <Text size="4" weight="bold" style={{ color: '#374151' }}>
+                  {timeControl.time}
+                </Text>
+              </Flex>
               <Button
-                size="large"
-                fullWidth
-                onClick={() => handleTimeControlClick(timeControl)}
+                size="3"
+                variant="solid"
+                style={{ width: '100%' }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleTimeControlClick(timeControl);
+                }}
               >
                 Play
               </Button>
-            </CardComponent>
-          );
-        })}
-      </TimeControlsGrid>
-    </QuickPairingContainer>
+            </Flex>
+          </TimeControlCard>
+        ))}
+      </Grid>
+    </Card>
   );
 };

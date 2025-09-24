@@ -87,7 +87,7 @@ export const GameLobby: React.FC<Props> = ({ onCreateGame, onJoinGame }) => {
 
       <Flex direction="column" gap="2">
         {games.map((game) => (
-          <Card key={game.id} variant="surface" size="2">
+          <Card key={game.id} variant="surface" size="1">
             <Flex align="center" gap="4" p="3">
               <Box style={{ minWidth: '120px' }}>
                 <Text weight="medium" size="3">
