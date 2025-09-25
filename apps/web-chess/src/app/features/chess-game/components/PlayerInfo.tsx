@@ -30,15 +30,17 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
   const isWaiting = !username;
 
   return (
-    <Skeleton loading={isLoading}>
-      <Flex align="center" gap="2" p="2">
+    <Flex align="center" gap="2" p="2">
+      <Skeleton loading={isLoading}>
         <Avatar
           size="4"
           src={avatar}
           fallback={isWaiting ? '?' : getInitials(username)}
           alt={`${displayUsername} avatar`}
         />
-        <Flex direction="column" gap="2">
+      </Skeleton>
+      <Flex direction="column" gap="2">
+        <Skeleton loading={isLoading}>
           <Text
             size="3"
             weight="bold"
@@ -49,8 +51,10 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
           >
             {displayUsername}
           </Text>
+        </Skeleton>
 
-          <Flex align="center" gap="1">
+        <Flex align="center" gap="1">
+          <Skeleton loading={isLoading}>
             <Badge
               color="gray"
               variant={color === 'white' ? 'outline' : 'solid'}
@@ -58,6 +62,8 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
             >
               {color}
             </Badge>
+          </Skeleton>
+          <Skeleton loading={isLoading}>
             <Text
               size="2"
               weight={isPlayerTurn ? 'bold' : 'medium'}
@@ -65,9 +71,9 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
             >
               {isPlayerTurn ? 'Turn to play' : 'Waiting'}
             </Text>
-          </Flex>
+          </Skeleton>
         </Flex>
       </Flex>
-    </Skeleton>
+    </Flex>
   );
 };
