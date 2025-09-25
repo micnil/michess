@@ -16,6 +16,9 @@ type Props = {
 export const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
   const { chessboard, squares } = useChessboardContext();
   const { register, draggingId } = useDragDropBounds();
+  const checkmate = chessboard.isCheckmate
+    ? chessboard.position.turn
+    : undefined;
 
   const {
     promotionDialog,
@@ -54,6 +57,7 @@ export const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
                 coord={coord as Coordinate}
                 piece={piece}
                 position={square.position}
+                checkmate={checkmate}
                 squareSize={square.size}
               />
             );

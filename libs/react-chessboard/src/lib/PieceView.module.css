@@ -1,3 +1,11 @@
 .pieceGroup {
   cursor: pointer;
 }
+
+.checkmateIcon {
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.6));
+  opacity: 0.8;
+}
+
+
+
