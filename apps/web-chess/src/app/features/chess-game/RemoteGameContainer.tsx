@@ -3,16 +3,16 @@ import { Chessboard as ChessboardView } from '@michess/react-chessboard';
 import { Box, Card, Grid, Inset } from '@radix-ui/themes';
 import { useMemo } from 'react';
 import { PlayerInfo } from './components/PlayerInfo';
-import { useRemoteChessGame } from './hooks/useRemoteChessGame';
+import { useRemoteGame } from './hooks/useRemoteGame';
 
-export const ChessGameContainer = ({
+export const RemoteGameContainer = ({
   gameId,
   orientation,
 }: {
   gameId: string;
   orientation?: Color;
 }) => {
-  const { chessboard, handleMove, players, playerSide } = useRemoteChessGame({
+  const { chessboard, handleMove, players, playerSide } = useRemoteGame({
     gameId,
   });
 

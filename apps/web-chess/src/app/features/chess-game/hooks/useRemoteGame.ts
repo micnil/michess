@@ -28,7 +28,7 @@ const participantGameViewModelSelector = (
   ),
 });
 
-export const useRemoteChessGame = (props: Props): RemoteChessGame => {
+export const useRemoteGame = (props: Props): RemoteChessGame => {
   const { games } = useApi();
   const [chessboard, setChessboard] = useState<Chessboard>(
     Chessboard.fromPosition(ChessPosition.standardInitial())
