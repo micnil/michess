@@ -1,3 +1,4 @@
+import { LocalGameContainer } from '../features/chess-game/LocalGameContainer';
 import { RemoteGameContainer } from '../features/chess-game/RemoteGameContainer';
 
 type Props = {
@@ -7,7 +8,7 @@ type Props = {
 
 export const GamePage = ({ gameId, side }: Props) => {
   if (!gameId) {
-    return <RemoteGameContainer orientation={side} gameId={'gameId'} />;
+    return <LocalGameContainer orientation={side} />;
   }
 
   return <RemoteGameContainer gameId={gameId} orientation={side} />;

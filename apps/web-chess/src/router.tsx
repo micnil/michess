@@ -49,6 +49,15 @@ const indexRoute = createRoute({
   },
 });
 
+const gameRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/game/local/{-$side}',
+  component: function LocalGameComponent() {
+    const { side } = gameRoute.useParams();
+    return <GamePage side={side as Color} />;
+  },
+});
+
 const gameWithIdRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/game/$gameId/{-$side}',
@@ -58,7 +67,11 @@ const gameWithIdRoute = createRoute({
   },
 });
 
-const routeTree = rootRoute.addChildren([indexRoute, gameWithIdRoute]);
+const routeTree = rootRoute.addChildren([
+  indexRoute,
+  gameRoute,
+  gameWithIdRoute,
+]);
 export const router = createRouter({ routeTree });
 declare module '@tanstack/react-router' {
   interface Register {
