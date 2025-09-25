@@ -11,6 +11,7 @@ export const SocketClient = {
     const socket = io({
       autoConnect: false,
       reconnection: false,
+      transports: ['websocket', 'polling'],
     });
 
     socket.on('connect', () => {
