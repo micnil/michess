@@ -28,14 +28,14 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
   const isWaiting = !username;
 
   return (
-    <Flex align="center" gap="3" p="3">
+    <Flex align="center" gap="2" p="2">
       <Avatar
-        size="3"
+        size="4"
         src={avatar}
         fallback={isWaiting ? '?' : getInitials(username)}
         alt={`${displayUsername} avatar`}
       />
-      <Flex direction="column" gap="1" style={{ flex: 1, minWidth: 0 }}>
+      <Flex direction="column" gap="2">
         <Text
           size="3"
           weight="bold"
@@ -47,10 +47,10 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
           {displayUsername}
         </Text>
 
-        <Flex align="center" gap="2">
+        <Flex align="center" gap="1">
           <Badge
-            color={color === 'white' ? 'gray' : 'blue'}
-            variant="soft"
+            color="gray"
+            variant={color === 'white' ? 'outline' : 'solid'}
             size="1"
           >
             {color}
