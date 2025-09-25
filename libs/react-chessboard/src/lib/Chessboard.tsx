@@ -9,6 +9,7 @@ import { MovePayload } from './move/model/MovePayload';
 
 type Props<TMoveMeta = unknown> = {
   orientation?: Color;
+  isLoading?: boolean;
   maxSize?: number;
   moveOptions?: MoveOptions<TMoveMeta>;
   gameResult?: GameResultType;
@@ -30,6 +31,7 @@ export const Chessboard = <TMoveMeta,>({
   readonly,
   playableTurn,
   default: defaultState,
+  isLoading,
   chessboard,
   onMove,
 }: Props<TMoveMeta>) => {
@@ -46,7 +48,7 @@ export const Chessboard = <TMoveMeta,>({
       playableTurn={playableTurn}
       onMove={onMove}
     >
-      <ChessboardView size={boardSize} />
+      <ChessboardView size={boardSize} isLoading={isLoading} />
     </ChessboardContextProvider>
   );
 };

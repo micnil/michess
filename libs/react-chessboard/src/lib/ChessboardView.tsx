@@ -11,9 +11,10 @@ import { usePromotionDialog } from './promotion-dialog/hooks/usePromotionDialog'
 
 type Props = {
   size: number;
+  isLoading?: boolean;
 };
 
-export const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
+export const ChessboardView: React.FC<Props> = ({ size = 500, isLoading }) => {
   const { chessboard, squares, gameResult } = useChessboardContext();
   const { register, draggingId } = useDragDropBounds();
 
@@ -27,41 +28,51 @@ export const ChessboardView: React.FC<Props> = ({ size = 500 }) => {
   const boardState = chessboard.position;
   const squareSize = size / 8;
   return (
-    <div className={styles.boardContainer}>
-      <svg className={styles.board} width={size} height={size} ref={register}>
-        <g>
-          {Object.values(squares).map((square) => {
-            return (
-              <SquareView
-                hasPiece={!!boardState.pieces.get(square.coordinate)}
-                draggingFromCoord={draggingId as Maybe<Coordinate>}
-                showPromotionDialog={showPromotionDialog}
-                coordinate={square.coordinate}
-                key={square.coordinate}
-                position={square.position}
-                size={square.size}
-                color={square.color}
-              />
-            );
-          })}
-        </g>
-        <g>
-          {Array.from(boardState.pieces.entries()).map(([coord, piece]) => {
-            const square = squares[coord as Coordinate];
-            return (
-              <PieceView
-                key={coord}
-                coord={coord as Coordinate}
-                piece={piece}
-                position={square.position}
-                gameResult={gameResult}
-                squareSize={square.size}
-              />
-            );
-          })}
-        </g>
-        {draggingId && <use href={`#${draggingId}`} />}
-      </svg>
+    <div
+      className={styles.boardContainer}
+      style={{ width: size, height: size }}
+    >
+      {isLoading ? (
+        <div
+          className={styles.boardLoading}
+          style={{ backgroundSize: `${squareSize * 2}px ${squareSize * 2}px` }}
+        />
+      ) : (
+        <svg className={styles.board} width={size} height={size} ref={register}>
+          <g>
+            {Object.values(squares).map((square) => {
+              return (
+                <SquareView
+                  hasPiece={!!boardState.pieces.get(square.coordinate)}
+                  draggingFromCoord={draggingId as Maybe<Coordinate>}
+                  showPromotionDialog={showPromotionDialog}
+                  coordinate={square.coordinate}
+                  key={square.coordinate}
+                  position={square.position}
+                  size={square.size}
+                  color={square.color}
+                />
+              );
+            })}
+          </g>
+          <g>
+            {Array.from(boardState.pieces.entries()).map(([coord, piece]) => {
+              const square = squares[coord as Coordinate];
+              return (
+                <PieceView
+                  key={coord}
+                  coord={coord as Coordinate}
+                  piece={piece}
+                  position={square.position}
+                  gameResult={gameResult}
+                  squareSize={square.size}
+                />
+              );
+            })}
+          </g>
+          {draggingId && <use href={`#${draggingId}`} />}
+        </svg>
+      )}
 
       {promotionDialog.isOpen &&
         promotionDialog.coordinate &&

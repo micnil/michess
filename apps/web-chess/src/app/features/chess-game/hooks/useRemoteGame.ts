@@ -12,6 +12,7 @@ type Props = {
 };
 
 type RemoteChessGame = {
+  isLoadingInitial: boolean;
   chessboard: Chessboard;
   handleMove: (move: MovePayload) => void;
   players: ParticipantGameViewModel['players'];
@@ -35,7 +36,7 @@ export const useRemoteGame = (props: Props): RemoteChessGame => {
   );
   const queryClient = useQueryClient();
 
-  const { data: remoteData } = useQuery({
+  const { data: remoteData, isPending } = useQuery({
     queryKey: ['game', props.gameId],
     queryFn: async () => games.joinGame(props.gameId),
     select: participantGameViewModelSelector,
@@ -99,6 +100,7 @@ export const useRemoteGame = (props: Props): RemoteChessGame => {
   return {
     chessboard: chessboard,
     handleMove,
+    isLoadingInitial: isPending,
     players: remoteData?.players ?? {
       white: undefined,
       black: undefined,

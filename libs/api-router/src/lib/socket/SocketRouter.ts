@@ -104,6 +104,7 @@ const from = (api: Api, config: RouterConfig) => {
           socket.data.session,
           joinGamePayloadV1
         );
+        await new Promise((resolve) => setTimeout(resolve, 2000)); // slight delay to ensure order of events
         if (!socket.rooms.has(joinGamePayloadV1.gameId)) {
           socket.join(joinGamePayloadV1.gameId);
           socket.to(joinGamePayloadV1.gameId).emit('user-joined', gameState);

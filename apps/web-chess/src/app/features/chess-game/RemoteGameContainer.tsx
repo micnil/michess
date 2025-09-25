@@ -1,6 +1,6 @@
 import { Color, Move } from '@michess/core-board';
 import { Chessboard as ChessboardView } from '@michess/react-chessboard';
-import { Box, Card, Grid, Inset } from '@radix-ui/themes';
+import { Box, Card, Grid, Inset, Skeleton } from '@radix-ui/themes';
 import { useMemo } from 'react';
 import { PlayerInfo } from './components/PlayerInfo';
 import { useRemoteGame } from './hooks/useRemoteGame';
@@ -12,10 +12,11 @@ export const RemoteGameContainer = ({
   gameId: string;
   orientation?: Color;
 }) => {
-  const { chessboard, handleMove, players, playerSide } = useRemoteGame({
-    gameId,
-  });
-
+  const { chessboard, handleMove, players, playerSide, isLoadingInitial } =
+    useRemoteGame({
+      gameId,
+    });
+  console.log({ isLoadingInitial });
   const whitePlayerInfo = useMemo(
     () => (
       <PlayerInfo
@@ -23,9 +24,15 @@ export const RemoteGameContainer = ({
         avatar={players.white?.avatar}
         color={Color.White}
         isPlayerTurn={chessboard.position.turn === Color.White}
+        isLoading={isLoadingInitial}
       />
     ),
-    [players.white?.username, players.white?.avatar, chessboard.position.turn]
+    [
+      isLoadingInitial,
+      players.white?.username,
+      players.white?.avatar,
+      chessboard.position.turn,
+    ]
   );
 
   const blackPlayerInfo = useMemo(
@@ -35,9 +42,15 @@ export const RemoteGameContainer = ({
         avatar={players.black?.avatar}
         color={Color.Black}
         isPlayerTurn={chessboard.position.turn === Color.Black}
+        isLoading={isLoadingInitial}
       />
     ),
-    [players.black?.username, players.black?.avatar, chessboard.position.turn]
+    [
+      players.black?.username,
+      players.black?.avatar,
+      chessboard.position.turn,
+      isLoadingInitial,
+    ]
   );
 
   const currentOrientation = orientation || Color.White;
@@ -60,23 +73,30 @@ export const RemoteGameContainer = ({
       style={{ justifyItems: 'center' }}
       gap={{ initial: '1', sm: '4' }}
     >
-      <Box display={'inline-block'} gridColumn={{ initial: '1', sm: '2' }}>
+      <Box gridColumn={{ initial: '1', sm: '2' }}>
+        {/* <Skeleton loading={isLoadingInitial}> */}
         <Card size={'1'}>
           <Inset>
             {topPlayerInfo}
-            <ChessboardView<Move>
-              orientation={orientation}
-              maxSize={600}
-              gameResult={undefined}
-              winner={undefined}
-              chessboard={chessboard}
-              playableTurn={playerSide === 'spectator' ? undefined : playerSide}
-              readonly={playerSide === 'spectator'}
-              onMove={handleMove}
-            />
+            <Skeleton loading={isLoadingInitial} height={'9'} width={'5'}>
+              <ChessboardView<Move>
+                isLoading={isLoadingInitial}
+                orientation={orientation}
+                maxSize={600}
+                gameResult={undefined}
+                winner={undefined}
+                chessboard={chessboard}
+                playableTurn={
+                  playerSide === 'spectator' ? undefined : playerSide
+                }
+                readonly={playerSide === 'spectator'}
+                onMove={handleMove}
+              />
+            </Skeleton>
             {bottomPlayerInfo}
           </Inset>
         </Card>
+        {/* </Skeleton> */}
       </Box>
     </Grid>
   );
