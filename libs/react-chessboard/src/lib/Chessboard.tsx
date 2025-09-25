@@ -13,7 +13,6 @@ type Props<TMoveMeta = unknown> = {
   maxSize?: number;
   moveOptions?: MoveOptions<TMoveMeta>;
   gameResult?: GameResultType;
-  winner?: Color;
   chessboard?: ChessboardModel;
   playableTurn?: Color;
   default?: {
@@ -27,7 +26,6 @@ export const Chessboard = <TMoveMeta,>({
   orientation = 'white',
   maxSize = 600,
   gameResult,
-  winner: _winner,
   readonly,
   playableTurn,
   default: defaultState,

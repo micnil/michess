@@ -74,17 +74,17 @@ export const RemoteGameContainer = ({
       gap={{ initial: '1', sm: '4' }}
     >
       <Box gridColumn={{ initial: '1', sm: '2' }}>
-        {/* <Skeleton loading={isLoadingInitial}> */}
         <Card size={'1'}>
           <Inset>
             {topPlayerInfo}
             <Skeleton loading={isLoadingInitial} height={'9'} width={'5'}>
               <ChessboardView<Move>
                 isLoading={isLoadingInitial}
-                orientation={orientation}
+                orientation={
+                  playerSide !== 'spectator' ? playerSide : orientation
+                }
                 maxSize={600}
                 gameResult={undefined}
-                winner={undefined}
                 chessboard={chessboard}
                 playableTurn={
                   playerSide === 'spectator' ? undefined : playerSide
@@ -96,7 +96,6 @@ export const RemoteGameContainer = ({
             {bottomPlayerInfo}
           </Inset>
         </Card>
-        {/* </Skeleton> */}
       </Box>
     </Grid>
   );
