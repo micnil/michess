@@ -1,4 +1,4 @@
-import { Color, Move } from '@michess/core-board';
+import { Color } from '@michess/core-board';
 import { Chessboard as ChessboardView } from '@michess/react-chessboard';
 import { Box, Card, Grid, Inset, Skeleton } from '@radix-ui/themes';
 import { useMemo } from 'react';
@@ -78,7 +78,7 @@ export const RemoteGameContainer = ({
           <Inset>
             {topPlayerInfo}
             <Skeleton loading={isLoadingInitial} height={'9'} width={'5'}>
-              <ChessboardView<Move>
+              <ChessboardView
                 isLoading={isLoadingInitial}
                 orientation={
                   playerSide !== 'spectator' ? playerSide : orientation
