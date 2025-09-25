@@ -7,53 +7,93 @@ import {
   PieceType,
 } from '@michess/core-board';
 import { useDrag } from '@michess/react-dnd';
-import { Skull, Trophy } from 'lucide-react';
-import React from 'react';
+import { Handshake, Skull, Trophy } from 'lucide-react';
+import React, { ReactNode } from 'react';
 import pieceSprite from '../assets/chessboard-sprite-staunty.svg';
 import styles from './PieceView.module.css';
+import { GameResultType } from './model/GameResultType';
 
 const DEFAULT_SPRITE_SIZE = 40;
+
+const IconBackground = ({
+  size,
+  offset,
+  children,
+  fill,
+}: {
+  size: number;
+  offset: number;
+  children: ReactNode;
+  fill: string;
+}) => (
+  <g className={styles.resultIcon}>
+    <circle
+      cx={offset + size / 2}
+      cy={offset + size / 2}
+      r={size / 2 + 4}
+      fill={fill}
+    />
+    {children}
+  </g>
+);
 
 const SkullIcon: React.FC<{ size: number; offset: number }> = ({
   size,
   offset,
 }) => (
-  <g className={styles.checkmateIcon}>
-    <circle
-      cx={offset + size / 2}
-      cy={offset + size / 2}
-      r={size / 2 + 4}
-      fill="#dc2626"
-    />
+  <IconBackground fill="#dc2626" size={size} offset={offset}>
     <Skull x={offset} y={offset} width={size} height={size} color="white" />
-  </g>
+  </IconBackground>
 );
 
 const TrophyIcon: React.FC<{ size: number; offset: number }> = ({
   size,
   offset,
 }) => (
-  <g className={styles.checkmateIcon}>
-    <circle
-      cx={offset + size / 2}
-      cy={offset + size / 2}
-      r={size / 2 + 4}
-      fill="#16a34a"
-    />
+  <IconBackground fill="#16a34a" size={size} offset={offset}>
     <Trophy x={offset} y={offset} width={size} height={size} color="white" />
-  </g>
+  </IconBackground>
 );
 
-// Checkmate indicators component
-const CheckmateIndicators: React.FC<{
-  isLosingKing: boolean | undefined;
-  isWinningKing: boolean | undefined;
+const HandshakeIcon: React.FC<{ size: number; offset: number }> = ({
+  size,
+  offset,
+}) => (
+  <IconBackground fill="#bf8c00" size={size} offset={offset}>
+    <Handshake x={offset} y={offset} width={size} height={size} color="white" />
+  </IconBackground>
+);
+
+const GameResultIndicator: React.FC<{
+  resultType?: GameResultType;
+  piece: Piece;
   iconSize: number;
   iconOffset: number;
-}> = ({ isLosingKing, isWinningKing, iconSize, iconOffset }) => (
+}> = ({ resultType, piece, iconSize, iconOffset }) => (
   <>
-    {isLosingKing && <SkullIcon size={iconSize} offset={iconOffset} />}
-    {isWinningKing && <TrophyIcon size={iconSize} offset={iconOffset} />}
+    {resultType === 'black_win' &&
+      piece.type === PieceType.King &&
+      piece.color === Color.Black && (
+        <TrophyIcon size={iconSize} offset={iconOffset} />
+      )}
+    {resultType === 'black_win' &&
+      piece.type === PieceType.King &&
+      piece.color === Color.White && (
+        <SkullIcon size={iconSize} offset={iconOffset} />
+      )}
+    {resultType === 'white_win' &&
+      piece.type === PieceType.King &&
+      piece.color === Color.White && (
+        <TrophyIcon size={iconSize} offset={iconOffset} />
+      )}
+    {resultType === 'white_win' &&
+      piece.type === PieceType.King &&
+      piece.color === Color.Black && (
+        <SkullIcon size={iconSize} offset={iconOffset} />
+      )}
+    {resultType === 'draw' && piece.type === PieceType.King && (
+      <HandshakeIcon size={iconSize} offset={iconOffset} />
+    )}
   </>
 );
 
@@ -61,7 +101,7 @@ type Props = {
   piece: Piece;
   squareSize: number;
   position: Position;
-  checkmate?: Color;
+  gameResult?: GameResultType;
   coord: Coordinate;
 };
 
@@ -69,7 +109,7 @@ export const PieceView: React.FC<Props> = ({
   piece,
   position: initialPosition,
   squareSize,
-  checkmate,
+  gameResult,
   coord,
 }) => {
   const scaling = squareSize / DEFAULT_SPRITE_SIZE;
@@ -77,14 +117,7 @@ export const PieceView: React.FC<Props> = ({
   const { register, registerPreview, isDragging } = useDrag({
     id: coord,
   });
-
-  // Determine if this piece should show checkmate indicators
-  const isKing = piece.type === PieceType.King;
-  const isLosingKing = isKing && checkmate && piece.color === checkmate;
-  const isWinningKing = isKing && checkmate && piece.color !== checkmate;
-
-  // Icon positioning - center over the piece
-  const iconSize = squareSize * 0.4; // 40% of square size
+  const iconSize = squareSize * 0.4;
   const iconOffset = (squareSize - iconSize) / 2;
   return (
     <>
@@ -97,9 +130,9 @@ export const PieceView: React.FC<Props> = ({
           href={`${pieceSprite}#${pieceAndColor}`}
           transform={`scale(${scaling} ${scaling})`}
         />
-        <CheckmateIndicators
-          isLosingKing={isLosingKing}
-          isWinningKing={isWinningKing}
+        <GameResultIndicator
+          resultType={gameResult}
+          piece={piece}
           iconSize={iconSize}
           iconOffset={iconOffset}
         />
@@ -120,9 +153,9 @@ export const PieceView: React.FC<Props> = ({
             href={`${pieceSprite}#${pieceAndColor}`}
             transform={`scale(${scaling} ${scaling})`}
           />
-          <CheckmateIndicators
-            isLosingKing={isLosingKing}
-            isWinningKing={isWinningKing}
+          <GameResultIndicator
+            resultType={gameResult}
+            piece={piece}
             iconSize={iconSize}
             iconOffset={iconOffset}
           />

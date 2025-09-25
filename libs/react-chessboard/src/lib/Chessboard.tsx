@@ -3,7 +3,7 @@ import { Chessboard as ChessboardModel } from '@michess/core-game';
 import { ChessboardView } from './ChessboardView';
 import { ChessboardContextProvider } from './context/ChessboardContextProvider';
 import { useResponsiveBoardSize } from './hooks/useResponsiveBoardSize';
-import { GameStatusType } from './model/GameStatusType';
+import { GameResultType } from './model/GameResultType';
 import { MoveOptions } from './move/model/MoveOptions';
 import { MovePayload } from './move/model/MovePayload';
 
@@ -11,7 +11,7 @@ type Props<TMoveMeta = unknown> = {
   orientation?: Color;
   maxSize?: number;
   moveOptions?: MoveOptions<TMoveMeta>;
-  gameStatus?: GameStatusType;
+  gameResult?: GameResultType;
   winner?: Color;
   chessboard?: ChessboardModel;
   playableTurn?: Color;
@@ -25,7 +25,7 @@ type Props<TMoveMeta = unknown> = {
 export const Chessboard = <TMoveMeta,>({
   orientation = 'white',
   maxSize = 600,
-  gameStatus = 'active',
+  gameResult,
   winner: _winner,
   readonly,
   playableTurn,
@@ -41,7 +41,7 @@ export const Chessboard = <TMoveMeta,>({
       orientation={orientation}
       default={defaultState}
       chessboard={chessboard}
-      gameStatus={gameStatus}
+      gameResult={gameResult}
       readonly={readonly}
       playableTurn={playableTurn}
       onMove={onMove}

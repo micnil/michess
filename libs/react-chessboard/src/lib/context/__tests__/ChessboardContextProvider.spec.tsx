@@ -25,7 +25,7 @@ describe('ChessboardContextProvider', () => {
   describe('orientation', () => {
     it('should default to white orientation', () => {
       const { getByTestId } = render(
-        <ChessboardContextProvider size={400} gameStatus="active">
+        <ChessboardContextProvider size={400}>
           <TestComponent />
         </ChessboardContextProvider>
       );
@@ -37,11 +37,7 @@ describe('ChessboardContextProvider', () => {
 
     it('should support white orientation explicitly', () => {
       const { getByTestId } = render(
-        <ChessboardContextProvider
-          size={400}
-          orientation="white"
-          gameStatus="active"
-        >
+        <ChessboardContextProvider size={400} orientation="white">
           <TestComponent />
         </ChessboardContextProvider>
       );
@@ -53,11 +49,7 @@ describe('ChessboardContextProvider', () => {
 
     it('should support black orientation', () => {
       const { getByTestId } = render(
-        <ChessboardContextProvider
-          size={400}
-          orientation="black"
-          gameStatus="active"
-        >
+        <ChessboardContextProvider size={400} orientation="black">
           <TestComponent />
         </ChessboardContextProvider>
       );
@@ -69,11 +61,7 @@ describe('ChessboardContextProvider', () => {
 
     it('should calculate correct square positions for white orientation', () => {
       const { getByTestId } = render(
-        <ChessboardContextProvider
-          size={400}
-          orientation="white"
-          gameStatus="active"
-        >
+        <ChessboardContextProvider size={400} orientation="white">
           <TestComponent />
         </ChessboardContextProvider>
       );
@@ -84,11 +72,7 @@ describe('ChessboardContextProvider', () => {
 
     it('should calculate correct square positions for black orientation', () => {
       const { getByTestId } = render(
-        <ChessboardContextProvider
-          size={400}
-          orientation="black"
-          gameStatus="active"
-        >
+        <ChessboardContextProvider size={400} orientation="black">
           <TestComponent />
         </ChessboardContextProvider>
       );

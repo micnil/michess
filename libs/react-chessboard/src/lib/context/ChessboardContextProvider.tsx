@@ -13,7 +13,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { GameStatusType } from '../model/GameStatusType';
+import { GameResultType } from '../model/GameResultType';
 import { Square } from '../model/Square';
 import { MoveOptionsMap } from '../move/model/MoveOptionsMap';
 import { MovePayload } from '../move/model/MovePayload';
@@ -27,7 +27,7 @@ type Props<TMoveMeta = unknown> = {
     moveHistory?: MovePayload<TMoveMeta>[];
   };
   chessboard?: Chessboard;
-  gameStatus: GameStatusType;
+  gameResult?: GameResultType;
   playableTurn?: Color;
   readonly?: boolean;
   onMove?: (move: MovePayload<TMoveMeta>) => void;
@@ -41,6 +41,7 @@ export const ChessboardContextProvider = <TMoveMeta,>({
   default: { positionFen, moveHistory } = {
     positionFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
   },
+  gameResult,
   chessboard: controlledChessboard,
   readonly,
   onMove,
@@ -112,11 +113,23 @@ export const ChessboardContextProvider = <TMoveMeta,>({
       )
     : {};
 
+  const chessboardGameResult = chessboard.isCheckmate
+    ? chessboard.position.turn === Color.White
+      ? 'black_win'
+      : 'white_win'
+    : chessboard.isStalemate ||
+      chessboard.isInsufficientMaterial ||
+      chessboard.isThreeFoldRepetition ||
+      chessboard.isFiftyMoveRule
+    ? 'draw'
+    : undefined;
+
   return (
     <ChessboardContext.Provider
       value={{
         squares,
         chessboard,
+        gameResult: gameResult ?? chessboardGameResult,
         movePiece: movePiece as (payload: MovePayload<unknown>) => void,
         moveOptionsMap,
         latestMove,
