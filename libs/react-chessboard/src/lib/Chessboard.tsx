@@ -1,35 +1,36 @@
-import { Observable } from '@michess/common-utils';
 import { Color } from '@michess/core-board';
+import { Chessboard as ChessboardModel } from '@michess/core-game';
 import { ChessboardView } from './ChessboardView';
 import { ChessboardContextProvider } from './context/ChessboardContextProvider';
 import { useResponsiveBoardSize } from './hooks/useResponsiveBoardSize';
 import { GameStatusType } from './model/GameStatusType';
-import { MovePayload } from './model/MovePayload';
 import { MoveOptions } from './move/model/MoveOptions';
+import { MovePayload } from './move/model/MovePayload';
 
 type Props<TMoveMeta = unknown> = {
   orientation?: Color;
   maxSize?: number;
-  fromPositionFen?: string;
   moveOptions?: MoveOptions<TMoveMeta>;
   gameStatus?: GameStatusType;
   winner?: Color;
+  chessboard?: ChessboardModel;
   playableTurn?: Color;
+  default?: {
+    positionFen: string;
+    moveHistory?: MovePayload<TMoveMeta>[];
+  };
   readonly?: boolean;
-  moveHistory?: MovePayload<TMoveMeta>[];
-  moveObservable?: Observable<MovePayload<TMoveMeta>>;
-  onMove?: (move: MovePayload<TMoveMeta>) => Promise<boolean>;
+  onMove?: (move: MovePayload<TMoveMeta>) => void;
 };
 export const Chessboard = <TMoveMeta,>({
   orientation = 'white',
   maxSize = 600,
-  fromPositionFen,
   gameStatus = 'active',
   winner: _winner,
   readonly,
   playableTurn,
-  moveHistory,
-  moveObservable,
+  default: defaultState,
+  chessboard,
   onMove,
 }: Props<TMoveMeta>) => {
   const boardSize = useResponsiveBoardSize({ maxSize });
@@ -38,12 +39,11 @@ export const Chessboard = <TMoveMeta,>({
     <ChessboardContextProvider
       size={boardSize}
       orientation={orientation}
-      fromPositionFen={fromPositionFen}
+      default={defaultState}
+      chessboard={chessboard}
       gameStatus={gameStatus}
       readonly={readonly}
-      moveHistory={moveHistory}
       playableTurn={playableTurn}
-      moveObservable={moveObservable}
       onMove={onMove}
     >
       <ChessboardView size={boardSize} />

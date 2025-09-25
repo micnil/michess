@@ -5,7 +5,7 @@ import React from 'react';
 import styles from './SquareView.module.css';
 import { useChessboardContext } from './context/hooks/useChessboardContext';
 import { useMoveOptions } from './context/hooks/useMoveOptions';
-import { MovePayload } from './model/MovePayload';
+import { MovePayload } from './move/model/MovePayload';
 import { canMoveTo } from './move/util/canMoveTo';
 
 type Props = {

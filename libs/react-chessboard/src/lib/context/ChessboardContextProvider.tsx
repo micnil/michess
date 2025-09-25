@@ -1,10 +1,8 @@
-import { Observable } from '@michess/common-utils';
 import {
   BoardCoordinates,
   Color,
   Coordinate,
   FenParser,
-  PiecePlacements,
 } from '@michess/core-board';
 import { Chessboard, MoveOption } from '@michess/core-game';
 import {
@@ -16,22 +14,23 @@ import {
   useState,
 } from 'react';
 import { GameStatusType } from '../model/GameStatusType';
-import { MovePayload } from '../model/MovePayload';
 import { Square } from '../model/Square';
 import { MoveOptionsMap } from '../move/model/MoveOptionsMap';
+import { MovePayload } from '../move/model/MovePayload';
 import { ChessboardContext } from './ChessboardContext';
 
 type Props<TMoveMeta = unknown> = {
   size: number;
   orientation?: Color;
-  fromPositionFen?: string;
-  piecePlacements?: PiecePlacements;
+  default?: {
+    positionFen: string;
+    moveHistory?: MovePayload<TMoveMeta>[];
+  };
+  chessboard?: Chessboard;
   gameStatus: GameStatusType;
-  moveHistory?: MovePayload<TMoveMeta>[];
-  moveObservable?: Observable<MovePayload<TMoveMeta>>;
   playableTurn?: Color;
   readonly?: boolean;
-  onMove?: (move: MovePayload<TMoveMeta>) => Promise<boolean>;
+  onMove?: (move: MovePayload<TMoveMeta>) => void;
   children: ReactNode;
 };
 
@@ -39,22 +38,23 @@ export const ChessboardContextProvider = <TMoveMeta,>({
   children,
   orientation = 'white',
   playableTurn,
-  gameStatus,
-  moveObservable,
+  default: { positionFen, moveHistory } = {
+    positionFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+  },
+  chessboard: controlledChessboard,
   readonly,
-  fromPositionFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
   onMove,
-  moveHistory,
   size,
 }: Props<TMoveMeta>) => {
-  const [chessboard, setChessboard] = useState<Chessboard>(() => {
+  const [uncontrolledChessboard, setChessboard] = useState<Chessboard>(() => {
     return Chessboard.fromPosition(
-      {
-        ...FenParser.toChessPosition(fromPositionFen),
-      },
+      FenParser.toChessPosition(positionFen),
       moveHistory
     );
   });
+
+  const chessboard = controlledChessboard ?? uncontrolledChessboard;
+
   const onMoveRef = useRef(onMove);
   onMoveRef.current = onMove;
 
@@ -88,29 +88,17 @@ export const ChessboardContextProvider = <TMoveMeta,>({
     }
   }, [moveHistory]);
 
-  useEffect(() => {
-    if (moveObservable) {
-      return moveObservable.subscribe((move) => {
-        setChessboard((currentBoard) => currentBoard.playMove(move));
-      });
-    }
-    return;
-  }, [moveObservable]);
-
-  const movePiece = useCallback(async (payload: MovePayload<TMoveMeta>) => {
-    setChessboard((prevChessboard) => {
-      return prevChessboard.playMove(payload);
-    });
-    if (onMoveRef.current) {
-      const result = await onMoveRef.current(payload);
-      if (!result) {
-        // Revert the move if not accepted
+  const movePiece = useCallback(
+    async (payload: MovePayload<TMoveMeta>) => {
+      if (!controlledChessboard) {
         setChessboard((prevChessboard) => {
-          return prevChessboard.unmakeMove();
+          return prevChessboard.playMove(payload);
         });
       }
-    }
-  }, []);
+      onMoveRef.current?.(payload);
+    },
+    [controlledChessboard]
+  );
 
   const latestMove = chessboard.movesRecord.at(-1);
 

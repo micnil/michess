@@ -1,11 +1,12 @@
 import { Maybe, Observable } from '@michess/common-utils';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export const useObservable = <T>(
-  observable: Maybe<Observable<T>>,
+  observableIn: Maybe<Observable<T>> | (() => Maybe<Observable<T>>),
   callback: (value: T) => void,
   onUnsubscribe?: () => void
 ) => {
+  const [observable] = useState(observableIn);
   const callbackRef = useRef(callback);
   const onUnsubscribeRef = useRef(onUnsubscribe);
 

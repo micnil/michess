@@ -21,18 +21,20 @@ export class GameService {
   toGameViewModel(gameDetails: GameDetailsV1): GameViewModel {
     return {
       moves: gameDetails.moves.map((m) => Move.fromUci(m.uci)),
-      blackPlayer: gameDetails.players.black
-        ? {
-            username: gameDetails.players.black.name,
-            avatar: undefined,
-          }
-        : undefined,
-      whitePlayer: gameDetails.players.white
-        ? {
-            username: gameDetails.players.white.name,
-            avatar: undefined,
-          }
-        : undefined,
+      players: {
+        white: gameDetails.players.white
+          ? {
+              username: gameDetails.players.white.name,
+              avatar: undefined,
+            }
+          : undefined,
+        black: gameDetails.players.black
+          ? {
+              username: gameDetails.players.black.name,
+              avatar: undefined,
+            }
+          : undefined,
+      },
     };
   }
 

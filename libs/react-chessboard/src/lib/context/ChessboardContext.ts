@@ -1,9 +1,9 @@
 import { Coordinate } from '@michess/core-board';
 import { Chessboard } from '@michess/core-game';
 import React from 'react';
-import { MovePayload } from '../model/MovePayload';
 import { Square } from '../model/Square';
 import { MoveOptionsMap } from '../move/model/MoveOptionsMap';
+import { MovePayload } from '../move/model/MovePayload';
 
 export type ChessboardContextState<TMoveMeta = unknown> = {
   chessboard: Chessboard;

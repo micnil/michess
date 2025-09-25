@@ -66,7 +66,7 @@ describe('SocketRouter', () => {
   beforeAll((done) => {
     apiMock.auth.getSession = jest.fn().mockResolvedValue(sessionMock);
     httpServer = createServer();
-    io = SocketRouter.from(apiMock);
+    io = SocketRouter.from(apiMock, { cors: { origins: ['*'] } });
     io.attach(httpServer);
 
     httpServer.listen(() => {
@@ -105,7 +105,7 @@ describe('SocketRouter', () => {
       };
       const mockGameState: GameDetailsV1 = {
         id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-        players: { white: { name: 'Test User' }, black: undefined },
+        players: { white: { name: 'Test User', id: 'u1' }, black: undefined },
         isPrivate: false,
         moves: [],
         variant: 'standard',
