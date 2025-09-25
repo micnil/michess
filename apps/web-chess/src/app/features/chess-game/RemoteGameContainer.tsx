@@ -67,7 +67,7 @@ export const RemoteGameContainer = ({
             <ChessboardView<Move>
               orientation={orientation}
               maxSize={600}
-              gameStatus={undefined}
+              gameResult={undefined}
               winner={undefined}
               chessboard={chessboard}
               playableTurn={playerSide === 'spectator' ? undefined : playerSide}
