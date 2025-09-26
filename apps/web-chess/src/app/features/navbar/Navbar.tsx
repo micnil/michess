@@ -1,4 +1,4 @@
-import { Flex } from '@radix-ui/themes';
+import { Box, Flex } from '@radix-ui/themes';
 import { FC, ReactNode } from 'react';
 import { Logo } from '../../components/Logo';
 
@@ -9,7 +9,11 @@ type Props = {
 export const Navbar: FC<Props> = () => {
   return (
     <Flex>
-      <Logo />
+      <Box flexGrow={'1'} style={{ backgroundColor: '--gray9' }}>
+        {/* <Card> */}
+        <Logo />
+        {/* </Card> */}
+      </Box>
     </Flex>
   );
 };

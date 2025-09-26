@@ -8,7 +8,7 @@ export const Logo: FC = () => {
       <Flex asChild gap={'2'} align={'center'}>
         <Link to="/">
           <img src="/chess-monky-v1.svg" height={64} width={64} alt="logo" />
-          <Text size={'4'} weight={'bold'}>
+          <Text size={'4'} weight={'bold'} color="amber">
             chess monky
           </Text>
         </Link>

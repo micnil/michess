@@ -1,5 +1,5 @@
 import { Color } from '@michess/core-board';
-import { Box, Container, Theme } from '@radix-ui/themes';
+import { Box, Card, Container, Theme } from '@radix-ui/themes';
 import {
   createRootRoute,
   createRoute,
@@ -8,19 +8,28 @@ import {
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { ApiProvider } from './app/api/context/ApiProvider';
+import { BackgroundGradient } from './app/components/BackgroundGradient';
 import { Navbar } from './app/features/navbar/Navbar';
 import GamePage from './app/pages/GamePage';
 import { HomePage } from './app/pages/HomePage';
 
 const RootLayout = () => (
-  <Theme>
-    <Box minHeight="100vh">
+  <Theme
+    accentColor="amber"
+    appearance="dark"
+    panelBackground="translucent"
+    grayColor="sand"
+  >
+    <Box minHeight="100vh" style={{ backgroundColor: 'var(--slate6)' }}>
       <ApiProvider>
-        <Container asChild>
+        <BackgroundGradient />
+        <Card asChild size={'1'} style={{ borderRadius: '0px' }}>
           <header>
-            <Navbar />
+            <Container>
+              <Navbar />
+            </Container>
           </header>
-        </Container>
+        </Card>
 
         <Container asChild mt={'6'}>
           <main>
