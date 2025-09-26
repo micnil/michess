@@ -15,20 +15,28 @@ type RemoteChessGame = {
   isLoadingInitial: boolean;
   chessboard: Chessboard;
   handleMove: (move: MovePayload) => void;
-  players: ParticipantGameViewModel['players'];
-  playerSide: ParticipantGameViewModel['playerSide'];
-  result: ParticipantGameViewModel['result'];
+  gameState: ParticipantGameViewModel;
 };
 
 const participantGameViewModelSelector = (
   data: ParticipantGameViewModel
-): ParticipantGameViewModel & { chessboard: Chessboard } => ({
-  ...data,
+): {
+  chessboard: Chessboard;
+  gameState: ParticipantGameViewModel;
+} => ({
   chessboard: Chessboard.fromPosition(
     ChessPosition.standardInitial(),
     data.moves
   ),
+  gameState: data,
 });
+
+const placeholderData: ParticipantGameViewModel = {
+  players: { white: undefined, black: undefined },
+  playerSide: 'spectator' as const,
+  result: undefined,
+  moves: [],
+};
 
 export const useRemoteGame = (props: Props): RemoteChessGame => {
   const { games } = useApi();
@@ -44,6 +52,7 @@ export const useRemoteGame = (props: Props): RemoteChessGame => {
     gcTime: Infinity,
     staleTime: Infinity,
     refetchOnMount: 'always',
+    placeholderData,
   });
   const remoteChessboard = remoteData?.chessboard;
   useEffect(() => {
@@ -101,12 +110,7 @@ export const useRemoteGame = (props: Props): RemoteChessGame => {
   return {
     chessboard: chessboard,
     handleMove,
-    result: remoteData?.result,
     isLoadingInitial: isPending,
-    players: remoteData?.players ?? {
-      white: undefined,
-      black: undefined,
-    },
-    playerSide: remoteData?.playerSide || 'spectator',
+    gameState: remoteData?.gameState || placeholderData,
   };
 };

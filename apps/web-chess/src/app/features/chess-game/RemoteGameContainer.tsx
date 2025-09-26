@@ -12,17 +12,13 @@ export const RemoteGameContainer = ({
   gameId: string;
   orientation?: Color;
 }) => {
-  const {
-    chessboard,
-    handleMove,
-    players,
-    playerSide,
-    isLoadingInitial,
-    result,
-  } = useRemoteGame({
-    gameId,
-  });
-  console.log({ isLoadingInitial });
+  const { chessboard, handleMove, gameState, isLoadingInitial } = useRemoteGame(
+    {
+      gameId,
+    }
+  );
+  const { players, playerSide, result } = gameState;
+
   const whitePlayerInfo = useMemo(
     () => (
       <PlayerInfo
