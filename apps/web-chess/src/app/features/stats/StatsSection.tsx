@@ -24,11 +24,8 @@ export const StatsSection: React.FC<Props> = ({ stats = defaultStats }) => {
 
   return (
     <Card variant="surface" size="3">
-      <Box p="6">
-        <Grid
-          columns={{ initial: '1', sm: '3' }}
-          gap={{ initial: '3', sm: '4' }}
-        >
+      <Box>
+        <Grid columns={'1'} gap={{ initial: '3' }}>
           <Flex direction="column" align="center" p="4">
             <Text
               as="div"

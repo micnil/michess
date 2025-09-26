@@ -33,15 +33,21 @@ export const HomePage: React.FC = () => {
   };
 
   return (
-    <Flex direction="column" gap={'4'} width={'100%'}>
-      <Box>
+    <Flex
+      direction={'row'}
+      wrap={'wrap'}
+      gap={'4'}
+      width={'100%'}
+      px={{ initial: '2', lg: '0' }}
+    >
+      <Box flexGrow={'1'}>
         <GameLobby
           onCreateGame={handleCreateGame}
           onJoinGame={handleJoinGame}
         />
       </Box>
 
-      <Box>
+      <Box flexGrow={'1'} style={{ minWidth: '250px', flexBasis: '250px' }}>
         <StatsSection />
       </Box>
     </Flex>
