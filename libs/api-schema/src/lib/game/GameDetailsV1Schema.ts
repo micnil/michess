@@ -11,5 +11,5 @@ export const GameDetailsV1Schema = z.object({
   result: GameResultV1Schema.optional(),
   initialPosition: z.string().optional(),
   moves: z.array(MoveV1Schema),
-  startedAt: z.date().optional(),
+  startedAt: z.coerce.date().optional(),
 });

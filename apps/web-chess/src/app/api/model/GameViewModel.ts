@@ -8,4 +8,5 @@ export type GameViewModel = {
     white?: { username: string; avatar?: string };
     black?: { username: string; avatar?: string };
   };
+  startedAt?: Date;
 };

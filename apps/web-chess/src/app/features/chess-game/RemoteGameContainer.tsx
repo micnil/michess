@@ -17,7 +17,7 @@ export const RemoteGameContainer = ({
       gameId,
     }
   );
-  const { players, playerSide, result } = gameState;
+  const { players, playerSide, result, startedAt } = gameState;
 
   const whitePlayerInfo = useMemo(
     () => (
@@ -91,7 +91,7 @@ export const RemoteGameContainer = ({
                 playableTurn={
                   playerSide === 'spectator' ? undefined : playerSide
                 }
-                readonly={playerSide === 'spectator'}
+                readonly={playerSide === 'spectator' || !startedAt || !!result}
                 onMove={handleMove}
               />
             </Skeleton>

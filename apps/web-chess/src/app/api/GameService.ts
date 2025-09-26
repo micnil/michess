@@ -22,6 +22,7 @@ export class GameService {
     return {
       moves: gameDetails.moves.map((m) => Move.fromUci(m.uci)),
       result: gameDetails.result,
+      startedAt: gameDetails.startedAt,
       players: {
         white: gameDetails.players.white
           ? {

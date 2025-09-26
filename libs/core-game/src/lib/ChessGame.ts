@@ -148,7 +148,12 @@ const evalResultFromBoard = (
     return ChessGameResult.toCheckmate(
       board.position.turn === Color.White ? Color.Black : Color.White
     );
-  } else if (board.isStalemate) {
+  } else if (
+    board.isStalemate ||
+    board.isInsufficientMaterial ||
+    board.isThreeFoldRepetition ||
+    board.isFiftyMoveRule
+  ) {
     return { type: 'draw' };
   } else {
     return undefined;
@@ -185,6 +190,7 @@ const fromGameStateInternal = (
       throw new Error('Not your turn');
     } else {
       const newBoard = board.playMove(move);
+      const result = evalResultFromBoard(newBoard);
       return fromGameStateInternal({
         ...gameStateInternal,
         board: newBoard,
@@ -192,7 +198,13 @@ const fromGameStateInternal = (
           gameStateInternal.status === 'READY'
             ? 'IN_PROGRESS'
             : gameStateInternal.status,
-        result: evalResultFromBoard(newBoard),
+        meta: {
+          ...gameStateInternal.meta,
+          startedAt: gameStateInternal.meta.startedAt ?? new Date(),
+          endedAt:
+            gameStateInternal.meta.endedAt ?? result ? new Date() : undefined,
+        },
+        result,
         additionalActions: evalAdditionalActions(additionalActions, newBoard),
       });
     }
@@ -215,10 +227,12 @@ const fromGameStateInternal = (
     getAdditionalActions: () => gameStateInternal.additionalActions.value(),
     joinGame: (playerInfo: PlayerInfo, side?: Color): ChessGame => {
       const newPlayers = joinGame(gameStateInternal.players, playerInfo, side);
+      const bothSidesTaken = !!newPlayers.black && !!newPlayers.white;
+
       return fromGameStateInternal({
         ...gameStateInternal,
         players: newPlayers,
-        status: newPlayers.black && newPlayers.white ? 'READY' : 'WAITING',
+        status: bothSidesTaken ? 'READY' : 'WAITING',
       });
     },
     isPlayerInGame: (playerId: string): boolean => {
