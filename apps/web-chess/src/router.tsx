@@ -8,6 +8,7 @@ import {
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { ApiProvider } from './app/api/context/ApiProvider';
+import { QueryProvider } from './app/api/context/QueryProvider';
 import { BackgroundGradient } from './app/components/BackgroundGradient';
 import { Navbar } from './app/features/navbar/Navbar';
 import GamePage from './app/pages/GamePage';
@@ -20,29 +21,31 @@ const RootLayout = () => (
     panelBackground="translucent"
     grayColor="sand"
   >
-    <Box minHeight="100vh" style={{ backgroundColor: 'var(--slate6)' }}>
-      <ApiProvider>
-        <BackgroundGradient />
-        <Card asChild size={'1'} style={{ borderRadius: '0px' }}>
-          <header>
-            <Container>
-              <Navbar />
-            </Container>
-          </header>
-        </Card>
+    <QueryProvider>
+      <Box minHeight="100vh" style={{ backgroundColor: 'var(--slate6)' }}>
+        <ApiProvider>
+          <BackgroundGradient />
+          <Card asChild size={'1'} style={{ borderRadius: '0px' }}>
+            <header>
+              <Container>
+                <Navbar />
+              </Container>
+            </header>
+          </Card>
 
-        <Container asChild mt={'6'}>
-          <main>
-            <Outlet />
-          </main>
-        </Container>
+          <Container asChild mt={'6'}>
+            <main>
+              <Outlet />
+            </main>
+          </Container>
 
-        <Container asChild>
-          <footer>{/* Footer content can be added here */}</footer>
-        </Container>
-      </ApiProvider>
-      <TanStackRouterDevtools />
-    </Box>
+          <Container asChild>
+            <footer>{/* Footer content can be added here */}</footer>
+          </Container>
+        </ApiProvider>
+        <TanStackRouterDevtools />
+      </Box>
+    </QueryProvider>
   </Theme>
 );
 

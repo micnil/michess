@@ -1,7 +1,15 @@
-import { Box, Button, Card, Flex, Heading, Text } from '@radix-ui/themes';
-import { useQuery } from '@tanstack/react-query';
+import {
+  Box,
+  Button,
+  Card,
+  Flex,
+  Heading,
+  Skeleton,
+  Text,
+} from '@radix-ui/themes';
 import React, { use } from 'react';
 import { ApiContext } from '../../api/context/ApiContext';
+import { useQuery } from '../../util/useQuery';
 
 const ColorIndicator: React.FC<{ color: 'white' | 'black' | 'spectator' }> = ({
   color,
@@ -38,11 +46,7 @@ type Props = {
 export const GameLobby: React.FC<Props> = ({ onCreateGame, onJoinGame }) => {
   const api = use(ApiContext);
 
-  const {
-    data: lobbyData,
-    isLoading,
-    error,
-  } = useQuery({
+  const { data: lobbyData, isPending } = useQuery({
     queryKey: ['lobby-games'],
     queryFn: () => api.games.getLobbyGames(1),
     refetchInterval: 5000,
@@ -53,31 +57,11 @@ export const GameLobby: React.FC<Props> = ({ onCreateGame, onJoinGame }) => {
       <Heading size="4" weight="medium">
         Game Lobby
       </Heading>
-      <Button onClick={onCreateGame}>+ Create Game</Button>
+      <Skeleton loading={isPending}>
+        <Button onClick={onCreateGame}>+ Create Game</Button>
+      </Skeleton>
     </Flex>
   );
-
-  if (isLoading) {
-    return (
-      <Card size="3" style={{ padding: '24px' }}>
-        {renderHeader()}
-        <Box style={{ textAlign: 'center', padding: '32px', color: '#6b7280' }}>
-          <Text>Loading games...</Text>
-        </Box>
-      </Card>
-    );
-  }
-
-  if (error) {
-    return (
-      <Card size="3" style={{ padding: '24px' }}>
-        {renderHeader()}
-        <Box style={{ textAlign: 'center', padding: '32px', color: '#6b7280' }}>
-          <Text>Error loading games: {(error as Error).message}</Text>
-        </Box>
-      </Card>
-    );
-  }
 
   const games = lobbyData?.items || [];
 
@@ -85,44 +69,46 @@ export const GameLobby: React.FC<Props> = ({ onCreateGame, onJoinGame }) => {
     <Card size="3" style={{ padding: '24px' }}>
       {renderHeader()}
 
-      <Flex direction="column" gap="2">
-        {games.map((game) => (
-          <Card key={game.id} variant="surface" size="1">
-            <Flex align="center" gap="4" p="3">
-              <Box style={{ minWidth: '120px' }}>
-                <Text weight="medium" size="3">
-                  {game.opponent.name}
-                </Text>
-              </Box>
-              <Flex align="center" gap="2" style={{ minWidth: '100px' }}>
-                <ColorIndicator color={game.availableColor} />
-                <Text
-                  size="2"
-                  color="gray"
-                  style={{ textTransform: 'capitalize' }}
-                >
-                  {game.availableColor}
-                </Text>
+      <Skeleton loading={isPending}>
+        <Flex direction="column" gap="2">
+          {games.map((game) => (
+            <Card key={game.id} variant="surface" size="1">
+              <Flex align="center" gap="4" p="3">
+                <Box style={{ minWidth: '120px' }}>
+                  <Text weight="medium" size="3">
+                    {game.opponent.name}
+                  </Text>
+                </Box>
+                <Flex align="center" gap="2" style={{ minWidth: '100px' }}>
+                  <ColorIndicator color={game.availableColor} />
+                  <Text
+                    size="2"
+                    color="gray"
+                    style={{ textTransform: 'capitalize' }}
+                  >
+                    {game.availableColor}
+                  </Text>
+                </Flex>
+                <Box flexGrow="1">
+                  <Text size="2" color="gray">
+                    {game.variant}
+                  </Text>
+                </Box>
+                <Button size="2" onClick={() => onJoinGame?.(game.id)}>
+                  Join
+                </Button>
               </Flex>
-              <Box flexGrow="1">
-                <Text size="2" color="gray">
-                  {game.variant}
-                </Text>
-              </Box>
-              <Button size="2" onClick={() => onJoinGame?.(game.id)}>
-                Join
-              </Button>
-            </Flex>
-          </Card>
-        ))}
-        {games.length === 0 && (
-          <Box
-            style={{ textAlign: 'center', padding: '32px', color: '#6b7280' }}
-          >
-            <Text>No games available. Create one to get started!</Text>
-          </Box>
-        )}
-      </Flex>
+            </Card>
+          ))}
+          {games.length === 0 && (
+            <Box
+              style={{ textAlign: 'center', padding: '32px', color: '#6b7280' }}
+            >
+              <Text>No games available. Create one to get started!</Text>
+            </Box>
+          )}
+        </Flex>
+      </Skeleton>
     </Card>
   );
 };

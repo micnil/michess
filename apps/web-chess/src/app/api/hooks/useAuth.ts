@@ -27,6 +27,8 @@ export const useAuth = (): UseAuthState => {
     refetch,
   } = useQuery<AuthState>({
     queryKey: AUTH_QUERY_KEY,
+    staleTime: Infinity,
+    gcTime: Infinity,
     queryFn: async () => {
       try {
         const result = await api.auth.ensureAnonymousSession();
