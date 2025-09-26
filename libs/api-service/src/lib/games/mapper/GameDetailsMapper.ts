@@ -125,6 +125,11 @@ export const GameDetailsMapper = {
             }
           : undefined,
       },
+      result: game.result
+        ? {
+            type: game.result.type,
+          }
+        : undefined,
       variant: 'standard',
       isPrivate: game.isPrivate,
       moves: game.movesRecord.map((move) => ({

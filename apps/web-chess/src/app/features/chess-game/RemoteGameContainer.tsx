@@ -12,10 +12,16 @@ export const RemoteGameContainer = ({
   gameId: string;
   orientation?: Color;
 }) => {
-  const { chessboard, handleMove, players, playerSide, isLoadingInitial } =
-    useRemoteGame({
-      gameId,
-    });
+  const {
+    chessboard,
+    handleMove,
+    players,
+    playerSide,
+    isLoadingInitial,
+    result,
+  } = useRemoteGame({
+    gameId,
+  });
   console.log({ isLoadingInitial });
   const whitePlayerInfo = useMemo(
     () => (
@@ -84,7 +90,7 @@ export const RemoteGameContainer = ({
                   playerSide !== 'spectator' ? playerSide : orientation
                 }
                 maxSize={600}
-                gameResult={undefined}
+                gameResult={result?.type}
                 chessboard={chessboard}
                 playableTurn={
                   playerSide === 'spectator' ? undefined : playerSide

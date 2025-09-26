@@ -17,6 +17,7 @@ type RemoteChessGame = {
   handleMove: (move: MovePayload) => void;
   players: ParticipantGameViewModel['players'];
   playerSide: ParticipantGameViewModel['playerSide'];
+  result: ParticipantGameViewModel['result'];
 };
 
 const participantGameViewModelSelector = (
@@ -100,6 +101,7 @@ export const useRemoteGame = (props: Props): RemoteChessGame => {
   return {
     chessboard: chessboard,
     handleMove,
+    result: remoteData?.result,
     isLoadingInitial: isPending,
     players: remoteData?.players ?? {
       white: undefined,

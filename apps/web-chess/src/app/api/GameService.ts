@@ -21,6 +21,7 @@ export class GameService {
   toGameViewModel(gameDetails: GameDetailsV1): GameViewModel {
     return {
       moves: gameDetails.moves.map((m) => Move.fromUci(m.uci)),
+      result: gameDetails.result,
       players: {
         white: gameDetails.players.white
           ? {
