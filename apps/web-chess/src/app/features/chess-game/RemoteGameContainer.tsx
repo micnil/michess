@@ -2,6 +2,7 @@ import { Color } from '@michess/core-board';
 import { Chessboard as ChessboardView } from '@michess/react-chessboard';
 import { Box, Card, Grid, Inset, Skeleton } from '@radix-ui/themes';
 import { useMemo } from 'react';
+import { useAuth } from '../../api/hooks/useAuth';
 import { PlayerInfo } from './components/PlayerInfo';
 import { useRemoteGame } from './hooks/useRemoteGame';
 
@@ -17,12 +18,15 @@ export const RemoteGameContainer = ({
       gameId,
     }
   );
+  const { auth } = useAuth();
   const { players, playerSide, result, startedAt } = gameState;
   orientation = playerSide !== 'spectator' ? playerSide : orientation;
 
   const whitePlayerInfo = useMemo(
     () => (
       <PlayerInfo
+        isPlayerAnonymous={auth?.user?.isAnonymous || false}
+        playerSide={playerSide}
         username={players.white?.username}
         avatar={players.white?.avatar}
         color={Color.White}
@@ -32,6 +36,8 @@ export const RemoteGameContainer = ({
     ),
     [
       isLoadingInitial,
+      auth?.user?.isAnonymous,
+      playerSide,
       players.white?.username,
       players.white?.avatar,
       chessboard.position.turn,
@@ -41,6 +47,8 @@ export const RemoteGameContainer = ({
   const blackPlayerInfo = useMemo(
     () => (
       <PlayerInfo
+        isPlayerAnonymous={auth?.user?.isAnonymous || false}
+        playerSide={playerSide}
         username={players.black?.username}
         avatar={players.black?.avatar}
         color={Color.Black}
@@ -49,6 +57,8 @@ export const RemoteGameContainer = ({
       />
     ),
     [
+      auth?.user?.isAnonymous,
+      playerSide,
       players.black?.username,
       players.black?.avatar,
       chessboard.position.turn,

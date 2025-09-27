@@ -5,6 +5,8 @@ import React from 'react';
 type PlayerInfoProps = {
   username?: string;
   color: Color;
+  playerSide: Color | 'spectator';
+  isPlayerAnonymous: boolean;
   avatar?: string;
   isPlayerTurn?: boolean;
   isLoading?: boolean;
@@ -12,6 +14,8 @@ type PlayerInfoProps = {
 
 export const PlayerInfo: React.FC<PlayerInfoProps> = ({
   username,
+  isPlayerAnonymous,
+  playerSide,
   color,
   avatar,
   isPlayerTurn = false,
@@ -26,7 +30,9 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
       .slice(0, 2);
   };
 
-  const displayUsername = username || 'Waiting for player';
+  const displayUsername = username
+    ? username + (isPlayerAnonymous && playerSide === color ? ' (You)' : '')
+    : 'Waiting for player';
   const isWaiting = !username;
 
   return (
