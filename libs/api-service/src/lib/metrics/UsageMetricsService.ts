@@ -9,11 +9,11 @@ export class UsageMetricsService {
   constructor(private processId: string, private cacheRepo: CacheRepository) {
     const connectionOptions = { connection: this.cacheRepo.client };
     this.processTrackerQueue = new Queue(
-      `process-tracker:${processId}`,
+      `process-tracker/${processId}`,
       connectionOptions
     );
     this.processTrackerWorker = new Worker(
-      `process-tracker:${processId}`,
+      `process-tracker/${processId}`,
       this.trackProcess.bind(this),
       connectionOptions
     );
