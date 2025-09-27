@@ -9,6 +9,7 @@ import {
 } from '@radix-ui/themes';
 import React, { use } from 'react';
 import { ApiContext } from '../../api/context/ApiContext';
+import { Alert } from '../../components/Alert';
 import { useQuery } from '../../util/useQuery';
 
 const ColorIndicator: React.FC<{ color: 'white' | 'black' | 'spectator' }> = ({
@@ -46,7 +47,11 @@ type Props = {
 export const GameLobby: React.FC<Props> = ({ onCreateGame, onJoinGame }) => {
   const api = use(ApiContext);
 
-  const { data: lobbyData, isPending } = useQuery({
+  const {
+    data: lobbyData,
+    isPending,
+    error,
+  } = useQuery({
     queryKey: ['lobby-games'],
     queryFn: () => api.games.getLobbyGames(1),
     refetchInterval: 5000,
@@ -68,6 +73,7 @@ export const GameLobby: React.FC<Props> = ({ onCreateGame, onJoinGame }) => {
   return (
     <Card size="3" style={{ padding: '24px' }}>
       {renderHeader()}
+      <Alert text={error?.message} />
 
       <Skeleton loading={isPending}>
         <Flex direction="column" gap="2">
@@ -104,7 +110,7 @@ export const GameLobby: React.FC<Props> = ({ onCreateGame, onJoinGame }) => {
               </Flex>
             </Card>
           ))}
-          {games.length === 0 && (
+          {!error && games.length === 0 && (
             <Box
               style={{ textAlign: 'center', padding: '32px', color: '#6b7280' }}
             >
