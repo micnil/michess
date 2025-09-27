@@ -2,8 +2,8 @@ import { App } from '@michess/api-router';
 import { Api } from '@michess/api-service';
 import { Repositories } from '@michess/infra-db';
 import dotenv from 'dotenv';
+import Redis from 'ioredis';
 import postgres from 'postgres';
-import { createClient, RedisClientType } from 'redis';
 import { AppConfigService } from './config/service/AppConfigService';
 import { Server } from './Server';
 
@@ -14,12 +14,11 @@ const main = async () => {
 
   const client = postgres(appConfig.database.url);
 
-  const redis = createClient({
-    url: appConfig.redis.url,
+  const redis = new Redis(appConfig.redis.url, {
+    maxRetriesPerRequest: null,
   });
-  await redis.connect();
 
-  const repos = Repositories.from(client, redis as RedisClientType);
+  const repos = Repositories.from(client, redis);
   const api = Api.from(repos, client);
   const app = App.from(api, { cors: appConfig.cors });
 

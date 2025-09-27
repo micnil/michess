@@ -1,5 +1,5 @@
+import Redis from 'ioredis';
 import { Sql } from 'postgres';
-import { RedisClientType } from 'redis';
 import { CacheRepository } from './repository/CacheRepository';
 import { GameRepository } from './repository/GameRepository';
 import { MoveRepository } from './repository/MoveRepository';
@@ -12,7 +12,7 @@ export type Repositories = {
   cache: CacheRepository;
 };
 
-const from = (sql: Sql, redis: RedisClientType): Repositories => {
+const from = (sql: Sql, redis: Redis): Repositories => {
   return {
     user: new UserRepository(sql),
     game: new GameRepository(sql),

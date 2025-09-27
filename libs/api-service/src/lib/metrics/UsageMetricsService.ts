@@ -7,16 +7,21 @@ export class UsageMetricsService {
   metricCleanupQueue: Queue;
   metricCleanupWorker: Worker;
   constructor(private processId: string, private cacheRepo: CacheRepository) {
-    this.processTrackerQueue = new Queue('process-tracker');
-    this.processTrackerWorker = new Worker(
-      'process-tracker',
-      this.trackProcess.bind(this)
+    const connectionOptions = { connection: this.cacheRepo.client };
+    this.processTrackerQueue = new Queue(
+      `process-tracker:${processId}`,
+      connectionOptions
     );
-    // TODO: Add redis client
-    this.metricCleanupQueue = new Queue('metric-cleanup');
+    this.processTrackerWorker = new Worker(
+      `process-tracker:${processId}`,
+      this.trackProcess.bind(this),
+      connectionOptions
+    );
+    this.metricCleanupQueue = new Queue('metric-cleanup', connectionOptions);
     this.metricCleanupWorker = new Worker(
       'metric-cleanup',
-      this.cleanupMetrics.bind(this)
+      this.cleanupMetrics.bind(this),
+      connectionOptions
     );
   }
 

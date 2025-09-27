@@ -1,14 +1,14 @@
 import { Maybe } from '@michess/common-utils';
-import { RedisClientType } from 'redis';
+import Redis from 'ioredis';
 
 type CacheKey = string;
 type CacheValue = string;
 type CacheExpiration = number; // seconds
 
 export class CacheRepository {
-  constructor(private readonly redisClient: RedisClientType) {}
+  constructor(private readonly redisClient: Redis) {}
 
-  get client(): RedisClientType {
+  get client(): Redis {
     return this.redisClient;
   }
 
@@ -23,10 +23,8 @@ export class CacheRepository {
   ): Promise<void> {
     await this.redisClient
       .multi()
-      .sAdd('processes', processId)
-      .set(`${processId}:is-up`, '1', {
-        expiration: { type: 'EX', value: expirationSeconds },
-      })
+      .sadd('processes', processId)
+      .setex(`${processId}:is-up`, expirationSeconds, '1')
       .exec();
   }
 
@@ -52,7 +50,7 @@ export class CacheRepository {
       await this.redisClient
         .multi()
         .del(`${processId}:total-clients}`)
-        .decrBy('total-clients', parseInt(count))
+        .decrby('total-clients', parseInt(count))
         .exec();
     }
   }
@@ -60,18 +58,18 @@ export class CacheRepository {
   async removeProcess(processId: string): Promise<void> {
     await this.redisClient
       .multi()
-      .sRem('processes', processId)
+      .srem('processes', processId)
       .del(`${processId}:is-up`)
       .exec();
   }
 
   async getProcessStates(): Promise<{ processId: string; isUp: boolean }[]> {
-    const processes = await this.redisClient.sMembers('processes');
-    const states = await this.redisClient.mGet(
-      processes.map((p) => `${p}:is-up`)
+    const processes = await this.redisClient.smembers('processes');
+    const states = await this.redisClient.mget(
+      processes.map((p: string) => `${p}:is-up`)
     );
 
-    return processes.map((processId, index) => ({
+    return processes.map((processId: string, index: number) => ({
       processId,
       isUp: states[index] === '1',
     }));
@@ -83,7 +81,7 @@ export class CacheRepository {
     expirationSeconds?: CacheExpiration
   ): Promise<void> {
     if (expirationSeconds) {
-      await this.redisClient.setEx(key, expirationSeconds, value);
+      await this.redisClient.setex(key, expirationSeconds, value);
       return;
     } else {
       await this.redisClient.set(key, value);
@@ -128,6 +126,6 @@ export class CacheRepository {
   }
 
   async flush(): Promise<void> {
-    await this.redisClient.flushAll();
+    await this.redisClient.flushall();
   }
 }
