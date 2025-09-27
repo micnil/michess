@@ -1,4 +1,5 @@
-import { CacheRepository } from '@michess/infra-db';
+import { UsageMetricsV1 } from '@michess/api-schema';
+import { CacheRepository, GameRepository } from '@michess/infra-db';
 import { Queue, Worker } from 'bullmq';
 
 export class UsageMetricsService {
@@ -6,7 +7,14 @@ export class UsageMetricsService {
   processTrackerWorker: Worker;
   metricCleanupQueue: Queue;
   metricCleanupWorker: Worker;
-  constructor(private processId: string, private cacheRepo: CacheRepository) {
+
+  // gameStatsQueue: Queue;
+  // gameStatsWorker: Worker;
+  constructor(
+    private processId: string,
+    private cacheRepo: CacheRepository,
+    private gameRepo: GameRepository
+  ) {
     const connectionOptions = { connection: this.cacheRepo.client };
     this.processTrackerQueue = new Queue(
       `process-tracker/${processId}`,
@@ -23,6 +31,13 @@ export class UsageMetricsService {
       this.cleanupMetrics.bind(this),
       connectionOptions
     );
+
+    // this.gameStatsQueue = new Queue('game-stats', connectionOptions);
+    // this.gameStatsWorker = new Worker(
+    //   'game-stats',
+    //   this.trackGameStats.bind(this),
+    //   connectionOptions
+    // );
   }
 
   async initialize() {
@@ -71,5 +86,13 @@ export class UsageMetricsService {
   async getTotalClientCount(): Promise<number> {
     const count = await this.cacheRepo.client.get('total-clients');
     return count ? parseInt(count) : 0;
+  }
+
+  async getUsageMetrics(): Promise<UsageMetricsV1> {
+    const totalClients = parseInt(
+      (await this.cacheRepo.client.get('total-clients')) || '0'
+    );
+
+    this.gameRepo.
   }
 }

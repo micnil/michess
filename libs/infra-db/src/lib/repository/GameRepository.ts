@@ -1,6 +1,6 @@
 import { Maybe } from '@michess/common-utils';
 import { GameStatusType } from '@michess/core-game';
-import { and, count, eq, inArray } from 'drizzle-orm';
+import { and, count, eq, gt, inArray } from 'drizzle-orm';
 import { GameStatusEnum } from '../model/GameStatusEnum';
 import { InsertGame } from '../model/InsertGame';
 import { SelectGame } from '../model/SelectGame';
@@ -72,6 +72,37 @@ export class GameRepository extends BaseRepository {
       where: eq(this.schema.games.gameId, id),
       with: { moves: true, whitePlayer: true, blackPlayer: true },
     });
+  }
+
+  async countActiveGames(): Promise<{ count: number }> {
+    return {
+      count:
+        (
+          await this.db
+            .select({ count: count() })
+            .from(games)
+            .where(eq(games.status, 'in-progress'))
+            .execute()
+        )[0]?.count ?? 0,
+    };
+  }
+
+  async countTodaysCompletedGames(): Promise<{ count: number }> {
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    return {
+      count:
+        (
+          await this.db
+            .select({ count: count() })
+            .from(games)
+            .where(
+              and(eq(games.status, 'end'), gt(games.endedAt, startOfToday))
+            )
+            .execute()
+        )[0]?.count ?? 0,
+    };
   }
 
   async createGame(data: InsertGame): Promise<SelectGame> {
