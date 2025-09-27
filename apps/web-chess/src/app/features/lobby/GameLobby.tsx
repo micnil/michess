@@ -16,8 +16,8 @@ const ColorIndicator: React.FC<{ color: 'white' | 'black' | 'spectator' }> = ({
 }) => {
   const getStyle = () => {
     const baseStyle = {
-      width: '16px',
-      height: '16px',
+      width: '12px',
+      height: '12px',
       borderRadius: '50%',
       border: '2px solid #333',
     };
@@ -25,7 +25,7 @@ const ColorIndicator: React.FC<{ color: 'white' | 'black' | 'spectator' }> = ({
     if (color === 'white') {
       return { ...baseStyle, backgroundColor: '#ffffff' };
     } else if (color === 'black') {
-      return { ...baseStyle, backgroundColor: '#333333' };
+      return { ...baseStyle, backgroundColor: '#111111' };
     } else {
       return {
         ...baseStyle,
@@ -55,7 +55,7 @@ export const GameLobby: React.FC<Props> = ({ onCreateGame, onJoinGame }) => {
   const renderHeader = () => (
     <Flex justify="between" align="center" mb="4">
       <Heading size="4" weight="medium">
-        Game Lobby
+        Lobby
       </Heading>
       <Skeleton loading={isPending}>
         <Button onClick={onCreateGame}>+ Create Game</Button>
@@ -73,7 +73,7 @@ export const GameLobby: React.FC<Props> = ({ onCreateGame, onJoinGame }) => {
         <Flex direction="column" gap="2">
           {games.map((game) => (
             <Card key={game.id} variant="surface" size="1">
-              <Flex align="center" gap="4" p="3">
+              <Flex align="center" gap="4">
                 <Box style={{ minWidth: '120px' }}>
                   <Text weight="medium" size="3">
                     {game.opponent.name}
@@ -94,7 +94,11 @@ export const GameLobby: React.FC<Props> = ({ onCreateGame, onJoinGame }) => {
                     {game.variant}
                   </Text>
                 </Box>
-                <Button size="2" onClick={() => onJoinGame?.(game.id)}>
+                <Button
+                  size="1"
+                  onClick={() => onJoinGame?.(game.id)}
+                  variant="soft"
+                >
                   Join
                 </Button>
               </Flex>
