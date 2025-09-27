@@ -1,6 +1,7 @@
 import { serve } from '@hono/node-server';
 import { ServerType } from '@hono/node-server/.';
 import { App } from '@michess/api-router';
+import { logger } from '@michess/be-utils';
 import { AppConfig } from './config/model/AppConfig';
 
 const start = (app: App, appConfig: AppConfig): ServerType => {
@@ -8,25 +9,31 @@ const start = (app: App, appConfig: AppConfig): ServerType => {
     fetch: app.restRouter.fetch,
     port: appConfig.server.port,
   }).on('listening', () => {
-    console.log('Server is running on:');
-    console.log(server.address());
+    logger.info('Server is running on:');
+    logger.info(server.address());
   });
 
   app.socketRouter.attach(server);
 
   app.socketRouter.engine.on('connection_error', (err) => {
-    console.log(`${err.code}: ${err.message}`);
+    logger.info(`${err.code}: ${err.message}`);
+  });
+
+  app.init().catch((err) => {
+    logger.error('Failed to initialize app:', err);
+    process.exit(1);
   });
 
   // graceful shutdown
   process.on('SIGINT', () => {
     server.close();
+    app.socketRouter.close();
     process.exit(0);
   });
   process.on('SIGTERM', () => {
     server.close((err) => {
       if (err) {
-        console.error(err);
+        logger.error(err);
         process.exit(1);
       }
       process.exit(0);

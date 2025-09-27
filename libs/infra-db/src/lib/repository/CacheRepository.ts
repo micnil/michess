@@ -8,9 +8,73 @@ type CacheExpiration = number; // seconds
 export class CacheRepository {
   constructor(private readonly redisClient: RedisClientType) {}
 
+  get client(): RedisClientType {
+    return this.redisClient;
+  }
+
   async get(key: CacheKey): Promise<Maybe<CacheValue>> {
     const value = await this.redisClient.get(key);
     return value ?? undefined;
+  }
+
+  async setProcessUp(
+    processId: string,
+    expirationSeconds: number
+  ): Promise<void> {
+    await this.redisClient
+      .multi()
+      .sAdd('processes', processId)
+      .set(`${processId}:is-up`, '1', {
+        expiration: { type: 'EX', value: expirationSeconds },
+      })
+      .exec();
+  }
+
+  async incrementClientCount(processId: string): Promise<void> {
+    await this.redisClient
+      .multi()
+      .incr(`${processId}:total-clients`)
+      .incr('total-clients')
+      .exec();
+  }
+
+  async decrementClientCount(processId: string): Promise<void> {
+    await this.redisClient
+      .multi()
+      .decr(`${processId}:total-clients`)
+      .decr('total-clients')
+      .exec();
+  }
+
+  async clearClientCount(processId: string): Promise<void> {
+    const count = await this.redisClient.get(`${processId}:total-clients`);
+    if (count) {
+      await this.redisClient
+        .multi()
+        .del(`${processId}:total-clients}`)
+        .decrBy('total-clients', parseInt(count))
+        .exec();
+    }
+  }
+
+  async removeProcess(processId: string): Promise<void> {
+    await this.redisClient
+      .multi()
+      .sRem('processes', processId)
+      .del(`${processId}:is-up`)
+      .exec();
+  }
+
+  async getProcessStates(): Promise<{ processId: string; isUp: boolean }[]> {
+    const processes = await this.redisClient.sMembers('processes');
+    const states = await this.redisClient.mGet(
+      processes.map((p) => `${p}:is-up`)
+    );
+
+    return processes.map((processId, index) => ({
+      processId,
+      isUp: states[index] === '1',
+    }));
   }
 
   async set(

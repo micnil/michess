@@ -1,20 +1,26 @@
 import { Repositories } from '@michess/infra-db';
+import { randomUUID } from 'crypto';
 import { Sql } from 'postgres';
 import { AuthService } from './auth/service/AuthService';
 import { GamesService } from './games/service/GamesService';
+import { UsageMetricsService } from './metrics/UsageMetricsService';
 
 export type Api = {
   games: GamesService;
   auth: AuthService;
+  usageMetrics: UsageMetricsService;
 };
 
 const from = (repos: Repositories, sql: Sql): Api => {
+  const processId = randomUUID();
   const gamesService = new GamesService(repos.game, repos.move);
   const authService = new AuthService(sql, repos.cache);
+  const usageMetrics = new UsageMetricsService(processId, repos.cache);
 
   return {
     games: gamesService,
     auth: authService,
+    usageMetrics,
   };
 };
 export const Api = {

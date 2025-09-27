@@ -79,7 +79,7 @@ const from = (api: Api, config: RouterConfig) => {
       });
   });
 
-  io.on('connection', (socket) => {
+  io.on('connection', async (socket) => {
     logger.debug(
       {
         socketId: socket.id,
@@ -87,6 +87,7 @@ const from = (api: Api, config: RouterConfig) => {
       },
       'User connected'
     );
+    await api.usageMetrics.incrementClientCount();
 
     socket.on('join-game', async (payload: unknown, callback) => {
       try {
@@ -160,6 +161,7 @@ const from = (api: Api, config: RouterConfig) => {
         },
         'User disconnecting'
       );
+      await api.usageMetrics.decrementClientCount();
       const gameIds = Array.from(socket.rooms)
         .map((room) => z.uuid().safeParse(room))
         .filter((result) => result.success)

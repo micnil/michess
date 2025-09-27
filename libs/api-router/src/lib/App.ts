@@ -9,12 +9,19 @@ export type App = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   restRouter: Hono<any>;
   socketRouter: Server;
+  init: () => Promise<void>;
 };
 
 const from = (api: Api, routerConfig: RouterConfig): App => {
   const restRouter = RestRouter.from(api, routerConfig);
   const socketRouter = SocketRouter.from(api, routerConfig);
-  return { restRouter, socketRouter };
+  return {
+    restRouter,
+    socketRouter,
+    init: async () => {
+      await api.usageMetrics.initialize();
+    },
+  };
 };
 export const App = {
   from,
