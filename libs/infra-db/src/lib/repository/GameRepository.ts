@@ -1,6 +1,6 @@
 import { Maybe } from '@michess/common-utils';
 import { GameStatusType } from '@michess/core-game';
-import { and, count, eq, gt, inArray } from 'drizzle-orm';
+import { and, count, eq, inArray, sql } from 'drizzle-orm';
 import { GameStatusEnum } from '../model/GameStatusEnum';
 import { InsertGame } from '../model/InsertGame';
 import { SelectGame } from '../model/SelectGame';
@@ -45,7 +45,6 @@ export class GameRepository extends BaseRepository {
     const statusFilter =
       andConditions.length > 0 ? and(...andConditions) : undefined;
 
-    // Execute both queries in parallel for efficiency
     const [gamesResult, countResult] = await Promise.all([
       // Get paginated games with relations
       this.db.query.games.findMany({
@@ -74,34 +73,33 @@ export class GameRepository extends BaseRepository {
     });
   }
 
-  async countActiveGames(): Promise<{ count: number }> {
-    return {
-      count:
-        (
-          await this.db
-            .select({ count: count() })
-            .from(games)
-            .where(eq(games.status, 'in-progress'))
-            .execute()
-        )[0]?.count ?? 0,
-    };
-  }
-
-  async countTodaysCompletedGames(): Promise<{ count: number }> {
+  async countGameStats(): Promise<{
+    activeCount: number;
+    todayCompletedCount: number;
+    totalCount: number;
+  }> {
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
 
+    const [result] = await this.db
+      .select({
+        activeCount: sql<number>`COUNT(CASE WHEN ${
+          games.status
+        } = ${GameStatusEnum.fromGameStatusType('IN_PROGRESS')} THEN 1 END)`,
+        todayCompletedCount: sql<number>`COUNT(CASE WHEN ${
+          games.status
+        } = ${GameStatusEnum.fromGameStatusType('ENDED')} AND ${
+          games.endedAt
+        } > ${startOfToday.toISOString()} THEN 1 END)`,
+        totalCount: count(),
+      })
+      .from(games)
+      .execute();
+
     return {
-      count:
-        (
-          await this.db
-            .select({ count: count() })
-            .from(games)
-            .where(
-              and(eq(games.status, 'end'), gt(games.endedAt, startOfToday))
-            )
-            .execute()
-        )[0]?.count ?? 0,
+      activeCount: result.activeCount,
+      todayCompletedCount: result.todayCompletedCount,
+      totalCount: result.totalCount,
     };
   }
 

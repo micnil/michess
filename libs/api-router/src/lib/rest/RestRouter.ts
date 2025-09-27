@@ -4,10 +4,12 @@ import { cors } from 'hono/cors';
 import { RestContext } from '../model/RestContext';
 import { RouterConfig } from '../model/RouterConfig';
 import { GamesController } from './games/GamesController';
+import { MetricsController } from './metrics/MetricsController';
 
 export const RestRouter = {
   from: (api: Api, config: RouterConfig) => {
     const gamesController = GamesController(api.games);
+    const metricsController = MetricsController(api.usageMetrics);
     const honoApp = new Hono<RestContext>().basePath('/api');
     honoApp.use(
       '*',
@@ -33,6 +35,7 @@ export const RestRouter = {
     });
 
     honoApp.route('/games', gamesController);
+    honoApp.route('/metrics', metricsController);
 
     return honoApp;
   },

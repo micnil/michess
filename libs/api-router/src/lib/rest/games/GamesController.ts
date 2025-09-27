@@ -7,12 +7,12 @@ import {
 } from '@michess/api-schema';
 import { GamesService } from '@michess/api-service';
 import { Hono } from 'hono';
-import { GamesControllerContext } from './model/RestContext';
+import { RestContext } from '../../model/RestContext';
 
 export const GamesController = (
   gameService: GamesService
-): Hono<GamesControllerContext> => {
-  return new Hono<GamesControllerContext>()
+): Hono<RestContext> => {
+  return new Hono<RestContext>()
     .post('/', zValidator('json', CreateGameV1Schema), async (c) => {
       const body: CreateGameV1 = c.req.valid('json');
       const response = await gameService.createGame(body);

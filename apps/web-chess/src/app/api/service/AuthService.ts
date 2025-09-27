@@ -1,7 +1,7 @@
 import { Maybe } from '@michess/common-utils';
-import { AuthClient } from './infra/AuthClient';
-import { SocketClient } from './infra/SocketClient';
-import { AuthState } from './model/AuthState';
+import { AuthClient } from '../infra/AuthClient';
+import { SocketClient } from '../infra/SocketClient';
+import { AuthState } from '../model/AuthState';
 
 type BetterAuthSessionData = AuthClient['$Infer']['Session'];
 

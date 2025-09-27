@@ -3,13 +3,11 @@ import { CacheRepository, GameRepository } from '@michess/infra-db';
 import { Queue, Worker } from 'bullmq';
 
 export class UsageMetricsService {
-  processTrackerQueue: Queue<{ processId: string }>;
-  processTrackerWorker: Worker;
-  metricCleanupQueue: Queue;
-  metricCleanupWorker: Worker;
+  private processTrackerQueue: Queue<{ processId: string }>;
+  private processTrackerWorker: Worker;
+  private metricCleanupQueue: Queue;
+  private metricCleanupWorker: Worker;
 
-  // gameStatsQueue: Queue;
-  // gameStatsWorker: Worker;
   constructor(
     private processId: string,
     private cacheRepo: CacheRepository,
@@ -31,13 +29,6 @@ export class UsageMetricsService {
       this.cleanupMetrics.bind(this),
       connectionOptions
     );
-
-    // this.gameStatsQueue = new Queue('game-stats', connectionOptions);
-    // this.gameStatsWorker = new Worker(
-    //   'game-stats',
-    //   this.trackGameStats.bind(this),
-    //   connectionOptions
-    // );
   }
 
   async initialize() {
@@ -55,6 +46,9 @@ export class UsageMetricsService {
   }
 
   async shutdown() {
+    await this.processTrackerWorker.close();
+    await this.metricCleanupWorker.close();
+    await this.metricCleanupQueue.close();
     await this.processTrackerQueue.close();
   }
 
@@ -92,7 +86,12 @@ export class UsageMetricsService {
     const totalClients = parseInt(
       (await this.cacheRepo.client.get('total-clients')) || '0'
     );
+    const gameStats = await this.gameRepo.countGameStats();
 
-    this.gameRepo.
+    return {
+      connectionCount: totalClients,
+      activeGameCount: gameStats.activeCount,
+      todaysCompletedGameCount: gameStats.todayCompletedCount,
+    };
   }
 }

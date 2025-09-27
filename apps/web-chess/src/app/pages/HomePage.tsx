@@ -3,7 +3,7 @@ import { useNavigate } from '@tanstack/react-router';
 import React from 'react';
 import { useApi } from '../api/hooks/useApi';
 import { GameLobby } from '../features/lobby/GameLobby';
-import { StatsSection } from '../features/stats/StatsSection';
+import { StatsSection } from '../features/metrics/StatsSection';
 
 export const HomePage: React.FC = () => {
   const api = useApi();

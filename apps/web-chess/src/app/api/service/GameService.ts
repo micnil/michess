@@ -5,11 +5,11 @@ import {
 } from '@michess/api-schema';
 import { Maybe, Observable } from '@michess/common-utils';
 import { Move } from '@michess/core-board';
+import { RestClient } from '../infra/RestClient';
+import { SocketClient } from '../infra/SocketClient';
+import { GameViewModel } from '../model/GameViewModel';
+import { ParticipantGameViewModel } from '../model/ParticipantGameViewModel';
 import { AuthService } from './AuthService';
-import { RestClient } from './infra/RestClient';
-import { SocketClient } from './infra/SocketClient';
-import { GameViewModel } from './model/GameViewModel';
-import { ParticipantGameViewModel } from './model/ParticipantGameViewModel';
 
 export class GameService {
   constructor(

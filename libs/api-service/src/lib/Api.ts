@@ -15,7 +15,11 @@ const from = (repos: Repositories, sql: Sql): Api => {
   const processId = randomUUID();
   const gamesService = new GamesService(repos.game, repos.move);
   const authService = new AuthService(sql, repos.cache);
-  const usageMetrics = new UsageMetricsService(processId, repos.cache);
+  const usageMetrics = new UsageMetricsService(
+    processId,
+    repos.cache,
+    repos.game
+  );
 
   return {
     games: gamesService,
