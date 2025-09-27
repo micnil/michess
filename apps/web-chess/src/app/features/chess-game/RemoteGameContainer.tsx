@@ -1,7 +1,6 @@
 import { Color } from '@michess/core-board';
 import { Chessboard as ChessboardView } from '@michess/react-chessboard';
 import { Box, Card, Grid, Inset, Skeleton } from '@radix-ui/themes';
-import { useMemo } from 'react';
 import { useAuth } from '../../api/hooks/useAuth';
 import { PlayerInfo } from './components/PlayerInfo';
 import { useRemoteGame } from './hooks/useRemoteGame';
@@ -22,63 +21,13 @@ export const RemoteGameContainer = ({
   const { players, playerSide, result, startedAt } = gameState;
   orientation = playerSide !== 'spectator' ? playerSide : orientation;
 
-  const whitePlayerInfo = useMemo(
-    () => (
-      <PlayerInfo
-        isPlayerAnonymous={auth?.user?.isAnonymous || false}
-        playerSide={playerSide}
-        username={players.white?.username}
-        avatar={players.white?.avatar}
-        color={Color.White}
-        isPlayerTurn={chessboard.position.turn === Color.White}
-        isLoading={isLoadingInitial}
-      />
-    ),
-    [
-      isLoadingInitial,
-      auth?.user?.isAnonymous,
-      playerSide,
-      players.white?.username,
-      players.white?.avatar,
-      chessboard.position.turn,
-    ]
-  );
-
-  const blackPlayerInfo = useMemo(
-    () => (
-      <PlayerInfo
-        isPlayerAnonymous={auth?.user?.isAnonymous || false}
-        playerSide={playerSide}
-        username={players.black?.username}
-        avatar={players.black?.avatar}
-        color={Color.Black}
-        isPlayerTurn={chessboard.position.turn === Color.Black}
-        isLoading={isLoadingInitial}
-      />
-    ),
-    [
-      auth?.user?.isAnonymous,
-      playerSide,
-      players.black?.username,
-      players.black?.avatar,
-      chessboard.position.turn,
-      isLoadingInitial,
-    ]
-  );
-
+  const blackPlayer = { ...players.black, color: Color.Black };
+  const whitePlayer = { ...players.white, color: Color.White };
   const currentOrientation = orientation || Color.White;
-
-  const topPlayerInfo = useMemo(
-    () =>
-      currentOrientation === Color.White ? blackPlayerInfo : whitePlayerInfo,
-    [currentOrientation, blackPlayerInfo, whitePlayerInfo]
-  );
-
-  const bottomPlayerInfo = useMemo(
-    () =>
-      currentOrientation === Color.White ? whitePlayerInfo : blackPlayerInfo,
-    [currentOrientation, whitePlayerInfo, blackPlayerInfo]
-  );
+  const topPlayer =
+    currentOrientation === Color.White ? blackPlayer : whitePlayer;
+  const bottomPlayer =
+    currentOrientation === Color.White ? whitePlayer : blackPlayer;
 
   return (
     <Grid
@@ -89,7 +38,15 @@ export const RemoteGameContainer = ({
       <Box gridColumn={{ initial: '1', sm: '2' }}>
         <Card size={'1'}>
           <Inset>
-            {topPlayerInfo}
+            <PlayerInfo
+              isPlayerAnonymous={auth?.user?.isAnonymous || false}
+              playerSide={playerSide}
+              username={topPlayer?.username}
+              avatar={topPlayer?.avatar}
+              color={topPlayer.color}
+              isPlayerTurn={chessboard.position.turn === topPlayer.color}
+              isLoading={isLoadingInitial}
+            />
             <Skeleton loading={isLoadingInitial} height={'9'} width={'5'}>
               <ChessboardView
                 isLoading={isLoadingInitial}
@@ -106,7 +63,15 @@ export const RemoteGameContainer = ({
                 onMove={handleMove}
               />
             </Skeleton>
-            {bottomPlayerInfo}
+            <PlayerInfo
+              isPlayerAnonymous={auth?.user?.isAnonymous || false}
+              playerSide={playerSide}
+              username={bottomPlayer?.username}
+              avatar={bottomPlayer?.avatar}
+              color={bottomPlayer.color}
+              isPlayerTurn={chessboard.position.turn === bottomPlayer.color}
+              isLoading={isLoadingInitial}
+            />
           </Inset>
         </Card>
       </Box>
