@@ -1,3 +1,4 @@
+import { Maybe } from '@michess/common-utils';
 import { ChessPosition, Move } from '@michess/core-board';
 import { Chessboard } from '@michess/core-game';
 import { MovePayload } from '@michess/react-chessboard';
@@ -15,6 +16,7 @@ type RemoteChessGame = {
   isLoadingInitial: boolean;
   chessboard: Chessboard;
   handleMove: (move: MovePayload) => void;
+  error: Maybe<Error>;
   gameState: ParticipantGameViewModel;
 };
 
@@ -45,7 +47,11 @@ export const useRemoteGame = (props: Props): RemoteChessGame => {
   );
   const queryClient = useQueryClient();
 
-  const { data: remoteData, isPending } = useQuery({
+  const {
+    data: remoteData,
+    isPending,
+    error,
+  } = useQuery({
     queryKey: ['game', props.gameId],
     queryFn: async () => games.joinGame(props.gameId),
     select: participantGameViewModelSelector,
@@ -110,6 +116,7 @@ export const useRemoteGame = (props: Props): RemoteChessGame => {
   return {
     chessboard: chessboard,
     handleMove,
+    error: error ?? undefined,
     isLoadingInitial: isPending,
     gameState: remoteData?.gameState || placeholderData,
   };

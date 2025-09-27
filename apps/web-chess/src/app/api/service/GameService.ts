@@ -87,6 +87,7 @@ export class GameService {
       gameId,
       side,
     });
+    console.log('Join game response:', response);
     if (response.status === 'error') {
       throw new Error(response.error.message, { cause: response.error });
     } else {

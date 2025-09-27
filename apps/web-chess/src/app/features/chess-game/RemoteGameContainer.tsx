@@ -2,6 +2,7 @@ import { Color } from '@michess/core-board';
 import { Chessboard as ChessboardView } from '@michess/react-chessboard';
 import { Box, Card, Grid, Inset, Skeleton } from '@radix-ui/themes';
 import { useAuth } from '../../api/hooks/useAuth';
+import { Alert } from '../../components/Alert';
 import { PlayerInfo } from './components/PlayerInfo';
 import { useRemoteGame } from './hooks/useRemoteGame';
 
@@ -12,11 +13,10 @@ export const RemoteGameContainer = ({
   gameId: string;
   orientation?: Color;
 }) => {
-  const { chessboard, handleMove, gameState, isLoadingInitial } = useRemoteGame(
-    {
+  const { chessboard, handleMove, gameState, isLoadingInitial, error } =
+    useRemoteGame({
       gameId,
-    }
-  );
+    });
   const { auth } = useAuth();
   const { players, playerSide, result, startedAt } = gameState;
   orientation = playerSide !== 'spectator' ? playerSide : orientation;
@@ -36,6 +36,7 @@ export const RemoteGameContainer = ({
       gap={{ initial: '1', sm: '4' }}
     >
       <Box gridColumn={{ initial: '1', sm: '2' }}>
+        <Alert text={error?.message} />
         <Card size={'1'}>
           <Inset>
             <PlayerInfo
