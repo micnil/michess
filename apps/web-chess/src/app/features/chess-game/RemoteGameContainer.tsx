@@ -18,6 +18,7 @@ export const RemoteGameContainer = ({
     }
   );
   const { players, playerSide, result, startedAt } = gameState;
+  orientation = playerSide !== 'spectator' ? playerSide : orientation;
 
   const whitePlayerInfo = useMemo(
     () => (
