@@ -24,7 +24,7 @@ export type ChessGame = {
   getAdditionalActions(): ChessGameAction[];
   makeAction(playerId: string, action: ChessGameAction): ChessGame;
   getPosition(): ChessPosition;
-  play(playerId: string, movesRecord: Move): ChessGame;
+  play(playerId: string, move: Move): ChessGame;
   setResult(result: ChessGameResult): ChessGame;
   joinGame(playerInfo: PlayerInfo, side?: Color): ChessGame;
   leaveGame(playerId: string): ChessGame;

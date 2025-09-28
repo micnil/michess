@@ -1,4 +1,4 @@
-import { Color, createChessPositionMock } from '@michess/core-board';
+import { Color, createChessPositionMock, FenParser } from '@michess/core-board';
 import { ChessGame } from '../ChessGame';
 import { GameStateMock } from '../model/__mocks__/GameState.mock';
 
@@ -233,6 +233,64 @@ describe('ChessGame', () => {
       expect(gameWithPlayer.getState().result).toEqual(
         chessGame.getState().result
       );
+    });
+  });
+
+  describe('play', () => {
+    it('should set the result to checkmate when a move results in checkmate', () => {
+      const chessGame = ChessGame.fromGameState(
+        GameStateMock.fromPartial({
+          initialPosition: FenParser.toChessPosition(
+            'r1bqkbnr/ppp2ppp/2np4/4p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR w KQkq - 0 1'
+          ),
+          players: {
+            white: { id: 'player1', name: 'Player One' },
+            black: { id: 'player2', name: 'Player Two' },
+          },
+          status: 'IN_PROGRESS',
+        })
+      );
+
+      expect(chessGame.getState().result).toBeUndefined();
+
+      // Scholars mate
+      const updatedGame = chessGame.play('player1', {
+        from: 'f3',
+        to: 'f7',
+        promotion: undefined,
+      });
+
+      const gameState = updatedGame.getState();
+      expect(gameState.result).toBeDefined();
+      expect(gameState.result?.type).toBe('white_win');
+    });
+
+    it('should set the result to draw when a move results in stalemate', () => {
+      const chessGame = ChessGame.fromGameState(
+        GameStateMock.fromPartial({
+          initialPosition: FenParser.toChessPosition(
+            '3k4/5K2/8/8/8/8/6Q1/8 w - - 0 1'
+          ),
+          players: {
+            white: { id: 'player1', name: 'Player One' },
+            black: { id: 'player2', name: 'Player Two' },
+          },
+          status: 'IN_PROGRESS',
+        })
+      );
+
+      expect(chessGame.getState().result).toBeUndefined();
+
+      // Scholars mate
+      const updatedGame = chessGame.play('player1', {
+        from: 'g2',
+        to: 'b7',
+        promotion: undefined,
+      });
+
+      const gameState = updatedGame.getState();
+      expect(gameState.result).toBeDefined();
+      expect(gameState.result?.type).toBe('draw');
     });
   });
 });
