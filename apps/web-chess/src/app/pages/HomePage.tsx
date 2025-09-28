@@ -3,7 +3,7 @@ import { useNavigate } from '@tanstack/react-router';
 import React from 'react';
 import { useApi } from '../api/hooks/useApi';
 import { GameLobby } from '../features/lobby/GameLobby';
-import { StatsSection } from '../features/metrics/StatsSection';
+import { StatsContainer } from '../features/metrics/StatsContainer';
 
 export const HomePage: React.FC = () => {
   const api = useApi();
@@ -48,7 +48,7 @@ export const HomePage: React.FC = () => {
       </Box>
 
       <Box flexGrow={'1'} style={{ minWidth: '250px', flexBasis: '250px' }}>
-        <StatsSection />
+        <StatsContainer />
       </Box>
     </Flex>
   );

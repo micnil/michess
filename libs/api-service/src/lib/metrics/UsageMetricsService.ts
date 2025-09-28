@@ -33,6 +33,9 @@ export class UsageMetricsService {
   }
 
   async initialize() {
+    await this.metricCleanupQueue.upsertJobScheduler('cleanup-metrics', {
+      every: 5000,
+    });
     await this.processTrackerQueue.upsertJobScheduler(
       'process-heartbeat',
       {
@@ -40,10 +43,6 @@ export class UsageMetricsService {
       },
       { data: { processId: this.processId } }
     );
-
-    await this.metricCleanupQueue.upsertJobScheduler('cleanup-metrics', {
-      every: 5000,
-    });
   }
 
   async close() {
@@ -56,6 +55,7 @@ export class UsageMetricsService {
 
   private async cleanupMetrics() {
     const processStates = await this.cacheRepo.getProcessStates();
+    let hasProcessStopped = false;
 
     for (const { processId, isUp } of processStates) {
       if (isUp) {
@@ -65,8 +65,12 @@ export class UsageMetricsService {
         { processId: this.processId },
         'Cleaning up process client counts'
       );
+      hasProcessStopped = true;
       await this.cacheRepo.removeProcess(processId);
-      await this.cacheRepo.clearClientCount(processId);
+    }
+
+    if (hasProcessStopped) {
+      await this.cacheRepo.calcTotalClients();
     }
   }
 
@@ -89,9 +93,7 @@ export class UsageMetricsService {
   }
 
   async getUsageMetrics(): Promise<UsageMetricsV1> {
-    const totalClients = parseInt(
-      (await this.cacheRepo.client.get('total-clients')) || '0'
-    );
+    const totalClients = await this.getTotalClientCount();
     const gameStats = await this.gameRepo.countGameStats();
 
     return {

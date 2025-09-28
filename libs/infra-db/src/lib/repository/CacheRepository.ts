@@ -24,14 +24,14 @@ export class CacheRepository {
     await this.redisClient
       .multi()
       .sadd('processes', processId)
-      .setex(`${processId}:is-up`, expirationSeconds, '1')
+      .setex(`process:${processId}:is-up`, expirationSeconds, '1')
       .exec();
   }
 
   async incrementClientCount(processId: string): Promise<void> {
     await this.redisClient
       .multi()
-      .incr(`${processId}:total-clients`)
+      .incr(`process:${processId}:total-clients`)
       .incr('total-clients')
       .exec();
   }
@@ -39,34 +39,41 @@ export class CacheRepository {
   async decrementClientCount(processId: string): Promise<void> {
     await this.redisClient
       .multi()
-      .decr(`${processId}:total-clients`)
+      .decr(`process:${processId}:total-clients`)
       .decr('total-clients')
       .exec();
   }
 
-  async clearClientCount(processId: string): Promise<void> {
-    const count = await this.redisClient.get(`${processId}:total-clients`);
-    if (count) {
-      await this.redisClient
-        .multi()
-        .del(`${processId}:total-clients}`)
-        .decrby('total-clients', parseInt(count))
-        .exec();
+  async calcTotalClients(): Promise<void> {
+    const processes = await this.redisClient.smembers('processes');
+    if (processes.length === 0) {
+      await this.redisClient.set('total-clients', '0');
+      return;
     }
-  }
 
+    const counts = await this.redisClient.mget(
+      processes.map((p: string) => `process:${p}:total-clients`)
+    );
+    const total = counts.reduce((sum, count) => {
+      const num = parseInt(count || '0');
+      return sum + (isNaN(num) ? 0 : num);
+    }, 0);
+
+    await this.redisClient.set('total-clients', total.toString());
+  }
   async removeProcess(processId: string): Promise<void> {
     await this.redisClient
       .multi()
       .srem('processes', processId)
-      .del(`${processId}:is-up`)
+      .del(`process:${processId}:is-up`)
+      .del(`process:${processId}:total-clients`)
       .exec();
   }
 
   async getProcessStates(): Promise<{ processId: string; isUp: boolean }[]> {
     const processes = await this.redisClient.smembers('processes');
     const states = await this.redisClient.mget(
-      processes.map((p: string) => `${p}:is-up`)
+      processes.map((p: string) => `process:${p}:is-up`)
     );
 
     return processes.map((processId: string, index: number) => ({

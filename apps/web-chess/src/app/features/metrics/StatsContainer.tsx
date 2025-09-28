@@ -4,7 +4,7 @@ import { useApi } from '../../api/hooks/useApi';
 import { Alert } from '../../components/Alert';
 import { useQuery } from '../../util/useQuery';
 
-export const StatsSection: React.FC = () => {
+export const StatsContainer: React.FC = () => {
   const api = useApi();
   const {
     data: stats,
@@ -19,17 +19,20 @@ export const StatsSection: React.FC = () => {
     return num.toLocaleString();
   };
 
-  const displayActivePlayers = stats?.connectionCount
-    ? formatNumber(stats.connectionCount)
-    : '?';
+  const displayActivePlayers =
+    stats?.connectionCount !== undefined
+      ? formatNumber(stats.connectionCount)
+      : '?';
 
-  const displayActiveGames = stats?.activeGameCount
-    ? formatNumber(stats.activeGameCount)
-    : '?';
+  const displayActiveGames =
+    stats?.activeGameCount !== undefined
+      ? formatNumber(stats.activeGameCount)
+      : '?';
 
-  const displayGamesToday = stats?.todaysCompletedGameCount
-    ? formatNumber(stats.todaysCompletedGameCount)
-    : '?';
+  const displayGamesToday =
+    stats?.todaysCompletedGameCount !== undefined
+      ? formatNumber(stats.todaysCompletedGameCount)
+      : '?';
 
   return (
     <Card variant="surface" size="3">
