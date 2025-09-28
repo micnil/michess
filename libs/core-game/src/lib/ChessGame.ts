@@ -197,6 +197,8 @@ const fromGameStateInternal = (
         status:
           gameStateInternal.status === 'READY'
             ? 'IN_PROGRESS'
+            : result
+            ? 'ENDED'
             : gameStateInternal.status,
         meta: {
           ...gameStateInternal.meta,

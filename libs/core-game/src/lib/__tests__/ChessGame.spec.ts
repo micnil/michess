@@ -1,6 +1,8 @@
 import { Color, createChessPositionMock, FenParser } from '@michess/core-board';
 import { ChessGame } from '../ChessGame';
 import { GameStateMock } from '../model/__mocks__/GameState.mock';
+import { ChessGameResultType } from '../model/ChessGameResultType';
+import { GameStatusType } from '../model/GameStatusType';
 
 describe('ChessGame', () => {
   describe('getAdditionalActions', () => {
@@ -290,7 +292,8 @@ describe('ChessGame', () => {
 
       const gameState = updatedGame.getState();
       expect(gameState.result).toBeDefined();
-      expect(gameState.result?.type).toBe('draw');
+      expect(gameState.result?.type).toBe<ChessGameResultType>('draw');
+      expect(gameState.status).toBe<GameStatusType>('ENDED');
     });
   });
 });
