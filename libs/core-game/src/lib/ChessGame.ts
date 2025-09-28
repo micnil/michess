@@ -223,6 +223,7 @@ const fromGameStateInternal = (
       return fromGameStateInternal({
         ...gameStateInternal,
         result,
+        status: 'ENDED',
         additionalActions: ChessGameActions.fromResult(result),
       });
     },
