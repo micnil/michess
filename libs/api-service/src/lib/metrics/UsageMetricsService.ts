@@ -1,4 +1,5 @@
 import { UsageMetricsV1 } from '@michess/api-schema';
+import { logger } from '@michess/be-utils';
 import { CacheRepository, GameRepository } from '@michess/infra-db';
 import { Queue, Worker } from 'bullmq';
 
@@ -45,7 +46,8 @@ export class UsageMetricsService {
     });
   }
 
-  async shutdown() {
+  async close() {
+    logger.info({ processId: this.processId }, 'Closing usage metrics service');
     await this.processTrackerWorker.close();
     await this.metricCleanupWorker.close();
     await this.metricCleanupQueue.close();
@@ -59,14 +61,18 @@ export class UsageMetricsService {
       if (isUp) {
         continue;
       }
-
+      logger.info(
+        { processId: this.processId },
+        'Cleaning up process client counts'
+      );
       await this.cacheRepo.removeProcess(processId);
       await this.cacheRepo.clearClientCount(processId);
     }
   }
 
-  private async trackProcess() {
-    await this.cacheRepo.setProcessUp(this.processId, 10);
+  private async trackProcess(job: { data: { processId: string } }) {
+    logger.debug({ processId: job.data.processId }, 'Process heartbeat');
+    await this.cacheRepo.setProcessUp(job.data.processId, 10);
   }
 
   async incrementClientCount() {

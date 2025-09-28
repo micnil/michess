@@ -18,7 +18,7 @@ export const RemoteGameContainer = ({
       gameId,
     });
   const { auth } = useAuth();
-  const { players, playerSide, result, startedAt } = gameState;
+  const { players, playerSide, result, isReadOnly } = gameState;
   orientation = playerSide !== 'spectator' ? playerSide : orientation;
 
   const blackPlayer = { ...players.black, color: Color.Black };
@@ -60,7 +60,7 @@ export const RemoteGameContainer = ({
                 playableTurn={
                   playerSide === 'spectator' ? undefined : playerSide
                 }
-                readonly={playerSide === 'spectator' || !startedAt || !!result}
+                readonly={isReadOnly}
                 onMove={handleMove}
               />
             </Skeleton>

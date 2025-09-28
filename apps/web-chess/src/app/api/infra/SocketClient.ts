@@ -12,6 +12,7 @@ export const SocketClient = {
       autoConnect: false,
       reconnection: false,
       transports: ['websocket', 'polling'],
+      ackTimeout: 10000,
     });
 
     socket.on('connect', () => {

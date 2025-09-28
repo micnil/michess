@@ -20,6 +20,7 @@ export class GameService {
 
   toGameViewModel(gameDetails: GameDetailsV1): GameViewModel {
     return {
+      status: gameDetails.status,
       moves: gameDetails.moves.map((m) => Move.fromUci(m.uci)),
       result: gameDetails.result,
       startedAt: gameDetails.startedAt,
@@ -51,9 +52,13 @@ export class GameService {
         : gameDetails.players.black?.id === playerId
         ? 'black'
         : 'spectator';
+    const gameViewModel = this.toGameViewModel(gameDetails);
+    const isGameActive =
+      gameDetails.status === 'IN_PROGRESS' || gameDetails.status === 'READY';
     return {
       playerSide,
-      ...this.toGameViewModel(gameDetails),
+      isReadOnly: !isGameActive || playerSide === 'spectator',
+      ...gameViewModel,
     };
   }
 
@@ -83,6 +88,7 @@ export class GameService {
     side?: 'white' | 'black' | 'spectator'
   ): Promise<ParticipantGameViewModel> {
     const authState = await this.auth.getSession();
+    console.log('joining game', { gameId, side, authState });
     const response = await this.socketClient.emitWithAck('join-game', {
       gameId,
       side,

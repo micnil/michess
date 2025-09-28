@@ -87,7 +87,9 @@ const from = (api: Api, config: RouterConfig) => {
       },
       'User connected'
     );
-    await api.usageMetrics.incrementClientCount();
+    if (!socket.recovered) {
+      await api.usageMetrics.incrementClientCount();
+    }
 
     socket.on('join-game', async (payload: unknown, callback) => {
       try {
@@ -105,7 +107,6 @@ const from = (api: Api, config: RouterConfig) => {
           socket.data.session,
           joinGamePayloadV1
         );
-
         if (!socket.rooms.has(joinGamePayloadV1.gameId)) {
           socket.join(joinGamePayloadV1.gameId);
           socket.to(joinGamePayloadV1.gameId).emit('user-joined', gameState);

@@ -2,11 +2,12 @@ import { Maybe } from '@michess/common-utils';
 import { ChessPosition, Move } from '@michess/core-board';
 import { Chessboard } from '@michess/core-game';
 import { MovePayload } from '@michess/react-chessboard';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useApi } from '../../../api/hooks/useApi';
 import { ParticipantGameViewModel } from '../../../api/model/ParticipantGameViewModel';
 import { useObservable } from '../../../util/useObservable';
+import { useQuery } from '../../../util/useQuery';
 
 type Props = {
   gameId: string;
@@ -34,9 +35,12 @@ const participantGameViewModelSelector = (
 });
 
 const placeholderData: ParticipantGameViewModel = {
+  status: 'WAITING',
   players: { white: undefined, black: undefined },
   playerSide: 'spectator' as const,
   result: undefined,
+  startedAt: undefined,
+  isReadOnly: true,
   moves: [],
 };
 
@@ -60,6 +64,7 @@ export const useRemoteGame = (props: Props): RemoteChessGame => {
     refetchOnMount: 'always',
     placeholderData,
   });
+  console.log({ remoteData, error, isPending });
   const remoteChessboard = remoteData?.chessboard;
   useEffect(() => {
     if (remoteChessboard) {

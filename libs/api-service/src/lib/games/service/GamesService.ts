@@ -8,7 +8,7 @@ import {
   PaginationQueryV1,
 } from '@michess/api-schema';
 import { assertDefined, Maybe } from '@michess/common-utils';
-import { ChessPosition, FenParser, Move } from '@michess/core-board';
+import { Move } from '@michess/core-board';
 import { ChessGame } from '@michess/core-game';
 import { GameRepository, MoveRepository } from '@michess/infra-db';
 import { Session } from '../../auth/model/Session';
@@ -21,22 +21,12 @@ export class GamesService {
   ) {}
 
   async createGame(data: CreateGameV1): Promise<GameDetailsV1> {
-    const initialPosition = ChessPosition.standardInitial();
     const createdGame = await this.gameRepository.createGame({
       variant: 'standard',
-    });
-
-    return {
-      variant: createdGame.variant ?? 'standard',
-      id: createdGame.gameId,
       isPrivate: data.isPrivate ?? false,
-      initialPosition: FenParser.toFenStr(initialPosition),
-      players: {
-        black: undefined,
-        white: undefined,
-      },
-      moves: [],
-    };
+    });
+    const gameDetails = GameDetailsMapper.fromSelectGame(createdGame);
+    return GameDetailsMapper.toGameDetailsV1(gameDetails);
   }
 
   async queryLobby(query: PaginationQueryV1): Promise<LobbyPageResponseV1> {

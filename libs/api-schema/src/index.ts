@@ -11,6 +11,7 @@ export * from './lib/game/GameDetailsV1';
 export * from './lib/game/GameDetailsV1Schema';
 export * from './lib/game/GameResultV1';
 export * from './lib/game/GameResultV1Schema';
+export * from './lib/game/GameStatusTypeV1';
 export * from './lib/game/GameVariantV1';
 export * from './lib/game/JoinGamePayloadV1';
 export * from './lib/game/JoinGamePayloadV1Schema';

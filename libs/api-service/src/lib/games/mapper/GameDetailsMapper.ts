@@ -3,8 +3,10 @@ import {
   GameVariantV1,
   LobbyGameItemV1,
 } from '@michess/api-schema';
+import { Maybe } from '@michess/common-utils';
 import { ChessPosition, Move } from '@michess/core-board';
 import {
+  ChessGameResult,
   ChessGameResultType,
   GameDetails,
   GameMeta,
@@ -12,7 +14,11 @@ import {
   GameStatusType,
   PlayerInfo,
 } from '@michess/core-game';
-import { InsertGame, SelectGameWithRelations } from '@michess/infra-db';
+import {
+  InsertGame,
+  SelectGame,
+  SelectGameWithRelations,
+} from '@michess/infra-db';
 
 const RESULT_TYPE_MAPPING: Record<
   SelectGameWithRelations['result'],
@@ -43,7 +49,7 @@ const TO_STATUS_TYPE_MAPPING: Record<GameStatusType, InsertGame['status']> = {
   ENDED: 'end',
 };
 
-const toGameMeta = (game: SelectGameWithRelations): GameMeta => ({
+const toGameMeta = (game: SelectGameWithRelations | SelectGame): GameMeta => ({
   id: game.gameId,
   variant: game.variant ?? 'standard',
   isPrivate: game.isPrivate,
@@ -65,8 +71,31 @@ const toGamePlayers = (game: SelectGameWithRelations): GamePlayers => ({
   white: game.whitePlayer ? toPlayerInfo(game.whitePlayer) : undefined,
   black: game.blackPlayer ? toPlayerInfo(game.blackPlayer) : undefined,
 });
-
+const toChessGameResult = ({
+  result,
+}: SelectGame | SelectGameWithRelations): Maybe<ChessGameResult> => {
+  return result !== '0-0'
+    ? {
+        type: RESULT_TYPE_MAPPING[result],
+      }
+    : undefined;
+};
 export const GameDetailsMapper = {
+  fromSelectGame(game: SelectGame): GameDetails {
+    return {
+      players: {
+        white: undefined,
+        black: undefined,
+      },
+      result: toChessGameResult(game),
+      status: FROM_STATUS_TYPE_MAPPING[game.status],
+      resultStr: game.result,
+      initialPosition: ChessPosition.standardInitial(),
+      movesRecord: [],
+      ...toGameMeta(game),
+    };
+  },
+
   fromSelectGameWithRelations(game: SelectGameWithRelations): GameDetails {
     return {
       ...toGameMeta(game),
@@ -77,12 +106,7 @@ export const GameDetailsMapper = {
       variant: game.variant ?? 'standard',
       isPrivate: game.isPrivate,
       initialPosition: ChessPosition.standardInitial(),
-      result:
-        game.result !== '0-0'
-          ? {
-              type: RESULT_TYPE_MAPPING[game.result],
-            }
-          : undefined,
+      result: toChessGameResult(game),
       resultStr: game.result,
       movesRecord: game.moves.map((move) => Move.fromUci(move.uci)),
     };
@@ -111,6 +135,7 @@ export const GameDetailsMapper = {
   toGameDetailsV1(game: GameDetails): GameDetailsV1 {
     return {
       id: game.id,
+      status: game.status,
       players: {
         white: game.players.white
           ? {
