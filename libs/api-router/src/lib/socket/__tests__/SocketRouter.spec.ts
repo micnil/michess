@@ -4,7 +4,13 @@ import {
   MakeMovePayloadV1,
   MakeMoveResponseV1,
 } from '@michess/api-schema';
-import { Api, AuthService, GamesService, Session } from '@michess/api-service';
+import {
+  Api,
+  AuthService,
+  GamesService,
+  Session,
+  UsageMetricsService,
+} from '@michess/api-service';
 import { createServer } from 'node:http';
 import { Server, Socket as ServerSocket } from 'socket.io';
 import { Socket as ClientSocket, io as ioClient } from 'socket.io-client';
@@ -14,6 +20,7 @@ jest.mock('@michess/api-service');
 const apiMock: Api = {
   games: new GamesService({} as any, {} as any),
   auth: new AuthService({} as any, {} as any),
+  usageMetrics: new UsageMetricsService({} as any, {} as any, {} as any),
 };
 
 function waitFor(socket: ServerSocket | ClientSocket, event: string) {
@@ -105,6 +112,7 @@ describe('SocketRouter', () => {
       };
       const mockGameState: GameDetailsV1 = {
         id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+        status: 'WAITING',
         players: { white: { name: 'Test User', id: 'u1' }, black: undefined },
         isPrivate: false,
         moves: [],
