@@ -88,12 +88,10 @@ export class GameService {
     side?: 'white' | 'black' | 'spectator'
   ): Promise<ParticipantGameViewModel> {
     const authState = await this.auth.getSession();
-    console.log('joining game', { gameId, side, authState });
     const response = await this.socketClient.emitWithAck('join-game', {
       gameId,
       side,
     });
-    console.log('Join game response:', response);
     if (response.status === 'error') {
       throw new Error(response.error.message, { cause: response.error });
     } else {
@@ -122,22 +120,17 @@ export class GameService {
     }
   }
 
-  async observeGameState(
-    gameId: string
-  ): Promise<Observable<ParticipantGameViewModel>> {
-    const session = await this.auth.getSession();
+  observeGameState(
+    gameId: string,
+    playerId?: Maybe<string>
+  ): Observable<ParticipantGameViewModel> {
     return {
       subscribe: (
         callback: (gameViewModel: ParticipantGameViewModel) => void
       ) => {
         const handleGameDetails = (gameDetails: GameDetailsV1) => {
           if (gameDetails.id === gameId) {
-            callback(
-              this.toParticipantGameViewModel(
-                gameDetails,
-                session?.session.userId
-              )
-            );
+            callback(this.toParticipantGameViewModel(gameDetails, playerId));
           }
         };
 

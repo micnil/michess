@@ -3,11 +3,13 @@ import { ChessPosition, Move } from '@michess/core-board';
 import { Chessboard } from '@michess/core-game';
 import { MovePayload } from '@michess/react-chessboard';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useApi } from '../../../api/hooks/useApi';
+import { useAuth } from '../../../api/hooks/useAuth';
 import { ParticipantGameViewModel } from '../../../api/model/ParticipantGameViewModel';
 import { useObservable } from '../../../util/useObservable';
 import { useQuery } from '../../../util/useQuery';
+import { useUnmount } from '../../../util/useUnmount';
 
 type Props = {
   gameId: string;
@@ -46,6 +48,7 @@ const placeholderData: ParticipantGameViewModel = {
 
 export const useRemoteGame = (props: Props): RemoteChessGame => {
   const { games } = useApi();
+  const { auth } = useAuth();
   const [chessboard, setChessboard] = useState<Chessboard>(
     Chessboard.fromPosition(ChessPosition.standardInitial())
   );
@@ -64,7 +67,6 @@ export const useRemoteGame = (props: Props): RemoteChessGame => {
     refetchOnMount: 'always',
     placeholderData,
   });
-  console.log({ remoteData, error, isPending });
   const remoteChessboard = remoteData?.chessboard;
   useEffect(() => {
     if (remoteChessboard) {
@@ -81,34 +83,29 @@ export const useRemoteGame = (props: Props): RemoteChessGame => {
       games.makeMove(props.gameId, Move.toUci(move)),
   });
 
-  const { data: gameObservable } = useQuery({
-    queryKey: ['game', props.gameId, 'observable'],
-    queryFn: async () => games.observeGameState(props.gameId),
-    gcTime: Infinity,
-    staleTime: Infinity,
-    refetchOnMount: 'always',
+  const gameObservable = useMemo(
+    () => games.observeGameState(props.gameId, auth?.session.userId),
+    [games, props.gameId, auth?.session.userId]
+  );
+  useObservable(gameObservable, (gameState) => {
+    queryClient.setQueryData<ParticipantGameViewModel>(
+      ['game', props.gameId],
+      () => {
+        return gameState;
+      }
+    );
+  });
+  const movesObservable = useMemo(
+    () => games.observeMovesForGame(props.gameId),
+    [games, props.gameId]
+  );
+  useObservable(movesObservable, (move) => {
+    setChessboard((prev) => prev.playMove(move));
   });
 
-  useObservable(
-    gameObservable,
-    (gameState) => {
-      queryClient.setQueryData<ParticipantGameViewModel>(
-        ['game', props.gameId],
-        () => {
-          return gameState;
-        }
-      );
-    },
-    () => {
-      games.leaveGame(props.gameId);
-    }
-  );
-  useObservable(
-    () => games.observeMovesForGame(props.gameId),
-    (move) => {
-      setChessboard((prev) => prev.playMove(move));
-    }
-  );
+  useUnmount(() => {
+    games.leaveGame(props.gameId);
+  });
 
   const handleMove = (move: MovePayload) => {
     // Optimistic update

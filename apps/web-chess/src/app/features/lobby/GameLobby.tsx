@@ -1,3 +1,4 @@
+import { noop } from '@michess/common-utils';
 import {
   Box,
   Button,
@@ -7,6 +8,7 @@ import {
   Skeleton,
   Text,
 } from '@radix-ui/themes';
+import { useMutation } from '@tanstack/react-query';
 import React, { use } from 'react';
 import { ApiContext } from '../../api/context/ApiContext';
 import { Alert } from '../../components/Alert';
@@ -40,7 +42,7 @@ const ColorIndicator: React.FC<{ color: 'white' | 'black' | 'spectator' }> = ({
 };
 
 type Props = {
-  onCreateGame?: () => void;
+  onCreateGame?: (gameId: string) => void;
   onJoinGame?: (gameId: string) => void;
 };
 
@@ -50,12 +52,30 @@ export const GameLobby: React.FC<Props> = ({ onCreateGame, onJoinGame }) => {
   const {
     data: lobbyData,
     isPending,
-    error,
+    error: queryError,
   } = useQuery({
     queryKey: ['lobby-games'],
     queryFn: () => api.games.getLobbyGames(1),
     refetchInterval: 5000,
   });
+
+  const { mutateAsync: createAndJoinGame, error: createError } = useMutation({
+    mutationFn: async () => {
+      const gameDetails = await api.games.createGame(false);
+      await api.games.joinGame(gameDetails.id);
+      return gameDetails;
+    },
+  });
+
+  const handleCreateGame = () => {
+    createAndJoinGame()
+      .then((gameDetails) => {
+        if (onCreateGame) {
+          onCreateGame(gameDetails.id);
+        }
+      })
+      .catch(noop);
+  };
 
   const renderHeader = () => (
     <Flex justify="between" align="center" mb="4">
@@ -63,7 +83,7 @@ export const GameLobby: React.FC<Props> = ({ onCreateGame, onJoinGame }) => {
         Lobby
       </Heading>
       <Skeleton loading={isPending}>
-        <Button onClick={onCreateGame}>+ Create Game</Button>
+        <Button onClick={handleCreateGame}>+ Create Game</Button>
       </Skeleton>
     </Flex>
   );
@@ -73,7 +93,7 @@ export const GameLobby: React.FC<Props> = ({ onCreateGame, onJoinGame }) => {
   return (
     <Card size="3" style={{ padding: '24px' }}>
       {renderHeader()}
-      <Alert text={error?.message} />
+      <Alert text={createError?.message ?? queryError?.message} />
 
       <Skeleton loading={isPending}>
         <Flex direction="column" gap="2">
@@ -110,7 +130,7 @@ export const GameLobby: React.FC<Props> = ({ onCreateGame, onJoinGame }) => {
               </Flex>
             </Card>
           ))}
-          {!error && games.length === 0 && (
+          {!queryError && games.length === 0 && (
             <Box
               style={{ textAlign: 'center', padding: '32px', color: '#6b7280' }}
             >

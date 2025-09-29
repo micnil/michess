@@ -6,6 +6,7 @@ export * from './lib/immutability/removeItem';
 export * from './lib/immutability/updateItem';
 export * from './lib/isDefined';
 export * from './lib/lazyValue';
+export * from './lib/noop';
 export * from './lib/Observable';
 export * from './lib/randomElement';
 export * from './lib/randomString';

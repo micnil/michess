@@ -9,7 +9,6 @@ export class MetricsService {
   ) {}
 
   getUsage(): Promise<UsageMetricsV1> {
-    console.log('Fetching usage metrics');
     return this.restClient.get<UsageMetricsV1>('metrics/usage').json();
   }
 }
