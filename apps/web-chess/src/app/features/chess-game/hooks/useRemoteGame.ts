@@ -84,7 +84,10 @@ export const useRemoteGame = (props: Props): RemoteChessGame => {
   });
 
   const gameObservable = useMemo(
-    () => games.observeGameState(props.gameId, auth?.session.userId),
+    () =>
+      auth?.session.userId
+        ? games.observeGameState(props.gameId, auth?.session.userId)
+        : undefined,
     [games, props.gameId, auth?.session.userId]
   );
   useObservable(gameObservable, (gameState) => {

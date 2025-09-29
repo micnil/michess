@@ -9,8 +9,9 @@ export const useObservable = <T>(
 
   useEffect(() => {
     if (observable) {
+      const callbackToUse = callbackRef.current;
       return observable.subscribe((value) => {
-        callbackRef.current(value);
+        callbackToUse(value);
       });
     }
   }, [observable]);
