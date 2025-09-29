@@ -81,6 +81,7 @@ export class UsageMetricsService {
 
   async setClientCount(count: number) {
     await this.cacheRepo.setClientCount(this.processId, count);
+    await this.cacheRepo.calcTotalClients();
   }
 
   async incrementClientCount() {
