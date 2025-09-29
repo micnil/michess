@@ -36,6 +36,13 @@ export class CacheRepository {
       .exec();
   }
 
+  async setClientCount(processId: string, count: number): Promise<void> {
+    await this.redisClient
+      .multi()
+      .set(`process:${processId}:total-clients`, count.toString())
+      .exec();
+  }
+
   async decrementClientCount(processId: string): Promise<void> {
     await this.redisClient
       .multi()

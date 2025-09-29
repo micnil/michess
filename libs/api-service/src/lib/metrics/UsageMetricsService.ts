@@ -79,6 +79,10 @@ export class UsageMetricsService {
     await this.cacheRepo.setProcessUp(job.data.processId, 10);
   }
 
+  async setClientCount(count: number) {
+    await this.cacheRepo.setClientCount(this.processId, count);
+  }
+
   async incrementClientCount() {
     await this.cacheRepo.incrementClientCount(this.processId);
   }

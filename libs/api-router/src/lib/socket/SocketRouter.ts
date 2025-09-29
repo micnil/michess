@@ -88,7 +88,7 @@ const from = (api: Api, config: RouterConfig) => {
       'User connected'
     );
     if (!socket.recovered) {
-      await api.usageMetrics.incrementClientCount();
+      await api.usageMetrics.setClientCount(io.engine.clientsCount);
     }
 
     socket.on('join-game', async (payload: unknown, callback) => {
@@ -162,7 +162,6 @@ const from = (api: Api, config: RouterConfig) => {
         },
         'User disconnecting'
       );
-      await api.usageMetrics.decrementClientCount();
       const gameIds = Array.from(socket.rooms)
         .map((room) => z.uuid().safeParse(room))
         .filter((result) => result.success)
@@ -170,6 +169,10 @@ const from = (api: Api, config: RouterConfig) => {
       await Promise.all(
         gameIds.map((gameId) => leaveGame(socket, api, { gameId }))
       );
+    });
+
+    socket.on('disconnect', async () => {
+      await api.usageMetrics.setClientCount(io.engine.clientsCount);
     });
     socket.on('error', (error) => {
       logger.error(
