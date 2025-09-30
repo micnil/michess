@@ -103,9 +103,13 @@ export class GameService {
   }
 
   leaveGame(gameId: string): void {
-    this.socketClient.emit('leave-game', {
-      gameId,
-    });
+    this.socketClient
+      .emitWithAck('leave-game', {
+        gameId,
+      })
+      .catch((error) => {
+        console.error('Failed to leave game', error);
+      });
   }
 
   async makeMove(gameId: string, uci: string) {

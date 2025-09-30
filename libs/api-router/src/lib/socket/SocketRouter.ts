@@ -116,7 +116,7 @@ const from = (api: Api, config: RouterConfig) => {
       }
     });
 
-    socket.on('leave-game', async (payload: unknown) => {
+    socket.on('leave-game', async (payload: unknown, callback) => {
       try {
         const leaveGamePayloadV1 = LeaveGamePayloadV1Schema.parse(payload);
         logger.debug(
@@ -127,8 +127,10 @@ const from = (api: Api, config: RouterConfig) => {
           `User leaving game`
         );
         await leaveGame(socket, api, leaveGamePayloadV1);
+        callback(EventResponse.ok(undefined));
       } catch (error) {
         logger.error(error);
+        callback(EventResponse.error(ApiErrorMapper.from(error)));
       }
     });
 
