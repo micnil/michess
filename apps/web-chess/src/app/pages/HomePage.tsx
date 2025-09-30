@@ -1,6 +1,7 @@
-import { Box, Flex } from '@radix-ui/themes';
+import { Box, Grid } from '@radix-ui/themes';
 import { useNavigate } from '@tanstack/react-router';
 import React from 'react';
+import { GameRecordsContainer } from '../features/game-records/GameRecordsContainer';
 import { GameLobby } from '../features/lobby/GameLobby';
 import { StatsContainer } from '../features/metrics/StatsContainer';
 
@@ -16,23 +17,29 @@ export const HomePage: React.FC = () => {
   };
 
   return (
-    <Flex
-      direction={'row'}
-      wrap={'wrap'}
-      gap={'4'}
-      width={'100%'}
+    <Grid
+      columns={{ initial: '1', sm: '2fr 1fr' }}
+      gap="4"
+      width="100%"
       px={{ initial: '2', lg: '0' }}
     >
-      <Box flexGrow={'1'}>
-        <GameLobby
-          onCreateGame={handleCreateGame}
-          onJoinGame={handleJoinGame}
-        />
+      <Box>
+        <Grid gap="4">
+          <Box>
+            <GameLobby
+              onCreateGame={handleCreateGame}
+              onJoinGame={handleJoinGame}
+            />
+          </Box>
+          <Box>
+            <GameRecordsContainer onJoinGame={handleJoinGame} />
+          </Box>
+        </Grid>
       </Box>
 
-      <Box flexGrow={'1'} style={{ minWidth: '250px', flexBasis: '250px' }}>
+      <Box gridColumn={{ initial: '1', sm: '2' }}>
         <StatsContainer />
       </Box>
-    </Flex>
+    </Grid>
   );
 };
