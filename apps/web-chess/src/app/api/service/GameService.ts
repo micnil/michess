@@ -2,6 +2,7 @@ import {
   GameDetailsV1,
   LobbyPageResponseV1,
   MakeMovePayloadV1,
+  PlayerGameInfoPageResponseV1,
 } from '@michess/api-schema';
 import { Maybe, Observable } from '@michess/common-utils';
 import { Move } from '@michess/core-board';
@@ -79,6 +80,19 @@ export class GameService {
     });
     const response = await this.restClient
       .get<LobbyPageResponseV1>(`games/lobby`, { searchParams: queryParams })
+      .json();
+    return response;
+  }
+
+  async getMyGames(args: { page: number; status: 'ENDED' | 'IN_PROGRESS' }) {
+    const queryParams = new URLSearchParams({
+      page: args.page.toString(),
+      status: args.status,
+    });
+    const response = await this.restClient
+      .get<PlayerGameInfoPageResponseV1>(`games/my`, {
+        searchParams: queryParams,
+      })
       .json();
     return response;
   }

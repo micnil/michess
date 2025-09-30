@@ -36,6 +36,7 @@
     "dotenv-cli": "^10.0.0",
     "drizzle-orm": "^0.44.5",
     "hono": "^4.9.4",
+    "hono-pino": "^0.10.2",
     "ioredis": "^5.8.0",
     "ky": "^1.10.0",
     "lucide-react": "^0.544.0",

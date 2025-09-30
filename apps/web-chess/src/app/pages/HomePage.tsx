@@ -1,9 +1,9 @@
 import { Box, Grid } from '@radix-ui/themes';
 import { useNavigate } from '@tanstack/react-router';
 import React from 'react';
-import { GameRecordsContainer } from '../features/game-records/GameRecordsContainer';
 import { GameLobby } from '../features/lobby/GameLobby';
 import { StatsContainer } from '../features/metrics/StatsContainer';
+import { PlayerGamesOverview } from '../features/player-games-overview/PlayerGamesOverview';
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -32,7 +32,7 @@ export const HomePage: React.FC = () => {
             />
           </Box>
           <Box>
-            <GameRecordsContainer onJoinGame={handleJoinGame} />
+            <PlayerGamesOverview onJoinGame={handleJoinGame} />
           </Box>
         </Grid>
       </Box>

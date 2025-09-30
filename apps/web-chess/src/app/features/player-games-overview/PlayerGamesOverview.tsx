@@ -1,6 +1,3 @@
-import { GameResultV1, GameVariantV1 } from '@michess/api-schema';
-import { Maybe } from '@michess/common-utils';
-import { Color } from '@michess/core-board';
 import {
   Box,
   Button,
@@ -12,52 +9,29 @@ import {
   Text,
 } from '@radix-ui/themes';
 import React from 'react';
+import { useApi } from '../../api/hooks/useApi';
 import { Alert } from '../../components/Alert';
+import { useQuery } from '../../util/useQuery';
 
 type Props = {
   onJoinGame?: (gameId: string) => void;
 };
 
-type GameInfoItem = {
-  id: string;
-  opponent: {
-    name: string;
-  };
-  ownSide?: Color | 'spectator';
-  turn: Color;
-  variant: GameVariantV1;
-  result?: GameResultV1;
-};
-
-export const GameRecordsContainer: React.FC<Props> = ({ onJoinGame }) => {
-  const isPending = false;
-  const ongoingQueryError: Maybe<Error> = undefined as Maybe<Error>;
-  const ongoingGames: GameInfoItem[] = [
-    {
-      id: 'game1',
-      opponent: { name: 'Alice' },
-      ownSide: 'white',
-      turn: 'black',
-      variant: 'standard',
+export const PlayerGamesOverview: React.FC<Props> = ({ onJoinGame }) => {
+  const api = useApi();
+  const {
+    isPending,
+    data: ongoingGamesPage,
+    error: ongoingQueryError,
+  } = useQuery({
+    queryKey: ['games', 'my', 'IN_PROGRESS'],
+    queryFn: async () => {
+      return api.games.getMyGames({ status: 'IN_PROGRESS', page: 1 });
     },
-    {
-      id: 'game2',
-      opponent: { name: 'Bob' },
-      ownSide: 'white',
-      turn: 'white',
-      variant: 'standard',
-    },
-    {
-      id: 'game3',
-      opponent: { name: 'Charlie' },
-      ownSide: 'black',
-      turn: 'black',
-      variant: 'standard',
-    },
-  ];
+  });
 
   const isNoOngoingGames =
-    !isPending && ongoingGames.length === 0 && !ongoingQueryError;
+    !isPending && ongoingGamesPage?.items.length === 0 && !ongoingQueryError;
   return (
     <Card size="3" style={{ padding: '24px' }}>
       <Tabs.Root defaultValue={isNoOngoingGames ? 'completed' : 'ongoing'}>
@@ -77,7 +51,7 @@ export const GameRecordsContainer: React.FC<Props> = ({ onJoinGame }) => {
             <Tabs.Content value="ongoing"></Tabs.Content>
 
             <Tabs.Content value="completed"></Tabs.Content>
-            {ongoingGames.map((game) => {
+            {ongoingGamesPage?.items.map((game) => {
               const isPlayerTurn = game.turn === game.ownSide;
               return (
                 <Card key={game.id} variant="surface" size="1">
@@ -110,7 +84,7 @@ export const GameRecordsContainer: React.FC<Props> = ({ onJoinGame }) => {
                 </Card>
               );
             })}
-            {!ongoingQueryError && ongoingGames.length === 0 && (
+            {!ongoingQueryError && ongoingGamesPage?.items.length === 0 && (
               <Box
                 style={{
                   textAlign: 'center',

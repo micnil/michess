@@ -6,12 +6,15 @@ import {
   LobbyPageResponseV1,
   MakeMovePayloadV1,
   PaginationQueryV1,
+  PlayerGameInfoPageResponseV1,
+  PlayerGameInfoQueryV1,
 } from '@michess/api-schema';
 import { assertDefined, Maybe } from '@michess/common-utils';
 import { Move } from '@michess/core-board';
 import { ChessGame } from '@michess/core-game';
 import { GameRepository, MoveRepository } from '@michess/infra-db';
 import { Session } from '../../auth/model/Session';
+import { PageResponseMapper } from '../../mapper/PageResponseMapper';
 import { GameDetailsMapper } from '../mapper/GameDetailsMapper';
 
 export class GamesService {
@@ -43,14 +46,41 @@ export class GamesService {
       GameDetailsMapper.fromSelectGameWithRelations
     );
 
-    return {
-      items: gameDetails.map((game) =>
+    return PageResponseMapper.toPageResponse({
+      data: gameDetails.map((game) =>
         GameDetailsMapper.toLobbyGameItemV1(game)
       ),
-      totalPages: Math.ceil(totalCount / limit),
-      currentPage: page,
-      pageSize: games.length,
-    };
+      limit,
+      totalItems: totalCount,
+      page,
+    });
+  }
+
+  async queryPlayerGames(
+    userId: string,
+    query: PlayerGameInfoQueryV1
+  ): Promise<PlayerGameInfoPageResponseV1> {
+    const { page, limit } = query;
+    const { games, totalCount } = await this.gameRepository.queryGames({
+      page: {
+        page,
+        pageSize: limit,
+      },
+      playerId: userId,
+      status: query.status ? [query.status] : ['ENDED', 'IN_PROGRESS'],
+    });
+    const gameDetails = games.map(
+      GameDetailsMapper.fromSelectGameWithRelations
+    );
+
+    return PageResponseMapper.toPageResponse({
+      data: gameDetails.map((game) =>
+        GameDetailsMapper.toPlayerGameInfoV1(game, userId)
+      ),
+      limit,
+      totalItems: totalCount,
+      page,
+    });
   }
 
   async joinGame(

@@ -2,9 +2,10 @@ import {
   GameDetailsV1,
   GameVariantV1,
   LobbyGameItemV1,
+  PlayerGameInfoV1,
 } from '@michess/api-schema';
 import { Maybe } from '@michess/common-utils';
-import { ChessPosition, Move } from '@michess/core-board';
+import { ChessPosition, Color, Move } from '@michess/core-board';
 import {
   ChessGameResult,
   ChessGameResultType,
@@ -130,6 +131,37 @@ export const GameDetailsMapper = {
         : !game.players.black
         ? 'black'
         : 'spectator',
+    };
+  },
+  toPlayerGameInfoV1(game: GameDetails, playerId: string): PlayerGameInfoV1 {
+    const ownSide =
+      game.players.white?.id === playerId
+        ? 'white'
+        : game.players.black?.id === playerId
+        ? 'black'
+        : 'white'; // Should not happen, but fail gracefully
+    const opponent: PlayerInfo =
+      ownSide === 'white'
+        ? game.players.black ?? { id: 'anon', name: 'Anonymous' }
+        : game.players.white ?? { id: 'anon', name: 'Anonymous' };
+    const initialTurn = game.initialPosition.turn;
+    return {
+      id: game.id,
+      opponent: {
+        id: opponent.id,
+        name: opponent.name,
+      },
+      ownSide,
+      turn:
+        game.movesRecord.length % 2 === 0
+          ? initialTurn
+          : Color.opposite(initialTurn),
+      variant: game.variant as GameVariantV1,
+      result: game.result
+        ? {
+            type: game.result.type,
+          }
+        : undefined,
     };
   },
   toGameDetailsV1(game: GameDetails): GameDetailsV1 {

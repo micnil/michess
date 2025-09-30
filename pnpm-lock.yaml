@@ -44,6 +44,9 @@ importers:
       hono:
         specifier: ^4.9.4
         version: 4.9.4
+      hono-pino:
+        specifier: ^0.10.2
+        version: 0.10.2(hono@4.9.4)(pino@9.9.5)
       ioredis:
         specifier: ^5.8.0
         version: 5.8.0
@@ -5880,6 +5883,13 @@ packages:
   homedir-polyfill@1.0.3:
     resolution: {integrity: sha512-eSmmWE5bZTK2Nou4g0AI3zZ9rswp7GRKoKXS1BLUkvPviOqs4YTN1djQIqrXy9k5gEtdLPy86JjRwsNM9tnDcA==}
     engines: {node: '>=0.10.0'}
+
+  hono-pino@0.10.2:
+    resolution: {integrity: sha512-h8h4jODUoWdY7n7J1GsOO5Szpf0KH0+bdh8inJVTFrud/R/cxNjKty/pEaJIYSY9+enP0dfAiY+gjXTEFkARYg==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      hono: '>=4.0.0'
+      pino: '>=7.1.0'
 
   hono@4.9.4:
     resolution: {integrity: sha512-61hl6MF6ojTl/8QSRu5ran6GXt+6zsngIUN95KzF5v5UjiX/xnrLR358BNRawwIRO49JwUqJqQe3Rb2v559R8Q==}
@@ -15525,6 +15535,12 @@ snapshots:
   homedir-polyfill@1.0.3:
     dependencies:
       parse-passwd: 1.0.0
+
+  hono-pino@0.10.2(hono@4.9.4)(pino@9.9.5):
+    dependencies:
+      defu: 6.1.4
+      hono: 4.9.4
+      pino: 9.9.5
 
   hono@4.9.4: {}
 

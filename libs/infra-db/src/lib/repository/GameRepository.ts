@@ -14,6 +14,7 @@ type QueryOptions = {
     pageSize: number;
   };
   status?: GameStatusType[];
+  playerId?: string;
   private?: boolean;
 };
 
