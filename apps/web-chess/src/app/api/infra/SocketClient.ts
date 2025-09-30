@@ -13,6 +13,7 @@ export const SocketClient = {
       reconnection: false,
       transports: ['websocket', 'polling'],
       ackTimeout: 10000,
+      retries: 3,
     });
 
     socket.on('connect', () => {

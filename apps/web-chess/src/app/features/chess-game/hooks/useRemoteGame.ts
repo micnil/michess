@@ -65,7 +65,6 @@ export const useRemoteGame = (props: Props): RemoteChessGame => {
     gcTime: Infinity,
     staleTime: Infinity,
     refetchOnMount: 'always',
-    placeholderData,
   });
   const remoteChessboard = remoteData?.chessboard;
   useEffect(() => {

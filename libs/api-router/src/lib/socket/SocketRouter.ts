@@ -87,9 +87,6 @@ const from = (api: Api, config: RouterConfig) => {
       },
       'User connected'
     );
-    if (!socket.recovered) {
-      await api.usageMetrics.setClientCount(io.engine.clientsCount);
-    }
 
     socket.on('join-game', async (payload: unknown, callback) => {
       try {
@@ -183,6 +180,10 @@ const from = (api: Api, config: RouterConfig) => {
         'Socket error'
       );
     });
+
+    if (!socket.recovered) {
+      await api.usageMetrics.setClientCount(io.engine.clientsCount);
+    }
   });
 
   return io;
