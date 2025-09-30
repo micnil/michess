@@ -1,5 +1,5 @@
-import { LocalGameContainer } from '../features/chess-game/LocalGameContainer';
-import { RemoteGameContainer } from '../features/chess-game/RemoteGameContainer';
+import { LocalGameContainer } from '../features/game/LocalGameContainer';
+import { RemoteGameContainer } from '../features/game/RemoteGameContainer';
 
 type Props = {
   gameId?: string;
