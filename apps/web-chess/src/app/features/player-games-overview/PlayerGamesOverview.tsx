@@ -1,3 +1,4 @@
+import { GameResultType } from '@michess/react-chessboard';
 import {
   Box,
   Button,
@@ -30,6 +31,17 @@ export const PlayerGamesOverview: React.FC<Props> = ({ onJoinGame }) => {
     },
   });
 
+  const {
+    isPending: endedIsPending,
+    data: endedGamesPage,
+    error: endedQueryError,
+  } = useQuery({
+    queryKey: ['games', 'my', 'ENDED'],
+    queryFn: async () => {
+      return api.games.getMyGames({ status: 'ENDED', page: 1 });
+    },
+  });
+
   const isNoOngoingGames =
     !ongoingIsPending &&
     ongoingGamesPage?.items.length === 0 &&
@@ -48,9 +60,7 @@ export const PlayerGamesOverview: React.FC<Props> = ({ onJoinGame }) => {
         </Flex>
         <Alert text={ongoingQueryError?.message} />
 
-        <Tabs.Content value="ongoing"></Tabs.Content>
-
-        <Tabs.Content value="completed">
+        <Tabs.Content value="ongoing">
           <Skeleton loading={ongoingIsPending}>
             <Flex direction="column" gap="2">
               {ongoingGamesPage?.items.map((game) => {
@@ -88,6 +98,67 @@ export const PlayerGamesOverview: React.FC<Props> = ({ onJoinGame }) => {
               })}
 
               {!ongoingQueryError && ongoingGamesPage?.items.length === 0 && (
+                <Box
+                  style={{
+                    textAlign: 'center',
+                    padding: '32px',
+                    color: '#6b7280',
+                  }}
+                >
+                  <Text>No games available. Create one to get started!</Text>
+                </Box>
+              )}
+            </Flex>
+          </Skeleton>
+        </Tabs.Content>
+
+        <Tabs.Content value="completed">
+          <Skeleton loading={endedIsPending}>
+            <Flex direction="column" gap="2">
+              {endedGamesPage?.items.map((game) => {
+                const isPlayerWinner =
+                  GameResultType.toColor(game.result?.type) === game.ownSide;
+                return (
+                  <Card key={game.id} variant="surface" size="1">
+                    <Flex align="center" gap="4">
+                      <Box minWidth={'120px'}>
+                        <Text weight="medium" size="3">
+                          {game.opponent.name}
+                        </Text>
+                      </Box>
+                      <Box minWidth={'120px'}>
+                        <Text size="2" color="gray">
+                          {game.variant}
+                        </Text>
+                      </Box>
+                      <Box flexGrow="1">
+                        {isPlayerWinner ? (
+                          <Text size="2" color={'amber'}>
+                            {'You lost'}
+                          </Text>
+                        ) : game.result?.type === 'draw' ? (
+                          <Text size="2" color={'gray'}>
+                            {'Draw'}
+                          </Text>
+                        ) : (
+                          <Text size="2" color={'gray'}>
+                            {'You lost'}
+                          </Text>
+                        )}
+                      </Box>
+                      <Button
+                        size="1"
+                        onClick={() => onJoinGame?.(game.id)}
+                        variant="soft"
+                      >
+                        Join
+                      </Button>
+                    </Flex>
+                  </Card>
+                );
+              })}
+
+              {!endedQueryError && endedGamesPage?.items.length === 0 && (
                 <Box
                   style={{
                     textAlign: 'center',
