@@ -18,7 +18,7 @@ const queryClient = new QueryClient({
 
 const api = Api.create(
   RestClient.create(window.location.origin),
-  AuthClient.create(),
+  AuthClient.create(window.location.origin),
   SocketClient.create()
 );
 
