@@ -624,20 +624,19 @@ const generateMoves = (chessPosition: ChessPosition): MoveGeneratorResult => {
     ? getKingXRayAttacks(chessBitboards, chessPosition.turn)
     : attackers;
 
-  const moves = generateMovesFromContext(
-    MoveGeneratorContext.from(chessPosition, chessBitboards, {
-      attacks: attackers,
-      pinnedPieces,
-      kingXRayAttacks,
-      kingAttackers,
-      checkEvasion: checkEvasionMask,
-    })
-  );
-  return {
+  const context = MoveGeneratorContext.from(chessPosition, chessBitboards, {
+    attacks: attackers,
+    pinnedPieces,
+    kingXRayAttacks,
+    kingAttackers,
+    checkEvasion: checkEvasionMask,
+  });
+  const moves = generateMovesFromContext(context);
+  return MoveGeneratorResult.from(context, {
     moves,
     isCheckmate: isCheck && moves.length === 0,
     isCheck,
-  };
+  });
 };
 
 export type MoveGenerator = {

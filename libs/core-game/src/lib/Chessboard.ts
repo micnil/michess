@@ -6,6 +6,7 @@ import {
   Color,
   Coordinate,
   Move,
+  MoveNotation,
   Piece,
   PiecePlacements,
   PieceType,
@@ -32,6 +33,7 @@ export type Chessboard = BoardState & {
   initialPosition: ChessPosition;
   moveOptions: MoveOption[];
   movesRecord: Move[];
+  moveNotations: MoveNotation[];
   playMove: (move: Move) => Chessboard;
   playMoves: (moves: Move[]) => Chessboard;
   updateMoves: (moves: Move[]) => Chessboard;
@@ -304,6 +306,23 @@ const from = (
     },
     get movesRecord() {
       return history.map((item) => MoveOption.toMove(item.playedMove));
+    },
+    get moveNotations() {
+      return history.map<MoveNotation>((item, index) => {
+        const moveGen = MoveGenerator(item.position);
+        const nextMoveGen = MoveGenerator(
+          history[index + 1]?.position ?? state.position
+        );
+        const nextResult = nextMoveGen.generateMoves();
+        const result = moveGen.generateMoves();
+        return {
+          displayStr: result.toSan(item.playedMove, nextResult),
+          moveNumber:
+            item.position.fullMoves +
+            (item.position.turn === Color.White ? 0 : 1),
+          turn: item.position.turn,
+        };
+      });
     },
     get initialPosition() {
       return history.length > 0 ? history[0].position : state.position;

@@ -1,5 +1,4 @@
 import { Maybe } from '@michess/common-utils';
-import { Bitboard } from './Bitboard';
 import { Color } from '../common/Color';
 import { Coordinate } from '../common/Coordinate';
 import { Piece } from '../common/Piece';
@@ -7,6 +6,7 @@ import { PieceType } from '../common/PieceType';
 import { CastlingAbility } from '../position/model/CastlingAbility';
 import { CastlingRight } from '../position/model/CastlingRight';
 import { PiecePlacements } from '../position/model/PiecePlacements';
+import { Bitboard } from './Bitboard';
 
 type PieceBitboard = {
   [piece in PieceType]: Bitboard;
@@ -128,6 +128,7 @@ const fromPieceBitboards = (
 
       return fromPieceBitboards(newBitboards);
     },
+
     getOwnOccupancy: (color: Color) =>
       color === 'white' ? whiteOccupied : blackOccupied,
     getOpponentOccupancy: (color: Color) =>
