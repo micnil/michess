@@ -2,6 +2,7 @@ import { Card, Flex, Heading, Tabs } from '@radix-ui/themes';
 import React from 'react';
 import { useApi } from '../../api/hooks/useApi';
 import { Alert } from '../../components/Alert';
+import { TabTriggerNotification } from '../../components/TabTriggerNotification';
 import { useQuery } from '../../util/useQuery';
 import { EndedGameList } from './component/EndedGameList';
 import { OngoingGameList } from './component/OngoingGameList';
@@ -38,6 +39,10 @@ export const PlayerGamesOverview: React.FC<Props> = ({ onJoinGame }) => {
     !ongoingIsPending &&
     ongoingGamesPage?.items.length === 0 &&
     !ongoingQueryError;
+
+  // Check if there are any ongoing games where it's the player's turn
+  const hasPlayerTurnGames =
+    ongoingGamesPage?.items.some((game) => game.turn === game.ownSide) ?? false;
   return (
     <Card size="3" style={{ padding: '24px' }}>
       <Tabs.Root defaultValue={isNoOngoingGames ? 'completed' : 'ongoing'}>
@@ -46,7 +51,12 @@ export const PlayerGamesOverview: React.FC<Props> = ({ onJoinGame }) => {
             My Games
           </Heading>
           <Tabs.List>
-            <Tabs.Trigger value="ongoing">Ongoing</Tabs.Trigger>
+            <Tabs.Trigger value="ongoing">
+              <Flex align="center" gap="1">
+                Ongoing
+                {hasPlayerTurnGames && <TabTriggerNotification />}
+              </Flex>
+            </Tabs.Trigger>
             <Tabs.Trigger value="completed">Completed</Tabs.Trigger>
           </Tabs.List>
         </Flex>
