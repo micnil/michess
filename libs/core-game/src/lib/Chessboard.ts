@@ -1,15 +1,14 @@
 import { Maybe } from '@michess/common-utils';
 import {
   ChessPosition,
-  Color,
   Move,
+  MoveGenerator,
   MoveNotation,
   MoveOption,
   Piece,
   PiecePlacements,
   PieceType,
 } from '@michess/core-board';
-import { MoveGenerator } from './MoveGenerator';
 import { ZobristHash } from './ZobristHash';
 
 type BoardState = {
@@ -155,20 +154,9 @@ const from = (
       return history.map((item) => MoveOption.toMove(item.playedMove));
     },
     get moveNotations() {
-      return history.map<MoveNotation>((item, index) => {
-        const moveGen = MoveGenerator(item.position);
-        const nextMoveGen = MoveGenerator(
-          history[index + 1]?.position ?? state.position
-        );
-        const nextResult = nextMoveGen.generateMoves();
-        const result = moveGen.generateMoves();
-        return {
-          displayStr: result.toSan(item.playedMove, nextResult),
-          moveNumber:
-            item.position.fullMoves +
-            (item.position.turn === Color.White ? 0 : 1),
-          turn: item.position.turn,
-        };
+      return history.map<MoveNotation>((item) => {
+        const moveNotation = MoveNotation.from(item.position, item.playedMove);
+        return moveNotation;
       });
     },
     get initialPosition() {

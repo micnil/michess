@@ -1,16 +1,14 @@
 import { isDefined, lazyValue } from '@michess/common-utils';
-import {
-  Bitboard,
-  CastlingRight,
-  ChessBitboard,
-  ChessPosition,
-  Color,
-  Coordinate,
-  MoveOption,
-  Piece,
-  PiecePlacement,
-  PieceType,
-} from '@michess/core-board';
+import { Bitboard } from '../../bitboard/Bitboard';
+import { ChessBitboard } from '../../bitboard/ChessBitboard';
+import { Color } from '../../common/Color';
+import { Coordinate } from '../../common/Coordinate';
+import { Piece } from '../../common/Piece';
+import { PieceType } from '../../common/PieceType';
+import { CastlingRight } from '../../position/model/CastlingRight';
+import { ChessPosition } from '../../position/model/ChessPosition';
+import { PiecePlacement } from '../../position/model/PiecePlacement';
+import { MoveOption } from '../MoveOption';
 import { KingAttacks } from './bitboard/KingAttacks';
 import { KnightAttacks } from './bitboard/KnightAttacks';
 import { PawnAttacks } from './bitboard/PawnAttacks';
@@ -632,11 +630,11 @@ const generateMoves = (chessPosition: ChessPosition): MoveGeneratorResult => {
     checkEvasion: checkEvasionMask,
   });
   const moves = generateMovesFromContext(context);
-  return MoveGeneratorResult.from(context, {
+  return {
     moves,
     isCheckmate: isCheck && moves.length === 0,
     isCheck,
-  });
+  };
 };
 
 export type MoveGenerator = {

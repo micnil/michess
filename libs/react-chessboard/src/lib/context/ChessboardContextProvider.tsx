@@ -3,8 +3,9 @@ import {
   Color,
   Coordinate,
   FenParser,
+  MoveOption,
 } from '@michess/core-board';
-import { Chessboard, MoveOption } from '@michess/core-game';
+import { Chessboard } from '@michess/core-game';
 import {
   ReactNode,
   useCallback,

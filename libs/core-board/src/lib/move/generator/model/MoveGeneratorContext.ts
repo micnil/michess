@@ -1,12 +1,10 @@
-import {
-  CastlingAbility,
-  CastlingRight,
-  Color,
-  Coordinate,
-  ChessPosition,
-  PiecePlacements,
-  ChessBitboard,
-} from '@michess/core-board';
+import { ChessBitboard } from '../../../bitboard/ChessBitboard';
+import { Color } from '../../../common/Color';
+import { Coordinate } from '../../../common/Coordinate';
+import { CastlingAbility } from '../../../position/model/CastlingAbility';
+import { CastlingRight } from '../../../position/model/CastlingRight';
+import { ChessPosition } from '../../../position/model/ChessPosition';
+import { PiecePlacements } from '../../../position/model/PiecePlacements';
 import { MoveMaskBitboards } from './MoveMaskBitboards';
 
 export type MoveGeneratorContext = {

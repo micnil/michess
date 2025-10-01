@@ -13,6 +13,8 @@ export * from './lib/mocks/BoardState.mock';
 export * from './lib/mocks/ChessPosition.mock';
 export * from './lib/mocks/Piece.mock';
 export * from './lib/mocks/PiecePlacements.mock';
+export * from './lib/move/generator/model/MoveGeneratorResult';
+export * from './lib/move/generator/MoveGenerator';
 export * from './lib/move/Move';
 export * from './lib/move/MoveNotation';
 export * from './lib/move/MoveOption';

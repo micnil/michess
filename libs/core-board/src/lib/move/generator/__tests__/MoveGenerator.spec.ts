@@ -1,14 +1,11 @@
-import {
-  CastlingAbility,
-  CastlingRight,
-  Color,
-  Coordinate,
-  createChessPositionMock,
-  MoveOption,
-  p,
-  P,
-  PieceType,
-} from '@michess/core-board';
+import { Color } from '../../../common/Color';
+import { Coordinate } from '../../../common/Coordinate';
+import { PieceType } from '../../../common/PieceType';
+import { createChessPositionMock } from '../../../mocks/ChessPosition.mock';
+import { P, p } from '../../../mocks/Piece.mock';
+import { CastlingAbility } from '../../../position/model/CastlingAbility';
+import { CastlingRight } from '../../../position/model/CastlingRight';
+import { MoveOption } from '../../MoveOption';
 import { MoveGenerator } from '../MoveGenerator';
 
 describe('MoveGenerator', () => {
