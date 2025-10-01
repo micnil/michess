@@ -1,12 +1,13 @@
-import { ApiError } from '@michess/api-schema';
-import { ZodError } from 'zod';
+import { ApiErrorData } from '@michess/api-schema';
+import { ZodError, prettifyError } from 'zod';
 
 export const ApiErrorMapper = {
-  from: (error: unknown): ApiError => {
+  from: (error: unknown): ApiErrorData => {
     if (error instanceof ZodError) {
       return {
         code: 'INPUT_VALIDATION_ERROR',
-        message: error.message,
+        message: prettifyError(error),
+        details: error.issues,
       };
     } else {
       return {

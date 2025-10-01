@@ -1,4 +1,4 @@
-import { ApiError } from './ApiError';
+import { ApiErrorData } from './ApiErrorData';
 
 export type EventResponse<T> =
   | {
@@ -7,12 +7,12 @@ export type EventResponse<T> =
     }
   | {
       status: 'error';
-      error: ApiError;
+      error: ApiErrorData;
     };
 
 export const EventResponse = {
   ok: <T>(data: T): EventResponse<T> => ({ status: 'ok', data }),
-  error: <T = never>(error: ApiError): EventResponse<T> => ({
+  error: <T = never>(error: ApiErrorData): EventResponse<T> => ({
     status: 'error',
     error,
   }),

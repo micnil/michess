@@ -19,3 +19,8 @@ export type FenFullMoveCounterPart = string;
 
 export type FenStr =
   `${FenPiecePlacementPart} ${FenSideToMovePart} ${FenCastlingAbilityPart} ${FenEnPassantTargetSquarePart} ${FenHalfMoveClockPart} ${FenFullMoveCounterPart}`;
+
+export const FenStr = {
+  standardInitial: (): FenStr =>
+    'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+};

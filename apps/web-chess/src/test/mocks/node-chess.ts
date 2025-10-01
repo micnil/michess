@@ -1,4 +1,5 @@
 import { GameDetailsV1, LobbyPageResponseV1 } from '@michess/api-schema';
+import { FenStr } from '@michess/core-board';
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 
@@ -56,7 +57,9 @@ export const mswHandlers = [
       players: { white: undefined, black: undefined },
       variant: 'standard',
       isPrivate: false,
-      initialPosition: 'startpos',
+      initialPosition: FenStr.standardInitial(),
+      status: 'WAITING',
+
       moves: [],
       startedAt: undefined,
     });

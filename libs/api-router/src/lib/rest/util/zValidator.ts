@@ -1,5 +1,5 @@
 import { zValidator as zv } from '@hono/zod-validator';
-import { ApiError } from '@michess/api-schema';
+import { ApiErrorData } from '@michess/api-schema';
 import { ValidationTargets } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import z, { ZodSchema } from 'zod';
@@ -14,7 +14,7 @@ export const zValidator = <
 ) =>
   zv<T, Target, RestContext, string>(target, schema, (result, c) => {
     if (!result.success) {
-      const apiError: ApiError = {
+      const apiError: ApiErrorData = {
         code: 'VALIDATION_ERROR',
         message: z.prettifyError(result.error),
         details: result.error.issues,

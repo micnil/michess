@@ -1,5 +1,6 @@
 export * from './lib/ClientToServerEvents';
 export * from './lib/common/ApiError';
+export * from './lib/common/ApiErrorData';
 export * from './lib/common/EventResponse';
 export * from './lib/common/PageResponseV1';
 export * from './lib/common/PaginationQueryV1';
