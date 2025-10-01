@@ -50,5 +50,6 @@ export function useQuery<
     enabled: options.enabled !== false ? isAuthenticated : false,
   };
 
-  return tanstackUseQuery(enhancedOptions);
+  const result = tanstackUseQuery(enhancedOptions);
+  return result;
 }
