@@ -9,6 +9,7 @@ import {
   PlayerGameInfoPageResponseV1,
   PlayerGameInfoQueryV1,
 } from '@michess/api-schema';
+import { logger } from '@michess/be-utils';
 import { assertDefined, Maybe } from '@michess/common-utils';
 import { Move } from '@michess/core-board';
 import { ChessGame } from '@michess/core-game';
@@ -69,6 +70,7 @@ export class GamesService {
       playerId: userId,
       status: query.status ? [query.status] : ['ENDED', 'IN_PROGRESS'],
     });
+    logger.info(games);
     const gameDetails = games.map(
       GameDetailsMapper.fromSelectGameWithRelations
     );

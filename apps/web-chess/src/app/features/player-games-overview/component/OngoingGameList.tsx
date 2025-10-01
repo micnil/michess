@@ -23,7 +23,10 @@ export const OngoingGameList: FC<Props> = (props) => {
                     {game.opponent.name}
                   </Text>
                 </Box>
-                <Box flexGrow={isPlayerTurn ? undefined : '1'}>
+                <Box
+                  minWidth={'90px'}
+                  flexGrow={isPlayerTurn ? undefined : '1'}
+                >
                   <Text size="2" color="gray">
                     {game.variant}
                   </Text>
@@ -31,7 +34,7 @@ export const OngoingGameList: FC<Props> = (props) => {
                 {isPlayerTurn ? (
                   <Box flexGrow="1">
                     <Text size="2" color={'amber'}>
-                      {'Your turn'}
+                      Your turn
                     </Text>
                   </Box>
                 ) : undefined}

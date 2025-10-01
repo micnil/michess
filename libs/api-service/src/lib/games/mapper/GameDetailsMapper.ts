@@ -21,7 +21,7 @@ import {
   SelectGameWithRelations,
 } from '@michess/infra-db';
 
-const RESULT_TYPE_MAPPING: Record<
+const TO_RESULT_TYPE_MAPPING: Record<
   SelectGameWithRelations['result'],
   ChessGameResultType
 > = {
@@ -29,6 +29,15 @@ const RESULT_TYPE_MAPPING: Record<
   '0-1': 'black_win',
   '1/2-1/2': 'draw',
   '0-0': 'draw',
+};
+
+const FROM_RESULT_TYPE_MAPPING: Record<
+  ChessGameResultType,
+  SelectGameWithRelations['result']
+> = {
+  white_win: '1-0',
+  black_win: '0-1',
+  draw: '1/2-1/2',
 };
 
 const FROM_STATUS_TYPE_MAPPING: Record<
@@ -77,7 +86,7 @@ const toChessGameResult = ({
 }: SelectGame | SelectGameWithRelations): Maybe<ChessGameResult> => {
   return result !== '0-0'
     ? {
-        type: RESULT_TYPE_MAPPING[result],
+        type: TO_RESULT_TYPE_MAPPING[result],
       }
     : undefined;
 };
@@ -205,6 +214,7 @@ export const GameDetailsMapper = {
       status: TO_STATUS_TYPE_MAPPING[game.status],
       startedAt: game.startedAt ?? null,
       endedAt: game.endedAt ?? null,
+      result: game.result ? FROM_RESULT_TYPE_MAPPING[game.result.type] : '0-0',
     };
   },
 };

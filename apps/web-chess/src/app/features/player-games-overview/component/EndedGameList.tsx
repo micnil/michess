@@ -2,6 +2,7 @@ import { PlayerGameInfoPageResponseV1 } from '@michess/api-schema';
 import { Maybe } from '@michess/common-utils';
 import { GameResultType } from '@michess/react-chessboard';
 import { Box, Button, Card, Flex, Skeleton, Text } from '@radix-ui/themes';
+import { MinusSquare, PlusSquare } from 'lucide-react';
 import { FC } from 'react';
 
 type Props = {
@@ -20,6 +21,7 @@ export const EndedGameList: FC<Props> = ({
     <Skeleton loading={isPending}>
       <Flex direction="column" gap="2">
         {gamesPage?.items.map((game) => {
+          console.log(game.result?.type);
           const isPlayerWinner =
             GameResultType.toColor(game.result?.type) === game.ownSide;
           return (
@@ -37,17 +39,23 @@ export const EndedGameList: FC<Props> = ({
                 </Box>
                 <Box flexGrow="1">
                   {isPlayerWinner ? (
-                    <Text size="2" color={'amber'}>
-                      {'You lost'}
-                    </Text>
+                    <Flex align="center" gap="1">
+                      <PlusSquare size={'14px'} color="var(--grass-9)" />
+                      <Text size="2" color={'gray'}>
+                        Win
+                      </Text>
+                    </Flex>
                   ) : game.result?.type === 'draw' ? (
                     <Text size="2" color={'gray'}>
-                      {'Draw'}
+                      Draw
                     </Text>
                   ) : (
-                    <Text size="2" color={'gray'}>
-                      {'You lost'}
-                    </Text>
+                    <Flex align="center" gap="1">
+                      <MinusSquare size={'14px'} color="var(--tomato-9)" />
+                      <Text size="2" color={'gray'}>
+                        Lose
+                      </Text>
+                    </Flex>
                   )}
                 </Box>
                 <Button
