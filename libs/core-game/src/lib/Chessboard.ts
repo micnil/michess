@@ -199,11 +199,14 @@ const updateCastlingRights = (
   return newCastlingAbility;
 };
 
-const makeMove = (
-  { position, positionHash }: BoardState,
+const updatePosition = (
+  position: ChessPosition,
   move: MoveOption
 ): {
-  boardState: BoardState;
+  position: ChessPosition;
+  movedPiece: Piece;
+  capturedPiece: Maybe<Piece>;
+  promotedPiece: Maybe<Piece>;
 } => {
   const { newPiecePlacements, movedPiece, capturedPiece, promotedPiece } =
     updatePiecePlacements(move, position.pieces);
@@ -226,29 +229,50 @@ const makeMove = (
       ? oneStepBackFromIndex(move.target, position.turn)
       : undefined;
 
-  const newPositionHash = positionHash
-    .movePiece(movedPiece, move.start, move.target)
-    .capturePiece(capturedPiece, move.target)
-    .promotePawn(movedPiece, promotedPiece, move.target)
-    .updateEnPassant(position.enPassant, enPassant)
-    .updateCastlingRights(position.castlingAbility, newCastlingAbilities)
-    .toggleSideToMove();
-
   const newTurn = position.turn === Color.White ? Color.Black : Color.White;
   const newFullMoves =
     position.turn === Color.Black ? position.fullMoves + 1 : position.fullMoves;
 
   return {
+    position: {
+      pieces: newPiecePlacements,
+      castlingAbility: newCastlingAbilities,
+      turn: newTurn,
+      fullMoves: newFullMoves,
+      ply,
+      enPassant,
+    },
+    movedPiece,
+    capturedPiece,
+    promotedPiece,
+  };
+};
+
+const makeMove = (
+  { position, positionHash }: BoardState,
+  move: MoveOption
+): {
+  boardState: BoardState;
+} => {
+  const {
+    position: newPosition,
+    movedPiece,
+    capturedPiece,
+    promotedPiece,
+  } = updatePosition(position, move);
+
+  const newPositionHash = positionHash
+    .movePiece(movedPiece, move.start, move.target)
+    .capturePiece(capturedPiece, move.target)
+    .promotePawn(movedPiece, promotedPiece, move.target)
+    .updateEnPassant(position.enPassant, newPosition.enPassant)
+    .updateCastlingRights(position.castlingAbility, newPosition.castlingAbility)
+    .toggleSideToMove();
+
+  return {
     boardState: {
       positionHash: newPositionHash,
-      position: {
-        pieces: newPiecePlacements,
-        castlingAbility: newCastlingAbilities,
-        turn: newTurn,
-        fullMoves: newFullMoves,
-        ply,
-        enPassant,
-      },
+      position: newPosition,
     },
   };
 };
