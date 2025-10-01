@@ -15,14 +15,36 @@ import { stalematesTestCases } from './test-cases/stalemates';
 import { standardTestCases } from './test-cases/standard';
 import { taxingTestCases } from './test-cases/taxing';
 
-const getAndApplyMoves = (chessboard: Chessboard): FenStr[] => {
+const getAndApplyMoves = (
+  chessboard: Chessboard
+): { fen: FenStr[]; san: string[] } => {
   const moves = chessboard.moveOptions;
-  return moves.map((move) => {
-    const newGameState = chessboard.playMove(MoveOption.toMove(move));
-    return FenParser.toFenStr(newGameState.position);
-  });
+  const positions = moves
+    .map((move) => {
+      const newGameState = chessboard.playMove(MoveOption.toMove(move));
+      return {
+        fen: FenParser.toFenStr(newGameState.position) as FenStr,
+        san: newGameState.moveNotations.at(-1)?.displayStr || '',
+      };
+    })
+    .toSorted((a, b) => a.fen.localeCompare(b.fen));
+  return {
+    fen: positions.map((p) => p.fen),
+    san: positions.map((p) => p.san),
+  };
 };
 
+const toExpects = (
+  cases: Array<{ move: string; fen: FenStr }>
+): {
+  fen: FenStr[];
+  san: string[];
+} => {
+  const casesSorted = cases.toSorted((a, b) => a.fen.localeCompare(b.fen));
+  const expectedSans = casesSorted.map((e) => e.move);
+  const expectedFens = casesSorted.map((e) => e.fen);
+  return { fen: expectedFens, san: expectedSans };
+};
 describe('Chessboard', () => {
   describe('castling', () => {
     it.each(castlingTestCases.testCases)(
@@ -31,9 +53,11 @@ describe('Chessboard', () => {
         const gameState = Chessboard.fromPosition(
           FenParser.toChessPosition(start.fen)
         );
-        const actualFens = getAndApplyMoves(gameState);
-        const expectedFens = expected.map((e) => e.fen);
-        expect(actualFens.sort()).toEqual(expectedFens.sort());
+        const actual = getAndApplyMoves(gameState);
+        const expects = toExpects(expected);
+
+        expect(actual.fen).toEqual(expects.fen);
+        expect(actual.san).toEqual(expects.san);
       }
     );
   });
@@ -45,9 +69,11 @@ describe('Chessboard', () => {
         const gameState = Chessboard.fromPosition(
           FenParser.toChessPosition(start.fen)
         );
-        const actualFens = getAndApplyMoves(gameState);
-        const expectedFens = expected.map((e) => e.fen);
-        expect(actualFens.sort()).toEqual(expectedFens.sort());
+        const actual = getAndApplyMoves(gameState);
+        const expects = toExpects(expected);
+
+        expect(actual.fen).toEqual(expects.fen);
+        expect(actual.san).toEqual(expects.san);
       }
     );
   });
@@ -59,9 +85,11 @@ describe('Chessboard', () => {
         const gameState = Chessboard.fromPosition(
           FenParser.toChessPosition(start.fen)
         );
-        const actualFens = getAndApplyMoves(gameState);
-        const expectedFens = expected.map((e) => e.fen);
-        expect(actualFens.sort()).toEqual(expectedFens.sort());
+        const actual = getAndApplyMoves(gameState);
+        const expects = toExpects(expected);
+
+        expect(actual.fen).toEqual(expects.fen);
+        expect(actual.san).toEqual(expects.san);
       }
     );
   });
@@ -73,9 +101,11 @@ describe('Chessboard', () => {
         const gameState = Chessboard.fromPosition(
           FenParser.toChessPosition(start.fen)
         );
-        const actualFens = getAndApplyMoves(gameState);
-        const expectedFens = expected.map((e) => e.fen);
-        expect(actualFens.sort()).toEqual(expectedFens.sort());
+        const actual = getAndApplyMoves(gameState);
+        const expects = toExpects(expected);
+
+        expect(actual.fen).toEqual(expects.fen);
+        expect(actual.san).toEqual(expects.san);
       }
     );
   });
@@ -87,9 +117,11 @@ describe('Chessboard', () => {
         const gameState = Chessboard.fromPosition(
           FenParser.toChessPosition(start.fen)
         );
-        const actualFens = getAndApplyMoves(gameState);
-        const expectedFens = expected.map((e) => e.fen);
-        expect(actualFens.sort()).toEqual(expectedFens.sort());
+        const actual = getAndApplyMoves(gameState);
+        const expects = toExpects(expected);
+
+        expect(actual.fen).toEqual(expects.fen);
+        expect(actual.san).toEqual(expects.san);
       }
     );
   });
@@ -101,9 +133,11 @@ describe('Chessboard', () => {
         const gameState = Chessboard.fromPosition(
           FenParser.toChessPosition(start.fen)
         );
-        const actualFens = getAndApplyMoves(gameState);
-        const expectedFens = expected.map((e) => e.fen);
-        expect(actualFens.sort()).toEqual(expectedFens.sort());
+        const actual = getAndApplyMoves(gameState);
+        const expects = toExpects(expected);
+
+        expect(actual.fen).toEqual(expects.fen);
+        expect(actual.san).toEqual(expects.san);
       }
     );
   });
@@ -222,9 +256,11 @@ describe('Chessboard', () => {
         const gameState = Chessboard.fromPosition(
           FenParser.toChessPosition(start.fen)
         );
-        const actualFens = getAndApplyMoves(gameState);
-        const expectedFens = expected.map((e) => e.fen);
-        expect(actualFens.sort()).toEqual(expectedFens.sort());
+        const actual = getAndApplyMoves(gameState);
+        const expects = toExpects(expected);
+
+        expect(actual.fen).toEqual(expects.fen);
+        expect(actual.san).toEqual(expects.san);
       }
     );
   });
@@ -236,9 +272,11 @@ describe('Chessboard', () => {
         const gameState = Chessboard.fromPosition(
           FenParser.toChessPosition(start.fen)
         );
-        const actualFens = getAndApplyMoves(gameState);
-        const expectedFens = expected.map((e) => e.fen);
-        expect(actualFens.sort()).toEqual(expectedFens.sort());
+        const actual = getAndApplyMoves(gameState);
+        const expects = toExpects(expected);
+
+        expect(actual.fen).toEqual(expects.fen);
+        expect(actual.san).toEqual(expects.san);
       }
     );
   });

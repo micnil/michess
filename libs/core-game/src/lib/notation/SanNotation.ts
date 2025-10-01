@@ -39,7 +39,8 @@ export const SanNotation = {
           move.target === moveOption.target &&
           move.promotion === moveOption.promotion;
         const isSameTarget = move.target === moveOption.target;
-        const isSamePieceType = pieces.get(fromSquare)?.type === piece.type;
+        const isSamePieceType =
+          pieces.get(Coordinate.fromIndex(move.start))?.type === piece.type;
 
         return !isSameMove && isSameTarget && isSamePieceType;
       });
@@ -77,10 +78,6 @@ export const SanNotation = {
     }
 
     notation += toSquare;
-
-    if (moveOption.enPassant) {
-      notation += ' e.p.';
-    }
 
     if (moveOption.promotion) {
       notation += `=${moveOption.promotion.toUpperCase()}`;

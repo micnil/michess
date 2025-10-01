@@ -77,6 +77,27 @@ describe('SanNotation', () => {
       expect(san).toBe('O-O');
     });
 
+    it('should convert queenside castling move to SAN', () => {
+      const fenString =
+        'r1bqk2r/ppp2ppp/2np1n2/4p1B1/QbP5/2NP4/PP2PPPP/R3KBNR w KQkq - 2 6';
+      const position = FenParser.toChessPosition(fenString);
+      const moveGen = MoveGenerator(position);
+      const legalMoves = moveGen.generateMoves().moves;
+
+      // Find the queenside castling move
+      const queenCastlingMove = legalMoves.find(
+        (move) => move.castling === CastlingRight.QueenSide
+      );
+
+      expect(queenCastlingMove).toBeDefined();
+      const san = SanNotation.moveOptionToSan(
+        queenCastlingMove!,
+        position.pieces,
+        legalMoves
+      );
+      expect(san).toBe('O-O-O');
+    });
+
     it('should handle disambiguation when needed', () => {
       const position = ChessPosition.standardInitial();
       const moveGen = MoveGenerator(position);
