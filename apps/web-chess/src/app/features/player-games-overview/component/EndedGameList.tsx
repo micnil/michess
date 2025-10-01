@@ -63,7 +63,7 @@ export const EndedGameList: FC<Props> = ({
                   onClick={() => onJoinGame?.(game.id)}
                   variant="soft"
                 >
-                  Join
+                  View
                 </Button>
               </Flex>
             </Card>
