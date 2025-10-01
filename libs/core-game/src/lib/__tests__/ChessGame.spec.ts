@@ -96,6 +96,7 @@ describe('ChessGame', () => {
         pieces: {
           e1: { color: 'white', type: 'k' },
           e8: { color: 'black', type: 'k' },
+          e3: { color: 'white', type: 'q' },
         },
         turn: 'white',
       });

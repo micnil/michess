@@ -148,12 +148,7 @@ const evalResultFromBoard = (
     return ChessGameResult.toCheckmate(
       board.position.turn === Color.White ? Color.Black : Color.White
     );
-  } else if (
-    board.isStalemate ||
-    board.isInsufficientMaterial ||
-    board.isThreeFoldRepetition ||
-    board.isFiftyMoveRule
-  ) {
+  } else if (board.isStalemate || board.isInsufficientMaterial) {
     return { type: 'draw' };
   } else {
     return undefined;

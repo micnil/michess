@@ -7,7 +7,7 @@ import {
   PieceType,
 } from '@michess/core-board';
 import { MoveGenerator } from '../../MoveGenerator';
-import { SanNotation } from '../SanNotation';
+import { MoveNotation } from '../SanNotation';
 
 describe('SanNotation', () => {
   describe('moveOptionToSan', () => {
@@ -23,7 +23,7 @@ describe('SanNotation', () => {
 
       expect(e4Move).toBeDefined();
       if (e4Move) {
-        const san = SanNotation.moveOptionToSan(
+        const san = MoveNotation.moveOptionToSan(
           e4Move,
           position.pieces,
           legalMoves
@@ -47,7 +47,7 @@ describe('SanNotation', () => {
 
       expect(knightMove).toBeDefined();
       if (knightMove) {
-        const san = SanNotation.moveOptionToSan(
+        const san = MoveNotation.moveOptionToSan(
           knightMove,
           position.pieces,
           legalMoves
@@ -69,7 +69,7 @@ describe('SanNotation', () => {
       );
 
       expect(castlingMove).toBeDefined();
-      const san = SanNotation.moveOptionToSan(
+      const san = MoveNotation.moveOptionToSan(
         castlingMove!,
         position.pieces,
         legalMoves
@@ -90,7 +90,7 @@ describe('SanNotation', () => {
       );
 
       expect(queenCastlingMove).toBeDefined();
-      const san = SanNotation.moveOptionToSan(
+      const san = MoveNotation.moveOptionToSan(
         queenCastlingMove!,
         position.pieces,
         legalMoves
@@ -114,7 +114,7 @@ describe('SanNotation', () => {
 
       // Test that each knight move gets proper notation
       knightMoves.forEach((move) => {
-        const san = SanNotation.moveOptionToSan(
+        const san = MoveNotation.moveOptionToSan(
           move,
           position.pieces,
           legalMoves
@@ -136,7 +136,7 @@ describe('SanNotation', () => {
       const position = ChessPosition.standardInitial();
       const legalMoves = [mockMoveOption];
 
-      const san = SanNotation.moveOptionToSan(
+      const san = MoveNotation.moveOptionToSan(
         mockMoveOption,
         position.pieces,
         legalMoves
@@ -148,28 +148,28 @@ describe('SanNotation', () => {
   describe('addCheckNotation', () => {
     it('should add check notation', () => {
       const baseSan = 'Nf7';
-      const result = SanNotation.addCheckNotation(baseSan, true, false);
+      const result = MoveNotation.addCheckNotation(baseSan, true, false);
 
       expect(result).toBe('Nf7+');
     });
 
     it('should add checkmate notation', () => {
       const baseSan = 'Qh8';
-      const result = SanNotation.addCheckNotation(baseSan, true, true);
+      const result = MoveNotation.addCheckNotation(baseSan, true, true);
 
       expect(result).toBe('Qh8#');
     });
 
     it('should not add notation when no check', () => {
       const baseSan = 'Nf3';
-      const result = SanNotation.addCheckNotation(baseSan, false, false);
+      const result = MoveNotation.addCheckNotation(baseSan, false, false);
 
       expect(result).toBe('Nf3');
     });
 
     it('should prioritize checkmate over check', () => {
       const baseSan = 'Qf7';
-      const result = SanNotation.addCheckNotation(baseSan, true, true);
+      const result = MoveNotation.addCheckNotation(baseSan, true, true);
 
       expect(result).toBe('Qf7#');
     });

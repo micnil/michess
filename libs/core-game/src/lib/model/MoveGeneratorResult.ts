@@ -1,5 +1,5 @@
 import { MoveOption } from '@michess/core-board';
-import { SanNotation } from '../notation/SanNotation';
+import { MoveNotation } from '../notation/SanNotation';
 import { MoveGeneratorContext } from './MoveGeneratorContext';
 
 type MoveGeneratorResultData = {
@@ -24,13 +24,13 @@ export const MoveGeneratorResult = {
         move: MoveOption,
         moveGenResultAfter: MoveGeneratorResultData
       ): string => {
-        const sanWithoutChecks = SanNotation.moveOptionToSan(
+        const sanWithoutChecks = MoveNotation.moveOptionToSan(
           move,
           context.piecePlacements,
           result.moves
         );
 
-        const san = SanNotation.addCheckNotation(
+        const san = MoveNotation.addCheckNotation(
           sanWithoutChecks,
           moveGenResultAfter.isCheck,
           moveGenResultAfter.isCheckmate

@@ -7,7 +7,7 @@ import {
   PieceType,
 } from '@michess/core-board';
 
-export const SanNotation = {
+export const MoveNotation = {
   /**
    * Convert a MoveOption to SAN notation given the position and all legal moves
    */
