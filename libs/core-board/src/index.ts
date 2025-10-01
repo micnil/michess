@@ -15,6 +15,7 @@ export * from './lib/mocks/Piece.mock';
 export * from './lib/mocks/PiecePlacements.mock';
 export * from './lib/move/Move';
 export * from './lib/move/MoveNotation';
+export * from './lib/move/MoveOption';
 export * from './lib/position/model/CastlingAbility';
 export * from './lib/position/model/CastlingRight';
 export * from './lib/position/model/ChessPosition';

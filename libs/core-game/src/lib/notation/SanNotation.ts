@@ -2,10 +2,10 @@ import { assertDefined } from '@michess/common-utils';
 import {
   CastlingRight,
   Coordinate,
+  MoveOption,
   PiecePlacements,
   PieceType,
 } from '@michess/core-board';
-import { MoveOption } from '../move/MoveOption';
 
 export const SanNotation = {
   /**

@@ -1,4 +1,4 @@
-import { MoveOption } from '../move/MoveOption';
+import { MoveOption } from '@michess/core-board';
 import { SanNotation } from '../notation/SanNotation';
 import { MoveGeneratorContext } from './MoveGeneratorContext';
 

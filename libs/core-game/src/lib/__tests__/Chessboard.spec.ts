@@ -3,9 +3,9 @@ import {
   FenParser,
   FenStr,
   Move,
+  MoveOption,
 } from '@michess/core-board';
 import { Chessboard } from '../Chessboard';
-import { MoveOption } from '../move/MoveOption';
 import { castlingTestCases } from './test-cases/castling';
 import { checkmatesTestCases } from './test-cases/checkmates';
 import { famousTestCases } from './test-cases/famous';

@@ -7,13 +7,13 @@ import {
   Coordinate,
   Move,
   MoveNotation,
+  MoveOption,
   Piece,
   PiecePlacements,
   PieceType,
 } from '@michess/core-board';
 import { MoveGenerator } from './MoveGenerator';
 import { ZobristHash } from './ZobristHash';
-import { MoveOption } from './move/MoveOption';
 
 type BoardState = {
   position: ChessPosition;

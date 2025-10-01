@@ -4,12 +4,12 @@ import {
   Color,
   Coordinate,
   createChessPositionMock,
+  MoveOption,
   p,
   P,
   PieceType,
 } from '@michess/core-board';
 import { MoveGenerator } from '../MoveGenerator';
-import { MoveOption } from '../move/MoveOption';
 
 describe('MoveGenerator', () => {
   describe('bishop', () => {

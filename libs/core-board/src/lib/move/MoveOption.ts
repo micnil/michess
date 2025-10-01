@@ -1,9 +1,7 @@
-import {
-  CastlingRight,
-  Coordinate,
-  Move,
-  PieceType,
-} from '@michess/core-board';
+import { Coordinate } from '../common/Coordinate';
+import { PieceType } from '../common/PieceType';
+import { CastlingRight } from '../position/model/CastlingRight';
+import { Move } from './Move';
 
 export type MoveOption = {
   start: number;

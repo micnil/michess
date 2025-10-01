@@ -6,6 +6,7 @@ import {
   ChessPosition,
   Color,
   Coordinate,
+  MoveOption,
   Piece,
   PiecePlacement,
   PieceType,
@@ -17,7 +18,6 @@ import { SliderAttacks } from './bitboard/SliderAttacks';
 import { DirectionOffset } from './model/DirectionOffset';
 import { MoveGeneratorContext } from './model/MoveGeneratorContext';
 import { MoveGeneratorResult } from './model/MoveGeneratorResult';
-import { MoveOption } from './move/MoveOption';
 import { IndexBoardUtil } from './util/IndexBoardUtil';
 
 const SLIDERS_BY_DIRECTION: Record<DirectionOffset, PieceType[]> = {
