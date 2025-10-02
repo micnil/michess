@@ -3,6 +3,7 @@ import { Chessboard as ChessboardView } from '@michess/react-chessboard';
 import { Box, Card, Grid, Inset, Skeleton } from '@radix-ui/themes';
 import { useAuth } from '../../api/hooks/useAuth';
 import { Alert } from '../../components/Alert';
+import { MovesRecord } from './components/MovesRecord';
 import { PlayerInfo } from './components/PlayerInfo';
 import { useRemoteGame } from './hooks/useRemoteGame';
 
@@ -75,6 +76,9 @@ export const RemoteGameContainer = ({
             />
           </Inset>
         </Card>
+        <Box mt="2" style={{ width: '100%' }}>
+          <MovesRecord moves={chessboard.moveNotations} />
+        </Box>
       </Box>
     </Grid>
   );
