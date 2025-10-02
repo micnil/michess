@@ -1,12 +1,23 @@
 import { Color, MoveNotation } from '@michess/core-board';
 import { Badge, Box, Flex, ScrollArea, Text } from '@radix-ui/themes';
-import { FC, Fragment } from 'react';
+import { FC, Fragment, useEffect, useRef } from 'react';
 
 type Props = {
   moves: MoveNotation[];
 };
 
 export const MovesRecord: FC<Props> = (props) => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.scrollTo({
+        left: ref.current.scrollWidth,
+        behavior: 'smooth',
+      });
+    }
+  }, [props.moves]);
+
   if (props.moves.length === 0) {
     return (
       <Box p="2" style={{ textAlign: 'center', color: 'var(--gray-11)' }}>
@@ -16,6 +27,7 @@ export const MovesRecord: FC<Props> = (props) => {
   } else {
     return (
       <ScrollArea
+        ref={ref}
         type="always"
         scrollbars="horizontal"
         size={'1'}
