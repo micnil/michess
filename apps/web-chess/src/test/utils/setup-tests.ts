@@ -1,4 +1,6 @@
+import { fetch } from 'cross-fetch';
 import { server } from '../mocks/node-chess';
+global.fetch = fetch;
 
 // Start MSW server before all tests
 beforeAll(() => {

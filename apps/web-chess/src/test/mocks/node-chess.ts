@@ -4,7 +4,7 @@ import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 
 export const mswHandlers = [
-  http.get('/api/auth/session', () => {
+  http.get('/api/auth/get-session', () => {
     return HttpResponse.json({
       user: {
         createdAt: new Date().toISOString(),

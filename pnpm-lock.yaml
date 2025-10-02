@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  vitest@3.2.4:
+    hash: dde3c7a634692aefe0877c763192102a73d3451e6d12dae61df88fd1e6e9368e
+    path: patches/vitest@3.2.4.patch
+
 importers:
 
   .:
@@ -81,6 +86,9 @@ importers:
       '@angular-devkit/core':
         specifier: ^20.0.0
         version: 20.0.4(chokidar@4.0.3)
+      '@mswjs/socket.io-binding':
+        specifier: ^0.2.0
+        version: 0.2.0(msw@2.11.3(@types/node@24.3.0)(typescript@5.9.2))
       '@nx/cypress':
         specifier: 21.6.2
         version: 21.6.2(@babel/traverse@7.28.4)(@swc-node/register@1.9.2(@swc/core@1.5.29(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.5.29(@swc/helpers@0.5.17))(@zkochan/js-yaml@0.0.7)(cypress@14.4.0)(eslint@8.57.1)(nx@21.6.2(@swc-node/register@1.9.2(@swc/core@1.5.29(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.5.29(@swc/helpers@0.5.17)))(typescript@5.9.2)
@@ -177,6 +185,9 @@ importers:
       commander:
         specifier: ^14.0.0
         version: 14.0.0
+      cross-fetch:
+        specifier: ^4.1.0
+        version: 4.1.0(encoding@0.1.13)
       cypress:
         specifier: 14.4.0
         version: 14.4.0
@@ -272,7 +283,7 @@ importers:
         version: 7.1.5(@types/node@24.3.0)(jiti@2.4.2)(less@4.4.1)(sass-embedded@1.89.2)(sass@1.89.2)(stylus@0.62.0)(terser@5.43.1)(tsx@4.20.4)(yaml@2.8.0)
       vitest:
         specifier: ^3.0.0
-        version: 3.2.4(@types/node@24.3.0)(@vitest/ui@3.2.4)(jiti@2.4.2)(jsdom@22.1.0)(less@4.4.1)(msw@2.11.3(@types/node@24.3.0)(typescript@5.9.2))(sass-embedded@1.89.2)(sass@1.89.2)(stylus@0.62.0)(terser@5.43.1)(tsx@4.20.4)(yaml@2.8.0)
+        version: 3.2.4(patch_hash=dde3c7a634692aefe0877c763192102a73d3451e6d12dae61df88fd1e6e9368e)(@types/node@24.3.0)(@vitest/ui@3.2.4)(jiti@2.4.2)(jsdom@22.1.0)(less@4.4.1)(msw@2.11.3(@types/node@24.3.0)(typescript@5.9.2))(sass-embedded@1.89.2)(sass@1.89.2)(stylus@0.62.0)(terser@5.43.1)(tsx@4.20.4)(yaml@2.8.0)
 
 packages:
 
@@ -1856,6 +1867,11 @@ packages:
   '@mswjs/interceptors@0.39.7':
     resolution: {integrity: sha512-sURvQbbKsq5f8INV54YJgJEdk8oxBanqkTiXXd33rKmofFCwZLhLRszPduMZ9TA9b8/1CHc/IJmOlBHJk2Q5AQ==}
     engines: {node: '>=18'}
+
+  '@mswjs/socket.io-binding@0.2.0':
+    resolution: {integrity: sha512-Q2Y7ridsoWv3cCibmR8g4m4h50op22nuOm3pZciKCO7ss90dkI4m0jiL55kYzxsUvXIISuK9ovRyXrtr6J6O/A==}
+    peerDependencies:
+      msw: ^2.10.2
 
   '@napi-rs/nice-android-arm-eabi@1.1.1':
     resolution: {integrity: sha512-kjirL3N6TnRPv5iuHw36wnucNqXAO46dzK9oPb0wj076R5Xm8PfUVA9nAFB5ZNMmfJQJVKACAPd/Z2KYMppthw==}
@@ -4696,6 +4712,9 @@ packages:
   cron-parser@4.9.0:
     resolution: {integrity: sha512-p0SaNjrHOnQeR8/VnfGbmg9te2kfyYSQ7Sc/j/6DtPL3JQvKxmjO9TSjNFpujqV3vEYYBvNNvXSxzyksBWAx1Q==}
     engines: {node: '>=12.0.0'}
+
+  cross-fetch@4.1.0:
+    resolution: {integrity: sha512-uKm5PU+MHTootlWEY+mZ4vvXoCn4fLQxT9dSc1sXVMSFkINTJVN8cAQROpwcKm8bJ/c7rgZVIBWzH5T78sNZZw==}
 
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
@@ -10788,6 +10807,15 @@ snapshots:
       outvariant: 1.4.3
       strict-event-emitter: 0.5.1
 
+  '@mswjs/socket.io-binding@0.2.0(msw@2.11.3(@types/node@24.3.0)(typescript@5.9.2))':
+    dependencies:
+      '@mswjs/interceptors': 0.39.7
+      engine.io-parser: 5.2.3
+      msw: 2.11.3(@types/node@24.3.0)(typescript@5.9.2)
+      socket.io-parser: 4.2.4
+    transitivePeerDependencies:
+      - supports-color
+
   '@napi-rs/nice-android-arm-eabi@1.1.1':
     optional: true
 
@@ -11249,7 +11277,7 @@ snapshots:
       tsconfig-paths: 4.2.0
       tslib: 2.8.1
       vite: 7.1.5(@types/node@24.3.0)(jiti@2.4.2)(less@4.4.1)(sass-embedded@1.89.2)(sass@1.89.2)(stylus@0.62.0)(terser@5.43.1)(tsx@4.20.4)(yaml@2.8.0)
-      vitest: 3.2.4(@types/node@24.3.0)(@vitest/ui@3.2.4)(jiti@2.4.2)(jsdom@22.1.0)(less@4.4.1)(msw@2.11.3(@types/node@24.3.0)(typescript@5.9.2))(sass-embedded@1.89.2)(sass@1.89.2)(stylus@0.62.0)(terser@5.43.1)(tsx@4.20.4)(yaml@2.8.0)
+      vitest: 3.2.4(patch_hash=dde3c7a634692aefe0877c763192102a73d3451e6d12dae61df88fd1e6e9368e)(@types/node@24.3.0)(@vitest/ui@3.2.4)(jiti@2.4.2)(jsdom@22.1.0)(less@4.4.1)(msw@2.11.3(@types/node@24.3.0)(typescript@5.9.2))(sass-embedded@1.89.2)(sass@1.89.2)(stylus@0.62.0)(terser@5.43.1)(tsx@4.20.4)(yaml@2.8.0)
     transitivePeerDependencies:
       - '@babel/traverse'
       - '@swc-node/register'
@@ -13074,7 +13102,7 @@ snapshots:
       std-env: 3.9.0
       test-exclude: 7.0.1
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@types/node@24.3.0)(@vitest/ui@3.2.4)(jiti@2.4.2)(jsdom@22.1.0)(less@4.4.1)(msw@2.11.3(@types/node@24.3.0)(typescript@5.9.2))(sass-embedded@1.89.2)(sass@1.89.2)(stylus@0.62.0)(terser@5.43.1)(tsx@4.20.4)(yaml@2.8.0)
+      vitest: 3.2.4(patch_hash=dde3c7a634692aefe0877c763192102a73d3451e6d12dae61df88fd1e6e9368e)(@types/node@24.3.0)(@vitest/ui@3.2.4)(jiti@2.4.2)(jsdom@22.1.0)(less@4.4.1)(msw@2.11.3(@types/node@24.3.0)(typescript@5.9.2))(sass-embedded@1.89.2)(sass@1.89.2)(stylus@0.62.0)(terser@5.43.1)(tsx@4.20.4)(yaml@2.8.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -13124,7 +13152,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@types/node@24.3.0)(@vitest/ui@3.2.4)(jiti@2.4.2)(jsdom@22.1.0)(less@4.4.1)(msw@2.11.3(@types/node@24.3.0)(typescript@5.9.2))(sass-embedded@1.89.2)(sass@1.89.2)(stylus@0.62.0)(terser@5.43.1)(tsx@4.20.4)(yaml@2.8.0)
+      vitest: 3.2.4(patch_hash=dde3c7a634692aefe0877c763192102a73d3451e6d12dae61df88fd1e6e9368e)(@types/node@24.3.0)(@vitest/ui@3.2.4)(jiti@2.4.2)(jsdom@22.1.0)(less@4.4.1)(msw@2.11.3(@types/node@24.3.0)(typescript@5.9.2))(sass-embedded@1.89.2)(sass@1.89.2)(stylus@0.62.0)(terser@5.43.1)(tsx@4.20.4)(yaml@2.8.0)
 
   '@vitest/utils@3.2.4':
     dependencies:
@@ -14039,6 +14067,12 @@ snapshots:
   cron-parser@4.9.0:
     dependencies:
       luxon: 3.6.1
+
+  cross-fetch@4.1.0(encoding@0.1.13):
+    dependencies:
+      node-fetch: 2.7.0(encoding@0.1.13)
+    transitivePeerDependencies:
+      - encoding
 
   cross-spawn@7.0.6:
     dependencies:
@@ -18767,7 +18801,7 @@ snapshots:
       tsx: 4.20.4
       yaml: 2.8.0
 
-  vitest@3.2.4(@types/node@24.3.0)(@vitest/ui@3.2.4)(jiti@2.4.2)(jsdom@22.1.0)(less@4.4.1)(msw@2.11.3(@types/node@24.3.0)(typescript@5.9.2))(sass-embedded@1.89.2)(sass@1.89.2)(stylus@0.62.0)(terser@5.43.1)(tsx@4.20.4)(yaml@2.8.0):
+  vitest@3.2.4(patch_hash=dde3c7a634692aefe0877c763192102a73d3451e6d12dae61df88fd1e6e9368e)(@types/node@24.3.0)(@vitest/ui@3.2.4)(jiti@2.4.2)(jsdom@22.1.0)(less@4.4.1)(msw@2.11.3(@types/node@24.3.0)(typescript@5.9.2))(sass-embedded@1.89.2)(sass@1.89.2)(stylus@0.62.0)(terser@5.43.1)(tsx@4.20.4)(yaml@2.8.0):
     dependencies:
       '@types/chai': 5.2.2
       '@vitest/expect': 3.2.4

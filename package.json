@@ -23,6 +23,11 @@
     "migration:push": "dotenv -e ./apps/node-chess/.env -c -- drizzle-kit push --config=libs/infra-db/drizzle.config.ts --force"
   },
   "private": true,
+  "pnpm": {
+    "patchedDependencies": {
+      "vitest@3.2.4": "patches/vitest@3.2.4.patch"
+    }
+  },
   "dependencies": {
     "@hono/node-server": "^1.19.0",
     "@hono/zod-validator": "^0.7.2",
@@ -50,6 +55,7 @@
   },
   "devDependencies": {
     "@angular-devkit/core": "^20.0.0",
+    "@mswjs/socket.io-binding": "^0.2.0",
     "@nx/cypress": "21.6.2",
     "@nx/esbuild": "21.6.2",
     "@nx/eslint": "21.6.2",
@@ -82,6 +88,7 @@
     "@vitest/ui": "^3.0.0",
     "babel-jest": "30.0.5",
     "commander": "^14.0.0",
+    "cross-fetch": "^4.1.0",
     "cypress": "14.4.0",
     "drizzle-kit": "^0.31.4",
     "esbuild": "^0.19.2",
