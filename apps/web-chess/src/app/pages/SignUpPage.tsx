@@ -1,21 +1,12 @@
-import { noop } from '@michess/common-utils';
-import {
-  Box,
-  Button,
-  Card,
-  Flex,
-  Heading,
-  Link,
-  Separator,
-  Text,
-  TextField,
-} from '@radix-ui/themes';
+import { Box, Card, Flex, Heading, Link, Text } from '@radix-ui/themes';
 import { Link as RouterLink } from '@tanstack/react-router';
 import React, { useState } from 'react';
 
+import { noop } from '@michess/common-utils';
 import { Alert } from '../components/Alert';
-import FacebookIcon from '../features/auth/components/FacebookIcon';
-import GoogleIcon from '../features/auth/components/GoogleIcon';
+import { OrSeparator } from '../components/OrSeparator';
+import { SignUpForm } from '../features/auth/components/SignUpForm';
+import { SocialSignIn } from '../features/auth/components/SocialSignIn';
 
 export const SignUpPage: React.FC = () => {
   const [isLoading, _1] = useState(false);
@@ -37,76 +28,13 @@ export const SignUpPage: React.FC = () => {
 
             <Alert text={error} />
 
-            <Flex direction="column" gap="3">
-              <TextField.Root
-                placeholder="Name"
-                required
-                disabled={isLoading}
-              />
-
-              <TextField.Root
-                type="email"
-                placeholder="Email"
-                required
-                disabled={isLoading}
-              />
-
-              <TextField.Root
-                type="password"
-                placeholder="Password"
-                required
-                disabled={isLoading}
-              />
-
-              <TextField.Root
-                type="password"
-                placeholder="Confirm Password"
-                required
-                disabled={isLoading}
-              />
-
-              <Button
-                mt={'1'}
-                type="submit"
-                size="2"
-                style={{ width: '100%' }}
-                disabled={isLoading}
-              >
-                {isLoading ? 'Creating Account...' : 'Create Account'}
-              </Button>
-            </Flex>
-
-            <Flex align="center" gap="3">
-              <Separator size="4" style={{ flex: 1 }} />
-              <Text size="1" color="gray">
-                OR
-              </Text>
-              <Separator size="4" style={{ flex: 1 }} />
-            </Flex>
-
-            <Flex direction="column" gap="2">
-              <Button
-                type="button"
-                variant="outline"
-                size="3"
-                onClick={noop}
-                disabled={isLoading}
-              >
-                <GoogleIcon width={'16px'} fill="white" />
-                <Text>Continue with Google</Text>
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                size="3"
-                onClick={noop}
-                disabled={isLoading}
-              >
-                <FacebookIcon width={'16px'} fill="white" />
-                <Text>Continue with Facebook</Text>
-              </Button>
-            </Flex>
+            <SignUpForm isLoading={isLoading} onSubmit={noop} />
+            <OrSeparator />
+            <SocialSignIn
+              isLoading={isLoading}
+              onGoogleSignIn={noop}
+              onFacebookSignIn={noop}
+            />
 
             <Flex align="center" justify="center" gap="2">
               <Text size="2" color="gray">
