@@ -10,7 +10,7 @@ import {
   Text,
   TextField,
 } from '@radix-ui/themes';
-import { Link as RouterLink, useNavigate } from '@tanstack/react-router';
+import { Link as RouterLink } from '@tanstack/react-router';
 import React, { useState } from 'react';
 
 import { Alert } from '../components/Alert';
@@ -18,8 +18,6 @@ import FacebookIcon from '../features/signup/components/FacebookIcon';
 import GoogleIcon from '../features/signup/components/GoogleIcon';
 
 export const SignUpPage: React.FC = () => {
-  const navigate = useNavigate();
-
   const [isLoading, _1] = useState(false);
   const [error, _2] = useState('');
 
