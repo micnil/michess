@@ -124,7 +124,7 @@ const from = (position: ChessPosition, move: MoveOption): MoveNotation => {
 
   return {
     displayStr: addCheckNotation(san, isCheck, isCheckmate),
-    moveNumber: position.fullMoves + (position.turn === Color.White ? 1 : 0),
+    moveNumber: position.fullMoves,
     turn: position.turn,
   };
 };
