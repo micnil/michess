@@ -63,7 +63,7 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
           <Skeleton loading={isLoading}>
             <Badge
               color="gray"
-              variant={color === 'white' ? 'outline' : 'solid'}
+              variant={color === 'white' ? 'solid' : 'outline'}
               size="1"
             >
               {color}

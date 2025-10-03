@@ -48,7 +48,7 @@ export const MovesRecord: FC<Props> = (props) => {
                 </Text>
               )}
               <Badge
-                variant={move.turn === Color.White ? 'outline' : 'solid'}
+                  variant={move.turn === Color.White ? 'solid' : 'outline'}
                 color={move.turn === Color.White ? 'gray' : 'gray'}
               >
                 {move.displayStr}
