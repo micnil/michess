@@ -14,6 +14,7 @@ import { Navbar } from './app/features/navbar/Navbar';
 import GamePage from './app/pages/GamePage';
 import { HomePage } from './app/pages/HomePage';
 import { SignUpPage } from './app/pages/SignUpPage';
+import { SignInPage } from './app/pages/SingInPage';
 
 const RootLayout = () => (
   <Theme
@@ -92,7 +93,7 @@ const signinRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/sign-in',
   component: function SignInComponent() {
-    return <div></div>;
+    return <SignInPage />;
   },
 });
 

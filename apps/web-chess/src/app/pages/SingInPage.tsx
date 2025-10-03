@@ -12,12 +12,11 @@ import {
 } from '@radix-ui/themes';
 import { Link as RouterLink } from '@tanstack/react-router';
 import React, { useState } from 'react';
-
 import { Alert } from '../components/Alert';
 import FacebookIcon from '../features/auth/components/FacebookIcon';
 import GoogleIcon from '../features/auth/components/GoogleIcon';
 
-export const SignUpPage: React.FC = () => {
+export const SignInPage: React.FC = () => {
   const [isLoading, _1] = useState(false);
   const [error, _2] = useState('');
 
@@ -28,22 +27,16 @@ export const SignUpPage: React.FC = () => {
           <Flex direction="column" gap="4">
             <Box style={{ textAlign: 'center' }}>
               <Heading size="6" mb="2">
-                Sign up
+                Sign in
               </Heading>
               <Text color="gray" size="2">
-                Create your account to get started
+                Welcome back! Please enter your details.
               </Text>
             </Box>
 
             <Alert text={error} />
 
             <Flex direction="column" gap="3">
-              <TextField.Root
-                placeholder="Name"
-                required
-                disabled={isLoading}
-              />
-
               <TextField.Root
                 type="email"
                 placeholder="Email"
@@ -58,13 +51,6 @@ export const SignUpPage: React.FC = () => {
                 disabled={isLoading}
               />
 
-              <TextField.Root
-                type="password"
-                placeholder="Confirm Password"
-                required
-                disabled={isLoading}
-              />
-
               <Button
                 mt={'1'}
                 type="submit"
@@ -72,7 +58,7 @@ export const SignUpPage: React.FC = () => {
                 style={{ width: '100%' }}
                 disabled={isLoading}
               >
-                {isLoading ? 'Creating Account...' : 'Create Account'}
+                {isLoading ? 'Signing In...' : 'Sign In'}
               </Button>
             </Flex>
 
@@ -110,10 +96,10 @@ export const SignUpPage: React.FC = () => {
 
             <Flex align="center" justify="center" gap="2">
               <Text size="2" color="gray">
-                Already have an account?
+                Don't have an account?
               </Text>
               <Link asChild>
-                <RouterLink to="/sign-in">Sign in</RouterLink>
+                <RouterLink to="/sign-up">Sign up</RouterLink>
               </Link>
             </Flex>
           </Flex>
