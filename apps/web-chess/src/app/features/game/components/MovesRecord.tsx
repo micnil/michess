@@ -1,6 +1,7 @@
 import { Color, MoveNotation } from '@michess/core-board';
 import { Badge, Box, Flex, ScrollArea, Text } from '@radix-ui/themes';
 import { FC, Fragment, useEffect, useRef } from 'react';
+import styles from './MovesRecord.module.css';
 
 type Props = {
   moves: MoveNotation[];
@@ -28,6 +29,7 @@ export const MovesRecord: FC<Props> = (props) => {
     return (
       <ScrollArea
         ref={ref}
+        className={styles.faded}
         type="always"
         scrollbars="horizontal"
         size={'1'}

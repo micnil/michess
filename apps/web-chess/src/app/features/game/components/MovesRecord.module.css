@@ -1,0 +1,53 @@
+.faded :global(.rt-ScrollAreaViewport) {
+  overflow-x: auto;
+
+  mask-image: linear-gradient(
+      to left,
+      transparent 0,
+      black var(--top-mask-size),
+      black calc(100% - var(--bottom-mask-size)),
+      transparent 100%
+    ),
+    linear-gradient(
+      180deg,
+      transparent calc(100% - var(--scrollbar-width)),
+      black calc(100% - var(--scrollbar-width))
+    );
+  mask-composite: add;
+
+  --top-mask-size: 0px;
+  --bottom-mask-size: 0px;
+  --scrollbar-width: 8px;
+
+  animation: scroll-fade;
+  animation-timeline: scroll(self x);
+  animation-range: 0 100%;
+}
+
+@keyframes scroll-fade {
+  0% {
+    --top-mask-size: 48px;
+    --bottom-mask-size: 0px;
+  }
+
+  1% {
+    --bottom-mask-size: 24px;
+  }
+
+  10% {
+    --bottom-mask-size: 48px;
+  }
+
+  90% {
+    --top-mask-size: 48px;
+  }
+
+  99% {
+    --top-mask-size: 24px;
+  }
+
+  100% {
+    --top-mask-size: 0px;
+    --bottom-mask-size: 48px;
+  }
+}
