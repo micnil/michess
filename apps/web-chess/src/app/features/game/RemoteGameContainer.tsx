@@ -1,6 +1,6 @@
 import { Color } from '@michess/core-board';
 import { Chessboard as ChessboardView } from '@michess/react-chessboard';
-import { Box, Card, Grid, Inset, Skeleton } from '@radix-ui/themes';
+import { Box, Card, Flex, Grid, Inset, Skeleton } from '@radix-ui/themes';
 import { useAuth } from '../../api/hooks/useAuth';
 import { Alert } from '../../components/Alert';
 import { MovesRecord } from './components/MovesRecord';
@@ -34,7 +34,7 @@ export const RemoteGameContainer = ({
     <Grid
       columns={{ initial: '1', sm: '1fr auto 1fr' }}
       style={{ justifyItems: 'center' }}
-      gap={{ initial: '1', sm: '4' }}
+      gapX={{ initial: '1', sm: '4' }}
     >
       <Box gridColumn={{ initial: '1', sm: '2' }}>
         <Alert text={error?.message} />
@@ -76,12 +76,31 @@ export const RemoteGameContainer = ({
             />
           </Inset>
         </Card>
-        <Box style={{ width: '100%' }}>
+      </Box>
+      <Flex
+        gridColumn={'3'}
+        mt={'9'}
+        style={{ justifySelf: 'start', justifyContent: 'space-around' }}
+      >
+        <Box
+          style={{ width: '100%', height: '300px' }}
+          display={{ initial: 'none', md: 'block' }}
+        >
           <MovesRecord
             moves={chessboard.moveNotations}
             orientation={'vertical'}
           />
         </Box>
+      </Flex>
+      <Box
+        style={{ width: '100%' }}
+        gridColumn={{ initial: '1', sm: '2' }}
+        display={{ initial: 'block', md: 'none' }}
+      >
+        <MovesRecord
+          moves={chessboard.moveNotations}
+          orientation={'horizontal'}
+        />
       </Box>
     </Grid>
   );

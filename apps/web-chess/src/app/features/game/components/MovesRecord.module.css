@@ -1,4 +1,30 @@
-.faded :global(.rt-ScrollAreaViewport) {
+.fadedVertical :global(.rt-ScrollAreaViewport) {
+  overflow-y: auto;
+
+  mask-image: linear-gradient(
+      to top,
+      transparent 0,
+      black var(--top-mask-size),
+      black calc(100% - var(--bottom-mask-size)),
+      transparent 100%
+    ),
+    linear-gradient(
+      90deg,
+      transparent calc(100% - var(--scrollbar-width)),
+      black calc(100% - var(--scrollbar-width))
+    );
+  mask-composite: add;
+
+  --top-mask-size: 0px;
+  --bottom-mask-size: 0px;
+  --scrollbar-width: 8px;
+
+  animation: scroll-fade;
+  animation-timeline: scroll(self y);
+  animation-range: 0 100%;
+}
+
+.fadedHorizontal :global(.rt-ScrollAreaViewport) {
   overflow-x: auto;
 
   mask-image: linear-gradient(

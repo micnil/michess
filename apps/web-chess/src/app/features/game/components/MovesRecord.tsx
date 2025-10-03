@@ -15,6 +15,7 @@ export const MovesRecord: FC<Props> = ({ moves, orientation }) => {
     if (ref.current) {
       ref.current.scrollTo({
         left: ref.current.scrollWidth,
+        top: ref.current.scrollHeight,
         behavior: 'smooth',
       });
     }
@@ -32,15 +33,25 @@ export const MovesRecord: FC<Props> = ({ moves, orientation }) => {
     return (
       <ScrollArea
         ref={ref}
-        className={styles.faded}
-        type="always"
+        className={
+          orientation === 'horizontal'
+            ? styles.fadedHorizontal
+            : styles.fadedVertical
+        }
+        type={orientation === 'horizontal' ? 'always' : 'hover'}
         m={'1'}
         scrollbars={orientation}
         size={'1'}
-        style={{
-          minWidth: '100%',
-          width: '0',
-        }}
+        style={
+          orientation === 'horizontal'
+            ? {
+                minWidth: '100%',
+                width: '0',
+              }
+            : {
+                width: 'fit-content',
+              }
+        }
       >
         <Flex
           gap="4"
