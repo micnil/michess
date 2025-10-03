@@ -10,9 +10,7 @@ export const Navbar: FC<Props> = () => {
   return (
     <Flex>
       <Box flexGrow={'1'} style={{ backgroundColor: '--gray9' }}>
-        {/* <Card> */}
         <Logo />
-        {/* </Card> */}
       </Box>
     </Flex>
   );
