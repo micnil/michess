@@ -76,8 +76,11 @@ export const RemoteGameContainer = ({
             />
           </Inset>
         </Card>
-        <Box mt="2" style={{ width: '100%' }}>
-          <MovesRecord moves={chessboard.moveNotations} />
+        <Box style={{ width: '100%' }}>
+          <MovesRecord
+            moves={chessboard.moveNotations}
+            orientation={'vertical'}
+          />
         </Box>
       </Box>
     </Grid>
