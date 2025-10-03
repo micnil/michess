@@ -13,6 +13,7 @@ import { BackgroundGradient } from './app/components/BackgroundGradient';
 import { Navbar } from './app/features/navbar/Navbar';
 import GamePage from './app/pages/GamePage';
 import { HomePage } from './app/pages/HomePage';
+import { SignUpPage } from './app/pages/SignUpPage';
 
 const RootLayout = () => (
   <Theme
@@ -79,7 +80,25 @@ const gameWithIdRoute = createRoute({
   },
 });
 
+const signupRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/sign-up',
+  component: function SignUpComponent() {
+    return <SignUpPage />;
+  },
+});
+
+const signinRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/sign-in',
+  component: function SignInComponent() {
+    return <div></div>;
+  },
+});
+
 const routeTree = rootRoute.addChildren([
+  signupRoute,
+  signinRoute,
   indexRoute,
   gameRoute,
   gameWithIdRoute,
