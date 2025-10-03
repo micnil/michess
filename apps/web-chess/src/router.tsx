@@ -13,8 +13,8 @@ import { BackgroundGradient } from './app/components/BackgroundGradient';
 import { Navbar } from './app/features/navbar/Navbar';
 import GamePage from './app/pages/GamePage';
 import { HomePage } from './app/pages/HomePage';
+import { SignInPage } from './app/pages/SignInPage';
 import { SignUpPage } from './app/pages/SignUpPage';
-import { SignInPage } from './app/pages/SingInPage';
 
 const RootLayout = () => (
   <Theme

@@ -11,17 +11,17 @@ type Props = {
 export const Navbar: FC<Props> = () => {
   const { auth, isLoading } = useAuth();
   return (
-    <Flex align={'center'} gap={'2'}>
+    <Flex align={'center'} gap={'3'}>
       <Box flexGrow={'1'} style={{ backgroundColor: '--gray9' }}>
         <Logo />
       </Box>
       {!isLoading || auth?.user.isAnonymous ? (
         <>
+          <Link asChild size={'3'} color="gray">
+            <RouterLink to="/sign-in">Sign in</RouterLink>
+          </Link>
           <Link asChild size={'3'} color="amber">
             <RouterLink to="/sign-up">Sign up</RouterLink>
-          </Link>
-          <Link size={'2'} color="amber">
-            Log in
           </Link>
         </>
       ) : undefined}
