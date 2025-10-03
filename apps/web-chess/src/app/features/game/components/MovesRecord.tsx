@@ -64,7 +64,7 @@ export const MovesRecord: FC<Props> = ({ moves, orientation }) => {
               height={'3'}
               columns={'1fr 3fr 3fr'}
               areas={'"move white black"'}
-              gap="3"
+              gap="1"
               key={`${moveNumber}`}
             >
               <Flex gridArea={'move'} justify={'center'} align={'center'}>
