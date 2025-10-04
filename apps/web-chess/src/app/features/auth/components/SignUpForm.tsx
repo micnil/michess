@@ -1,14 +1,17 @@
 import { Button, Flex, TextField } from '@radix-ui/themes';
 import { FC } from 'react';
 import { SignUpInput } from '../../../api/model/SignUpInput';
+import { Alert } from '../../../components/Alert';
 
 type Props = {
   isLoading: boolean;
   onSubmit: (input: SignUpInput) => void;
+  error?: string;
 };
 
-export const SignUpForm: FC<Props> = ({ isLoading }) => (
+export const SignUpForm: FC<Props> = ({ isLoading, error }) => (
   <form>
+    <Alert text={error} />
     <Flex direction="column" gap="3">
       <TextField.Root placeholder="Name" required disabled={isLoading} />
 

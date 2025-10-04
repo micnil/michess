@@ -1,14 +1,17 @@
 import { Button, Flex, TextField } from '@radix-ui/themes';
 import { FC } from 'react';
 import { SignInInput } from '../../../api/model/SignInInput';
+import { Alert } from '../../../components/Alert';
 
 type Props = {
   isLoading: boolean;
   onSubmit: (input: SignInInput) => void;
+  error?: string;
 };
 
-export const SignInForm: FC<Props> = ({ isLoading }) => (
+export const SignInForm: FC<Props> = ({ isLoading, error }) => (
   <form>
+    <Alert text={error} />
     <Flex direction="column" gap="3">
       <TextField.Root
         type="email"

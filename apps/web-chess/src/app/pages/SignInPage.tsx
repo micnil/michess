@@ -1,18 +1,13 @@
-import { noop } from '@michess/common-utils';
 import { Card, Flex, Text } from '@radix-ui/themes';
 
-import React, { useState } from 'react';
-import { Alert } from '../components/Alert';
+import React from 'react';
 import { Link } from '../components/Link';
 import { OrSeparator } from '../components/OrSeparator';
 import { AuthCardHeader } from '../features/auth/components/AuthCardHeader';
-import { SignInForm } from '../features/auth/components/SignInForm';
-import { SocialSignIn } from '../features/auth/components/SocialSignIn';
+import { SignInFormContainer } from '../features/auth/container/SignInFormContainer';
+import { SocialSignInContainer } from '../features/auth/container/SocialSignInContainer';
 
 export const SignInPage: React.FC = () => {
-  const [isLoading, _1] = useState(false);
-  const [error, _2] = useState('');
-
   return (
     <Flex direction="column" align="center" justify="center">
       <Card size="4" style={{ width: '100%', maxWidth: '400px' }}>
@@ -22,15 +17,9 @@ export const SignInPage: React.FC = () => {
             subtitle="Welcome back! Please enter your details."
           />
 
-          <Alert text={error} />
-
-          <SignInForm isLoading={isLoading} onSubmit={noop} />
+          <SignInFormContainer />
           <OrSeparator />
-          <SocialSignIn
-            isLoading={isLoading}
-            onGoogleSignIn={noop}
-            onFacebookSignIn={noop}
-          />
+          <SocialSignInContainer />
 
           <Flex align="center" justify="center" gap="2">
             <Text size="2" color="gray">
