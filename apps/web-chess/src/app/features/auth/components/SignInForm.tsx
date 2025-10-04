@@ -9,11 +9,21 @@ type Props = {
   error?: string;
 };
 
-export const SignInForm: FC<Props> = ({ isLoading, error }) => (
-  <form>
+export const SignInForm: FC<Props> = ({ isLoading, error, onSubmit }) => (
+  <form
+    onSubmit={(e) => {
+      e.preventDefault();
+      const form = e.target as HTMLFormElement;
+      const formData = new FormData(form);
+      const email = formData.get('email') as string;
+      const password = formData.get('password') as string;
+      onSubmit({ email, password });
+    }}
+  >
     <Alert text={error} />
     <Flex direction="column" gap="3">
       <TextField.Root
+        name="email"
         type="email"
         placeholder="Email"
         required
@@ -21,6 +31,7 @@ export const SignInForm: FC<Props> = ({ isLoading, error }) => (
       />
 
       <TextField.Root
+        name="password"
         type="password"
         placeholder="Password"
         required

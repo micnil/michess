@@ -91,6 +91,7 @@ export class AuthService {
       const { data, error } = await this.authClient.signIn.email({
         email: credentials.email,
         password: credentials.password,
+        callbackURL: '/',
       });
       if (data) {
         this.socketClient.connect();
