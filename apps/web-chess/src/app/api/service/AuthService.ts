@@ -68,6 +68,7 @@ export class AuthService {
         this.socketClient.connect();
 
         // After sign up, get fresh session data
+        this.currentAuthState = undefined; // Clear cached session
         const sessionResult = await this.getSession();
         if (!sessionResult) {
           throw new Error('Failed to get session after sign up');
