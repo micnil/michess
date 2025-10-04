@@ -61,6 +61,7 @@ export class AuthService {
         email: credentials.email,
         password: credentials.password,
         name: credentials.name,
+        callbackURL: '/',
       });
 
       if (data) {

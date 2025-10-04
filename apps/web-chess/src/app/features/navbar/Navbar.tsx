@@ -18,7 +18,7 @@ export const Navbar: FC<Props> = () => {
       {!isLoading || auth?.user.isAnonymous ? (
         <>
           <Link asChild size={'3'} color="gray">
-            <RouterLink to="/sign-in">Sign in</RouterLink>
+            <RouterLink to="/sign-in">Log in</RouterLink>
           </Link>
           <Link asChild size={'3'} color="amber">
             <RouterLink to="/sign-up">Sign up</RouterLink>

@@ -9,13 +9,30 @@ type Props = {
   error?: string;
 };
 
-export const SignUpForm: FC<Props> = ({ isLoading, error }) => (
-  <form>
+export const SignUpForm: FC<Props> = ({ isLoading, error, onSubmit }) => (
+  <form
+    onSubmit={(e) => {
+      e.preventDefault();
+      const formData = new FormData(e.currentTarget);
+      const name = formData.get('name') as string;
+      const email = formData.get('email') as string;
+      const password = formData.get('password') as string;
+      const confirmPassword = formData.get('confirmPassword') as string;
+
+      onSubmit({ name, email, password, confirmPassword });
+    }}
+  >
     <Alert text={error} />
     <Flex direction="column" gap="3">
-      <TextField.Root placeholder="Name" required disabled={isLoading} />
+      <TextField.Root
+        name="name"
+        placeholder="Name"
+        required
+        disabled={isLoading}
+      />
 
       <TextField.Root
+        name="email"
         type="email"
         placeholder="Email"
         required
@@ -23,6 +40,7 @@ export const SignUpForm: FC<Props> = ({ isLoading, error }) => (
       />
 
       <TextField.Root
+        name="password"
         type="password"
         placeholder="Password"
         required
@@ -30,6 +48,7 @@ export const SignUpForm: FC<Props> = ({ isLoading, error }) => (
       />
 
       <TextField.Root
+        name="confirmPassword"
         type="password"
         placeholder="Confirm Password"
         required

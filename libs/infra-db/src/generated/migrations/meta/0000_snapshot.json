@@ -1,5 +1,5 @@
 {
-  "id": "5d443cd0-c966-40e3-b77d-86222df5a3ec",
+  "id": "2dd24da2-728a-4611-8536-72cff91f2ed4",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -211,7 +211,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "set null",
           "onUpdate": "no action"
         },
         "games_black_player_id_users_id_fk": {
@@ -224,7 +224,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },

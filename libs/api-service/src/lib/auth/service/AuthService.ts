@@ -1,8 +1,5 @@
 import { Maybe } from '@michess/common-utils';
-import { CacheRepository, DatabaseClient, schema } from '@michess/infra-db';
-import { betterAuth } from 'better-auth';
-import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { anonymous } from 'better-auth/plugins/anonymous';
+import { AuthClient, CacheRepository, DatabaseClient } from '@michess/infra-db';
 import { Sql } from 'postgres';
 import { Session } from '../model/Session';
 
@@ -10,20 +7,11 @@ export class AuthService {
   auth;
   constructor(sql: Sql, cacheRepo: CacheRepository) {
     const db = DatabaseClient.from(sql);
-
-    this.auth = betterAuth({
-      database: drizzleAdapter(db, {
-        provider: 'pg',
-        schema,
-        usePlural: true,
-      }),
-      plugins: [anonymous()],
-      secondaryStorage: {
-        get: (key) => cacheRepo.get(key),
-        set: (key, value, ttl) => cacheRepo.set(key, value, ttl),
-        delete: async (key) => {
-          await cacheRepo.delete(key);
-        },
+    this.auth = AuthClient.from(db, {
+      get: (key) => cacheRepo.get(key),
+      set: (key, value, ttl) => cacheRepo.set(key, value, ttl),
+      delete: async (key) => {
+        await cacheRepo.delete(key);
       },
     });
   }

@@ -10,7 +10,12 @@ export const SignUpFormContainer = () => {
     isPending,
     error,
   } = useMutation({
-    mutationFn: (input: SignUpInput) => api.auth.signUp(input),
+    mutationFn: (input: SignUpInput) => {
+      if (input.password !== input.confirmPassword) {
+        throw new Error('Passwords do not match');
+      }
+      return api.auth.signUp(input);
+    },
   });
 
   return (

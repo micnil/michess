@@ -13,8 +13,12 @@ export const games = pgTable('games', {
   variant: variantEnum().default('standard').notNull(),
   isPrivate: boolean('is_private').default(false).notNull(),
 
-  whitePlayerId: text('white_player_id').references(() => users.id),
-  blackPlayerId: text('black_player_id').references(() => users.id),
+  whitePlayerId: text('white_player_id').references(() => users.id, {
+    onDelete: 'set null',
+  }),
+  blackPlayerId: text('black_player_id').references(() => users.id, {
+    onDelete: 'set null',
+  }),
 
   status: gameStatusEnum().default('empty').notNull(),
   result: resultEnum().default('0-0').notNull(),

@@ -17,7 +17,7 @@
     "perft": "tsx --tsconfig tools/tsconfig.tools.json tools/perft.ts",
     "perft:debug": "tsx --inspect-brk --tsconfig tools/tsconfig.tools.json tools/perft.ts",
     "migration:generate": "drizzle-kit generate --config=libs/infra-db/drizzle.config.ts",
-    "better-auth:generate": "pnpx @better-auth/cli generate --config=libs/infra-db/auth.config.ts --output=libs/infra-db/src/lib/schema/auth.ts",
+    "better-auth:generate": "pnpx @better-auth/cli generate --config=libs/infra-db/src/auth.config.ts --output=libs/infra-db/src/lib/schema/auth.ts",
     "drizzle-studio": "dotenv -e ./apps/node-chess/.env -c -- drizzle-kit studio --config=libs/infra-db/drizzle.config.ts",
     "migration:run": "dotenv -e ./apps/node-chess/.env -c -- drizzle-kit migrate --config=libs/infra-db/drizzle.config.ts",
     "migration:push": "dotenv -e ./apps/node-chess/.env -c -- drizzle-kit push --config=libs/infra-db/drizzle.config.ts --force"

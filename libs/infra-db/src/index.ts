@@ -1,3 +1,4 @@
+export * from './lib/auth/AuthClient';
 export * from './lib/DatabaseClient';
 export * from './lib/model/InsertGame';
 export * from './lib/model/SelectGame';
