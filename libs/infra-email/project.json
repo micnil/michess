@@ -5,17 +5,6 @@
   "projectType": "library",
   "tags": [],
   "targets": {
-    "build": {
-      "executor": "@nx/js:tsc",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "outputPath": "dist/libs/infra-email",
-        "tsConfig": "libs/infra-email/tsconfig.lib.json",
-        "packageJson": "libs/infra-email/package.json",
-        "main": "libs/infra-email/src/index.ts",
-        "assets": ["libs/infra-email/*.md"]
-      }
-    },
     "lint": {
       "executor": "@nx/eslint:lint"
     },
