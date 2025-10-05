@@ -25,6 +25,7 @@
       "@michess/core-board": ["libs/core-board/src/index.ts"],
       "@michess/core-game": ["libs/core-game/src/index.ts"],
       "@michess/infra-db": ["libs/infra-db/src/index.ts"],
+      "@michess/infra-email": ["libs/infra-email/src/index.ts"],
       "@michess/react-chessboard": ["libs/react-chessboard/src/index.ts"],
       "@michess/react-dnd": ["libs/react-dnd/src/index.ts"]
     }
