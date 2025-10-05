@@ -31,7 +31,9 @@ export const AuthClient = {
       database: createDrizzleAdapter(db),
       plugins: [anonymous()],
       secondaryStorage,
+
       emailVerification: {
+        autoSignInAfterVerification: true,
         sendVerificationEmail: emails?.verification,
         sendOnSignUp: true,
       },

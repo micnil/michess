@@ -11,6 +11,7 @@ import { ApiProvider } from './app/api/context/ApiProvider';
 import { QueryProvider } from './app/api/context/QueryProvider';
 import { BackgroundGradient } from './app/components/BackgroundGradient';
 import { Navbar } from './app/features/navbar/Navbar';
+import { EmailVerificationPage } from './app/pages/EmailVerificationPage';
 import GamePage from './app/pages/GamePage';
 import { HomePage } from './app/pages/HomePage';
 import { SignInPage } from './app/pages/SignInPage';
@@ -97,12 +98,27 @@ const signinRoute = createRoute({
   },
 });
 
+const emailVerificationRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/email-verification',
+  validateSearch: (search) => {
+    return {
+      verificationError: search.error as string | undefined,
+    };
+  },
+  component: function EmailVerificationComponent() {
+    const { verificationError } = emailVerificationRoute.useSearch();
+    return <EmailVerificationPage verificationError={verificationError} />;
+  },
+});
+
 const routeTree = rootRoute.addChildren([
   signupRoute,
   signinRoute,
   indexRoute,
   gameRoute,
   gameWithIdRoute,
+  emailVerificationRoute,
 ]);
 export const router = createRouter({ routeTree });
 declare module '@tanstack/react-router' {
