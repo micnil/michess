@@ -1,9 +1,9 @@
 import * as nodemailer from 'nodemailer';
 import { SendMailOptions, Transporter } from 'nodemailer';
-import { EmailConfig } from '../model/EmailConfig';
-import { EmailMessage } from '../model/EmailMessage';
+import { EmailConfig } from './model/EmailConfig';
+import { EmailMessage } from './model/EmailMessage';
 
-export class EmailService {
+export class EmailClient {
   private transporter: Transporter;
   private defaultFrom: string;
 

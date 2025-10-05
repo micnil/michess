@@ -24,6 +24,15 @@ const getConfig = (): AppConfig => {
     cors: {
       origins: (process.env.CORS_ORIGINS || 'http://localhost:4200').split(','),
     },
+    email: {
+      host: readEnvStrict('EMAIL_HOST'),
+      port: parseInt(readEnvStrict('EMAIL_PORT'), 10),
+      secure: (process.env.EMAIL_SECURE || 'false').toLowerCase() === 'true',
+      auth: {
+        user: readEnvStrict('EMAIL_USER'),
+        pass: readEnvStrict('EMAIL_PASS'),
+      },
+    },
   };
 };
 

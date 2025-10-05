@@ -1,8 +1,8 @@
-import { EmailConfig } from '../../model/EmailConfig';
-import { EmailService } from '../EmailService';
+import { EmailClient } from '../EmailClient';
+import { EmailConfig } from '../model/EmailConfig';
 
-describe('EmailService', () => {
-  let emailService: EmailService;
+describe('EmailCLient', () => {
+  let emailClient: EmailClient;
   let mockConfig: EmailConfig;
 
   beforeEach(() => {
@@ -15,10 +15,10 @@ describe('EmailService', () => {
         pass: 'testpass',
       },
     };
-    emailService = new EmailService(mockConfig, 'noreply@test.com');
+    emailClient = new EmailClient(mockConfig, 'noreply@test.com');
   });
 
   it('should create an instance', () => {
-    expect(emailService).toBeDefined();
+    expect(emailClient).toBeDefined();
   });
 });

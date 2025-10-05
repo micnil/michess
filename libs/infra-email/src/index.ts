@@ -1,1 +1,2 @@
-export * from './lib/service/EmailService';
+export * from './lib/EmailClient';
+export * from './lib/model/EmailConfig';

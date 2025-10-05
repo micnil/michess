@@ -1,3 +1,5 @@
+import { EmailConfig } from '@michess/infra-email';
+
 export type AppConfig = {
   database: {
     url: string;
@@ -12,4 +14,5 @@ export type AppConfig = {
   cors: {
     origins: string[];
   };
+  email: EmailConfig;
 };
