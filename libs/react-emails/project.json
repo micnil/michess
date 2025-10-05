@@ -1,0 +1,30 @@
+{
+  "name": "react-emails",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/react-emails/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/react-emails",
+        "tsConfig": "libs/react-emails/tsconfig.lib.json",
+        "packageJson": "libs/react-emails/package.json",
+        "main": "libs/react-emails/src/index.ts",
+        "assets": ["libs/react-emails/*.md"]
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/react-emails/jest.config.ts"
+      }
+    }
+  }
+}
