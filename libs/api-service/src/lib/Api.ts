@@ -1,4 +1,5 @@
 import { Repositories } from '@michess/infra-db';
+import { EmailClient } from '@michess/infra-email';
 import { randomUUID } from 'crypto';
 import { Sql } from 'postgres';
 import { AuthService } from './auth/service/AuthService';
@@ -11,10 +12,10 @@ export type Api = {
   usageMetrics: UsageMetricsService;
 };
 
-const from = (repos: Repositories, sql: Sql): Api => {
+const from = (repos: Repositories, sql: Sql, emailClient: EmailClient): Api => {
   const processId = randomUUID();
   const gamesService = new GamesService(repos.game, repos.move);
-  const authService = new AuthService(sql, repos.cache);
+  const authService = new AuthService(sql, repos.cache, emailClient);
   const usageMetrics = new UsageMetricsService(
     processId,
     repos.cache,

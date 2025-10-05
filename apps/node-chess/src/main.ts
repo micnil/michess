@@ -1,6 +1,7 @@
 import { App } from '@michess/api-router';
 import { Api } from '@michess/api-service';
 import { Repositories } from '@michess/infra-db';
+import { EmailClient } from '@michess/infra-email';
 import dotenv from 'dotenv';
 import Redis from 'ioredis';
 import postgres from 'postgres';
@@ -12,14 +13,19 @@ dotenv.config();
 const main = async () => {
   const appConfig = AppConfigService.get();
 
-  const client = postgres(appConfig.database.url);
+  const pgClient = postgres(appConfig.database.url);
 
   const redis = new Redis(appConfig.redis.url, {
     maxRetriesPerRequest: null,
   });
 
-  const repos = Repositories.from(client, redis);
-  const api = Api.from(repos, client);
+  const emailClient = new EmailClient(
+    appConfig.email,
+    'no-reply@chessmonky.com'
+  );
+
+  const repos = Repositories.from(pgClient, redis);
+  const api = Api.from(repos, pgClient, emailClient);
   const app = App.from(api, { cors: appConfig.cors });
 
   Server.start(app, appConfig);

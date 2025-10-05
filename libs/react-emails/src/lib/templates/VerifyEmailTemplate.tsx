@@ -7,6 +7,7 @@ import {
   Preview,
   render,
   Text,
+  toPlainText,
 } from '@react-email/components';
 import { FC } from 'react';
 type Props = {
@@ -28,7 +29,14 @@ const Component: FC<Props> = (props) => {
 };
 
 export const VerifyEmailTemplate = {
-  async compile(props: Props): Promise<string> {
-    return render(<Component url={props.url} />);
+  async compile(props: Props): Promise<{
+    html: string;
+    text: string;
+  }> {
+    const rendered = await render(<Component url={props.url} />);
+    return {
+      html: rendered,
+      text: toPlainText(rendered),
+    };
   },
 };
