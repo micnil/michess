@@ -20,7 +20,7 @@ export class AuthService {
       },
       {
         verification: async ({ user, url }, _) => {
-          emailClient.sendEmail({
+          await emailClient.sendEmail({
             subject: 'Verify your email',
             to: user.email,
             text: `Please verify your email by clicking the following link: ${url}`,

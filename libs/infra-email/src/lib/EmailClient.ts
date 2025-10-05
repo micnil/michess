@@ -1,7 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { logger } from '@michess/be-utils';
 import * as nodemailer from 'nodemailer';
 import { SendMailOptions, Transporter } from 'nodemailer';
 import { EmailConfig } from './model/EmailConfig';
 import { EmailMessage } from './model/EmailMessage';
+
+const nodeMailerLogger = logger.child({ component: 'EmailClient' });
 
 export class EmailClient {
   private transporter: Transporter;
@@ -10,6 +14,15 @@ export class EmailClient {
   constructor(config: EmailConfig, defaultFrom: string) {
     this.defaultFrom = defaultFrom;
     this.transporter = nodemailer.createTransport({
+      logger: {
+        info: (...args: any[]) => nodeMailerLogger.info(args),
+        error: (...args: any[]) => nodeMailerLogger.error(args),
+        debug: (...args: any[]) => nodeMailerLogger.debug(args),
+        fatal: (...args: any[]) => nodeMailerLogger.error(args),
+        warn: (...args: any[]) => nodeMailerLogger.warn(args),
+        trace: (...args: any[]) => nodeMailerLogger.trace(args),
+        level: (level) => (nodeMailerLogger.level = level),
+      },
       host: config.host,
       port: config.port,
       secure: config.secure,
