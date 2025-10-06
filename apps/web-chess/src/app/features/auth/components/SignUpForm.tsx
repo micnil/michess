@@ -2,6 +2,7 @@ import { Button, Flex, TextField } from '@radix-ui/themes';
 import { FC } from 'react';
 import { SignUpInput } from '../../../api/model/SignUpInput';
 import { Alert } from '../../../components/Alert';
+import { PasswordField } from '../../../components/PasswordField';
 
 type Props = {
   isLoading: boolean;
@@ -39,7 +40,7 @@ export const SignUpForm: FC<Props> = ({ isLoading, error, onSubmit }) => (
         disabled={isLoading}
       />
 
-      <TextField.Root
+      <PasswordField
         name="password"
         type="password"
         placeholder="Password"
@@ -47,7 +48,7 @@ export const SignUpForm: FC<Props> = ({ isLoading, error, onSubmit }) => (
         disabled={isLoading}
       />
 
-      <TextField.Root
+      <PasswordField
         name="confirmPassword"
         type="password"
         placeholder="Confirm Password"
