@@ -1,10 +1,13 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
 import { useApi } from '../../../api/hooks/useApi';
 import { SignUpInput } from '../../../api/model/SignUpInput';
 import { SignUpForm } from '../components/SignUpForm';
 
 export const SignUpFormContainer = () => {
   const api = useApi();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const {
     mutate: signUp,
     isPending,
@@ -15,6 +18,10 @@ export const SignUpFormContainer = () => {
         throw new Error('Passwords do not match');
       }
       return api.auth.signUp(input);
+    },
+    onSuccess: (data) => {
+      navigate({ to: '/' });
+      queryClient.setQueryData(['auth', 'session'], data);
     },
   });
 

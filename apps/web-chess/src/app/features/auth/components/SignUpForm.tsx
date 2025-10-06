@@ -22,8 +22,8 @@ export const SignUpForm: FC<Props> = ({ isLoading, error, onSubmit }) => (
       onSubmit({ name, email, password, confirmPassword });
     }}
   >
-    <Alert text={error} />
     <Flex direction="column" gap="3">
+      <Alert text={error} />
       <TextField.Root
         name="name"
         placeholder="Name"

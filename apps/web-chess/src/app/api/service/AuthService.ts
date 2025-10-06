@@ -76,7 +76,7 @@ export class AuthService {
 
         return sessionResult;
       } else if (error) {
-        throw new Error('Sign up failed', { cause: error });
+        throw new Error(error.message, { cause: error });
       } else {
         throw new Error('Sign up failed: No data returned');
       }

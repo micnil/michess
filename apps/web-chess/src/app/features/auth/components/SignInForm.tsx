@@ -20,8 +20,8 @@ export const SignInForm: FC<Props> = ({ isLoading, error, onSubmit }) => (
       onSubmit({ email, password });
     }}
   >
-    <Alert text={error} />
     <Flex direction="column" gap="3">
+      <Alert text={error} />
       <TextField.Root
         name="email"
         type="email"
