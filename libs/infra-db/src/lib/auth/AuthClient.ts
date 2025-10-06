@@ -17,11 +17,20 @@ type Emails = {
   resetPassword: SendEmailCb;
 };
 
+type OAuthConfig = {
+  google: {
+    clientId: string;
+    clientSecret: string;
+    redirectUri?: string;
+  };
+};
+
 export const AuthClient = {
   from(
     db: DatabaseClient,
     secondaryStorage: SecondaryStorage,
-    emails?: Emails
+    emails?: Emails,
+    oauthConfig?: OAuthConfig
   ) {
     return betterAuth({
       emailAndPassword: {
@@ -33,6 +42,17 @@ export const AuthClient = {
       database: createDrizzleAdapter(db),
       plugins: [anonymous()],
       secondaryStorage,
+      socialProviders: {
+        google: oauthConfig
+          ? {
+              clientId: oauthConfig.google.clientId,
+              clientSecret: oauthConfig.google.clientSecret,
+              redirectURI: oauthConfig.google.redirectUri,
+              accessType: 'offline',
+              prompt: 'select_account consent',
+            }
+          : undefined,
+      },
 
       emailVerification: {
         autoSignInAfterVerification: true,

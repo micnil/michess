@@ -15,4 +15,10 @@ export type AppConfig = {
     origins: string[];
   };
   email: EmailConfig;
+  auth: {
+    google: {
+      clientId: string;
+      clientSecret: string;
+    };
+  };
 };

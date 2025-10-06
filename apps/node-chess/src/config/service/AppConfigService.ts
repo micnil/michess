@@ -33,6 +33,12 @@ const getConfig = (): AppConfig => {
         pass: readEnvStrict('EMAIL_PASS'),
       },
     },
+    auth: {
+      google: {
+        clientId: readEnvStrict('GOOGLE_OAUTH_CLIENT_ID'),
+        clientSecret: readEnvStrict('GOOGLE_OAUTH_CLIENT_SECRET'),
+      },
+    },
   };
 };
 
