@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { useApi } from '../../../api/hooks/useApi';
 import { SignInInput } from '../../../api/model/SignInInput';
+import { Link } from '../../../components/Link';
 import { SignInForm } from '../components/SignInForm';
 
 export const SignInFormContainer = () => {
@@ -14,10 +15,15 @@ export const SignInFormContainer = () => {
   });
 
   return (
-    <SignInForm
-      onSubmit={signIn}
-      isLoading={isPending}
-      error={error?.message}
-    />
+    <>
+      <SignInForm
+        onSubmit={signIn}
+        isLoading={isPending}
+        error={error?.message}
+      />
+      <Link color="gray" to="/forgot-password" style={{ width: 'fit-content' }}>
+        Forgot your password?
+      </Link>
+    </>
   );
 };

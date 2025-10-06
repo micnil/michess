@@ -1,26 +1,25 @@
 import { Card, Flex, Text } from '@radix-ui/themes';
-import React from 'react';
+
+import { FC } from 'react';
 import { Link } from '../components/Link';
 import { OrSeparator } from '../components/OrSeparator';
 import { AuthCardHeader } from '../features/auth/components/AuthCardHeader';
-import { SignUpFormContainer } from '../features/auth/container/SignUpFormContainer';
-import { SocialSignInContainer } from '../features/auth/container/SocialSignInContainer';
+import { RequestResetPasswordFormContainer } from '../features/auth/container/RequestResetPasswordFormContainer';
 
-export const SignUpPage: React.FC = () => {
+export const RequestResetPasswordPage: FC = () => {
   return (
     <Flex direction="column" align="center" justify="center">
       <Card size="4" style={{ width: '100%', maxWidth: '400px' }}>
-        <Flex direction="column" gap="4">
+        <Flex direction="column" gap="5">
           <AuthCardHeader
-            title="Sign up"
-            subtitle="Create your account to get started"
+            title="Reset Password"
+            subtitle="Enter your email to reset your password"
           />
-          <SignUpFormContainer />
+          <RequestResetPasswordFormContainer />
           <OrSeparator />
-          <SocialSignInContainer />
           <Flex align="center" justify="center" gap="2">
             <Text size="2" color="gray">
-              Already have an account?
+              Remembered your login?
             </Text>
             <Link to="/sign-in">Sign in</Link>
           </Flex>

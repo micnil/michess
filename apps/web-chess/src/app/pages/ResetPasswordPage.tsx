@@ -1,26 +1,32 @@
 import { Card, Flex, Text } from '@radix-ui/themes';
-import React from 'react';
+import { FC } from 'react';
+import { Alert } from '../components/Alert';
 import { Link } from '../components/Link';
-import { OrSeparator } from '../components/OrSeparator';
 import { AuthCardHeader } from '../features/auth/components/AuthCardHeader';
-import { SignUpFormContainer } from '../features/auth/container/SignUpFormContainer';
-import { SocialSignInContainer } from '../features/auth/container/SocialSignInContainer';
+import { ResetPasswordFormContainer } from '../features/auth/container/ResetPasswordFormContainer';
 
-export const SignUpPage: React.FC = () => {
+type Props = {
+  token?: string;
+};
+
+export const ResetPasswordPage: FC<Props> = ({ token }) => {
   return (
     <Flex direction="column" align="center" justify="center">
       <Card size="4" style={{ width: '100%', maxWidth: '400px' }}>
         <Flex direction="column" gap="4">
           <AuthCardHeader
-            title="Sign up"
-            subtitle="Create your account to get started"
+            title="Reset Password"
+            subtitle="Complete the form to reset your password"
           />
-          <SignUpFormContainer />
-          <OrSeparator />
-          <SocialSignInContainer />
+          {token ? (
+            <ResetPasswordFormContainer token={token} />
+          ) : (
+            <Alert text="Something went wrong. Please try resetting your password again." />
+          )}
+
           <Flex align="center" justify="center" gap="2">
             <Text size="2" color="gray">
-              Already have an account?
+              Remembered your login?
             </Text>
             <Link to="/sign-in">Sign in</Link>
           </Flex>

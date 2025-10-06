@@ -62,6 +62,7 @@ export const SignUpForm: FC<Props> = ({ isLoading, error, onSubmit }) => (
         size="2"
         style={{ width: '100%' }}
         disabled={isLoading}
+        loading={isLoading}
       >
         {isLoading ? 'Creating Account...' : 'Create Account'}
       </Button>

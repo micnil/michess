@@ -1,7 +1,10 @@
 import { Maybe } from '@michess/common-utils';
 import { AuthClient, CacheRepository, DatabaseClient } from '@michess/infra-db';
 import { EmailClient } from '@michess/infra-email';
-import { VerifyEmailTemplate } from '@michess/react-emails';
+import {
+  ResetPasswordEmailTemplate,
+  VerifyEmailTemplate,
+} from '@michess/react-emails';
 import { Sql } from 'postgres';
 import { Session } from '../model/Session';
 
@@ -20,11 +23,23 @@ export class AuthService {
       },
       {
         verification: async ({ user, url }, _) => {
+          const { html, text } = await VerifyEmailTemplate.compile({ url });
           await emailClient.sendEmail({
             subject: 'Verify your email',
             to: user.email,
-            text: `Please verify your email by clicking the following link: ${url}`,
-            html: (await VerifyEmailTemplate.compile({ url })).html,
+            text,
+            html,
+          });
+        },
+        resetPassword: async ({ user, url }, _) => {
+          const { html, text } = await ResetPasswordEmailTemplate.compile({
+            url,
+          });
+          await emailClient.sendEmail({
+            subject: 'Reset your password',
+            to: user.email,
+            text,
+            html,
           });
         },
       }

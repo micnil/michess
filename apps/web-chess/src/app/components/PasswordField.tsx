@@ -16,6 +16,7 @@ export const PasswordField: FC<Props> = (props) => {
       <TextField.Slot side="right">
         <IconButton
           variant="ghost"
+          tabIndex={-1}
           size="1"
           type="button"
           radius="full"

@@ -167,6 +167,42 @@ export class AuthService {
     }
   }
 
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    try {
+      const { error } = await this.authClient.resetPassword({
+        newPassword,
+        token,
+      });
+
+      if (error) {
+        throw new Error(error.message || 'Failed to reset password', {
+          cause: error,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to reset password:', error);
+      throw error;
+    }
+  }
+
+  async requestPasswordReset(email: string): Promise<void> {
+    try {
+      const { error } = await this.authClient.requestPasswordReset({
+        email,
+        redirectTo: '/reset-password',
+      });
+
+      if (error) {
+        throw new Error(error.message || 'Failed to reset password', {
+          cause: error,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to reset password:', error);
+      throw error;
+    }
+  }
+
   clearCurrentSession(): void {
     this.currentAuthState = undefined;
   }

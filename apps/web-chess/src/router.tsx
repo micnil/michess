@@ -14,6 +14,8 @@ import { Navbar } from './app/features/navbar/Navbar';
 import { EmailVerificationPage } from './app/pages/EmailVerificationPage';
 import GamePage from './app/pages/GamePage';
 import { HomePage } from './app/pages/HomePage';
+import { RequestResetPasswordPage } from './app/pages/RequestResetPasswordPage';
+import { ResetPasswordPage } from './app/pages/ResetPasswordPage';
 import { SignInPage } from './app/pages/SignInPage';
 import { SignUpPage } from './app/pages/SignUpPage';
 
@@ -112,6 +114,28 @@ const emailVerificationRoute = createRoute({
   },
 });
 
+const forgotPasswordRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/forgot-password',
+  component: function RequestResetPasswordComponent() {
+    return <RequestResetPasswordPage />;
+  },
+});
+
+const resetPasswordRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/reset-password',
+  validateSearch: (search) => {
+    return {
+      token: search.token as string | undefined,
+    };
+  },
+  component: function ResetPasswordComponent() {
+    const { token } = resetPasswordRoute.useSearch();
+    return <ResetPasswordPage token={token} />;
+  },
+});
+
 const routeTree = rootRoute.addChildren([
   signupRoute,
   signinRoute,
@@ -119,6 +143,8 @@ const routeTree = rootRoute.addChildren([
   gameRoute,
   gameWithIdRoute,
   emailVerificationRoute,
+  forgotPasswordRoute,
+  resetPasswordRoute,
 ]);
 export const router = createRouter({ routeTree });
 declare module '@tanstack/react-router' {

@@ -25,7 +25,7 @@ export const SignInPage: React.FC = () => {
             <Text size="2" color="gray">
               Don't have an account?
             </Text>
-            <Link route={{ to: '/sign-up' }}>Sign up</Link>
+            <Link to="/sign-up">Sign up</Link>
           </Flex>
         </Flex>
       </Card>

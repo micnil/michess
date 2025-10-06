@@ -1,40 +1,43 @@
-import { Button, Flex, TextField } from '@radix-ui/themes';
-import { FC } from 'react';
-import { SignInInput } from '../../../api/model/SignInInput';
+import { Button, Flex } from '@radix-ui/themes';
 import { Alert } from '../../../components/Alert';
 import { PasswordField } from '../../../components/PasswordField';
 
 type Props = {
   isLoading: boolean;
-  onSubmit: (input: SignInInput) => void;
+  onSubmit: (input: { password: string; confirmPassword: string }) => void;
   error?: string;
 };
 
-export const SignInForm: FC<Props> = ({ isLoading, error, onSubmit }) => (
+export const ResetPasswordForm: React.FC<Props> = ({
+  isLoading,
+  onSubmit,
+  error,
+}) => (
   <form
     onSubmit={(e) => {
       e.preventDefault();
       const form = e.target as HTMLFormElement;
       const formData = new FormData(form);
-      const email = formData.get('email') as string;
       const password = formData.get('password') as string;
-      onSubmit({ email, password });
+      const confirmPassword = formData.get('confirmPassword') as string;
+
+      onSubmit({ password, confirmPassword });
     }}
   >
     <Flex direction="column" gap="3">
       <Alert text={error} />
-      <TextField.Root
-        name="email"
-        type="email"
-        placeholder="Email"
+      <PasswordField
+        name="password"
+        type="password"
+        placeholder="Password"
         required
         disabled={isLoading}
       />
 
       <PasswordField
-        name="password"
+        name="confirmPassword"
         type="password"
-        placeholder="Password"
+        placeholder="Confirm Password"
         required
         disabled={isLoading}
       />
@@ -47,7 +50,7 @@ export const SignInForm: FC<Props> = ({ isLoading, error, onSubmit }) => (
         disabled={isLoading}
         loading={isLoading}
       >
-        {isLoading ? 'Signing In...' : 'Sign In'}
+        {isLoading ? 'Submitting' : 'Submit'}
       </Button>
     </Flex>
   </form>

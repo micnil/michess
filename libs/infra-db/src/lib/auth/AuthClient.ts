@@ -4,7 +4,7 @@ import { anonymous } from 'better-auth/plugins/anonymous';
 import { DatabaseClient } from '../DatabaseClient';
 import { createDrizzleAdapter } from './drizzleAdapter';
 
-type SendVerificationEmailCb = (
+type SendEmailCb = (
   data: {
     user: User;
     url: string;
@@ -13,7 +13,8 @@ type SendVerificationEmailCb = (
   request?: Request
 ) => Promise<void>;
 type Emails = {
-  verification: SendVerificationEmailCb;
+  verification: SendEmailCb;
+  resetPassword: SendEmailCb;
 };
 
 export const AuthClient = {
@@ -25,6 +26,7 @@ export const AuthClient = {
     return betterAuth({
       emailAndPassword: {
         enabled: true,
+        sendResetPassword: emails?.resetPassword,
       },
       // TODO: Use app config
       trustedOrigins: process.env.CORS_ORIGINS?.split(',') || [],
