@@ -95,8 +95,14 @@ const signupRoute = createRoute({
 const signinRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/sign-in',
+  validateSearch: (search): { referer?: string } => {
+    return {
+      referer: search.referer as string | undefined,
+    };
+  },
   component: function SignInComponent() {
-    return <SignInPage />;
+    const { referer } = signinRoute.useSearch();
+    return <SignInPage referer={referer} />;
   },
 });
 
@@ -146,7 +152,9 @@ const routeTree = rootRoute.addChildren([
   forgotPasswordRoute,
   resetPasswordRoute,
 ]);
+
 export const router = createRouter({ routeTree });
+
 declare module '@tanstack/react-router' {
   interface Register {
     router: typeof router;

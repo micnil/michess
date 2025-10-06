@@ -20,7 +20,11 @@ export const ResetPasswordFormContainer = ({ token }: Props) => {
       await api.auth.resetPassword(token, formData.password);
     },
     onSuccess: () => {
-      navigate({ to: '/sign-in', replace: true });
+      navigate({
+        to: '/sign-in',
+        replace: true,
+        search: { referer: 'reset-password' },
+      });
     },
   });
 
