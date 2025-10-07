@@ -1,6 +1,6 @@
 {
-  "id": "d1421650-ed39-4a49-8682-64f18270ac69",
-  "prevId": "7b713084-3b26-44a5-b0d2-d07f471efa9d",
+  "id": "61318e8d-ecf2-484d-8538-bf59e8c6a67d",
+  "prevId": "8c374de3-97f4-4d6d-8bc8-e375d7cd46bd",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -345,8 +345,7 @@
           "name": "username",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
-          "default": "concat('user', nextval('username_seq'))"
+          "notNull": false
         },
         "display_username": {
           "name": "display_username",

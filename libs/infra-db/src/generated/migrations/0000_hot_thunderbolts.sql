@@ -51,7 +51,7 @@ CREATE TABLE "users" (
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	"is_anonymous" boolean,
-	"username" text DEFAULT concat('user', nextval('username_seq')) NOT NULL,
+	"username" text,
 	"display_username" text,
 	CONSTRAINT "users_email_unique" UNIQUE("email"),
 	CONSTRAINT "users_username_unique" UNIQUE("username")

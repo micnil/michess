@@ -1,4 +1,3 @@
-import { sql } from 'drizzle-orm';
 import {
   boolean,
   pgSequence,
@@ -19,9 +18,6 @@ export const users = pgTable('users', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt,
   isAnonymous: boolean('is_anonymous'),
-  username: text('username')
-    .unique()
-    .default(sql`concat('user', nextval('username_seq'))`)
-    .notNull(),
+  username: text('username').unique(),
   displayUsername: text('display_username'),
 });
