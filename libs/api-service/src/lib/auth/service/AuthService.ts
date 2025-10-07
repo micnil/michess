@@ -6,7 +6,6 @@ import {
   VerifyEmailTemplate,
 } from '@michess/react-emails';
 import { Sql } from 'postgres';
-import { URL } from 'url';
 import { AuthConfig } from '../model/AuthConfig';
 import { Session } from '../model/Session';
 
@@ -54,8 +53,6 @@ export class AuthService {
         google: {
           clientId: config.google.clientId,
           clientSecret: config.google.clientSecret,
-          redirectUri: new URL('/auth/callback/google', process.env.WEB_APP_URL)
-            .href,
         },
       }
     );

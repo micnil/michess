@@ -1,13 +1,19 @@
 import { noop } from '@michess/common-utils';
-import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { useApi } from '../../../api/hooks/useApi';
 import { SocialSignIn } from '../components/SocialSignIn';
 
 export const SocialSignInContainer = () => {
-  const [isLoading, _] = useState(false);
+  const api = useApi();
+  const { mutate, isPending } = useMutation({
+    mutationFn: async () => {
+      await api.auth.signInWithGoogle();
+    },
+  });
   return (
     <SocialSignIn
-      isLoading={isLoading}
-      onGoogleSignIn={noop}
+      isLoading={isPending}
+      onGoogleSignIn={mutate}
       onFacebookSignIn={noop}
     />
   );

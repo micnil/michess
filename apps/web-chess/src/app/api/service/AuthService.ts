@@ -56,104 +56,102 @@ export class AuthService {
   }
 
   async signUp(credentials: SignUpInput): Promise<AuthState> {
-    try {
-      const { data, error } = await this.authClient.signUp.email({
-        email: credentials.email,
-        password: credentials.password,
-        name: credentials.name,
-        callbackURL: '/email-verification',
-      });
+    const { data, error } = await this.authClient.signUp.email({
+      email: credentials.email,
+      password: credentials.password,
+      name: credentials.name,
+      callbackURL: '/email-verification',
+    });
 
-      if (data) {
-        this.socketClient.connect();
+    if (data) {
+      this.socketClient.connect();
 
-        // After sign up, get fresh session data
-        this.currentAuthState = undefined; // Clear cached session
-        const sessionResult = await this.getSession();
-        if (!sessionResult) {
-          throw new Error('Failed to get session after sign up');
-        }
-
-        return sessionResult;
-      } else if (error) {
-        throw new Error(error.message, { cause: error });
-      } else {
-        throw new Error('Sign up failed: No data returned');
+      // After sign up, get fresh session data
+      this.currentAuthState = undefined; // Clear cached session
+      const sessionResult = await this.getSession();
+      if (!sessionResult) {
+        throw new Error('Failed to get session after sign up');
       }
-    } catch (error) {
-      console.error('Failed to sign up:', error);
-      throw error;
+
+      return sessionResult;
+    } else if (error) {
+      throw new Error(error.message, { cause: error });
+    } else {
+      throw new Error('Sign up failed: No data returned');
     }
   }
 
   async signIn(credentials: SignInInput): Promise<AuthState> {
-    try {
-      const { data, error } = await this.authClient.signIn.email({
-        email: credentials.email,
-        password: credentials.password,
-        callbackURL: '/',
-      });
-      if (data) {
-        this.socketClient.connect();
+    const { data, error } = await this.authClient.signIn.email({
+      email: credentials.email,
+      password: credentials.password,
+      callbackURL: '/',
+    });
+    if (data) {
+      this.socketClient.connect();
 
-        // After sign in, get fresh session data
-        this.currentAuthState = undefined; // Clear cached session
-        const sessionResult = await this.getSession();
-        if (!sessionResult) {
-          throw new Error('Failed to get session after sign in');
-        }
-
-        return sessionResult;
-      } else if (error) {
-        throw new Error(error.message || 'Sign in failed', { cause: error });
-      } else {
-        throw new Error('Sign in failed: No data returned');
+      // After sign in, get fresh session data
+      this.currentAuthState = undefined; // Clear cached session
+      const sessionResult = await this.getSession();
+      if (!sessionResult) {
+        throw new Error('Failed to get session after sign in');
       }
-    } catch (error) {
-      console.error('Failed to sign in:', error);
-      throw error;
+
+      return sessionResult;
+    } else if (error) {
+      throw new Error(error.message || 'Sign in failed', { cause: error });
+    } else {
+      throw new Error('Sign in failed: No data returned');
     }
   }
 
   async signInAnonymously(): Promise<AuthState> {
-    try {
-      const { data, error } = await this.authClient.signIn.anonymous();
+    const { data, error } = await this.authClient.signIn.anonymous();
 
-      if (data) {
-        this.socketClient.connect();
+    if (data) {
+      this.socketClient.connect();
 
-        // After anonymous sign in, get fresh session data
-        this.currentAuthState = undefined; // Clear cached session
-        const sessionResult = await this.getSession();
-        if (!sessionResult) {
-          throw new Error('Failed to get session after anonymous sign in');
-        }
-
-        return sessionResult;
-      } else if (error) {
-        throw error;
-      } else {
-        throw new Error('Anonymous sign in failed: No data or error returned');
+      // After anonymous sign in, get fresh session data
+      this.currentAuthState = undefined; // Clear cached session
+      const sessionResult = await this.getSession();
+      if (!sessionResult) {
+        throw new Error('Failed to get session after anonymous sign in');
       }
-    } catch (error) {
-      console.error('Failed to sign in anonymously:', error);
+
+      return sessionResult;
+    } else if (error) {
       throw error;
+    } else {
+      throw new Error('Anonymous sign in failed: No data or error returned');
     }
   }
 
   async signOut(): Promise<void> {
-    try {
-      const { error } = await this.authClient.signOut();
+    const { error } = await this.authClient.signOut();
 
-      if (!error) {
-        this.currentAuthState = undefined;
-        this.socketClient.disconnect();
-      } else {
-        throw error;
-      }
-    } catch (error) {
-      console.error('Failed to sign out:', error);
+    if (!error) {
+      this.currentAuthState = undefined;
+      this.socketClient.disconnect();
+    } else {
       throw error;
+    }
+  }
+
+  async signInWithGoogle(): Promise<void> {
+    const { data, error } = await this.authClient.signIn.social({
+      provider: 'google',
+      callbackURL: '/',
+    });
+    if (error) {
+      throw new Error(error.message || 'Google sign-in failed', {
+        cause: error,
+      });
+    }
+
+    if (data?.url) {
+      window.location.href = data.url;
+    } else {
+      throw new Error('Google sign-in failed: No URL returned');
     }
   }
 
@@ -168,38 +166,28 @@ export class AuthService {
   }
 
   async resetPassword(token: string, newPassword: string): Promise<void> {
-    try {
-      const { error } = await this.authClient.resetPassword({
-        newPassword,
-        token,
-      });
+    const { error } = await this.authClient.resetPassword({
+      newPassword,
+      token,
+    });
 
-      if (error) {
-        throw new Error(error.message || 'Failed to reset password', {
-          cause: error,
-        });
-      }
-    } catch (error) {
-      console.error('Failed to reset password:', error);
-      throw error;
+    if (error) {
+      throw new Error(error.message || 'Failed to reset password', {
+        cause: error,
+      });
     }
   }
 
   async requestPasswordReset(email: string): Promise<void> {
-    try {
-      const { error } = await this.authClient.requestPasswordReset({
-        email,
-        redirectTo: '/reset-password',
-      });
+    const { error } = await this.authClient.requestPasswordReset({
+      email,
+      redirectTo: '/reset-password',
+    });
 
-      if (error) {
-        throw new Error(error.message || 'Failed to reset password', {
-          cause: error,
-        });
-      }
-    } catch (error) {
-      console.error('Failed to reset password:', error);
-      throw error;
+    if (error) {
+      throw new Error(error.message || 'Failed to reset password', {
+        cause: error,
+      });
     }
   }
 
