@@ -55,11 +55,27 @@ export class AuthService {
     }
   }
 
+  async isUsernameAvailable(username: string): Promise<boolean> {
+    const { data, error } = await this.authClient.isUsernameAvailable({
+      username,
+    });
+
+    if (error) {
+      throw new Error(
+        error.message || 'Failed to check username availability',
+        { cause: error }
+      );
+    }
+
+    return data?.available ?? false;
+  }
+
   async signUp(credentials: SignUpInput): Promise<AuthState> {
     const { data, error } = await this.authClient.signUp.email({
       email: credentials.email,
       password: credentials.password,
       name: credentials.name,
+      username: credentials.username,
       callbackURL: '/email-verification',
     });
 
