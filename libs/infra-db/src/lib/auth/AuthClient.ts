@@ -1,6 +1,6 @@
 import { logger } from '@michess/be-utils';
 import { betterAuth, LogLevel, SecondaryStorage, User } from 'better-auth';
-import { anonymous } from 'better-auth/plugins/anonymous';
+import { anonymous, username } from 'better-auth/plugins';
 import { DatabaseClient } from '../DatabaseClient';
 import { createDrizzleAdapter } from './drizzleAdapter';
 
@@ -40,7 +40,7 @@ export const AuthClient = {
       // TODO: Use app config
       trustedOrigins: process.env.CORS_ORIGINS?.split(',') || [],
       database: createDrizzleAdapter(db),
-      plugins: [anonymous()],
+      plugins: [anonymous(), username()],
       secondaryStorage,
       socialProviders: {
         google: oauthConfig
