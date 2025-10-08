@@ -3,7 +3,6 @@ CREATE TYPE "public"."game_status" AS ENUM('empty', 'waiting', 'ready', 'in-prog
 CREATE TYPE "public"."result" AS ENUM('1-0', '0-1', '1/2-1/2', '0-0');--> statement-breakpoint
 CREATE TYPE "public"."result_reason" AS ENUM('checkmate', 'stalemate', 'timeout', 'resignation', 'abandoned');--> statement-breakpoint
 CREATE TYPE "public"."variant" AS ENUM('standard');--> statement-breakpoint
-CREATE SEQUENCE "public"."username_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START WITH 1 CACHE 1;--> statement-breakpoint
 CREATE TABLE "accounts" (
 	"id" text PRIMARY KEY NOT NULL,
 	"account_id" text NOT NULL,

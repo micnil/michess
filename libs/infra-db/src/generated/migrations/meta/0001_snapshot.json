@@ -1,6 +1,6 @@
 {
-  "id": "61318e8d-ecf2-484d-8538-bf59e8c6a67d",
-  "prevId": "8c374de3-97f4-4d6d-8bc8-e375d7cd46bd",
+  "id": "0588e8d9-d1e6-4ec9-bc28-50d6804c14c4",
+  "prevId": "d5a32328-1750-4ab6-a5fb-a78f736201e6",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -480,18 +480,7 @@
   },
   "schemas": {},
   "views": {},
-  "sequences": {
-    "public.username_seq": {
-      "name": "username_seq",
-      "increment": "1",
-      "minValue": "1",
-      "maxValue": "9223372036854775807",
-      "startWith": "1",
-      "cache": "1",
-      "cycle": false,
-      "schema": "public"
-    }
-  },
+  "sequences": {},
   "roles": {},
   "policies": {},
   "_meta": {

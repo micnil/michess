@@ -1,13 +1,5 @@
-import {
-  boolean,
-  pgSequence,
-  pgTable,
-  text,
-  timestamp,
-} from 'drizzle-orm/pg-core';
+import { boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 import { updatedAt } from './shared/updatedAt';
-
-export const usernameSequence = pgSequence('username_seq');
 
 export const users = pgTable('users', {
   id: text('id').primaryKey(),
