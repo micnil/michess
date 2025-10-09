@@ -5,9 +5,14 @@ import { FC } from 'react';
 export const Logo: FC = () => {
   return (
     <Reset>
-      <Flex asChild align={'center'}>
+      <Flex asChild align={'center'} gap={'2'}>
         <Link to="/">
-          <img src="/chess-monky-v1.svg" height={48} width={48} alt="logo" />
+          <img
+            src="/chess-monky-side-v1.svg"
+            height={48}
+            width={48}
+            alt="logo"
+          />
           <Text size={'6'} weight={'bold'} color="amber">
             chess monky
           </Text>
