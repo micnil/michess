@@ -1,5 +1,12 @@
 import { logger } from '@michess/be-utils';
-import { betterAuth, LogLevel, SecondaryStorage, User } from 'better-auth';
+import { Maybe } from '@michess/common-utils';
+import {
+  AuthContext,
+  betterAuth,
+  LogLevel,
+  SecondaryStorage,
+  User,
+} from 'better-auth';
 import { anonymous, username } from 'better-auth/plugins';
 import { DatabaseClient } from '../DatabaseClient';
 import { createDrizzleAdapter } from './drizzleAdapter';
@@ -36,6 +43,24 @@ export const AuthClient = {
       emailAndPassword: {
         enabled: true,
         sendResetPassword: emails?.resetPassword,
+      },
+      databaseHooks: {
+        user: {
+          create: {
+            after: async (user, ctx): Promise<void> => {
+              const context: Maybe<AuthContext> = ctx?.context;
+
+              // There is a db trigger that updates the user after insert. This
+              // is not picked up by better-auth, since it returns the user before
+              // the trigger runs. So we need to manually fetch the updated user
+              // and copy the properties over.
+              const updatedUser = await context?.internalAdapter.findUserById(
+                user.id
+              );
+              Object.assign(user, updatedUser);
+            },
+          },
+        },
       },
       // TODO: Use app config
       trustedOrigins: process.env.CORS_ORIGINS?.split(',') || [],

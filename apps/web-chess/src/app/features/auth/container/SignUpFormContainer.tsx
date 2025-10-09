@@ -15,6 +15,7 @@ export const SignUpFormContainer = () => {
     queryKey: ['auth', 'usernameAvailability', username],
     queryFn: () => api.auth.isUsernameAvailable(username),
     enabled: username.length > 0,
+    initialData: true,
   });
 
   const {

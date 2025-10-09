@@ -24,7 +24,9 @@ export const SignUpForm: FC<Props> = ({
     usernameInputRef.current?.setCustomValidity(
       isUsernameAvailable ? '' : 'Username is already taken'
     );
-    usernameInputRef.current?.reportValidity();
+    if (isUsernameAvailable === false) {
+      usernameInputRef.current?.reportValidity();
+    }
   }, [isUsernameAvailable]);
   return (
     <form
