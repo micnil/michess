@@ -1,8 +1,9 @@
 import { Button, Flex, TextField } from '@radix-ui/themes';
-import { FC, useEffect, useRef } from 'react';
+import { FC } from 'react';
 import { SignUpInput } from '../../../api/model/SignUpInput';
 import { Alert } from '../../../components/Alert';
 import { PasswordField } from '../../../components/PasswordField';
+import { UsernameField } from './UsernameField';
 
 type Props = {
   isLoading: boolean;
@@ -19,15 +20,6 @@ export const SignUpForm: FC<Props> = ({
   onSubmit,
   onUsernameChange,
 }) => {
-  const usernameInputRef = useRef<HTMLInputElement | null>(null);
-  useEffect(() => {
-    usernameInputRef.current?.setCustomValidity(
-      isUsernameAvailable ? '' : 'Username is already taken'
-    );
-    if (isUsernameAvailable === false) {
-      usernameInputRef.current?.reportValidity();
-    }
-  }, [isUsernameAvailable]);
   return (
     <form
       onSubmit={(e) => {
@@ -59,12 +51,12 @@ export const SignUpForm: FC<Props> = ({
           disabled={isLoading}
         />
 
-        <TextField.Root
-          ref={usernameInputRef}
+        <UsernameField
           name="username"
           type="text"
           placeholder="Username"
           required
+          isUsernameAvailable={isUsernameAvailable}
           disabled={isLoading}
           onChange={(e) => onUsernameChange(e.target.value)}
         />

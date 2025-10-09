@@ -5,6 +5,7 @@ export type User = {
   createdAt: Date;
   updatedAt: Date;
   email: string;
+  username: Maybe<string>;
   emailVerified: boolean;
   name: string;
   image: Maybe<string>;

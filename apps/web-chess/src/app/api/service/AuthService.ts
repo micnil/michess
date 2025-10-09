@@ -1,9 +1,10 @@
-import { Maybe } from '@michess/common-utils';
+import { assertDefined, Maybe } from '@michess/common-utils';
 import { AuthClient } from '../infra/AuthClient';
 import { SocketClient } from '../infra/SocketClient';
 import { AuthState } from '../model/AuthState';
 import { SignInInput } from '../model/SignInInput';
 import { SignUpInput } from '../model/SignUpInput';
+import { UpdateUsernameInput } from '../model/UpdateUserInput';
 
 type BetterAuthSessionData = AuthClient['$Infer']['Session'];
 
@@ -26,6 +27,7 @@ export class AuthService {
         expiresAt: sessionData.session.expiresAt,
       },
       user: {
+        username: sessionData.user.username ?? undefined,
         id: sessionData.user.id,
         email: sessionData.user.email,
         name: sessionData.user.name,
@@ -70,6 +72,22 @@ export class AuthService {
     return data?.available ?? false;
   }
 
+  async updateUser(input: UpdateUsernameInput): Promise<AuthState> {
+    const { error } = await this.authClient.updateUser(input);
+
+    if (error) {
+      throw new Error(error.message || 'Failed to update user', {
+        cause: error,
+      });
+    }
+
+    // Clear cached session to force refresh
+    this.currentAuthState = undefined;
+    const authState = await this.getSession();
+    assertDefined(authState, 'Failed to refresh session after user update');
+    return authState;
+  }
+
   async signUp(credentials: SignUpInput): Promise<AuthState> {
     const { data, error } = await this.authClient.signUp.email({
       email: credentials.email,
@@ -85,9 +103,7 @@ export class AuthService {
       // After sign up, get fresh session data
       this.currentAuthState = undefined; // Clear cached session
       const sessionResult = await this.getSession();
-      if (!sessionResult) {
-        throw new Error('Failed to get session after sign up');
-      }
+      assertDefined(sessionResult, 'Failed to get session after sign up');
 
       return sessionResult;
     } else if (error) {

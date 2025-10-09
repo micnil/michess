@@ -1,14 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useApi } from '../../../api/hooks/useApi';
-import { SignUpInput } from '../../../api/model/SignUpInput';
-import { SignUpForm } from '../components/SignUpForm';
+import { useAuth } from '../../../api/hooks/useAuth';
+import { UsernameForm } from '../components/UsernameForm';
 import { useUsernameAvailability } from '../hooks/useUsernameAvailability';
 
-export const SignUpFormContainer = () => {
+export const UsernameFormContainer = () => {
   const api = useApi();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { auth } = useAuth();
   const { isUsernameAvailable, checkUsername } = useUsernameAvailability();
 
   const {
@@ -16,20 +17,18 @@ export const SignUpFormContainer = () => {
     isPending,
     error,
   } = useMutation({
-    mutationFn: (input: SignUpInput) => {
-      if (input.password !== input.confirmPassword) {
-        throw new Error('Passwords do not match');
-      }
-      return api.auth.signUp(input);
+    mutationFn: (input: { username: string }) => {
+      return api.auth.updateUser(input);
     },
     onSuccess: (data) => {
-      navigate({ to: '/welcome', search: { type: 'email' } });
       queryClient.setQueryData(['auth', 'session'], data);
+      navigate({ to: '/' });
     },
   });
 
   return (
-    <SignUpForm
+    <UsernameForm
+      initialUsername={auth?.user?.username}
       onSubmit={signUp}
       onUsernameChange={checkUsername}
       isUsernameAvailable={isUsernameAvailable}

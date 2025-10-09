@@ -1,3 +1,4 @@
+import { Maybe } from '@michess/common-utils';
 import { Color } from '@michess/core-board';
 import { Box, Card, Container, Theme } from '@radix-ui/themes';
 import {
@@ -18,6 +19,7 @@ import { RequestResetPasswordPage } from './app/pages/RequestResetPasswordPage';
 import { ResetPasswordPage } from './app/pages/ResetPasswordPage';
 import { SignInPage } from './app/pages/SignInPage';
 import { SignUpPage } from './app/pages/SignUpPage';
+import { WelcomePage } from './app/pages/WelcomePage';
 
 const RootLayout = () => (
   <Theme
@@ -142,6 +144,20 @@ const resetPasswordRoute = createRoute({
   },
 });
 
+const welcomeRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/welcome',
+  validateSearch: (search): { type?: Maybe<'social' | 'email'> } => {
+    return {
+      type: search.type as Maybe<'social' | 'email'>,
+    };
+  },
+  component: function WelcomeComponent() {
+    const { type } = welcomeRoute.useSearch();
+    return <WelcomePage type={type} />;
+  },
+});
+
 const routeTree = rootRoute.addChildren([
   signupRoute,
   signinRoute,
@@ -151,6 +167,7 @@ const routeTree = rootRoute.addChildren([
   emailVerificationRoute,
   forgotPasswordRoute,
   resetPasswordRoute,
+  welcomeRoute,
 ]);
 
 export const router = createRouter({ routeTree });
