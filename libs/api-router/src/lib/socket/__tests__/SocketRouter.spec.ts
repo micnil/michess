@@ -19,18 +19,13 @@ import { SocketRouter } from '../SocketRouter';
 jest.mock('@michess/api-service');
 
 const apiMock: Api = {
-  games: new GamesService({} as any, {} as any),
-  auth: new AuthService({} as any, {} as any, {} as any, {
+  games: new GamesService({} as never, {} as never),
+  auth: new AuthService({} as never, {} as never, {} as never, {
     google: { clientId: '', clientSecret: '' },
   }),
-  usageMetrics: new UsageMetricsService({} as any, {} as any, {} as any),
+  usageMetrics: new UsageMetricsService({} as never, {} as never, {} as never),
 };
 
-function waitFor(socket: ServerSocket | ClientSocket, event: string) {
-  return new Promise((resolve) => {
-    socket.once(event, resolve);
-  });
-}
 
 const leaveAllRooms = (socket: ServerSocket) => {
   socket.rooms.forEach((room) => {
