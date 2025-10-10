@@ -11,6 +11,7 @@ import {
   Session,
   UsageMetricsService,
 } from '@michess/api-service';
+import { createEventIterator } from '@michess/be-utils';
 import { createServer } from 'node:http';
 import { Server, Socket as ServerSocket } from 'socket.io';
 import { Socket as ClientSocket, io as ioClient } from 'socket.io-client';
@@ -72,28 +73,32 @@ describe('SocketRouter', () => {
     leaveAllRooms(serverSocket1);
     leaveAllRooms(serverSocket2);
   });
-  beforeAll((done) => {
+
+  beforeAll(async () => {
     apiMock.auth.getSession = jest.fn().mockResolvedValue(sessionMock);
     httpServer = createServer();
     io = SocketRouter.from(apiMock, { cors: { origins: ['*'] } });
     io.attach(httpServer);
 
+    const connectionIter = createEventIterator<ServerSocket>(io, 'connection');
+
     httpServer.listen(() => {
       const address = httpServer.address();
 
       const port = typeof address === 'object' && address ? address.port : 0;
-      io.on('connection', (socket) => {
-        if (socket.handshake.auth.token === 'client1') {
-          serverSocket1 = socket;
-        } else {
-          serverSocket2 = socket;
-        }
-      });
 
       clientSocket1 = connectClientSocket(port, 'client1');
       clientSocket2 = connectClientSocket(port, 'client2');
-      clientSocket2.on('connect', done);
     });
+
+    const firstConnection = await connectionIter.next();
+    const secondConnection = await connectionIter.next();
+
+    firstConnection.value.handshake.auth.token === 'client1'
+      ? ((serverSocket1 = firstConnection.value),
+        (serverSocket2 = secondConnection.value))
+      : ((serverSocket2 = firstConnection.value),
+        (serverSocket1 = secondConnection.value));
   });
 
   afterAll(() => {
