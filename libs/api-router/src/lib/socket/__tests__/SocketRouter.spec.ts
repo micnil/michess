@@ -80,7 +80,7 @@ describe('SocketRouter', () => {
     io = SocketRouter.from(apiMock, { cors: { origins: ['*'] } });
     io.attach(httpServer);
 
-    const connectionIter = createEventIterator<ServerSocket>(io, 'connection');
+    using connectionIter = createEventIterator<ServerSocket>(io, 'connection');
 
     httpServer.listen(() => {
       const address = httpServer.address();
