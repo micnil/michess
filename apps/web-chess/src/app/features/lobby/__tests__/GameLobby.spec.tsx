@@ -8,7 +8,7 @@ describe('GameLobby', () => {
   it('should render the game lobby header', () => {
     const { getByText } = render(<GameLobby />);
 
-    expect(getByText('Game Lobby')).toBeTruthy();
+    expect(getByText('Lobby')).toBeTruthy();
     expect(getByText('+ Create Game')).toBeTruthy();
   });
 

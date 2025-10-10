@@ -12,7 +12,11 @@ describe('ChessGame', () => {
       expect(
         chessGame
           .getAdditionalActions()
-          .filter((action) => action.type === 'CLAIM_DRAW')
+          .filter(
+            (action) =>
+              action.type === 'accept_draw' &&
+              action.reason === 'threefold_repetition'
+          )
       ).toHaveLength(0);
 
       // Bongcloud draw (magnus - hikaru game).
@@ -63,7 +67,11 @@ describe('ChessGame', () => {
       expect(
         almostThreeFoldRepetition
           .getAdditionalActions()
-          .filter((action) => action.type === 'CLAIM_DRAW')
+          .filter(
+            (action) =>
+              action.type === 'accept_draw' &&
+              action.reason === 'threefold_repetition'
+          )
       ).toHaveLength(0);
 
       const threeFoldRepetitionGame = almostThreeFoldRepetition
@@ -79,7 +87,11 @@ describe('ChessGame', () => {
 
       const claimDrawAction = threeFoldRepetitionGame
         .getAdditionalActions()
-        .filter((action) => action.type === 'CLAIM_DRAW')[0];
+        .filter(
+          (action) =>
+            action.type === 'accept_draw' &&
+            action.reason === 'threefold_repetition'
+        )[0];
 
       expect(claimDrawAction).toBeDefined();
 
@@ -107,8 +119,8 @@ describe('ChessGame', () => {
       // Should always include offer draw and resign options
       expect(actions).toEqual(
         expect.arrayContaining([
-          expect.objectContaining({ type: 'OFFER_DRAW' }),
-          expect.objectContaining({ type: 'RESIGN' }),
+          expect.objectContaining({ type: 'offer_draw' }),
+          expect.objectContaining({ type: 'resign' }),
         ])
       );
     });

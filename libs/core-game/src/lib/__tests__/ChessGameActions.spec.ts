@@ -1,99 +1,90 @@
 import { Color } from '@michess/core-board';
 import { ChessGameActions } from '../ChessGameActions';
-import { ChessGameAction } from '../model/ChessGameAction';
+import { GameAction } from '../model/GameAction';
 
 describe('ChessGameActions', () => {
   describe('useAction', () => {
-    it('should handle OFFER_DRAW action correctly', () => {
+    it('should handle offer_draw action correctly', () => {
       const initialActions = ChessGameActions.fromResult(undefined);
 
       const afterOfferDraw = initialActions.useAction(
-        ChessGameAction.offerDraw(),
+        GameAction.offerDraw(),
         Color.White
       );
 
       expect(
         afterOfferDraw.isActionAvailable(
-          ChessGameAction.acceptDraw(Color.Black),
+          GameAction.acceptDraw(Color.Black),
           Color.Black
         )
       ).toBe(true);
       expect(
         afterOfferDraw.isActionAvailable(
-          ChessGameAction.rejectDraw(Color.Black),
+          GameAction.rejectDraw(Color.Black),
           Color.Black
         )
       ).toBe(true);
       expect(
-        afterOfferDraw.isActionAvailable(ChessGameAction.resign(), Color.Black)
+        afterOfferDraw.isActionAvailable(GameAction.resign(), Color.Black)
       ).toBe(true);
       expect(
-        afterOfferDraw.isActionAvailable(
-          ChessGameAction.offerDraw(),
-          Color.Black
-        )
+        afterOfferDraw.isActionAvailable(GameAction.offerDraw(), Color.Black)
       ).toBe(false);
     });
 
-    it('should handle REJECT_DRAW action correctly', () => {
+    it('should handle reject_draw action correctly', () => {
       const actions = ChessGameActions.fromActions([
-        ChessGameAction.acceptDraw(Color.Black),
-        ChessGameAction.rejectDraw(Color.Black),
-        ChessGameAction.resign(),
+        GameAction.acceptDraw(Color.Black),
+        GameAction.rejectDraw(Color.Black),
+        GameAction.resign(),
       ]);
 
       const afterRejectDraw = actions.useAction(
-        ChessGameAction.rejectDraw(Color.Black),
+        GameAction.rejectDraw(Color.Black),
         Color.Black
       );
 
       expect(
-        afterRejectDraw.isActionAvailable(
-          ChessGameAction.offerDraw(),
-          Color.Black
-        )
+        afterRejectDraw.isActionAvailable(GameAction.offerDraw(), Color.Black)
       ).toBe(true);
       expect(
-        afterRejectDraw.isActionAvailable(ChessGameAction.resign(), Color.Black)
+        afterRejectDraw.isActionAvailable(GameAction.resign(), Color.Black)
       ).toBe(true);
       expect(
         afterRejectDraw.isActionAvailable(
-          ChessGameAction.acceptDraw(Color.Black),
+          GameAction.acceptDraw(Color.Black),
           Color.Black
         )
       ).toBe(false);
       expect(
         afterRejectDraw.isActionAvailable(
-          ChessGameAction.rejectDraw(Color.Black),
+          GameAction.rejectDraw(Color.Black),
           Color.Black
         )
       ).toBe(false);
     });
 
-    it('should handle ACCEPT_DRAW action correctly', () => {
+    it('should handle accept_draw action correctly', () => {
       const actions = ChessGameActions.fromActions([
-        ChessGameAction.acceptDraw(Color.Black),
-        ChessGameAction.rejectDraw(Color.Black),
-        ChessGameAction.resign(),
+        GameAction.acceptDraw(Color.Black),
+        GameAction.rejectDraw(Color.Black),
+        GameAction.resign(),
       ]);
 
       const afterAcceptDraw = actions.useAction(
-        ChessGameAction.acceptDraw(Color.Black),
+        GameAction.acceptDraw(Color.Black),
         Color.Black
       );
 
       expect(
-        afterAcceptDraw.isActionAvailable(
-          ChessGameAction.offerDraw(),
-          Color.Black
-        )
+        afterAcceptDraw.isActionAvailable(GameAction.offerDraw(), Color.Black)
       ).toBe(false);
       expect(
-        afterAcceptDraw.isActionAvailable(ChessGameAction.resign(), Color.Black)
+        afterAcceptDraw.isActionAvailable(GameAction.resign(), Color.Black)
       ).toBe(false);
       expect(
         afterAcceptDraw.isActionAvailable(
-          ChessGameAction.acceptDraw(Color.Black),
+          GameAction.acceptDraw(Color.Black),
           Color.Black
         )
       ).toBe(false);
@@ -105,23 +96,20 @@ describe('ChessGameActions', () => {
       const initialActions = ChessGameActions.fromResult(undefined);
 
       const withClaimDraw = initialActions.addAction(
-        ChessGameAction.claimDrawThreeFold()
+        GameAction.acceptDrawThreeFold()
       );
 
       expect(
         withClaimDraw.isActionAvailable(
-          ChessGameAction.claimDrawThreeFold(),
+          GameAction.acceptDrawThreeFold(),
           Color.White
         )
       ).toBe(true);
       expect(
-        withClaimDraw.isActionAvailable(
-          ChessGameAction.offerDraw(),
-          Color.White
-        )
+        withClaimDraw.isActionAvailable(GameAction.offerDraw(), Color.White)
       ).toBe(false);
       expect(
-        withClaimDraw.isActionAvailable(ChessGameAction.resign(), Color.White)
+        withClaimDraw.isActionAvailable(GameAction.resign(), Color.White)
       ).toBe(true);
     });
   });

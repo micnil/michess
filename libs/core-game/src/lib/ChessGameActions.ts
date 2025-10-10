@@ -1,24 +1,24 @@
 import { Maybe } from '@michess/common-utils';
 import { Color } from '@michess/core-board';
-import { ChessGameAction } from './model/ChessGameAction';
 import { ChessGameResult } from './model/ChessGameResult';
+import { GameAction } from './model/GameAction';
 
 export type ChessGameActions = {
-  addAction: (action: ChessGameAction) => ChessGameActions;
-  useAction: (action: ChessGameAction, currentTurn: Color) => ChessGameActions;
-  isActionAvailable: (action: ChessGameAction, playerColor: Color) => boolean;
-  value: () => ChessGameAction[];
+  addAction: (action: GameAction) => ChessGameActions;
+  useAction: (action: GameAction, currentTurn: Color) => ChessGameActions;
+  isActionAvailable: (action: GameAction, playerColor: Color) => boolean;
+  value: () => GameAction[];
 };
 
-const fromActions = (actions: ChessGameAction[]): ChessGameActions => {
+const fromActions = (actions: GameAction[]): ChessGameActions => {
   return {
     value: () => actions,
-    addAction: (action: ChessGameAction) => {
+    addAction: (action: GameAction) => {
       const newActions =
-        action.type === 'CLAIM_DRAW'
+        action.type === 'accept_draw'
           ? [
               ...actions.filter(
-                (a) => a.type !== 'OFFER_DRAW' && a.type !== 'CLAIM_DRAW'
+                (a) => a.type !== 'offer_draw' && a.type !== 'accept_draw'
               ),
               action,
             ]
@@ -26,7 +26,7 @@ const fromActions = (actions: ChessGameAction[]): ChessGameActions => {
 
       return fromActions(newActions);
     },
-    useAction: (action: ChessGameAction, playerColor: Color) => {
+    useAction: (action: GameAction, playerColor: Color) => {
       const isValidUsage = actions.some(
         (a) => a.type === action.type && (!a.color || a.color === playerColor)
       );
@@ -34,29 +34,25 @@ const fromActions = (actions: ChessGameAction[]): ChessGameActions => {
         const newActions = actions.filter((a) => a.type !== action.type);
 
         switch (action.type) {
-          case 'OFFER_DRAW': {
+          case 'offer_draw': {
             const opponentColor =
               playerColor === Color.White ? Color.Black : Color.White;
             return fromActions([
               ...newActions,
-              ChessGameAction.acceptDraw(opponentColor),
-              ChessGameAction.rejectDraw(opponentColor),
+              GameAction.acceptDraw(opponentColor),
+              GameAction.rejectDraw(opponentColor),
             ]);
           }
-          case 'REJECT_DRAW': {
+          case 'reject_draw': {
             return fromActions([
-              ...newActions.filter((a) => a.type !== 'ACCEPT_DRAW'),
-              ChessGameAction.offerDraw(),
+              ...newActions.filter((a) => a.type !== 'accept_draw'),
+              GameAction.offerDraw(),
             ]);
           }
-          case 'ACCEPT_DRAW': {
+          case 'accept_draw': {
             return fromActions([]);
           }
-          case 'RESIGN': {
-            return fromActions([]);
-          }
-
-          case 'CLAIM_DRAW': {
+          case 'resign': {
             return fromActions([]);
           }
         }
@@ -64,7 +60,7 @@ const fromActions = (actions: ChessGameAction[]): ChessGameActions => {
         return fromActions(actions);
       }
     },
-    isActionAvailable: (action: ChessGameAction, playerColor: Color) =>
+    isActionAvailable: (action: GameAction, playerColor: Color) =>
       actions.some(
         (a) =>
           a.type === action.type && (!action.color || a.color === playerColor)
@@ -75,10 +71,7 @@ const fromActions = (actions: ChessGameAction[]): ChessGameActions => {
 export const ChessGameActions = {
   fromResult(result: Maybe<ChessGameResult>): ChessGameActions {
     if (!result) {
-      return fromActions([
-        ChessGameAction.offerDraw(),
-        ChessGameAction.resign(),
-      ]);
+      return fromActions([GameAction.offerDraw(), GameAction.resign()]);
     } else {
       return fromActions([]);
     }

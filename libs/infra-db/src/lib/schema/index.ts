@@ -1,4 +1,5 @@
 export * from './accounts';
+export * from './actions';
 export * from './games';
 export * from './moves';
 export * from './shared/colorEnum';

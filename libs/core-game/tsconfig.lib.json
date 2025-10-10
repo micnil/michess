@@ -7,8 +7,5 @@
     "types": ["node"]
   },
   "exclude": ["**/*.spec.ts", "**/*.test.ts", "jest.config.ts"],
-  "include": [
-    "**/*.ts",
-    "../core-board/src/lib/move/__tests__/MoveOption.spec.ts"
-  ]
+  "include": ["**/*.ts"]
 }

@@ -19,7 +19,9 @@ jest.mock('@michess/api-service');
 
 const apiMock: Api = {
   games: new GamesService({} as any, {} as any),
-  auth: new AuthService({} as any, {} as any),
+  auth: new AuthService({} as any, {} as any, {} as any, {
+    google: { clientId: '', clientSecret: '' },
+  }),
   usageMetrics: new UsageMetricsService({} as any, {} as any, {} as any),
 };
 

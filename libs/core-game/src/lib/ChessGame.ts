@@ -2,8 +2,8 @@ import { isDefined, Maybe } from '@michess/common-utils';
 import { ChessPosition, Color, Move } from '@michess/core-board';
 import { Chessboard } from './Chessboard';
 import { ChessGameActions } from './ChessGameActions';
-import { ChessGameAction } from './model/ChessGameAction';
 import { ChessGameResult } from './model/ChessGameResult';
+import { GameAction } from './model/GameAction';
 import { GameMeta } from './model/GameMeta';
 import { GamePlayers } from './model/GamePlayers';
 import { GameState } from './model/GameState';
@@ -21,8 +21,8 @@ type GameStateInternal = {
 
 export type ChessGame = {
   getState(): GameState;
-  getAdditionalActions(): ChessGameAction[];
-  makeAction(playerId: string, action: ChessGameAction): ChessGame;
+  getAdditionalActions(): GameAction[];
+  makeAction(playerId: string, action: GameAction): ChessGame;
   getPosition(): ChessPosition;
   play(playerId: string, move: Move): ChessGame;
   setResult(result: ChessGameResult): ChessGame;
@@ -37,15 +37,13 @@ const evalAdditionalActions = (
 ): ChessGameActions => {
   let additionalActions = previousActions;
   additionalActions = board.isThreeFoldRepetition
-    ? additionalActions.addAction(ChessGameAction.claimDrawThreeFold())
+    ? additionalActions.addAction(GameAction.acceptDrawThreeFold())
     : additionalActions;
   additionalActions = board.isFiftyMoveRule
-    ? additionalActions.addAction(ChessGameAction.claimDrawFiftyMoveRule())
+    ? additionalActions.addAction(GameAction.acceptDrawFiftyMoveRule())
     : additionalActions;
   additionalActions = board.isInsufficientMaterial
-    ? additionalActions.addAction(
-        ChessGameAction.claimDrawInsufficientMaterial()
-      )
+    ? additionalActions.addAction(GameAction.acceptDrawInsufficientMaterial())
     : additionalActions;
   return additionalActions;
 };
@@ -53,7 +51,7 @@ const evalAdditionalActions = (
 const makeAction = (
   gameState: GameStateInternal,
   playerId: string,
-  action: ChessGameAction
+  action: GameAction
 ): {
   gameState: GameStateInternal;
 } => {
@@ -71,9 +69,8 @@ const makeAction = (
         playerColor
       );
       switch (action.type) {
-        case 'CLAIM_DRAW':
-        case 'ACCEPT_DRAW':
-        case 'RESIGN':
+        case 'accept_draw':
+        case 'resign':
           return {
             gameState: {
               ...gameState,
@@ -84,8 +81,8 @@ const makeAction = (
               additionalActions: newActions,
             },
           };
-        case 'OFFER_DRAW':
-        case 'REJECT_DRAW':
+        case 'offer_draw':
+        case 'reject_draw':
           return {
             gameState: {
               ...gameState,
@@ -208,7 +205,7 @@ const fromGameStateInternal = (
   };
   return {
     getPosition: () => board.position,
-    makeAction: (playerId: string, action: ChessGameAction): ChessGame => {
+    makeAction: (playerId: string, action: GameAction): ChessGame => {
       const { gameState } = makeAction(gameStateInternal, playerId, action);
       return fromGameStateInternal(gameState);
     },
