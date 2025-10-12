@@ -4,11 +4,13 @@ import {
   LobbyGameItemV1,
   PlayerGameInfoV1,
 } from '@michess/api-schema';
-import { Maybe } from '@michess/common-utils';
+import { isDefined, Maybe } from '@michess/common-utils';
 import { ChessPosition, Color, Move } from '@michess/core-board';
 import {
   ChessGameResult,
   ChessGameResultType,
+  DrawReasonType,
+  GameAction,
   GameDetails,
   GameMeta,
   GamePlayers,
@@ -81,6 +83,40 @@ const toGamePlayers = (game: SelectGameWithRelations): GamePlayers => ({
   white: game.whitePlayer ? toPlayerInfo(game.whitePlayer) : undefined,
   black: game.blackPlayer ? toPlayerInfo(game.blackPlayer) : undefined,
 });
+
+const toGameActions = (game: SelectGameWithRelations): GameAction[] => {
+  const playerMap = {
+    [String(game.blackPlayerId)]: Color.Black,
+    [String(game.whitePlayerId)]: Color.White,
+  };
+  return game.actions
+    .map((action) => {
+      const playerColor = playerMap[String(action.playerId)];
+      if (playerColor) {
+        const base = {
+          color: playerColor,
+          moveNumber: action.moveNumber,
+        };
+        switch (action.type) {
+          case 'resign':
+          case 'offer_draw': {
+            return { ...base, type: action.type };
+          }
+          case 'accept_draw':
+            return {
+              ...base,
+              type: action.type,
+              reason:
+                (action.payload?.reason as DrawReasonType) ?? 'by_agreement',
+            };
+        }
+      } else {
+        return undefined;
+      }
+    })
+    .filter(isDefined);
+};
+
 const toChessGameResult = ({
   result,
 }: SelectGame | SelectGameWithRelations): Maybe<ChessGameResult> => {
@@ -97,6 +133,7 @@ export const GameDetailsMapper = {
         white: undefined,
         black: undefined,
       },
+      actionRecord: [],
       result: toChessGameResult(game),
       status: FROM_STATUS_TYPE_MAPPING[game.status],
       resultStr: game.result,
@@ -107,11 +144,11 @@ export const GameDetailsMapper = {
   },
 
   fromSelectGameWithRelations(game: SelectGameWithRelations): GameDetails {
+    const players = toGamePlayers(game);
     return {
       ...toGameMeta(game),
-
-      players: toGamePlayers(game),
-
+      actionRecord: toGameActions(game),
+      players,
       status: FROM_STATUS_TYPE_MAPPING[game.status],
       variant: game.variant ?? 'standard',
       isPrivate: game.isPrivate,
@@ -198,6 +235,7 @@ export const GameDetailsMapper = {
         : undefined,
       variant: 'standard',
       isPrivate: game.isPrivate,
+      actions: game.actionRecord,
       moves: game.movesRecord.map((move) => ({
         uci: Move.toUci(move),
       })),

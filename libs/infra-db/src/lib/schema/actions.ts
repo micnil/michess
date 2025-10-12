@@ -14,7 +14,6 @@ import { users } from './users';
 
 export const actionTypeEnum = pgEnum('action_type', [
   'accept_draw',
-  'reject_draw',
   'offer_draw',
   'resign',
 ]);

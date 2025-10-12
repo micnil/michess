@@ -18,6 +18,7 @@ const gameStateMock: GameState = {
   endedAt: undefined,
   variant: 'standard',
   status: 'IN_PROGRESS',
+  actionRecord: [],
 };
 
 const fromPartial = (partial?: Partial<GameState>): GameState => ({

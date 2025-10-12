@@ -50,7 +50,12 @@ export class GameRepository extends BaseRepository {
       // Get paginated games with relations
       this.db.query.games.findMany({
         orderBy: (games, { desc }) => [desc(games.createdAt)],
-        with: { whitePlayer: true, blackPlayer: true, moves: true },
+        with: {
+          whitePlayer: true,
+          blackPlayer: true,
+          moves: true,
+          actions: true,
+        },
         offset: (options.page.page - 1) * options.page.pageSize,
         limit: options.page.pageSize,
         where: statusFilter,
@@ -70,7 +75,12 @@ export class GameRepository extends BaseRepository {
   ): Promise<Maybe<SelectGameWithRelations>> {
     return await this.db.query.games.findFirst({
       where: eq(this.schema.games.gameId, id),
-      with: { moves: true, whitePlayer: true, blackPlayer: true },
+      with: {
+        moves: true,
+        whitePlayer: true,
+        blackPlayer: true,
+        actions: true,
+      },
     });
   }
 

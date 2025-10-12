@@ -1,9 +1,10 @@
 import { isDefined, Maybe } from '@michess/common-utils';
 import { ChessPosition, Color, Move } from '@michess/core-board';
+import { ChessGameActions } from './actions/ChessGameActions';
+import { GameActionIn } from './actions/model/GameActionIn';
+import { GameActionOption } from './actions/model/GameActionOption';
 import { Chessboard } from './Chessboard';
-import { ChessGameActions } from './ChessGameActions';
 import { ChessGameResult } from './model/ChessGameResult';
-import { GameAction } from './model/GameAction';
 import { GameMeta } from './model/GameMeta';
 import { GamePlayers } from './model/GamePlayers';
 import { GameState } from './model/GameState';
@@ -21,8 +22,8 @@ type GameStateInternal = {
 
 export type ChessGame = {
   getState(): GameState;
-  getAdditionalActions(): GameAction[];
-  makeAction(playerId: string, action: GameAction): ChessGame;
+  getAdditionalActions(): GameActionOption[];
+  makeAction(playerId: string, action: GameActionIn): ChessGame;
   getPosition(): ChessPosition;
   play(playerId: string, move: Move): ChessGame;
   setResult(result: ChessGameResult): ChessGame;
@@ -31,27 +32,10 @@ export type ChessGame = {
   isPlayerInGame(playerId: string): boolean;
 };
 
-const evalAdditionalActions = (
-  previousActions: ChessGameActions,
-  board: Chessboard
-): ChessGameActions => {
-  let additionalActions = previousActions;
-  additionalActions = board.isThreeFoldRepetition
-    ? additionalActions.addAction(GameAction.acceptDrawThreeFold())
-    : additionalActions;
-  additionalActions = board.isFiftyMoveRule
-    ? additionalActions.addAction(GameAction.acceptDrawFiftyMoveRule())
-    : additionalActions;
-  additionalActions = board.isInsufficientMaterial
-    ? additionalActions.addAction(GameAction.acceptDrawInsufficientMaterial())
-    : additionalActions;
-  return additionalActions;
-};
-
 const makeAction = (
   gameState: GameStateInternal,
   playerId: string,
-  action: GameAction
+  action: GameActionOption
 ): {
   gameState: GameStateInternal;
 } => {
@@ -63,10 +47,10 @@ const makeAction = (
       : undefined;
 
   if (playerColor) {
-    if (gameState.additionalActions.isActionAvailable(action, playerColor)) {
+    if (gameState.additionalActions.isActionAvailable(playerColor, action)) {
       const newActions = gameState.additionalActions.useAction(
-        action,
-        playerColor
+        playerColor,
+        action
       );
       switch (action.type) {
         case 'accept_draw':
@@ -82,7 +66,6 @@ const makeAction = (
             },
           };
         case 'offer_draw':
-        case 'reject_draw':
           return {
             gameState: {
               ...gameState,
@@ -164,6 +147,7 @@ const fromGameStateInternal = (
       initialPosition: board.initialPosition,
       movesRecord: board.movesRecord,
       result,
+      actionRecord: gameStateInternal.additionalActions.usedActions,
       resultStr: ChessGameResult.toResultString(result),
     };
   };
@@ -183,15 +167,16 @@ const fromGameStateInternal = (
     } else {
       const newBoard = board.playMove(move);
       const result = evalResultFromBoard(newBoard);
+      const newStatus =
+        gameStateInternal.status === 'READY'
+          ? 'IN_PROGRESS'
+          : result
+          ? 'ENDED'
+          : gameStateInternal.status;
       return fromGameStateInternal({
         ...gameStateInternal,
         board: newBoard,
-        status:
-          gameStateInternal.status === 'READY'
-            ? 'IN_PROGRESS'
-            : result
-            ? 'ENDED'
-            : gameStateInternal.status,
+        status: newStatus,
         meta: {
           ...gameStateInternal.meta,
           startedAt: gameStateInternal.meta.startedAt ?? new Date(),
@@ -199,13 +184,13 @@ const fromGameStateInternal = (
             gameStateInternal.meta.endedAt ?? result ? new Date() : undefined,
         },
         result,
-        additionalActions: evalAdditionalActions(additionalActions, newBoard),
+        additionalActions: additionalActions.updateBoard(newStatus, newBoard),
       });
     }
   };
   return {
     getPosition: () => board.position,
-    makeAction: (playerId: string, action: GameAction): ChessGame => {
+    makeAction: (playerId: string, action: GameActionOption): ChessGame => {
       const { gameState } = makeAction(gameStateInternal, playerId, action);
       return fromGameStateInternal(gameState);
     },
@@ -216,7 +201,10 @@ const fromGameStateInternal = (
         ...gameStateInternal,
         result,
         status: 'ENDED',
-        additionalActions: ChessGameActions.fromResult(result),
+        additionalActions: gameStateInternal.additionalActions.updateBoard(
+          'ENDED',
+          board
+        ),
       });
     },
     getAdditionalActions: () => gameStateInternal.additionalActions.value(),
@@ -270,7 +258,11 @@ const fromGameState = (gameState: GameState): ChessGame => {
     status: gameState.status,
     board,
     result,
-    additionalActions: ChessGameActions.fromResult(result),
+    additionalActions: ChessGameActions.from(
+      gameState.actionRecord,
+      board,
+      gameState.status
+    ),
   });
 };
 

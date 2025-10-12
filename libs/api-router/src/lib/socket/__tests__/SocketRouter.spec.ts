@@ -119,6 +119,7 @@ describe('SocketRouter', () => {
         isPrivate: false,
         moves: [],
         variant: 'standard',
+        actions: [],
       };
       serverSocket2.join(joinGamePayload.gameId);
 

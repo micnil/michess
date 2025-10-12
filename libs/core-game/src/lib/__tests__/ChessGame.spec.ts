@@ -85,7 +85,7 @@ describe('ChessGame', () => {
           to: 'e7',
         });
 
-      const claimDrawAction = threeFoldRepetitionGame
+      const acceptDrawAction = threeFoldRepetitionGame
         .getAdditionalActions()
         .filter(
           (action) =>
@@ -93,12 +93,12 @@ describe('ChessGame', () => {
             action.reason === 'threefold_repetition'
         )[0];
 
-      expect(claimDrawAction).toBeDefined();
+      expect(acceptDrawAction).toBeDefined();
 
       expect(threeFoldRepetitionGame.getState().result).toBeUndefined();
       const drawnGame = threeFoldRepetitionGame.makeAction(
         'player1',
-        claimDrawAction
+        acceptDrawAction
       );
       expect(drawnGame.getState().result?.type).toEqual('draw');
     });
@@ -113,7 +113,12 @@ describe('ChessGame', () => {
         turn: 'white',
       });
 
-      const chessGame = ChessGame.fromChessPosition(position);
+      const chessGame = ChessGame.fromGameState(
+        GameStateMock.fromPartial({
+          initialPosition: position,
+          status: 'IN_PROGRESS',
+        })
+      );
       const actions = chessGame.getAdditionalActions();
 
       // Should always include offer draw and resign options
