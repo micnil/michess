@@ -47,7 +47,7 @@ const RootLayout = () => (
           </Container>
 
           <Container asChild>
-            <footer>{/* Footer content can be added here */}</footer>
+            <footer></footer>
           </Container>
         </ApiProvider>
         <TanStackRouterDevtools />

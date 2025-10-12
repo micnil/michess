@@ -1,7 +1,10 @@
-import { LobbyPageResponseV1 } from '@michess/api-schema';
+import { GameDetailsV1, LobbyPageResponseV1 } from '@michess/api-schema';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse, server } from '../../../../test/mocks/node-chess';
-import { render } from '../../../../test/utils/custom-testing-library';
+import {
+  render,
+  socketClient,
+} from '../../../../test/utils/custom-testing-library';
 import { GameLobby } from '../GameLobby';
 
 describe('GameLobby', () => {
@@ -14,7 +17,21 @@ describe('GameLobby', () => {
 
   it('should call onCreateGame when create button is clicked', async () => {
     const user = userEvent.setup();
-    const onCreateGame = vitest.fn();
+    const onCreateGame = vi.fn();
+    const gameDetailsMockV1: GameDetailsV1 = {
+      actions: [],
+      id: 'new-game-id',
+      variant: 'standard',
+      status: 'READY',
+      moves: [],
+      players: { white: undefined, black: undefined },
+
+      isPrivate: false,
+    };
+    socketClient.emitWithAck = vi.fn().mockResolvedValue({
+      status: 'success',
+      data: gameDetailsMockV1,
+    });
 
     const { getByText } = render(<GameLobby onCreateGame={onCreateGame} />);
 

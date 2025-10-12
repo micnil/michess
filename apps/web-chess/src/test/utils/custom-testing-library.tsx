@@ -15,11 +15,11 @@ const queryClient = new QueryClient({
     },
   },
 });
-
+const socketClient = SocketClient.create();
 const api = Api.create(
   RestClient.create(window.location.origin),
   AuthClient.create(window.location.origin),
-  SocketClient.create()
+  socketClient
 );
 
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
@@ -38,4 +38,4 @@ const customRender = (
 ) => render(ui, { wrapper: AllTheProviders, ...options });
 
 export * from '@testing-library/react';
-export { customRender as render };
+export { api, queryClient, customRender as render, socketClient };
