@@ -7,7 +7,7 @@ import { useEffect, useMemo } from 'react';
 import { create } from 'zustand';
 import { useApi } from '../../../api/hooks/useApi';
 import { useAuth } from '../../../api/hooks/useAuth';
-import { ParticipantGameViewModel } from '../../../api/model/ParticipantGameViewModel';
+import { PlayerGameViewModel } from '../../../api/model/PlayerGameViewModel';
 import { useObservable } from '../../../util/useObservable';
 
 type Props = {
@@ -19,10 +19,10 @@ type RemoteChessGame = {
   chessboard: Chessboard;
   handleMove: (move: MovePayload) => void;
   error: Maybe<Error>;
-  gameState: ParticipantGameViewModel;
+  gameState: PlayerGameViewModel;
 };
 
-const placeholderData: ParticipantGameViewModel = {
+const placeholderData: PlayerGameViewModel = {
   status: 'WAITING',
   players: { white: undefined, black: undefined },
   playerSide: 'spectator' as const,
@@ -33,13 +33,13 @@ const placeholderData: ParticipantGameViewModel = {
 };
 
 type GameStoreState = {
-  viewModel: Maybe<ParticipantGameViewModel>;
+  viewModel: Maybe<PlayerGameViewModel>;
   chessboard: Chessboard;
 };
 
 type GameStoreActions = {
   setChessboard: (fn: (old: Chessboard) => Chessboard) => void;
-  setViewModel: (viewModel: Maybe<ParticipantGameViewModel>) => void;
+  setViewModel: (viewModel: Maybe<PlayerGameViewModel>) => void;
 };
 
 type GameStore = GameStoreState & GameStoreActions;

@@ -9,7 +9,7 @@ import { Move } from '@michess/core-board';
 import { RestClient } from '../infra/RestClient';
 import { SocketClient } from '../infra/SocketClient';
 import { GameViewModel } from '../model/GameViewModel';
-import { ParticipantGameViewModel } from '../model/ParticipantGameViewModel';
+import { PlayerGameViewModel } from '../model/PlayerGameViewModel';
 import { AuthService } from './AuthService';
 
 export class GameService {
@@ -45,8 +45,7 @@ export class GameService {
   toParticipantGameViewModel(
     gameDetails: GameDetailsV1,
     playerId: Maybe<string>
-  ): ParticipantGameViewModel {
-    // Perhaps move to backend.
+  ): PlayerGameViewModel {
     const playerSide =
       gameDetails.players.white?.id === playerId
         ? 'white'
@@ -59,6 +58,9 @@ export class GameService {
     return {
       playerSide,
       isReadOnly: !isGameActive || playerSide === 'spectator',
+      actionOptions: gameDetails.actionOptions.filter(
+        (option) => !option.availableTo || option.availableTo === playerSide
+      ),
       ...gameViewModel,
     };
   }
@@ -100,7 +102,7 @@ export class GameService {
   async joinGame(
     gameId: string,
     side?: 'white' | 'black' | 'spectator'
-  ): Promise<ParticipantGameViewModel> {
+  ): Promise<PlayerGameViewModel> {
     const authState = await this.auth.getSession();
     const response = await this.socketClient.emitWithAck('join-game', {
       gameId,
@@ -141,11 +143,9 @@ export class GameService {
   observeGameState(
     gameId: string,
     playerId?: Maybe<string>
-  ): Observable<ParticipantGameViewModel> {
+  ): Observable<PlayerGameViewModel> {
     return {
-      subscribe: (
-        callback: (gameViewModel: ParticipantGameViewModel) => void
-      ) => {
+      subscribe: (callback: (gameViewModel: PlayerGameViewModel) => void) => {
         const handleGameDetails = (gameDetails: GameDetailsV1) => {
           if (gameDetails.id === gameId) {
             callback(this.toParticipantGameViewModel(gameDetails, playerId));
@@ -153,8 +153,6 @@ export class GameService {
         };
 
         this.socketClient.on('game-updated', handleGameDetails);
-
-        // Return unsubscribe function
         return () => {
           this.socketClient.off('game-updated', handleGameDetails);
         };
