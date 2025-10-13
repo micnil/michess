@@ -1,4 +1,7 @@
-html {
+html,
+body,
+#root {
+  height: 100%;
   -webkit-text-size-adjust: 100%;
   line-height: 1.5;
   tab-size: 4;
@@ -6,10 +9,17 @@ html {
 }
 body {
   margin: 0;
+  height: 100%;
+}
+#root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
-
-:root, .light, .light-theme {
+:root,
+.light,
+.light-theme {
   --yellow-1: #fefdfa;
   --yellow-2: #fffbe9;
   --yellow-3: #fff6bc;
@@ -42,7 +52,8 @@ body {
   --yellow-track: #ffd800;
 }
 
-.dark, .dark-theme {
+.dark,
+.dark-theme {
   --yellow-1: #23211a;
   --yellow-2: #29261d;
   --yellow-3: #373015;
@@ -75,15 +86,16 @@ body {
   --yellow-track: #f2cd18;
 }
 
-
-
-.dark, .dark-theme, :is(.dark, .dark-theme) :where(.radix-themes:not(.light, .light-theme)) {
+.dark,
+.dark-theme,
+:is(.dark, .dark-theme) :where(.radix-themes:not(.light, .light-theme)) {
   --color-background: #212121;
 }
 
 @supports (color: color(display-p3 1 1 1)) {
   @media (color-gamut: p3) {
-    .dark, .dark-theme {
+    .dark,
+    .dark-theme {
       --yellow-1: oklch(24.8% 0.0127 95.45);
       --yellow-2: oklch(27% 0.0176 95.45);
       --yellow-3: oklch(31.1% 0.044 95.45);
@@ -120,7 +132,9 @@ body {
 
 @supports (color: color(display-p3 1 1 1)) {
   @media (color-gamut: p3) {
-    :root, .light, .light-theme {
+    :root,
+    .light,
+    .light-theme {
       --yellow-1: oklch(99.3% 0.0038 95.45);
       --yellow-2: oklch(98.7% 0.0242 95.45);
       --yellow-3: oklch(97.1% 0.0752 95.45);

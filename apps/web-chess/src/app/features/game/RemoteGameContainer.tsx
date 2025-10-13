@@ -34,8 +34,9 @@ export const RemoteGameContainer = ({
   return (
     <Grid
       columns={{ initial: '1', sm: '1fr auto 1fr' }}
-      style={{ justifyItems: 'center' }}
-      gapX={{ initial: '1', sm: '4' }}
+      rows={'auto 1fr'}
+      height={'100%'}
+      gapX={{ initial: '0', sm: '4' }}
     >
       <Box gridColumn={{ initial: '1', sm: '2' }}>
         <Alert text={error?.message} />
@@ -94,17 +95,20 @@ export const RemoteGameContainer = ({
           <GameToolbar />
         </Box>
       </Flex>
-      <Box
+      <Flex
         style={{ width: '100%' }}
+        height={'100%'}
+        direction={'column'}
+        justify={'between'}
         gridColumn={{ initial: '1', sm: '2' }}
-        display={{ initial: 'block', md: 'none' }}
+        display={{ initial: 'flex', md: 'none' }}
       >
         <MovesRecord
           moves={chessboard.moveNotations}
           orientation={'horizontal'}
         />
         <GameToolbar />
-      </Box>
+      </Flex>
     </Grid>
   );
 };

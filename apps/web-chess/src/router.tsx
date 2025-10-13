@@ -1,13 +1,12 @@
 import { Maybe } from '@michess/common-utils';
 import { Color } from '@michess/core-board';
-import { Box, Card, Container, Theme } from '@radix-ui/themes';
+import { Card, Container, Theme } from '@radix-ui/themes';
 import {
   createRootRoute,
   createRoute,
   createRouter,
   Outlet,
 } from '@tanstack/react-router';
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { ApiProvider } from './app/api/context/ApiProvider';
 import { QueryProvider } from './app/api/context/QueryProvider';
 import { BackgroundGradient } from './app/components/BackgroundGradient';
@@ -27,31 +26,29 @@ const RootLayout = () => (
     appearance="dark"
     panelBackground="translucent"
     grayColor="sand"
+    style={{
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+    }}
   >
     <QueryProvider>
-      <Box minHeight="100vh" style={{ backgroundColor: 'var(--slate6)' }}>
-        <ApiProvider>
-          <BackgroundGradient />
-          <Card asChild size={'1'} style={{ borderRadius: '0px' }}>
-            <header>
-              <Container>
-                <Navbar />
-              </Container>
-            </header>
-          </Card>
+      <ApiProvider>
+        <BackgroundGradient />
+        <Card asChild size={'1'} style={{ borderRadius: '0px' }}>
+          <header>
+            <Container>
+              <Navbar />
+            </Container>
+          </header>
+        </Card>
 
-          <Container asChild mt={'6'}>
-            <main>
-              <Outlet />
-            </main>
-          </Container>
-
-          <Container asChild>
-            <footer></footer>
-          </Container>
-        </ApiProvider>
-        <TanStackRouterDevtools />
-      </Box>
+        <Container asChild height="100%">
+          <main>
+            <Outlet />
+          </main>
+        </Container>
+      </ApiProvider>
     </QueryProvider>
   </Theme>
 );
