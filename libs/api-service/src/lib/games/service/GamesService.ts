@@ -4,6 +4,7 @@ import {
   JoinGamePayloadV1,
   LeaveGamePayloadV1,
   LobbyPageResponseV1,
+  MakeActionPayloadV1,
   MakeMovePayloadV1,
   PaginationQueryV1,
   PlayerGameInfoPageResponseV1,
@@ -12,8 +13,12 @@ import {
 import { logger } from '@michess/be-utils';
 import { assertDefined, Maybe } from '@michess/common-utils';
 import { Move } from '@michess/core-board';
-import { ChessGame } from '@michess/core-game';
-import { GameRepository, MoveRepository } from '@michess/infra-db';
+import { ChessGame, GameActionIn } from '@michess/core-game';
+import {
+  ActionRepository,
+  GameRepository,
+  MoveRepository,
+} from '@michess/infra-db';
 import { Session } from '../../auth/model/Session';
 import { PageResponseMapper } from '../../mapper/PageResponseMapper';
 import { GameDetailsMapper } from '../mapper/GameDetailsMapper';
@@ -21,7 +26,8 @@ import { GameDetailsMapper } from '../mapper/GameDetailsMapper';
 export class GamesService {
   constructor(
     private gameRepository: GameRepository,
-    private moveRepository: MoveRepository
+    private moveRepository: MoveRepository,
+    private actionRepository: ActionRepository
   ) {}
 
   async createGame(data: CreateGameV1): Promise<GameDetailsV1> {
@@ -30,7 +36,7 @@ export class GamesService {
       isPrivate: data.isPrivate ?? false,
     });
     const gameDetails = GameDetailsMapper.fromSelectGame(createdGame);
-    return GameDetailsMapper.toGameDetailsV1(gameDetails);
+    return GameDetailsMapper.toGameDetailsV1({ game: gameDetails });
   }
 
   async queryLobby(query: PaginationQueryV1): Promise<LobbyPageResponseV1> {
@@ -97,7 +103,7 @@ export class GamesService {
     const chessGame = ChessGame.fromGameState(gameDetails);
 
     if (data.side === 'spectator') {
-      return GameDetailsMapper.toGameDetailsV1(gameDetails);
+      return GameDetailsMapper.toGameDetailsV1({ game: gameDetails });
     } else {
       const updatedGame = chessGame.joinGame(
         // TODO
@@ -109,7 +115,10 @@ export class GamesService {
         gameDetails.id,
         GameDetailsMapper.toInsertGame(updatedGameState)
       );
-      return GameDetailsMapper.toGameDetailsV1(updatedGameState);
+      return GameDetailsMapper.toGameDetailsV1({
+        game: updatedGameState,
+        availableActions: updatedGame.getAdditionalActions(),
+      });
     }
   }
 
@@ -130,7 +139,10 @@ export class GamesService {
         gameDetails.id,
         GameDetailsMapper.toInsertGame(updatedGameState)
       );
-      return GameDetailsMapper.toGameDetailsV1(updatedGameState);
+      return GameDetailsMapper.toGameDetailsV1({
+        game: updatedGameState,
+        availableActions: updatedGame.getAdditionalActions(),
+      });
     }
   }
 
@@ -144,6 +156,7 @@ export class GamesService {
     const chessGame = ChessGame.fromGameState(gameDetails);
     const updatedGame = chessGame.play(session.userId, moveToPlay);
     const updatedGameState = updatedGame.getState();
+
     await this.gameRepository.updateGame(
       gameDetails.id,
       GameDetailsMapper.toInsertGame(updatedGameState)
@@ -151,6 +164,34 @@ export class GamesService {
     await this.moveRepository.createMove({
       gameId: gameDetails.id,
       uci: data.uci,
+    });
+  }
+
+  async makeAction(
+    session: Session,
+    data: MakeActionPayloadV1
+  ): Promise<GameDetailsV1> {
+    const dbGame = await this.gameRepository.findGameWithRelationsById(
+      data.gameId
+    );
+    const gameActionIn: GameActionIn = {
+      type: data.action.type,
+    };
+    assertDefined(dbGame, `Game '${data.gameId}' not found`);
+    const gameDetails = GameDetailsMapper.fromSelectGameWithRelations(dbGame);
+    const chessGame = ChessGame.fromGameState(gameDetails);
+    const updatedGame = chessGame.makeAction(session.userId, gameActionIn);
+    const updatedGameState = updatedGame.getState();
+    await this.gameRepository.updateGame(
+      gameDetails.id,
+      GameDetailsMapper.toInsertGame(updatedGameState)
+    );
+    const action = updatedGameState.actionRecord.at(-1);
+    action &&
+      (await this.actionRepository.createAction(gameDetails.id, action));
+    return GameDetailsMapper.toGameDetailsV1({
+      game: updatedGameState,
+      availableActions: updatedGame.getAdditionalActions(),
     });
   }
 }

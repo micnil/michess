@@ -59,7 +59,7 @@ export const mswHandlers = [
       isPrivate: false,
       initialPosition: FenStr.standardInitial(),
       status: 'WAITING',
-      actions: [],
+      actionOptions: [],
       moves: [],
       startedAt: undefined,
     });

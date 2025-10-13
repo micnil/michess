@@ -19,7 +19,7 @@ describe('GameLobby', () => {
     const user = userEvent.setup();
     const onCreateGame = vi.fn();
     const gameDetailsMockV1: GameDetailsV1 = {
-      actions: [],
+      actionOptions: [],
       id: 'new-game-id',
       variant: 'standard',
       status: 'READY',

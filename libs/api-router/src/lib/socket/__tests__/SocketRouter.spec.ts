@@ -19,7 +19,7 @@ import { SocketRouter } from '../SocketRouter';
 jest.mock('@michess/api-service');
 
 const apiMock: Api = {
-  games: new GamesService({} as never, {} as never),
+  games: new GamesService({} as never, {} as never, {} as never),
   auth: new AuthService({} as never, {} as never, {} as never, {
     google: { clientId: '', clientSecret: '' },
   }),
@@ -119,7 +119,7 @@ describe('SocketRouter', () => {
         isPrivate: false,
         moves: [],
         variant: 'standard',
-        actions: [],
+        actionOptions: [],
       };
       serverSocket2.join(joinGamePayload.gameId);
 

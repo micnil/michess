@@ -15,7 +15,7 @@ export type GameDetailsV1 = {
     white?: Maybe<PlayerInfoV1>;
     black?: Maybe<PlayerInfoV1>;
   };
-  actions: GameActionOptionV1[];
+  actionOptions: GameActionOptionV1[];
   moves: MoveV1[];
   result?: Maybe<z.infer<typeof GameResultV1Schema>>;
   initialPosition?: Maybe<string>;

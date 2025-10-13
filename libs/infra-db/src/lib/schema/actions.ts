@@ -5,12 +5,11 @@ import {
   pgTable,
   serial,
   smallint,
-  text,
   timestamp,
   uuid,
 } from 'drizzle-orm/pg-core';
 import { games } from './games';
-import { users } from './users';
+import { colorEnum } from './shared/colorEnum';
 
 export const actionTypeEnum = pgEnum('action_type', [
   'accept_draw',
@@ -23,9 +22,7 @@ export const actions = pgTable('actions', {
   gameId: uuid('game_id')
     .references(() => games.gameId, { onDelete: 'cascade' })
     .notNull(),
-  playerId: text('player_id').references(() => users.id, {
-    onDelete: 'set null',
-  }),
+  color: colorEnum().notNull(),
   moveNumber: smallint('move_number').notNull(),
   type: actionTypeEnum().notNull(),
   payload: jsonb().$type<{
@@ -38,9 +35,5 @@ export const actionsRelations = relations(actions, ({ one }) => ({
   game: one(games, {
     fields: [actions.gameId],
     references: [games.gameId],
-  }),
-  player: one(users, {
-    fields: [actions.playerId],
-    references: [users.id],
   }),
 }));

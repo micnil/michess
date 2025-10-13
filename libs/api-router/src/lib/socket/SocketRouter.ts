@@ -4,6 +4,7 @@ import {
   JoinGamePayloadV1Schema,
   LeaveGamePayloadV1,
   LeaveGamePayloadV1Schema,
+  MakeActionPayloadV1Schema,
   MakeMovePayloadV1Schema,
   ServerToClientEvents,
 } from '@michess/api-schema';
@@ -146,6 +147,29 @@ const from = (api: Api, config: RouterConfig) => {
           .to(makeMovePayloadV1.gameId)
           .emit('move-made', makeMovePayloadV1);
         callback(EventResponse.ok(makeMovePayloadV1));
+      } catch (error) {
+        logger.error(error);
+        callback(EventResponse.error(ApiErrorMapper.from(error)));
+      }
+    });
+
+    socket.on('make-action', async (payload: unknown, callback) => {
+      try {
+        const makeActionPayload = MakeActionPayloadV1Schema.parse(payload);
+        logger.debug(
+          {
+            userId: socket.data.session.userId,
+            gameId: makeActionPayload.gameId,
+            action: makeActionPayload.action,
+          },
+          'User made action'
+        );
+        const gameDetails = await api.games.makeAction(
+          socket.data.session,
+          makeActionPayload
+        );
+        socket.to(makeActionPayload.gameId).emit('action-made', gameDetails);
+        callback(EventResponse.ok(gameDetails));
       } catch (error) {
         logger.error(error);
         callback(EventResponse.error(ApiErrorMapper.from(error)));

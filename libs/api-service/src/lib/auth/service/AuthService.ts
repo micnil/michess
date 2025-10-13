@@ -10,7 +10,7 @@ import { AuthConfig } from '../model/AuthConfig';
 import { Session } from '../model/Session';
 
 export class AuthService {
-  auth;
+  auth: ReturnType<typeof AuthClient.from>;
   constructor(
     sql: Sql,
     cacheRepo: CacheRepository,

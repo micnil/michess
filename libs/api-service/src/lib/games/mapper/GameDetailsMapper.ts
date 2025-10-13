@@ -11,6 +11,7 @@ import {
   ChessGameResultType,
   DrawReasonType,
   GameAction,
+  GameActionOption,
   GameDetails,
   GameMeta,
   GamePlayers,
@@ -85,33 +86,24 @@ const toGamePlayers = (game: SelectGameWithRelations): GamePlayers => ({
 });
 
 const toGameActions = (game: SelectGameWithRelations): GameAction[] => {
-  const playerMap = {
-    [String(game.blackPlayerId)]: Color.Black,
-    [String(game.whitePlayerId)]: Color.White,
-  };
   return game.actions
     .map((action) => {
-      const playerColor = playerMap[String(action.playerId)];
-      if (playerColor) {
-        const base = {
-          color: playerColor,
-          moveNumber: action.moveNumber,
-        };
-        switch (action.type) {
-          case 'resign':
-          case 'offer_draw': {
-            return { ...base, type: action.type };
-          }
-          case 'accept_draw':
-            return {
-              ...base,
-              type: action.type,
-              reason:
-                (action.payload?.reason as DrawReasonType) ?? 'by_agreement',
-            };
+      const base = {
+        color: action.color,
+        moveNumber: action.moveNumber,
+      };
+      switch (action.type) {
+        case 'resign':
+        case 'offer_draw': {
+          return { ...base, type: action.type };
         }
-      } else {
-        return undefined;
+        case 'accept_draw':
+          return {
+            ...base,
+            type: action.type,
+            reason:
+              (action.payload?.reason as DrawReasonType) ?? 'by_agreement',
+          };
       }
     })
     .filter(isDefined);
@@ -210,7 +202,13 @@ export const GameDetailsMapper = {
         : undefined,
     };
   },
-  toGameDetailsV1(game: GameDetails): GameDetailsV1 {
+  toGameDetailsV1({
+    game,
+    availableActions,
+  }: {
+    game: GameDetails;
+    availableActions?: GameActionOption[];
+  }): GameDetailsV1 {
     return {
       id: game.id,
       status: game.status,
@@ -235,7 +233,7 @@ export const GameDetailsMapper = {
         : undefined,
       variant: 'standard',
       isPrivate: game.isPrivate,
-      actions: game.actionRecord,
+      actionOptions: availableActions ?? [],
       moves: game.movesRecord.map((move) => ({
         uci: Move.toUci(move),
       })),
