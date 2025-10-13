@@ -1,3 +1,4 @@
+CREATE TYPE "public"."action_type" AS ENUM('accept_draw', 'offer_draw', 'resign');--> statement-breakpoint
 CREATE TYPE "public"."color" AS ENUM('white', 'black');--> statement-breakpoint
 CREATE TYPE "public"."game_status" AS ENUM('empty', 'waiting', 'ready', 'in-progress', 'end');--> statement-breakpoint
 CREATE TYPE "public"."result" AS ENUM('1-0', '0-1', '1/2-1/2', '0-0');--> statement-breakpoint
@@ -17,6 +18,16 @@ CREATE TABLE "accounts" (
 	"password" text,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "actions" (
+	"action_id" serial PRIMARY KEY NOT NULL,
+	"game_id" uuid NOT NULL,
+	"color" "color" NOT NULL,
+	"move_number" smallint NOT NULL,
+	"type" "action_type" NOT NULL,
+	"payload" jsonb,
+	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "games" (
@@ -66,6 +77,7 @@ CREATE TABLE "verifications" (
 );
 --> statement-breakpoint
 ALTER TABLE "accounts" ADD CONSTRAINT "accounts_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "actions" ADD CONSTRAINT "actions_game_id_games_game_id_fk" FOREIGN KEY ("game_id") REFERENCES "public"."games"("game_id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "games" ADD CONSTRAINT "games_white_player_id_users_id_fk" FOREIGN KEY ("white_player_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "games" ADD CONSTRAINT "games_black_player_id_users_id_fk" FOREIGN KEY ("black_player_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "moves" ADD CONSTRAINT "moves_game_id_games_game_id_fk" FOREIGN KEY ("game_id") REFERENCES "public"."games"("game_id") ON DELETE cascade ON UPDATE no action;

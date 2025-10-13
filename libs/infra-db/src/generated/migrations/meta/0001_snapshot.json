@@ -1,6 +1,6 @@
 {
-  "id": "0588e8d9-d1e6-4ec9-bc28-50d6804c14c4",
-  "prevId": "d5a32328-1750-4ab6-a5fb-a78f736201e6",
+  "id": "f92f20fb-b05e-4979-9606-744c455f2023",
+  "prevId": "9256b84b-f033-41fe-b9b4-2bcbae93588e",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -100,6 +100,78 @@
           "tableTo": "users",
           "columnsTo": [
             "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.actions": {
+      "name": "actions",
+      "schema": "",
+      "columns": {
+        "action_id": {
+          "name": "action_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "game_id": {
+          "name": "game_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "color": {
+          "name": "color",
+          "type": "color",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "move_number": {
+          "name": "move_number",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "action_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "payload": {
+          "name": "payload",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "actions_game_id_games_game_id_fk": {
+          "name": "actions_game_id_games_game_id_fk",
+          "tableFrom": "actions",
+          "columnsFrom": [
+            "game_id"
+          ],
+          "tableTo": "games",
+          "columnsTo": [
+            "game_id"
           ],
           "onUpdate": "no action",
           "onDelete": "cascade"
@@ -430,6 +502,15 @@
     }
   },
   "enums": {
+    "public.action_type": {
+      "name": "action_type",
+      "schema": "public",
+      "values": [
+        "accept_draw",
+        "offer_draw",
+        "resign"
+      ]
+    },
     "public.color": {
       "name": "color",
       "schema": "public",
