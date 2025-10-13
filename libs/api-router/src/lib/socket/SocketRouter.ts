@@ -11,10 +11,12 @@ import {
 import { Api, Session } from '@michess/api-service';
 import { logger } from '@michess/be-utils';
 import { IncomingHttpHeaders } from 'http2';
-import { DefaultEventsMap, Server, Socket } from 'socket.io';
+import { DefaultEventsMap, Socket as IoSocket, Server } from 'socket.io';
 import z from 'zod';
 import { RouterConfig } from '../model/RouterConfig';
 import { ApiErrorMapper } from './util/ApiErrorMapper';
+
+type Socket = IoSocket<ClientToServerEvents, ServerToClientEvents>;
 
 const convertIncomingHeadersToHeaders = (
   incomingHeaders: IncomingHttpHeaders
@@ -43,7 +45,7 @@ const leaveGame = async (
 
   socket.leave(leaveGamePayloadV1.gameId);
   if (gameState) {
-    socket.to(leaveGamePayloadV1.gameId).emit('user-left', gameState);
+    socket.to(leaveGamePayloadV1.gameId).emit('game-updated', gameState);
   }
 };
 
@@ -107,7 +109,7 @@ const from = (api: Api, config: RouterConfig) => {
         );
         if (!socket.rooms.has(joinGamePayloadV1.gameId)) {
           socket.join(joinGamePayloadV1.gameId);
-          socket.to(joinGamePayloadV1.gameId).emit('user-joined', gameState);
+          socket.to(joinGamePayloadV1.gameId).emit('game-updated', gameState);
         }
 
         callback(EventResponse.ok(gameState));
@@ -142,11 +144,18 @@ const from = (api: Api, config: RouterConfig) => {
           { ...makeMovePayloadV1, rooms: Array.from(socket.rooms) },
           'Received make-move event'
         );
-        await api.games.makeMove(socket.data.session, makeMovePayloadV1);
+        const gameDetails = await api.games.makeMove(
+          socket.data.session,
+          makeMovePayloadV1
+        );
         socket
           .to(makeMovePayloadV1.gameId)
           .emit('move-made', makeMovePayloadV1);
+
         callback(EventResponse.ok(makeMovePayloadV1));
+        if (gameDetails) {
+          io.to(makeMovePayloadV1.gameId).emit('game-updated', gameDetails);
+        }
       } catch (error) {
         logger.error(error);
         callback(EventResponse.error(ApiErrorMapper.from(error)));
@@ -168,7 +177,7 @@ const from = (api: Api, config: RouterConfig) => {
           socket.data.session,
           makeActionPayload
         );
-        socket.to(makeActionPayload.gameId).emit('action-made', gameDetails);
+        socket.to(makeActionPayload.gameId).emit('game-updated', gameDetails);
         callback(EventResponse.ok(gameDetails));
       } catch (error) {
         logger.error(error);

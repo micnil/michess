@@ -146,7 +146,10 @@ export class GamesService {
     }
   }
 
-  async makeMove(session: Session, data: MakeMovePayloadV1): Promise<void> {
+  async makeMove(
+    session: Session,
+    data: MakeMovePayloadV1
+  ): Promise<Maybe<GameDetailsV1>> {
     const dbGame = await this.gameRepository.findGameWithRelationsById(
       data.gameId
     );
@@ -157,14 +160,26 @@ export class GamesService {
     const updatedGame = chessGame.play(session.userId, moveToPlay);
     const updatedGameState = updatedGame.getState();
 
-    await this.gameRepository.updateGame(
-      gameDetails.id,
-      GameDetailsMapper.toInsertGame(updatedGameState)
-    );
     await this.moveRepository.createMove({
       gameId: gameDetails.id,
       uci: data.uci,
     });
+
+    if (
+      chessGame.hasNewStatus(updatedGame) ||
+      chessGame.hasNewActionOptions(updatedGame)
+    ) {
+      await this.gameRepository.updateGame(
+        gameDetails.id,
+        GameDetailsMapper.toInsertGame(updatedGameState)
+      );
+      return GameDetailsMapper.toGameDetailsV1({
+        game: updatedGameState,
+        availableActions: updatedGame.getAdditionalActions(),
+      });
+    } else {
+      return undefined;
+    }
   }
 
   async makeAction(

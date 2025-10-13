@@ -95,6 +95,26 @@ export class ChessGameActions {
     return ChessGameActions.from(this.state.usedActions, board, status);
   }
 
+  hasExactOptions(options: GameActionOption[]): boolean {
+    if (options.length !== this.state.options.length) {
+      return false;
+    }
+    const sortedCurrent = [...this.state.options].sort((a, b) =>
+      a.type.localeCompare(b.type)
+    );
+    const sortedNew = [...options].sort((a, b) => a.type.localeCompare(b.type));
+    return sortedCurrent.every((option, index) => {
+      const newOption = sortedNew[index];
+      return (
+        option.type === newOption.type &&
+        option.availableTo === newOption.availableTo &&
+        (option.type === 'accept_draw' && newOption.type === 'accept_draw'
+          ? option.reason === newOption.reason
+          : true)
+      );
+    });
+  }
+
   get usedActions(): GameAction[] {
     return this.state.usedActions;
   }

@@ -152,13 +152,11 @@ export class GameService {
           }
         };
 
-        this.socketClient.on('user-left', handleGameDetails);
-        this.socketClient.on('user-joined', handleGameDetails);
+        this.socketClient.on('game-updated', handleGameDetails);
 
         // Return unsubscribe function
         return () => {
-          this.socketClient.off('user-left', handleGameDetails);
-          this.socketClient.off('user-joined', handleGameDetails);
+          this.socketClient.off('game-updated', handleGameDetails);
         };
       },
     };

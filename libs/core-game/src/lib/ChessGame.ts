@@ -30,6 +30,8 @@ export type ChessGame = {
   joinGame(playerInfo: PlayerInfo, side?: Color): ChessGame;
   leaveGame(playerId: string): ChessGame;
   isPlayerInGame(playerId: string): boolean;
+  hasNewStatus(oldChess: ChessGame): boolean;
+  hasNewActionOptions(oldChess: ChessGame): boolean;
 };
 
 const makeAction = (
@@ -220,6 +222,14 @@ const fromGameStateInternal = (
     },
     isPlayerInGame: (playerId: string): boolean => {
       return getPlayerEntry(playerId) !== undefined;
+    },
+    hasNewActionOptions: (oldChess: ChessGame): boolean => {
+      return !gameStateInternal.additionalActions.hasExactOptions(
+        oldChess.getAdditionalActions()
+      );
+    },
+    hasNewStatus: (oldChess: ChessGame): boolean => {
+      return oldChess.getState().status !== gameStateInternal.status;
     },
     leaveGame: (playerId: string): ChessGame => {
       const playerEntry = getPlayerEntry(playerId);

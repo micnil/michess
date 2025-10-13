@@ -3,7 +3,5 @@ import { MakeMovePayloadV1 } from './game/MakeMovePayloadV1';
 
 export type ServerToClientEvents = {
   'move-made': (move: MakeMovePayloadV1) => void;
-  'user-joined': (gameDetails: GameDetailsV1) => void;
-  'user-left': (gameDetails: GameDetailsV1) => void;
-  'action-made': (gameDetails: GameDetailsV1) => void;
+  'game-updated': (gameDetails: GameDetailsV1) => void;
 };

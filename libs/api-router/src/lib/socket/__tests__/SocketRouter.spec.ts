@@ -125,7 +125,7 @@ describe('SocketRouter', () => {
 
       apiMock.games.joinGame = jest.fn().mockResolvedValue(mockGameState);
 
-      clientSocket2.on('user-joined', (data) => {
+      clientSocket2.on('game-updated', (data) => {
         expect(data).toEqual(mockGameState);
       });
 
