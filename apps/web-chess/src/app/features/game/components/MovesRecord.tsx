@@ -41,12 +41,12 @@ export const MovesRecord: FC<Props> = ({ moves, orientation }) => {
         type={orientation === 'horizontal' ? 'always' : 'hover'}
         m={'1'}
         scrollbars={orientation}
-        size={'1'}
         style={
           orientation === 'horizontal'
             ? {
                 minWidth: '100%',
                 width: '0',
+                height: 'fit-content',
               }
             : {
                 width: 'fit-content',
@@ -55,6 +55,7 @@ export const MovesRecord: FC<Props> = ({ moves, orientation }) => {
       >
         <Flex
           gap="4"
+          mb={'2'}
           width={'fit-content'}
           direction={orientation === 'horizontal' ? 'row' : 'column'}
           p="2"
