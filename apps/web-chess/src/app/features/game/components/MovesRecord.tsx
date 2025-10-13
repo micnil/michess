@@ -59,33 +59,36 @@ export const MovesRecord: FC<Props> = ({ moves, orientation }) => {
           direction={orientation === 'horizontal' ? 'row' : 'column'}
           p="2"
         >
-          {movesGrouped.entries().map(([moveNumber, moves]) => (
-            <Grid
-              height={'3'}
-              columns={'1fr 3fr 3fr'}
-              areas={'"move white black"'}
-              gap="1"
-              key={`${moveNumber}`}
-            >
-              <Flex gridArea={'move'} justify={'center'} align={'center'}>
-                <Text size={'1'} color={'gray'}>
-                  {moveNumber}.
-                </Text>
-              </Flex>
-              {moves.map((move) => (
-                <Badge
-                  style={{
-                    width: 'fit-content',
-                  }}
-                  key={`${move.moveNumber}-${move.turn}`}
-                  variant={move.turn === Color.White ? 'solid' : 'outline'}
-                  color={move.turn === Color.White ? 'gray' : 'gray'}
-                >
-                  {move.displayStr}
-                </Badge>
-              ))}
-            </Grid>
-          ))}
+          {movesGrouped
+            .entries()
+            .toArray()
+            .map(([moveNumber, moves]) => (
+              <Grid
+                height={'3'}
+                columns={'1fr 3fr 3fr'}
+                areas={'"move white black"'}
+                gap="1"
+                key={`${moveNumber}`}
+              >
+                <Flex gridArea={'move'} justify={'center'} align={'center'}>
+                  <Text size={'1'} color={'gray'}>
+                    {moveNumber}.
+                  </Text>
+                </Flex>
+                {moves.map((move) => (
+                  <Badge
+                    style={{
+                      width: 'fit-content',
+                    }}
+                    key={`${move.moveNumber}-${move.turn}`}
+                    variant={move.turn === Color.White ? 'solid' : 'outline'}
+                    color={move.turn === Color.White ? 'gray' : 'gray'}
+                  >
+                    {move.displayStr}
+                  </Badge>
+                ))}
+              </Grid>
+            ))}
         </Flex>
       </ScrollArea>
     );

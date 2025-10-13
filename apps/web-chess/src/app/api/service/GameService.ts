@@ -1,4 +1,5 @@
 import {
+  GameActionOptionV1,
   GameDetailsV1,
   LobbyPageResponseV1,
   MakeMovePayloadV1,
@@ -137,6 +138,22 @@ export class GameService {
       throw new Error(response.error.message, { cause: response.error });
     } else {
       return response.data;
+    }
+  }
+
+  async makeAction(gameId: string, actionOption: GameActionOptionV1) {
+    const authState = await this.auth.getSession();
+    const response = await this.socketClient.emitWithAck('make-action', {
+      gameId,
+      action: { type: actionOption.type },
+    });
+    if (response.status === 'error') {
+      throw new Error(response.error.message, { cause: response.error });
+    } else {
+      return this.toParticipantGameViewModel(
+        response.data,
+        authState?.session.userId
+      );
     }
   }
 
