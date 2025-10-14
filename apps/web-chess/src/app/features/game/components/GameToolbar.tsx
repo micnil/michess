@@ -1,5 +1,5 @@
 import { DrawReasonV1, GameActionOptionV1 } from '@michess/api-schema';
-import { Button, Flex, IconButton, Popover } from '@radix-ui/themes';
+import { Button, Dialog, Flex, IconButton, Popover } from '@radix-ui/themes';
 import { Separator } from '@radix-ui/themes/dist/cjs/components/context-menu';
 import { ArrowBigLeftIcon, ArrowBigRightIcon, MenuIcon } from 'lucide-react';
 import { FC } from 'react';
@@ -98,17 +98,39 @@ export const GameToolbar: FC<Props> = ({
                 Offer draw
               </Button>
               <Separator />
-              <Button
-                size="4"
-                variant="ghost"
-                color="tomato"
-                style={{ width: '100%' }}
-                disabled={!resignOption}
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                onClick={() => onMakeAction(resignOption!)}
-              >
-                Resign
-              </Button>
+              <Dialog.Root>
+                <Dialog.Trigger>
+                  <Button
+                    size="4"
+                    variant="ghost"
+                    color="tomato"
+                    disabled={!resignOption}
+                    style={{ width: '100%' }}
+                  >
+                    Resign
+                  </Button>
+                </Dialog.Trigger>
+                <Dialog.Content size="2" width={'300px'}>
+                  <Dialog.Title>Confirm Resignation</Dialog.Title>
+                  <Dialog.Description>
+                    Are you sure you want to resign?
+                  </Dialog.Description>
+                  <Flex gap="5" justify="center" mt="4">
+                    <Dialog.Close>
+                      <Button
+                        color="tomato"
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        onClick={() => onMakeAction(resignOption!)}
+                      >
+                        Resign
+                      </Button>
+                    </Dialog.Close>
+                    <Dialog.Close>
+                      <Button color="gray">Cancel</Button>
+                    </Dialog.Close>
+                  </Flex>
+                </Dialog.Content>
+              </Dialog.Root>
             </Flex>
           </Popover.Content>
         </Popover.Root>

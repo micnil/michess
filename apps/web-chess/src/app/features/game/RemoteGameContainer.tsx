@@ -103,6 +103,7 @@ export const RemoteGameContainer = ({
         <Flex
           className={styles.gradientBox}
           direction={'column'}
+          justify={'between'}
           display={{ initial: 'none', md: 'flex' }}
           p="4"
           style={{
