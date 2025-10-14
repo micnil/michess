@@ -110,7 +110,7 @@
     "msw": "^2.11.5",
     "nx": "21.6.2",
     "pino-pretty": "^13.1.1",
-    "prettier": "2.7.1",
+    "prettier": "3.6.2",
     "regenerator-runtime": "0.13.9",
     "socket.io-client": "^4.8.1",
     "ts-jest": "29.4.1",
