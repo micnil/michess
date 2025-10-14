@@ -15,10 +15,10 @@ importers:
     dependencies:
       '@hono/node-server':
         specifier: ^1.19.5
-        version: 1.19.5(hono@4.9.11)
+        version: 1.19.5(hono@4.9.12)
       '@hono/zod-validator':
         specifier: ^0.7.4
-        version: 0.7.4(hono@4.9.11)(zod@4.1.12)
+        version: 0.7.4(hono@4.9.12)(zod@4.1.12)
       '@radix-ui/themes':
         specifier: ^3.2.1
         version: 3.2.1(@types/react-dom@19.0.0)(@types/react@19.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -47,14 +47,14 @@ importers:
         specifier: ^10.0.0
         version: 10.0.0
       drizzle-orm:
-        specifier: ^0.44.5
-        version: 0.44.5(kysely@0.28.5)(postgres@3.4.7)
+        specifier: ^0.44.6
+        version: 0.44.6(kysely@0.28.5)(postgres@3.4.7)
       hono:
-        specifier: ^4.9.11
-        version: 4.9.11
+        specifier: ^4.9.12
+        version: 4.9.12
       hono-pino:
         specifier: ^0.10.3
-        version: 0.10.3(hono@4.9.11)(pino@10.0.0)
+        version: 0.10.3(hono@4.9.12)(pino@10.0.0)
       ioredis:
         specifier: ^5.8.1
         version: 5.8.1
@@ -5139,8 +5139,8 @@ packages:
     resolution: {integrity: sha512-+CHgPFzuoTQTt7cOYCV6MOw2w8vqEn/ap1yv4bpZOWL03u7rlVRQhUY0WYT3rHsgVTXwYQDZaSUJSQrMBUKuWg==}
     hasBin: true
 
-  drizzle-orm@0.44.5:
-    resolution: {integrity: sha512-jBe37K7d8ZSKptdKfakQFdeljtu3P2Cbo7tJoJSVZADzIKOBo9IAJPOmMsH2bZl90bZgh8FQlD8BjxXA/zuBkQ==}
+  drizzle-orm@0.44.6:
+    resolution: {integrity: sha512-uy6uarrrEOc9K1u5/uhBFJbdF5VJ5xQ/Yzbecw3eAYOunv5FDeYkR2m8iitocdHBOHbvorviKOW5GVw0U1j4LQ==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
       '@cloudflare/workers-types': '>=4'
@@ -5898,8 +5898,8 @@ packages:
       hono: '>=4.0.0'
       pino: '>=7.1.0'
 
-  hono@4.9.11:
-    resolution: {integrity: sha512-MyJ4xop3boTyXl8bJBh4i20AAZTLM3AXUJphyrUb0CpgTKYb1N703z53XiKUKchGUpcPqiiYkiLOXA3kqK3icA==}
+  hono@4.9.12:
+    resolution: {integrity: sha512-SrTC0YxqPwnN7yKa8gg/giLyQ2pILCKoideIHbYbFQlWZjYt68D2A4Ae1hehO/aDQ6RmTcpqOV/O2yBtMzx/VQ==}
     engines: {node: '>=16.9.0'}
 
   hosted-git-info@7.0.2:
@@ -10442,13 +10442,13 @@ snapshots:
 
   '@hexagon/base64@1.1.28': {}
 
-  '@hono/node-server@1.19.5(hono@4.9.11)':
+  '@hono/node-server@1.19.5(hono@4.9.12)':
     dependencies:
-      hono: 4.9.11
+      hono: 4.9.12
 
-  '@hono/zod-validator@0.7.4(hono@4.9.11)(zod@4.1.12)':
+  '@hono/zod-validator@0.7.4(hono@4.9.12)(zod@4.1.12)':
     dependencies:
-      hono: 4.9.11
+      hono: 4.9.12
       zod: 4.1.12
 
   '@humanfs/core@0.19.1': {}
@@ -14683,7 +14683,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.44.5(kysely@0.28.5)(postgres@3.4.7):
+  drizzle-orm@0.44.6(kysely@0.28.5)(postgres@3.4.7):
     optionalDependencies:
       kysely: 0.28.5
       postgres: 3.4.7
@@ -15614,13 +15614,13 @@ snapshots:
     dependencies:
       parse-passwd: 1.0.0
 
-  hono-pino@0.10.3(hono@4.9.11)(pino@10.0.0):
+  hono-pino@0.10.3(hono@4.9.12)(pino@10.0.0):
     dependencies:
       defu: 6.1.4
-      hono: 4.9.11
+      hono: 4.9.12
       pino: 10.0.0
 
-  hono@4.9.11: {}
+  hono@4.9.12: {}
 
   hosted-git-info@7.0.2:
     dependencies:
