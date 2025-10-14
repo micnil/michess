@@ -26,7 +26,7 @@ const main = async () => {
 
   const repos = Repositories.from(pgClient, redis);
   const api = Api.from(repos, pgClient, emailClient, appConfig.auth);
-  const app = App.from(api, { cors: appConfig.cors });
+  const app = App.from(api, redis, { cors: appConfig.cors });
 
   Server.start(app, appConfig);
 };

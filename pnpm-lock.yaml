@@ -25,6 +25,9 @@ importers:
       '@react-email/components':
         specifier: 0.5.6
         version: 0.5.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@socket.io/redis-streams-adapter':
+        specifier: ^0.2.2
+        version: 0.2.2(socket.io-adapter@2.5.5)
       '@tanstack/react-query':
         specifier: ^5.90.2
         version: 5.90.2(react@19.1.0)
@@ -1943,6 +1946,10 @@ packages:
   '@module-federation/webpack-bundler-runtime@0.18.0':
     resolution: {integrity: sha512-TEvErbF+YQ+6IFimhUYKK3a5wapD90d90sLsNpcu2kB3QGT7t4nIluE25duXuZDVUKLz86tEPrza/oaaCWTpvQ==}
 
+  '@msgpack/msgpack@2.8.0':
+    resolution: {integrity: sha512-h9u4u/jiIRKbq25PM+zymTyW6bhTzELvOoUd+AvYriWOAKpLGnIamaET3pnHYoI5iYphAHBI4ayx0MehR+VVPQ==}
+    engines: {node: '>= 10'}
+
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
     resolution: {integrity: sha512-QZHtlVgbAdy2zAqNA9Gu1UpIuI8Xvsd1v8ic6B2pZmeFnFcMWiPLfWXh7TVw4eGEZ/C9TH281KwhVoeQUKbyjw==}
     cpu: [arm64]
@@ -3634,6 +3641,12 @@ packages:
 
   '@socket.io/component-emitter@3.1.2':
     resolution: {integrity: sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==}
+
+  '@socket.io/redis-streams-adapter@0.2.2':
+    resolution: {integrity: sha512-BMPa6oGC0wFgpMXoGksbJ75zMBwk+79pxjHc2YusdoK+X0BxN4fTsqEBuFV7yeXi9ekbi87rwlsT61+WZGVW9g==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      socket.io-adapter: ^2.5.4
 
   '@svgr/babel-plugin-add-jsx-attribute@8.0.0':
     resolution: {integrity: sha512-b9MIk7yhdS1pMCZM8VeNfUlSKVRhsHZNMl5O9SfaX0l0t5wjdgu4IDzGB8bpnGBBOjGST3rRFVsaaEtI4W6f7g==}
@@ -11331,6 +11344,8 @@ snapshots:
       '@module-federation/runtime': 0.18.0
       '@module-federation/sdk': 0.18.0
 
+  '@msgpack/msgpack@2.8.0': {}
+
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
     optional: true
 
@@ -13329,6 +13344,14 @@ snapshots:
       tslib: 2.8.1
 
   '@socket.io/component-emitter@3.1.2': {}
+
+  '@socket.io/redis-streams-adapter@0.2.2(socket.io-adapter@2.5.5)':
+    dependencies:
+      '@msgpack/msgpack': 2.8.0
+      debug: 4.3.7
+      socket.io-adapter: 2.5.5
+    transitivePeerDependencies:
+      - supports-color
 
   '@svgr/babel-plugin-add-jsx-attribute@8.0.0(@babel/core@7.28.4)':
     dependencies:

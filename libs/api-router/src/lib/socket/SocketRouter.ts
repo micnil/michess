@@ -10,7 +10,9 @@ import {
 } from '@michess/api-schema';
 import { Api, Session } from '@michess/api-service';
 import { logger } from '@michess/be-utils';
+import { createAdapter } from '@socket.io/redis-streams-adapter';
 import { IncomingHttpHeaders } from 'http2';
+import Redis from 'ioredis';
 import { DefaultEventsMap, Socket as IoSocket, Server } from 'socket.io';
 import z from 'zod';
 import { RouterConfig } from '../model/RouterConfig';
@@ -52,7 +54,7 @@ const leaveGame = async (
 type SocketData = {
   session: Session;
 };
-const from = (api: Api, config: RouterConfig) => {
+const from = (api: Api, redis: Redis, config: RouterConfig) => {
   const io = new Server<
     ClientToServerEvents,
     ServerToClientEvents,
@@ -63,6 +65,7 @@ const from = (api: Api, config: RouterConfig) => {
       maxDisconnectionDuration: 15000,
       skipMiddlewares: true,
     },
+    adapter: createAdapter(redis),
     cors: {
       origin: config.cors.origins,
     },
