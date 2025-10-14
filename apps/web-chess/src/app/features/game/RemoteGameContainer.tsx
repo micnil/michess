@@ -6,6 +6,7 @@ import { Alert } from '../../components/Alert';
 import { GameToolbar } from './components/GameToolbar';
 import { MovesRecord } from './components/MovesRecord';
 import { PlayerInfo } from './components/PlayerInfo';
+import { ResultMessage } from './components/ResultMessage';
 import { usePeekBoardState } from './hooks/usePeekBoardState';
 import { useRemoteGame } from './hooks/useRemoteGame';
 import styles from './RemoteGameContainer.module.css';
@@ -116,6 +117,7 @@ export const RemoteGameContainer = ({
             orientation={'vertical'}
             peekActions={peekActions}
           />
+          <ResultMessage result={result} />
           <GameToolbar
             peekActions={peekActions}
             actionOptions={actionOptions}
@@ -138,6 +140,7 @@ export const RemoteGameContainer = ({
           moves={chessboard.moveNotations}
           orientation={'horizontal'}
         />
+        <ResultMessage result={result} />
         <GameToolbar
           peekActions={peekActions}
           actionOptions={actionOptions}
