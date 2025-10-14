@@ -43,7 +43,7 @@ const RootLayout = () => (
           </header>
         </Card>
 
-        <Container asChild height="100%">
+        <Container asChild height="100%" mt="4">
           <main>
             <Outlet />
           </main>
