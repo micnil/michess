@@ -1,0 +1,28 @@
+.gradientBox {
+  position: relative;
+  box-sizing: border-box;
+
+  color: #fff;
+  background: linear-gradient(120deg, transparent, var(--color-background));
+  background-clip: padding-box; /* !importanté */
+  border: solid 2px transparent; /* !importanté */
+  border-radius: 1em;
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    margin: -2px; /* !importanté */
+    border-radius: inherit; /* !importanté */
+    background: linear-gradient(
+      120deg,
+      transparent,
+      transparent 50%,
+      var(--gray-9)
+    );
+  }
+}

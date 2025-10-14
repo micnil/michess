@@ -49,7 +49,7 @@ export const MovesRecord: FC<Props> = ({ moves, orientation }) => {
                 height: 'fit-content',
               }
             : {
-                width: 'fit-content',
+                width: '100%',
               }
         }
       >

@@ -7,6 +7,7 @@ import { GameToolbar } from './components/GameToolbar';
 import { MovesRecord } from './components/MovesRecord';
 import { PlayerInfo } from './components/PlayerInfo';
 import { useRemoteGame } from './hooks/useRemoteGame';
+import styles from './RemoteGameContainer.module.css';
 
 export const RemoteGameContainer = ({
   gameId,
@@ -81,19 +82,28 @@ export const RemoteGameContainer = ({
       </Box>
       <Flex
         gridColumn={'3'}
-        mt={'9'}
-        style={{ justifySelf: 'start', justifyContent: 'space-around' }}
+        style={{
+          justifySelf: 'start',
+          justifyContent: 'space-around',
+          alignItems: 'center',
+        }}
       >
-        <Box
-          style={{ width: '100%', height: '300px' }}
-          display={{ initial: 'none', md: 'block' }}
+        <Flex
+          className={styles.gradientBox}
+          direction={'column'}
+          display={{ initial: 'none', md: 'flex' }}
+          p="4"
+          style={{
+            height: '300px',
+            width: '100%',
+          }}
         >
           <MovesRecord
             moves={chessboard.moveNotations}
             orientation={'vertical'}
           />
           <GameToolbar />
-        </Box>
+        </Flex>
       </Flex>
       <Flex
         style={{ width: '100%' }}

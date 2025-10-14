@@ -7,7 +7,7 @@ export const GameToolbar: FC = () => {
     <Flex direction="row" justify="between" align="center" p="2">
       <Button
         size={'3'}
-        variant="soft"
+        variant="ghost"
         color="gray"
         style={{
           flex: 1,
@@ -21,7 +21,7 @@ export const GameToolbar: FC = () => {
       </IconButton>
       <Button
         size={'3'}
-        variant="soft"
+        variant="ghost"
         color="gray"
         style={{
           flex: 1,
