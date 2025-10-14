@@ -16,12 +16,18 @@ export const RemoteGameContainer = ({
   gameId: string;
   orientation?: Color;
 }) => {
-  const { chessboard, handleMove, gameState, isLoadingInitial, error } =
-    useRemoteGame({
-      gameId,
-    });
+  const {
+    chessboard,
+    handleMove,
+    gameState,
+    isLoadingInitial,
+    error,
+    actionState,
+  } = useRemoteGame({
+    gameId,
+  });
   const { auth } = useAuth();
-  const { players, playerSide, result, isReadOnly } = gameState;
+  const { players, playerSide, result, isReadOnly, actionOptions } = gameState;
   orientation = playerSide !== 'spectator' ? playerSide : orientation;
 
   const blackPlayer = { ...players.black, color: Color.Black };
@@ -102,7 +108,12 @@ export const RemoteGameContainer = ({
             moves={chessboard.moveNotations}
             orientation={'vertical'}
           />
-          <GameToolbar />
+          <GameToolbar
+            actionOptions={actionOptions}
+            onMakeAction={actionState.makeAction}
+            isPending={actionState.isPending}
+            error={actionState.error}
+          />
         </Flex>
       </Flex>
       <Flex
@@ -117,7 +128,12 @@ export const RemoteGameContainer = ({
           moves={chessboard.moveNotations}
           orientation={'horizontal'}
         />
-        <GameToolbar />
+        <GameToolbar
+          actionOptions={actionOptions}
+          onMakeAction={actionState.makeAction}
+          isPending={actionState.isPending}
+          error={actionState.error}
+        />
       </Flex>
     </Grid>
   );

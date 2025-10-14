@@ -7,6 +7,7 @@ export * from './lib/common/PaginationQueryV1';
 export * from './lib/common/PaginationQueryV1Schema';
 export * from './lib/game/CreateGameV1';
 export * from './lib/game/CreateGameV1Schema';
+export * from './lib/game/DrawReasonV1';
 export * from './lib/game/GameActionOptionV1';
 export * from './lib/game/GameDetailsResponseV1';
 export * from './lib/game/GameDetailsV1';

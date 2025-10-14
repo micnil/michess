@@ -1,3 +1,4 @@
+import { GameActionOptionV1 } from '@michess/api-schema';
 import { Maybe } from '@michess/common-utils';
 import { ChessPosition, Move } from '@michess/core-board';
 import { Chessboard } from '@michess/core-game';
@@ -20,6 +21,11 @@ type RemoteChessGame = {
   handleMove: (move: MovePayload) => void;
   error: Maybe<Error>;
   gameState: PlayerGameViewModel;
+  actionState: {
+    isPending: boolean;
+    error: Maybe<Error>;
+    makeAction: (option: GameActionOptionV1) => void;
+  };
 };
 
 const placeholderData: PlayerGameViewModel = {
@@ -29,6 +35,7 @@ const placeholderData: PlayerGameViewModel = {
   result: undefined,
   startedAt: undefined,
   isReadOnly: true,
+  actionOptions: [],
   moves: [],
 };
 
@@ -70,6 +77,18 @@ export const useRemoteGame = (props: Props): RemoteChessGame => {
     isPending,
   } = useMutation({
     mutationFn: () => games.joinGame(props.gameId),
+    onSuccess: (data) => {
+      setViewModel(data);
+    },
+  });
+
+  const {
+    mutate: makeAction,
+    error: makeActionError,
+    isPending: isMakeActionPending,
+  } = useMutation({
+    mutationFn: (option: GameActionOptionV1) =>
+      games.makeAction(props.gameId, option),
     onSuccess: (data) => {
       setViewModel(data);
     },
@@ -119,5 +138,10 @@ export const useRemoteGame = (props: Props): RemoteChessGame => {
     error: error ?? undefined,
     isLoadingInitial: isPending,
     gameState: viewModel || placeholderData,
+    actionState: {
+      isPending: isMakeActionPending,
+      error: makeActionError ?? undefined,
+      makeAction,
+    },
   };
 };
