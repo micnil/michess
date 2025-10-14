@@ -4,11 +4,13 @@ import { Separator } from '@radix-ui/themes/dist/cjs/components/context-menu';
 import { ArrowBigLeftIcon, ArrowBigRightIcon, MenuIcon } from 'lucide-react';
 import { FC } from 'react';
 import { Alert } from '../../../components/Alert';
+import { PeekActions } from '../model/PeekHandlers';
 
 type Props = {
   actionOptions: GameActionOptionV1[];
   isPending?: boolean;
   error?: Error;
+  peekActions: PeekActions;
   onMakeAction: (action: GameActionOptionV1) => void;
 };
 
@@ -30,6 +32,7 @@ export const GameToolbar: FC<Props> = ({
   onMakeAction,
   error,
   isPending,
+  peekActions,
 }) => {
   const resignOption = actionOptions.find((option) => option.type === 'resign');
   const offerDrawOption = actionOptions.find(
@@ -64,6 +67,7 @@ export const GameToolbar: FC<Props> = ({
             flex: 1,
             display: 'flex',
           }}
+          onClick={peekActions.back}
         >
           <ArrowBigLeftIcon />
         </Button>
@@ -116,6 +120,7 @@ export const GameToolbar: FC<Props> = ({
             flex: 1,
             display: 'flex',
           }}
+          onClick={peekActions.forward}
         >
           <ArrowBigRightIcon />
         </Button>

@@ -6,6 +6,7 @@ import { Alert } from '../../components/Alert';
 import { GameToolbar } from './components/GameToolbar';
 import { MovesRecord } from './components/MovesRecord';
 import { PlayerInfo } from './components/PlayerInfo';
+import { usePeekBoardState } from './hooks/usePeekBoardState';
 import { useRemoteGame } from './hooks/useRemoteGame';
 import styles from './RemoteGameContainer.module.css';
 
@@ -26,6 +27,11 @@ export const RemoteGameContainer = ({
   } = useRemoteGame({
     gameId,
   });
+  const {
+    actions: peekActions,
+    board: peekBoard,
+    isPeeking,
+  } = usePeekBoardState(chessboard);
   const { auth } = useAuth();
   const { players, playerSide, result, isReadOnly, actionOptions } = gameState;
   orientation = playerSide !== 'spectator' ? playerSide : orientation;
@@ -65,12 +71,12 @@ export const RemoteGameContainer = ({
                   playerSide !== 'spectator' ? playerSide : orientation
                 }
                 maxSize={600}
-                gameResult={result?.type}
-                chessboard={chessboard}
+                gameResult={isPeeking ? undefined : result?.type}
+                chessboard={isPeeking ? peekBoard : chessboard}
                 playableTurn={
                   playerSide === 'spectator' ? undefined : playerSide
                 }
-                readonly={isReadOnly}
+                readonly={isReadOnly || isPeeking}
                 onMove={handleMove}
               />
             </Skeleton>
@@ -107,8 +113,10 @@ export const RemoteGameContainer = ({
           <MovesRecord
             moves={chessboard.moveNotations}
             orientation={'vertical'}
+            peekActions={peekActions}
           />
           <GameToolbar
+            peekActions={peekActions}
             actionOptions={actionOptions}
             onMakeAction={actionState.makeAction}
             isPending={actionState.isPending}
@@ -125,10 +133,12 @@ export const RemoteGameContainer = ({
         display={{ initial: 'flex', md: 'none' }}
       >
         <MovesRecord
+          peekActions={peekActions}
           moves={chessboard.moveNotations}
           orientation={'horizontal'}
         />
         <GameToolbar
+          peekActions={peekActions}
           actionOptions={actionOptions}
           onMakeAction={actionState.makeAction}
           isPending={actionState.isPending}

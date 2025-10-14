@@ -114,23 +114,25 @@ export const ChessboardContextProvider = <TMoveMeta,>({
       )
     : {};
 
-  const chessboardGameResult = chessboard.isCheckmate
-    ? chessboard.position.turn === Color.White
-      ? 'black_win'
-      : 'white_win'
-    : chessboard.isStalemate ||
-      chessboard.isInsufficientMaterial ||
-      chessboard.isThreeFoldRepetition ||
-      chessboard.isFiftyMoveRule
-    ? 'draw'
-    : undefined;
+  const chessboardGameResult =
+    gameResult ??
+    (chessboard.isCheckmate
+      ? chessboard.position.turn === Color.White
+        ? 'black_win'
+        : 'white_win'
+      : chessboard.isStalemate ||
+        chessboard.isInsufficientMaterial ||
+        chessboard.isThreeFoldRepetition ||
+        chessboard.isFiftyMoveRule
+      ? 'draw'
+      : undefined);
 
   return (
     <ChessboardContext.Provider
       value={{
         squares,
         chessboard,
-        gameResult: gameResult ?? chessboardGameResult,
+        gameResult: chessboardGameResult,
         movePiece: movePiece as (payload: MovePayload<unknown>) => void,
         moveOptionsMap,
         latestMove,

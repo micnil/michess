@@ -1,14 +1,16 @@
 import { Color, MoveNotation } from '@michess/core-board';
 import { Badge, Box, Flex, Grid, ScrollArea, Text } from '@radix-ui/themes';
 import { FC, useEffect, useRef } from 'react';
+import { PeekActions } from '../model/PeekHandlers';
 import styles from './MovesRecord.module.css';
 
 type Props = {
   moves: MoveNotation[];
   orientation: 'horizontal' | 'vertical';
+  peekActions: PeekActions;
 };
 
-export const MovesRecord: FC<Props> = ({ moves, orientation }) => {
+export const MovesRecord: FC<Props> = ({ moves, orientation, peekActions }) => {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -78,7 +80,14 @@ export const MovesRecord: FC<Props> = ({ moves, orientation }) => {
                 </Flex>
                 {moves.map((move) => (
                   <Badge
+                    onClick={() =>
+                      peekActions.toMove(
+                        move.moveNumber * 2 +
+                          (move.turn === Color.Black ? 1 : 0)
+                      )
+                    }
                     style={{
+                      cursor: 'var(--cursor-link)',
                       width: 'fit-content',
                     }}
                     key={`${move.moveNumber}-${move.turn}`}
