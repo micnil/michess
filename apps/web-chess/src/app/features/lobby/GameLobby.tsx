@@ -77,22 +77,19 @@ export const GameLobby: React.FC<Props> = ({ onCreateGame, onJoinGame }) => {
       .catch(noop);
   };
 
-  const renderHeader = () => (
-    <Flex justify="between" align="center" mb="4">
-      <Heading size="4" weight="medium">
-        Lobby
-      </Heading>
-      <Skeleton loading={isPending}>
-        <Button onClick={handleCreateGame}>+ Create Game</Button>
-      </Skeleton>
-    </Flex>
-  );
-
   const games = lobbyData?.items || [];
 
   return (
     <Card size="3" style={{ padding: '24px' }}>
-      {renderHeader()}
+      <Flex justify="between" align="center" mb="4">
+        <Heading size="4" weight="medium">
+          Lobby
+        </Heading>
+        <Skeleton loading={isPending}>
+          <Button onClick={handleCreateGame}>+ Create Game</Button>
+        </Skeleton>
+      </Flex>
+
       <Alert text={createError?.message ?? queryError?.message} />
 
       <Skeleton loading={isPending}>
