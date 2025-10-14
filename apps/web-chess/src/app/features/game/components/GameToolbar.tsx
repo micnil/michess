@@ -30,12 +30,22 @@ export const GameToolbar: FC = () => {
           </IconButton>
         </Popover.Trigger>
         <Popover.Content size="3">
-          <Flex direction="column" gap="2" align={'start'}>
-            <Button size="3" variant="ghost" color="gold">
+          <Flex direction="column" gap="2">
+            <Button
+              size="4"
+              variant="ghost"
+              color="gold"
+              style={{ width: '100%' }}
+            >
               Offer draw
             </Button>
             <Separator />
-            <Button size="3" variant="ghost" color="tomato">
+            <Button
+              size="4"
+              variant="ghost"
+              color="tomato"
+              style={{ width: '100%' }}
+            >
               Resign
             </Button>
           </Flex>
