@@ -25,6 +25,9 @@
   },
   "private": true,
   "pnpm": {
+    "onlyBuiltDependencies": [
+      "nx"
+    ],
     "patchedDependencies": {
       "vitest@3.2.4": "patches/vitest@3.2.4.patch"
     }
@@ -59,16 +62,16 @@
   },
   "devDependencies": {
     "@mswjs/socket.io-binding": "^0.2.0",
-    "@nx/esbuild": "21.6.2",
-    "@nx/eslint": "21.6.2",
-    "@nx/eslint-plugin": "21.6.2",
-    "@nx/jest": "21.6.2",
-    "@nx/js": "21.6.2",
-    "@nx/node": "21.6.2",
-    "@nx/react": "21.6.2",
-    "@nx/vite": "21.6.2",
-    "@nx/web": "21.6.2",
-    "@nx/workspace": "21.6.2",
+    "@nx/esbuild": "21.6.4",
+    "@nx/eslint": "21.6.4",
+    "@nx/eslint-plugin": "21.6.4",
+    "@nx/jest": "21.6.4",
+    "@nx/js": "21.6.4",
+    "@nx/node": "21.6.4",
+    "@nx/react": "21.6.4",
+    "@nx/vite": "21.6.4",
+    "@nx/web": "21.6.4",
+    "@nx/workspace": "21.6.4",
     "@tanstack/react-query-devtools": "^5.87.4",
     "@tanstack/react-router-devtools": "^1.131.42",
     "@testing-library/dom": "^10.4.0",
@@ -103,7 +106,7 @@
     "jsdom": "~27.0.0",
     "jsonc-eslint-parser": "^2.1.0",
     "msw": "^2.11.5",
-    "nx": "21.6.2",
+    "nx": "21.6.4",
     "pino-pretty": "^13.1.1",
     "prettier": "3.6.2",
     "regenerator-runtime": "0.13.9",
