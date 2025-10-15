@@ -44,7 +44,7 @@ function main() {
         }
         return depth;
       },
-      5
+      5,
     )
     .addHelpText(
       'after',
@@ -56,7 +56,7 @@ Examples:
 
 Known test positions:
   Starting position: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-  Kiwipete test:     "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"`
+  Kiwipete test:     "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"`,
     );
 
   program.parse();
@@ -70,7 +70,7 @@ Known test positions:
 
   try {
     const chessPosition: ChessPosition = FenParser.toChessPosition(
-      options.fen as FenStr
+      options.fen as FenStr,
     );
 
     const board = Chessboard.fromPosition(chessPosition);
@@ -96,7 +96,7 @@ Known test positions:
     }
   } catch (error) {
     program.error(
-      `Error: ${error instanceof Error ? error.message : String(error)}`
+      `Error: ${error instanceof Error ? error.message : String(error)}`,
     );
   }
 }

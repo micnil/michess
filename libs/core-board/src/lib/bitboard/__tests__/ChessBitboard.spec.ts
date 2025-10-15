@@ -38,7 +38,7 @@ describe('ChessBitboard', () => {
           '3  . . . . . . . .\n' +
           '2  1 1 1 1 1 1 1 1\n' +
           '1  1 1 1 1 1 1 1 1\n' +
-          '   a b c d e f g h'
+          '   a b c d e f g h',
       );
     });
 
@@ -54,7 +54,7 @@ describe('ChessBitboard', () => {
           '3  . . . . . . . .\n' +
           '2  1 1 1 1 1 1 1 1\n' +
           '1  1 1 1 1 1 1 1 1\n' +
-          '   a b c d e f g h'
+          '   a b c d e f g h',
       );
     });
 
@@ -70,7 +70,7 @@ describe('ChessBitboard', () => {
           '3  . . . . . . . .\n' +
           '2  . . . . . . . .\n' +
           '1  . . . . . . . .\n' +
-          '   a b c d e f g h'
+          '   a b c d e f g h',
       );
     });
 
@@ -89,7 +89,7 @@ describe('ChessBitboard', () => {
           '3  . . . . . . . .\n' +
           '2  . . . . . . . .\n' +
           '1  . . . . . . . .\n' +
-          '   a b c d e f g h'
+          '   a b c d e f g h',
       );
     });
   });

@@ -37,12 +37,12 @@ export const GameToolbar: FC<Props> = ({
 }) => {
   const resignOption = actionOptions.find((option) => option.type === 'resign');
   const offerDrawOption = actionOptions.find(
-    (option) => option.type === 'offer_draw'
+    (option) => option.type === 'offer_draw',
   );
 
   const promotedActions = actionOptions
     .filter(
-      (option) => option.type !== 'resign' && option.type !== 'offer_draw'
+      (option) => option.type !== 'resign' && option.type !== 'offer_draw',
     )
     .map((option) => ({
       ...option,

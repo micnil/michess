@@ -7,7 +7,7 @@ export const boardStateMock: BoardState = {
 };
 
 export const createBoardStateMock = (
-  partialBoardState?: Partial<BoardState>
+  partialBoardState?: Partial<BoardState>,
 ): BoardState => ({
   ...boardStateMock,
   ...partialBoardState,

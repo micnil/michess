@@ -165,7 +165,7 @@ describe('Bitboard', () => {
     it('returns the highest bit for a large number', () => {
       // 0b100...0 (bit 63 set)
       expect(new Bitboard(1n << 63n).getHighestSetBit().value()).toBe(
-        1n << 63n
+        1n << 63n,
       );
     });
   });
@@ -182,7 +182,7 @@ describe('Bitboard', () => {
           '3  . . . . . . . .\n' +
           '2  . . . . . . . .\n' +
           '1  . . . . . . . .\n' +
-          '   a b c d e f g h'
+          '   a b c d e f g h',
       );
     });
     it('prints a board with a single bit set', () => {
@@ -196,7 +196,7 @@ describe('Bitboard', () => {
           '3  . . . . . . . .\n' +
           '2  . . . . . . . .\n' +
           '1  . . . . . . . .\n' +
-          '   a b c d e f g h'
+          '   a b c d e f g h',
       );
     });
   });

@@ -30,7 +30,7 @@ const oneStepBackFromIndex = (index: number, color: Color): Coordinate => {
 
 const updatePiecePlacements = (
   move: MoveOption,
-  piecePlacements: PiecePlacements
+  piecePlacements: PiecePlacements,
 ): {
   newPiecePlacements: PiecePlacements;
   movedPiece: Piece;
@@ -60,7 +60,7 @@ const updatePiecePlacements = (
   if (move.castling) {
     const castlingAbility = CastlingAbility.fromCastlingRight(
       move.castling,
-      turn
+      turn,
     );
     const rookCoord = rookStartingPositions[castlingAbility];
     const newRookIndex =
@@ -84,7 +84,7 @@ const updatePiecePlacements = (
 const isRookOnStartingSquare = (
   castlingAbility: CastlingAbility,
   oldPiecePlacements: PiecePlacements,
-  newPiecePlacements: PiecePlacements
+  newPiecePlacements: PiecePlacements,
 ): boolean => {
   const rookStartingPosition = rookStartingPositions[castlingAbility];
   const pieceOnRookStartingPositionOld =
@@ -94,7 +94,7 @@ const isRookOnStartingSquare = (
 
   return Piece.isEqual(
     pieceOnRookStartingPositionOld,
-    pieceOnRookStartingPositionNew
+    pieceOnRookStartingPositionNew,
   );
 };
 
@@ -104,12 +104,12 @@ const updateCastlingRights = (
   pieceToMove: Piece,
   capturedPiece: Maybe<Piece>,
   oldPiecePlacements: PiecePlacements,
-  newPiecePlacements: PiecePlacements
+  newPiecePlacements: PiecePlacements,
 ): Set<CastlingAbility> => {
   let newCastlingAbility = new Set(castlingAbility);
 
   const ownAbilities = newCastlingAbility.intersection(
-    CastlingAbility.fromColor(pieceToMove.color)
+    CastlingAbility.fromColor(pieceToMove.color),
   );
 
   if (move.castling) {
@@ -144,7 +144,7 @@ const updateCastlingRights = (
 
 const updatePosition = (
   position: ChessPosition,
-  move: MoveOption
+  move: MoveOption,
 ): {
   position: ChessPosition;
   movedPiece: Piece;
@@ -160,7 +160,7 @@ const updatePosition = (
     movedPiece,
     capturedPiece,
     position.pieces,
-    newPiecePlacements
+    newPiecePlacements,
   );
 
   const captureOrPawnMove = move.capture || movedPiece.type === PieceType.Pawn;
@@ -202,7 +202,7 @@ export const ChessPosition = {
   }),
   makeMove: (
     position: ChessPosition,
-    move: MoveOption
+    move: MoveOption,
   ): {
     position: ChessPosition;
     movedPiece: Piece;

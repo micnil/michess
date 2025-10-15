@@ -88,7 +88,7 @@ describe('ZobristHash', () => {
       const updatedHash = originalHash.movePiece(
         { color: 'white', type: 'k' },
         4, // e1 index
-        12 // e2 index
+        12, // e2 index
       );
 
       expect(originalHash.getValue()).not.toBe(updatedHash.getValue());
@@ -100,7 +100,7 @@ describe('ZobristHash', () => {
       const originalHash = ZobristHash.fromHash();
       const updatedHash = originalHash.capturePiece(
         { color: 'black', type: 'q' },
-        27 // d4 index
+        27, // d4 index
       );
 
       expect(originalHash.getValue()).not.toBe(updatedHash.getValue());
@@ -113,7 +113,7 @@ describe('ZobristHash', () => {
       const updatedHash = originalHash.promotePawn(
         { color: 'white', type: 'p' },
         { color: 'white', type: 'q' },
-        56 // a8 index
+        56, // a8 index
       );
 
       expect(originalHash.getValue()).not.toBe(updatedHash.getValue());
@@ -131,7 +131,7 @@ describe('ZobristHash', () => {
       const promotedHash = hashWithPawn.promotePawn(
         Piece.PawnWhite(),
         Piece.QueenWhite(),
-        Coordinate.toIndex('a8')
+        Coordinate.toIndex('a8'),
       );
 
       // Manual approach: start with pawn, remove it, then create position with queen
@@ -168,11 +168,11 @@ describe('ZobristHash', () => {
 
       const originalHash = ZobristHash.fromHash().updateCastlingRights(
         new Set([]),
-        originalRights
+        originalRights,
       );
       const updatedHash = originalHash.updateCastlingRights(
         originalRights,
-        newRights
+        newRights,
       );
 
       expect(originalHash.getValue()).not.toBe(updatedHash.getValue());
@@ -232,7 +232,7 @@ describe('ZobristHash', () => {
 
       expect(hashString).toMatch(/^0x[0-9a-f]{16}$/);
       expect(hashString).toBe(
-        `0x${hash.getValue().toString(16).padStart(16, '0')}`
+        `0x${hash.getValue().toString(16).padStart(16, '0')}`,
       );
     });
   });

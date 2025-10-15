@@ -9,7 +9,7 @@ const chebyshevDistance = (startIndex: number, nextIndex: number): number => {
   const nextRank = (nextIndex - nextFile) / 8;
   return Math.max(
     Math.abs(startRank - nextRank),
-    Math.abs(startFile - nextFile)
+    Math.abs(startFile - nextFile),
   );
 };
 
@@ -19,7 +19,7 @@ const isNeighbors = (startIndex: number, nextIndex: number): boolean => {
 
 const unfoldDirection = (
   startIndex: number,
-  directionOffset: DirectionOffset
+  directionOffset: DirectionOffset,
 ): number[] => {
   const indexes: number[] = [];
   for (

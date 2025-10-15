@@ -21,7 +21,7 @@ const main = async () => {
 
   const emailClient = new EmailClient(
     appConfig.email,
-    'no-reply@chessmonky.com'
+    'no-reply@chessmonky.com',
   );
 
   const repos = Repositories.from(pgClient, redis);

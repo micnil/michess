@@ -17,7 +17,7 @@ export class GameService {
   constructor(
     private restClient: RestClient,
     private socketClient: SocketClient,
-    private auth: AuthService
+    private auth: AuthService,
   ) {}
 
   toGameViewModel(gameDetails: GameDetailsV1): GameViewModel {
@@ -45,14 +45,14 @@ export class GameService {
 
   toParticipantGameViewModel(
     gameDetails: GameDetailsV1,
-    playerId: Maybe<string>
+    playerId: Maybe<string>,
   ): PlayerGameViewModel {
     const playerSide =
       gameDetails.players.white?.id === playerId
         ? 'white'
         : gameDetails.players.black?.id === playerId
-        ? 'black'
-        : 'spectator';
+          ? 'black'
+          : 'spectator';
     const gameViewModel = this.toGameViewModel(gameDetails);
     const isGameActive =
       gameDetails.status === 'IN_PROGRESS' || gameDetails.status === 'READY';
@@ -60,7 +60,7 @@ export class GameService {
       playerSide,
       isReadOnly: !isGameActive || playerSide === 'spectator',
       actionOptions: gameDetails.actionOptions.filter(
-        (option) => !option.availableTo || option.availableTo === playerSide
+        (option) => !option.availableTo || option.availableTo === playerSide,
       ),
       ...gameViewModel,
     };
@@ -102,7 +102,7 @@ export class GameService {
 
   async joinGame(
     gameId: string,
-    side?: 'white' | 'black' | 'spectator'
+    side?: 'white' | 'black' | 'spectator',
   ): Promise<PlayerGameViewModel> {
     const authState = await this.auth.getSession();
     const response = await this.socketClient.emitWithAck('join-game', {
@@ -114,7 +114,7 @@ export class GameService {
     } else {
       return this.toParticipantGameViewModel(
         response.data,
-        authState?.session.userId
+        authState?.session.userId,
       );
     }
   }
@@ -152,14 +152,14 @@ export class GameService {
     } else {
       return this.toParticipantGameViewModel(
         response.data,
-        authState?.session.userId
+        authState?.session.userId,
       );
     }
   }
 
   observeGameState(
     gameId: string,
-    playerId?: Maybe<string>
+    playerId?: Maybe<string>,
   ): Observable<PlayerGameViewModel> {
     return {
       subscribe: (callback: (gameViewModel: PlayerGameViewModel) => void) => {
@@ -189,7 +189,7 @@ export class GameService {
               console.error(
                 'Failed to parse move from UCI:',
                 error,
-                movePayload
+                movePayload,
               );
             }
           }

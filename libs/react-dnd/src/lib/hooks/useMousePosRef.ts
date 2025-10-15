@@ -18,7 +18,7 @@ export const useMousePosRef = (): MutableRefObject<Position> => {
     (evt: MouseEvent) => {
       updatePosition(evt.clientX, evt.clientY);
     },
-    [updatePosition]
+    [updatePosition],
   );
 
   const handleTouchMove = useCallback(
@@ -29,7 +29,7 @@ export const useMousePosRef = (): MutableRefObject<Position> => {
         updatePosition(touch.clientX, touch.clientY);
       }
     },
-    [updatePosition]
+    [updatePosition],
   );
 
   useEffect(() => {

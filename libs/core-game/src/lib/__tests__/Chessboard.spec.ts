@@ -16,7 +16,7 @@ import { standardTestCases } from './test-cases/standard';
 import { taxingTestCases } from './test-cases/taxing';
 
 const getAndApplyMoves = (
-  chessboard: Chessboard
+  chessboard: Chessboard,
 ): { fen: FenStr[]; san: string[] } => {
   const moves = chessboard.moveOptions;
   const positions = moves
@@ -35,7 +35,7 @@ const getAndApplyMoves = (
 };
 
 const toExpects = (
-  cases: Array<{ move: string; fen: FenStr }>
+  cases: Array<{ move: string; fen: FenStr }>,
 ): {
   fen: FenStr[];
   san: string[];
@@ -51,14 +51,14 @@ describe('Chessboard', () => {
       'should handle castling correctly for $start.fen',
       ({ start, expected }) => {
         const gameState = Chessboard.fromPosition(
-          FenParser.toChessPosition(start.fen)
+          FenParser.toChessPosition(start.fen),
         );
         const actual = getAndApplyMoves(gameState);
         const expects = toExpects(expected);
 
         expect(actual.fen).toEqual(expects.fen);
         expect(actual.san).toEqual(expects.san);
-      }
+      },
     );
   });
 
@@ -67,14 +67,14 @@ describe('Chessboard', () => {
       'should handle checkmates correctly for $start.fen',
       ({ start, expected }) => {
         const gameState = Chessboard.fromPosition(
-          FenParser.toChessPosition(start.fen)
+          FenParser.toChessPosition(start.fen),
         );
         const actual = getAndApplyMoves(gameState);
         const expects = toExpects(expected);
 
         expect(actual.fen).toEqual(expects.fen);
         expect(actual.san).toEqual(expects.san);
-      }
+      },
     );
   });
 
@@ -83,14 +83,14 @@ describe('Chessboard', () => {
       'should handle famous positions correctly for $start.fen',
       ({ start, expected }) => {
         const gameState = Chessboard.fromPosition(
-          FenParser.toChessPosition(start.fen)
+          FenParser.toChessPosition(start.fen),
         );
         const actual = getAndApplyMoves(gameState);
         const expects = toExpects(expected);
 
         expect(actual.fen).toEqual(expects.fen);
         expect(actual.san).toEqual(expects.san);
-      }
+      },
     );
   });
 
@@ -99,14 +99,14 @@ describe('Chessboard', () => {
       'should handle pawns correctly for $start.fen',
       ({ start, expected }) => {
         const gameState = Chessboard.fromPosition(
-          FenParser.toChessPosition(start.fen)
+          FenParser.toChessPosition(start.fen),
         );
         const actual = getAndApplyMoves(gameState);
         const expects = toExpects(expected);
 
         expect(actual.fen).toEqual(expects.fen);
         expect(actual.san).toEqual(expects.san);
-      }
+      },
     );
   });
 
@@ -115,14 +115,14 @@ describe('Chessboard', () => {
       'should handle promotions correctly for $start.fen',
       ({ start, expected }) => {
         const gameState = Chessboard.fromPosition(
-          FenParser.toChessPosition(start.fen)
+          FenParser.toChessPosition(start.fen),
         );
         const actual = getAndApplyMoves(gameState);
         const expects = toExpects(expected);
 
         expect(actual.fen).toEqual(expects.fen);
         expect(actual.san).toEqual(expects.san);
-      }
+      },
     );
   });
 
@@ -131,21 +131,21 @@ describe('Chessboard', () => {
       'should handle stalemates correctly for $start.fen',
       ({ start, expected }) => {
         const gameState = Chessboard.fromPosition(
-          FenParser.toChessPosition(start.fen)
+          FenParser.toChessPosition(start.fen),
         );
         const actual = getAndApplyMoves(gameState);
         const expects = toExpects(expected);
 
         expect(actual.fen).toEqual(expects.fen);
         expect(actual.san).toEqual(expects.san);
-      }
+      },
     );
   });
 
   describe('isInsufficientMaterial', () => {
     it('should detect king vs king as insufficient material', () => {
       const kingVsKingPosition = FenParser.toChessPosition(
-        '8/8/8/8/8/8/4k3/4K3 w - - 0 1'
+        '8/8/8/8/8/8/4k3/4K3 w - - 0 1',
       );
       const chessboard = Chessboard.fromPosition(kingVsKingPosition);
 
@@ -154,7 +154,7 @@ describe('Chessboard', () => {
 
     it('should detect king and bishop vs king as insufficient material', () => {
       const kingBishopVsKingPosition = FenParser.toChessPosition(
-        '8/8/8/8/8/8/4k3/4KB2 w - - 0 1'
+        '8/8/8/8/8/8/4k3/4KB2 w - - 0 1',
       );
       const chessboard = Chessboard.fromPosition(kingBishopVsKingPosition);
 
@@ -163,7 +163,7 @@ describe('Chessboard', () => {
 
     it('should detect king and knight vs king as insufficient material', () => {
       const kingKnightVsKingPosition = FenParser.toChessPosition(
-        '8/8/8/8/8/8/4k3/4KN2 w - - 0 1'
+        '8/8/8/8/8/8/4k3/4KN2 w - - 0 1',
       );
       const chessboard = Chessboard.fromPosition(kingKnightVsKingPosition);
 
@@ -173,7 +173,7 @@ describe('Chessboard', () => {
     // TODO
     it.skip('should detect king and bishop vs king and bishop (same color) as insufficient material', () => {
       const bishopsSameColorPosition = FenParser.toChessPosition(
-        '8/8/8/8/8/8/3bk3/4KB2 w - - 0 1'
+        '8/8/8/8/8/8/3bk3/4KB2 w - - 0 1',
       );
       const chessboard = Chessboard.fromPosition(bishopsSameColorPosition);
 
@@ -182,7 +182,7 @@ describe('Chessboard', () => {
 
     it('should not detect king and bishop vs king and bishop (different colors) as insufficient material', () => {
       const bishopsDifferentColorPosition = FenParser.toChessPosition(
-        '8/8/8/8/8/8/2b1k3/4KB2 w - - 0 1'
+        '8/8/8/8/8/8/2b1k3/4KB2 w - - 0 1',
       );
       const chessboard = Chessboard.fromPosition(bishopsDifferentColorPosition);
 
@@ -191,7 +191,7 @@ describe('Chessboard', () => {
 
     it('should not detect king and queen vs king as insufficient material', () => {
       const kingQueenVsKingPosition = FenParser.toChessPosition(
-        '8/8/8/8/8/8/4k3/4KQ2 w - - 0 1'
+        '8/8/8/8/8/8/4k3/4KQ2 w - - 0 1',
       );
       const chessboard = Chessboard.fromPosition(kingQueenVsKingPosition);
 
@@ -200,7 +200,7 @@ describe('Chessboard', () => {
 
     it('should not detect king and rook vs king as insufficient material', () => {
       const kingRookVsKingPosition = FenParser.toChessPosition(
-        '8/8/8/8/8/8/4k3/4KR2 w - - 0 1'
+        '8/8/8/8/8/8/4k3/4KR2 w - - 0 1',
       );
       const chessboard = Chessboard.fromPosition(kingRookVsKingPosition);
 
@@ -209,7 +209,7 @@ describe('Chessboard', () => {
 
     it('should not detect king and pawn vs king as insufficient material', () => {
       const kingPawnVsKingPosition = FenParser.toChessPosition(
-        '8/8/8/8/8/8/4kP2/4K3 w - - 0 1'
+        '8/8/8/8/8/8/4kP2/4K3 w - - 0 1',
       );
       const chessboard = Chessboard.fromPosition(kingPawnVsKingPosition);
 
@@ -218,7 +218,7 @@ describe('Chessboard', () => {
 
     it('should not detect multiple pieces as insufficient material', () => {
       const multiplePiecesPosition = FenParser.toChessPosition(
-        '8/8/8/8/8/8/3nk3/4KN2 w - - 0 1'
+        '8/8/8/8/8/8/3nk3/4KN2 w - - 0 1',
       );
       const chessboard = Chessboard.fromPosition(multiplePiecesPosition);
 
@@ -229,7 +229,7 @@ describe('Chessboard', () => {
   describe('isThreeFoldRepetition', () => {
     it('should detect threefold repetition when same position occurs three times', () => {
       const initialPosition = FenParser.toChessPosition(
-        'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+        'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
       );
 
       const moves: Move[] = [
@@ -254,14 +254,14 @@ describe('Chessboard', () => {
       'should handle standard positions correctly for $start.fen',
       ({ start, expected }) => {
         const gameState = Chessboard.fromPosition(
-          FenParser.toChessPosition(start.fen)
+          FenParser.toChessPosition(start.fen),
         );
         const actual = getAndApplyMoves(gameState);
         const expects = toExpects(expected);
 
         expect(actual.fen).toEqual(expects.fen);
         expect(actual.san).toEqual(expects.san);
-      }
+      },
     );
   });
 
@@ -270,21 +270,21 @@ describe('Chessboard', () => {
       'should handle taxing positions correctly for $start.fen',
       ({ start, expected }) => {
         const gameState = Chessboard.fromPosition(
-          FenParser.toChessPosition(start.fen)
+          FenParser.toChessPosition(start.fen),
         );
         const actual = getAndApplyMoves(gameState);
         const expects = toExpects(expected);
 
         expect(actual.fen).toEqual(expects.fen);
         expect(actual.san).toEqual(expects.san);
-      }
+      },
     );
   });
 
   describe('perft', () => {
     it('should return correct node counts for initial position depths 1-5', () => {
       const initialPosition = FenParser.toChessPosition(
-        'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+        'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
       );
       const chessGame = Chessboard.fromPosition(initialPosition);
 
@@ -297,7 +297,7 @@ describe('Chessboard', () => {
 
     it('should handle perft depth 0', () => {
       const initialPosition = FenParser.toChessPosition(
-        'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+        'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
       );
       const chessGame = Chessboard.fromPosition(initialPosition);
 
@@ -306,7 +306,7 @@ describe('Chessboard', () => {
 
     it('should work with Kiwipete position (Position 2)', () => {
       const kiwipetePosition = FenParser.toChessPosition(
-        'r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1'
+        'r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1',
       );
       const chessGame = Chessboard.fromPosition(kiwipetePosition);
 
@@ -317,7 +317,7 @@ describe('Chessboard', () => {
 
     it('should work with Kiwipete position (Position 4)', () => {
       const kiwipetePosition = FenParser.toChessPosition(
-        'r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1'
+        'r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1',
       );
       const chessGame = Chessboard.fromPosition(kiwipetePosition);
 

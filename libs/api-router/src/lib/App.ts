@@ -16,7 +16,7 @@ export type App = {
 const from = (
   api: Api,
   redisClient: Redis,
-  routerConfig: RouterConfig
+  routerConfig: RouterConfig,
 ): App => {
   const restRouter = RestRouter.from(api, routerConfig);
   const socketRouter = SocketRouter.from(api, redisClient, routerConfig);

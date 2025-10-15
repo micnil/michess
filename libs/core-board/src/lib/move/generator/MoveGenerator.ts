@@ -76,7 +76,7 @@ const hFileBb = new Bitboard().between('h1', 'h8');
 const getRayAttacks = (
   chessBitboard: ChessBitboard,
   direction: DirectionOffset,
-  coord: Coordinate
+  coord: Coordinate,
 ): Bitboard => {
   const attacks = SliderAttacks.fromCoordAndDirection(coord, direction);
   const blockers = attacks.intersection(chessBitboard.occupied);
@@ -86,8 +86,8 @@ const getRayAttacks = (
     return attacks.exclude(
       SliderAttacks.fromCoordAndDirection(
         Coordinate.fromIndex(indexOfFirstBlocker),
-        direction
-      )
+        direction,
+      ),
     );
   } else {
     return attacks;
@@ -97,14 +97,14 @@ const getRayAttacks = (
 const movesFromBitboard = (
   context: MoveGeneratorContext,
   { piece, coord }: PiecePlacement,
-  legalMoves: Bitboard
+  legalMoves: Bitboard,
 ): MoveOption[] => {
   if (legalMoves.isEmpty()) {
     return [];
   } else {
     const startIndex = Coordinate.toIndex(coord);
     const opponentOccupancy = context.bitboards.getOpponentOccupancy(
-      piece.color
+      piece.color,
     );
     return legalMoves.getIndices().map((targetIndex) => ({
       start: startIndex,
@@ -116,7 +116,7 @@ const movesFromBitboard = (
 
 const getSlidingAttacks = (
   chessBitboard: ChessBitboard,
-  { piece, coord }: PiecePlacement
+  { piece, coord }: PiecePlacement,
 ): Bitboard => {
   const moveOffsets = DIRECTIONS_BY_SLIDER[piece.type] ?? [];
   return moveOffsets.reduce((attacksBoard, direction) => {
@@ -126,7 +126,7 @@ const getSlidingAttacks = (
 
 const getSlidingMoves = (
   context: MoveGeneratorContext,
-  { piece, coord }: PiecePlacement
+  { piece, coord }: PiecePlacement,
 ): MoveOption[] => {
   const ownOccupancy = context.bitboards.getOwnOccupancy(piece.color);
   const attacks = getSlidingAttacks(context.bitboards, { piece, coord });
@@ -135,7 +135,7 @@ const getSlidingMoves = (
     return [];
   } else {
     const legalMoves = applyPinRestrictions(context, moves, coord).intersection(
-      context.moveMasks.checkEvasion
+      context.moveMasks.checkEvasion,
     );
     return movesFromBitboard(context, { piece, coord }, legalMoves);
   }
@@ -143,7 +143,7 @@ const getSlidingMoves = (
 
 const getMovesForKing = (
   context: MoveGeneratorContext,
-  { coord, piece }: PiecePlacement
+  { coord, piece }: PiecePlacement,
 ): MoveOption[] => {
   const ownOccupancy = context.bitboards.getOwnOccupancy(piece.color);
   const kingAttacks = KingAttacks.fromCoord(coord);
@@ -156,17 +156,17 @@ const getMovesForKing = (
 
 const getPinMoveRestrictions = (
   context: MoveGeneratorContext,
-  coordinate: Coordinate
+  coordinate: Coordinate,
 ): Bitboard => {
   const kingIndex =
     context.bitboards[context.turn][PieceType.King].scanForward();
   const pinDirection = DirectionOffset.fromCoordinates(
     kingIndex,
-    Coordinate.toIndex(coordinate)
+    Coordinate.toIndex(coordinate),
   );
   const pinMoveRestrictions = SliderAttacks.fromCoordAndDirection(
     Coordinate.fromIndex(kingIndex),
-    pinDirection
+    pinDirection,
   );
   return pinMoveRestrictions;
 };
@@ -174,7 +174,7 @@ const getPinMoveRestrictions = (
 const applyPinRestrictions = (
   context: MoveGeneratorContext,
   moves: Bitboard,
-  coordinate: Coordinate
+  coordinate: Coordinate,
 ): Bitboard => {
   const isPinned = context.moveMasks.pinnedPieces.isCoordSet(coordinate);
   if (isPinned) {
@@ -187,7 +187,7 @@ const applyPinRestrictions = (
 
 const getMovesForKnight = (
   context: MoveGeneratorContext,
-  { coord, piece }: PiecePlacement
+  { coord, piece }: PiecePlacement,
 ): MoveOption[] => {
   const isPinned = context.moveMasks.pinnedPieces.isCoordSet(coord);
   // Knight can never move when pinned
@@ -208,7 +208,7 @@ const getRank = (index: number) => 8 - (index >> 3);
 
 const getMovesForPawn = (
   context: MoveGeneratorContext,
-  { coord, piece }: PiecePlacement
+  { coord, piece }: PiecePlacement,
 ): MoveOption[] => {
   const index = Coordinate.toIndex(coord);
   const isPinned = context.moveMasks.pinnedPieces.isCoordSet(coord);
@@ -272,7 +272,7 @@ const getMovesForPawn = (
         ...PieceType.promotionValues.map((promotionPiece) => ({
           ...move,
           promotion: promotionPiece,
-        }))
+        })),
       );
     } else {
       moves.push(move);
@@ -290,7 +290,7 @@ const getMovesForPawn = (
   if (context.enPassantCoord) {
     const pawnAttacks = PawnAttacks.fromCoordAndColor(
       coord,
-      piece.color
+      piece.color,
     ).intersection(pinMoveRestrictions);
 
     const enPassantIndex = Coordinate.toIndex(context.enPassantCoord);
@@ -307,7 +307,7 @@ const getMovesForPawn = (
     ) {
       const bitboards = context.bitboards.removePiece(
         Piece.from(PieceType.Pawn, Color.opposite(piece.color)),
-        Coordinate.fromIndex(epAttackedIndex)
+        Coordinate.fromIndex(epAttackedIndex),
       );
       const pins = getHorizontalPins(bitboards, piece.color);
 
@@ -333,7 +333,7 @@ const getMovesForPawn = (
 
 const getSliderAttacks = (
   chessBitboard: ChessBitboard,
-  piece: Piece
+  piece: Piece,
 ): Bitboard => {
   return chessBitboard[piece.color][piece.type]
     .getCoordinates()
@@ -342,14 +342,14 @@ const getSliderAttacks = (
         getSlidingAttacks(chessBitboard, {
           piece,
           coord: coordinate,
-        })
+        }),
       );
     }, new Bitboard());
 };
 
 const getKingAttackers = (
   chessBitboard: ChessBitboard,
-  color: Color
+  color: Color,
 ): {
   kingAttackers: Bitboard;
   checkBlockPaths: Bitboard;
@@ -364,18 +364,18 @@ const getKingAttackers = (
     const opponentPieces = chessBitboard.getOpponentPieceBoards(color);
 
     const knightAttackers = KnightAttacks.fromCoord(kingCoord).intersection(
-      opponentPieces[PieceType.Knight]
+      opponentPieces[PieceType.Knight],
     );
     const pawnAttackers = PawnAttacks.fromCoordAndColor(
       kingCoord,
-      color
+      color,
     ).intersection(opponentPieces[PieceType.Pawn]);
 
     const opponentDiagonalSliders = opponentPieces[PieceType.Bishop].union(
-      opponentPieces[PieceType.Queen]
+      opponentPieces[PieceType.Queen],
     );
     const opponentOrthogonalSliders = opponentPieces[PieceType.Rook].union(
-      opponentPieces[PieceType.Queen]
+      opponentPieces[PieceType.Queen],
     );
 
     const diagonalSliderAttackers = getSlidingAttacks(chessBitboard, {
@@ -387,7 +387,7 @@ const getKingAttackers = (
       piece: Piece.from(PieceType.Rook, color),
     }).intersection(opponentOrthogonalSliders);
     const sliderAttackers = diagonalSliderAttackers.union(
-      orthogonalSliderAttackers
+      orthogonalSliderAttackers,
     );
     const kingAttackers = knightAttackers
       .union(pawnAttackers)
@@ -398,7 +398,7 @@ const getKingAttackers = (
       if (!kingAttackers.intersection(sliderAttackers).isEmpty()) {
         checkBlockPaths = new Bitboard().between(
           kingCoord,
-          Coordinate.fromIndex(kingAttackers.scanForward())
+          Coordinate.fromIndex(kingAttackers.scanForward()),
         );
       }
     }
@@ -408,7 +408,7 @@ const getKingAttackers = (
 
 const getAttackedSquares = (
   chessBitboard: ChessBitboard,
-  color: Color
+  color: Color,
 ): Bitboard => {
   const pieceBitboards = chessBitboard[color];
   const knightAttacks = pieceBitboards[PieceType.Knight]
@@ -417,7 +417,7 @@ const getAttackedSquares = (
       return attacks.union(KnightAttacks.fromCoord(coordinate));
     }, new Bitboard());
   const kingAttacks = KingAttacks.fromCoord(
-    Coordinate.fromIndex(pieceBitboards[PieceType.King].scanForward())
+    Coordinate.fromIndex(pieceBitboards[PieceType.King].scanForward()),
   );
   const { westAttackOffset, eastAttackOffset } = PAWN_DIRECTIONS[color];
 
@@ -433,7 +433,7 @@ const getAttackedSquares = (
   const sliderAttacks = sliders.reduce((attacks, pieceType) => {
     const slidingPieceAttacks = getSliderAttacks(
       chessBitboard,
-      Piece.from(pieceType, color)
+      Piece.from(pieceType, color),
     );
     return attacks.union(slidingPieceAttacks);
   }, new Bitboard());
@@ -445,17 +445,17 @@ const getAttackedSquares = (
 
 const getKingXRayAttacks = (
   chessBitboard: ChessBitboard,
-  color: Color
+  color: Color,
 ): Bitboard => {
   const chessBitboardWithoutKing = chessBitboard.removePiece(
-    Piece.from(PieceType.King, color)
+    Piece.from(PieceType.King, color),
   );
   return getAttackedSquares(chessBitboardWithoutKing, Color.opposite(color));
 };
 
 const getMovesFromSquare = (
   context: MoveGeneratorContext,
-  piecePlacement: PiecePlacement
+  piecePlacement: PiecePlacement,
 ): MoveOption[] => {
   switch (piecePlacement.piece.type) {
     case PieceType.Pawn:
@@ -514,7 +514,7 @@ const getCastlingMoves = (context: MoveGeneratorContext): MoveOption[] => {
 
 const getHorizontalPins = (
   chessBitboard: ChessBitboard,
-  color: Color
+  color: Color,
 ): Bitboard => {
   return getPinnedPieces(chessBitboard, color, DirectionOffset.horizontals);
 };
@@ -522,13 +522,13 @@ const getHorizontalPins = (
 const getPinnedPieces = (
   chessBitboard: ChessBitboard,
   color: Color,
-  directions: DirectionOffset[] = DirectionOffset.neighbors
+  directions: DirectionOffset[] = DirectionOffset.neighbors,
 ): Bitboard => {
   const ownOccupancy = chessBitboard.getOwnOccupancy(color);
 
   const getNextBlockerInDirection = (
     blockers: Bitboard,
-    direction: DirectionOffset
+    direction: DirectionOffset,
   ): Bitboard =>
     direction > 0 ? blockers.getLowestSetBit() : blockers.getHighestSetBit();
 
@@ -546,15 +546,15 @@ const getPinnedPieces = (
         const potentialPinners = pinningPieces.reduce(
           (potentialPinners, pieceType) => {
             return chessBitboard[Color.opposite(color)][pieceType].union(
-              potentialPinners
+              potentialPinners,
             );
           },
-          new Bitboard()
+          new Bitboard(),
         );
         const firstBlocker = getNextBlockerInDirection(blockers, direction);
         const secondBlocker = getNextBlockerInDirection(
           blockers.exclude(firstBlocker),
-          direction
+          direction,
         );
 
         if (
@@ -573,7 +573,7 @@ const getPinnedPieces = (
 };
 
 const generateMovesFromContext = (
-  context: MoveGeneratorContext
+  context: MoveGeneratorContext,
 ): MoveOption[] => {
   const numKingAttackers = context.moveMasks.kingAttackers.countBits();
   const isDoubleCheck = numKingAttackers >= 2;
@@ -603,12 +603,12 @@ const generateMoves = (chessPosition: ChessPosition): MoveGeneratorResult => {
   const chessBitboards = ChessBitboard(chessPosition.pieces);
   const { kingAttackers, checkBlockPaths } = getKingAttackers(
     chessBitboards,
-    chessPosition.turn
+    chessPosition.turn,
   );
   const pinnedPieces = getPinnedPieces(chessBitboards, chessPosition.turn);
   const attackers = getAttackedSquares(
     chessBitboards,
-    Color.opposite(chessPosition.turn)
+    Color.opposite(chessPosition.turn),
   );
   const numKingAttackers = kingAttackers.countBits();
   const isCheck = numKingAttackers > 0;

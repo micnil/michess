@@ -16,11 +16,11 @@ export class ChessGameActions {
 
   private findActionOptionIndex = (
     actionIn: GameActionIn,
-    color: Color
+    color: Color,
   ): number =>
     this.state.options.findIndex(
       (a) =>
-        a.type === actionIn.type && (!a.availableTo || a.availableTo === color)
+        a.type === actionIn.type && (!a.availableTo || a.availableTo === color),
     );
 
   value(): GameActionOption[] {
@@ -32,7 +32,7 @@ export class ChessGameActions {
       option.type === 'accept_draw'
         ? [
             ...this.state.options.filter(
-              (a) => a.type !== 'offer_draw' && a.type !== 'accept_draw'
+              (a) => a.type !== 'offer_draw' && a.type !== 'accept_draw',
             ),
             option,
           ]
@@ -100,7 +100,7 @@ export class ChessGameActions {
       return false;
     }
     const sortedCurrent = [...this.state.options].sort((a, b) =>
-      a.type.localeCompare(b.type)
+      a.type.localeCompare(b.type),
     );
     const sortedNew = [...options].sort((a, b) => a.type.localeCompare(b.type));
     return sortedCurrent.every((option, index) => {
@@ -122,7 +122,7 @@ export class ChessGameActions {
   static from(
     actionsIn: GameAction[],
     board: Chessboard,
-    status: GameStatusType
+    status: GameStatusType,
   ): ChessGameActions {
     if (status !== 'IN_PROGRESS') {
       return new ChessGameActions({
@@ -134,7 +134,7 @@ export class ChessGameActions {
       const moveNumber = board.movesRecord.length;
 
       const firstMoveThisTurn = actionsIn.findIndex(
-        (a) => a.moveNumber === moveNumber
+        (a) => a.moveNumber === moveNumber,
       );
 
       const actionsThisTurn =

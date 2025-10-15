@@ -4,13 +4,13 @@ import { useChessboardContext } from './useChessboardContext';
 import { MoveOptions } from '../../move/model/MoveOptions';
 
 export const useMoveOptions = (
-  coord: Maybe<Coordinate>
+  coord: Maybe<Coordinate>,
 ): Maybe<MoveOptions> => {
   const { moveOptionsMap } = useChessboardContext();
 
   return moveOptionsMap
     ? coord
-      ? moveOptionsMap?.[coord] ?? []
+      ? (moveOptionsMap?.[coord] ?? [])
       : []
     : undefined;
 };

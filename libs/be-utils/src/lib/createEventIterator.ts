@@ -3,7 +3,7 @@ import { createEventIterable } from './createEventIterable';
 
 export const createEventIterator = <T>(
   emitter: EventEmitter,
-  eventType: string
+  eventType: string,
 ): AsyncIterableIterator<T, T, undefined> & Disposable => {
   const iterable = createEventIterable<T>(emitter, eventType)[
     Symbol.asyncIterator

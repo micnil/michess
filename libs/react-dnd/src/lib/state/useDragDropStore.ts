@@ -38,8 +38,8 @@ export const useDragDropStore = create<DragDropStore>()((set) => ({
       draggingId: state.isDragging
         ? undefined
         : state.previousDraggingId === state.draggingId
-        ? undefined
-        : state.draggingId,
+          ? undefined
+          : state.draggingId,
     })),
 }));
 
@@ -49,5 +49,5 @@ useDragDropStore.subscribe((store) =>
     isDragging: store.isDragging,
     draggingId: store.draggingId,
     previousDraggingId: store.previousDraggingId,
-  })
+  }),
 );

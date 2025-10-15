@@ -9,7 +9,7 @@ const CastlingAbilityEnum = {
 } as const;
 
 export type CastlingAbility =
-  typeof CastlingAbilityEnum[keyof typeof CastlingAbilityEnum];
+  (typeof CastlingAbilityEnum)[keyof typeof CastlingAbilityEnum];
 
 const WHITE_CASTLING_ABILITIES: CastlingAbility[] = [
   CastlingAbilityEnum.WhiteKing,
@@ -52,13 +52,13 @@ export const CastlingAbility = Object.freeze({
     const relevantAbilitys = abilities.filter(
       (ability) =>
         (color === Color.White && WHITE_CASTLING_ABILITIES.includes(ability)) ||
-        (color === Color.Black && BLACK_CASTLING_ABILITIES.includes(ability))
+        (color === Color.Black && BLACK_CASTLING_ABILITIES.includes(ability)),
     );
     return relevantAbilitys.map(toCastingRights);
   },
   fromCastlingRights: (
     rights: CastlingRight[],
-    color: Color
+    color: Color,
   ): Set<CastlingAbility> => {
     const abilities = new Set<CastlingAbility>();
     rights.forEach((right) => {

@@ -14,11 +14,11 @@ const KING_ATTACKS: Record<Coordinate, Bitboard> = Object.fromEntries(
           ? attackBitboard.setIndex(target)
           : attackBitboard;
       },
-      new Bitboard()
+      new Bitboard(),
     );
 
     return [coord, attacks];
-  })
+  }),
 ) as Record<Coordinate, Bitboard>;
 
 export const KingAttacks = {

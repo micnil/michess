@@ -14,5 +14,5 @@ export const usePointerStore = create<PointerStore>()(
   subscribeWithSelector((set) => ({
     position: { x: 0, y: 0 },
     setPosition: (nextPosition) => set({ position: nextPosition }),
-  }))
+  })),
 );

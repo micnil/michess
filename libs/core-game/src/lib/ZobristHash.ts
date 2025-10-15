@@ -100,7 +100,7 @@ const updateHashForPieceMove = (
   hash: bigint,
   piece: Piece,
   fromSquare: number,
-  toSquare: number
+  toSquare: number,
 ): bigint => {
   // Remove piece from old square
   let newHash = hash ^ ZOBRIST_PIECES[piece.color][piece.type][fromSquare];
@@ -112,7 +112,7 @@ const updateHashForPieceMove = (
 const updateHashForCapture = (
   hash: bigint,
   capturedPiece: Maybe<Piece>,
-  square: number
+  square: number,
 ): bigint => {
   if (capturedPiece) {
     return (
@@ -130,7 +130,7 @@ const updateHashForSideToMove = (hash: bigint): bigint => {
 const updateHashForCastlingRights = (
   hash: bigint,
   oldRights: Set<CastlingAbility>,
-  newRights: Set<CastlingAbility>
+  newRights: Set<CastlingAbility>,
 ): bigint => {
   let newHash = hash;
 
@@ -152,7 +152,7 @@ const updateHashForCastlingRights = (
 const updateHashForEnPassant = (
   hash: bigint,
   oldEnPassant: Maybe<Coordinate>,
-  newEnPassant: Maybe<Coordinate>
+  newEnPassant: Maybe<Coordinate>,
 ): bigint => {
   let newHash = hash;
 
@@ -175,7 +175,7 @@ const updateHashForPromotePawn = (
   hash: bigint,
   pawn: Piece,
   promotedPiece: Maybe<Piece>,
-  square: number
+  square: number,
 ): bigint => {
   if (promotedPiece) {
     // Remove the pawn from the square
@@ -205,23 +205,23 @@ export class ZobristHash {
 
   movePiece(piece: Piece, fromSquare: number, toSquare: number): ZobristHash {
     return new ZobristHash(
-      updateHashForPieceMove(this.hash, piece, fromSquare, toSquare)
+      updateHashForPieceMove(this.hash, piece, fromSquare, toSquare),
     );
   }
 
   capturePiece(capturedPiece: Maybe<Piece>, square: number): ZobristHash {
     return new ZobristHash(
-      updateHashForCapture(this.hash, capturedPiece, square)
+      updateHashForCapture(this.hash, capturedPiece, square),
     );
   }
 
   promotePawn(
     pawn: Piece,
     promotedPiece: Maybe<Piece>,
-    square: number
+    square: number,
   ): ZobristHash {
     return new ZobristHash(
-      updateHashForPromotePawn(this.hash, pawn, promotedPiece, square)
+      updateHashForPromotePawn(this.hash, pawn, promotedPiece, square),
     );
   }
 
@@ -231,19 +231,19 @@ export class ZobristHash {
 
   updateCastlingRights(
     oldRights: Set<CastlingAbility>,
-    newRights: Set<CastlingAbility>
+    newRights: Set<CastlingAbility>,
   ): ZobristHash {
     return new ZobristHash(
-      updateHashForCastlingRights(this.hash, oldRights, newRights)
+      updateHashForCastlingRights(this.hash, oldRights, newRights),
     );
   }
 
   updateEnPassant(
     oldEnPassant: Maybe<Coordinate>,
-    newEnPassant: Maybe<Coordinate>
+    newEnPassant: Maybe<Coordinate>,
   ): ZobristHash {
     return new ZobristHash(
-      updateHashForEnPassant(this.hash, oldEnPassant, newEnPassant)
+      updateHashForEnPassant(this.hash, oldEnPassant, newEnPassant),
     );
   }
 

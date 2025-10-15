@@ -17,7 +17,7 @@ export type IncludeRelation<TableName extends keyof TSchema> = DBQueryConfig<
 
 export type InferResultType<
   TableName extends keyof TSchema,
-  With extends IncludeRelation<TableName> | undefined = undefined
+  With extends IncludeRelation<TableName> | undefined = undefined,
 > = BuildQueryResult<
   TSchema,
   TSchema[TableName],

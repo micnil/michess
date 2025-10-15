@@ -36,8 +36,8 @@ export class GameRepository extends BaseRepository {
       andConditions.push(
         inArray(
           games.status,
-          options.status.map(GameStatusEnum.fromGameStatusType)
-        )
+          options.status.map(GameStatusEnum.fromGameStatusType),
+        ),
       );
     }
     if (typeof options.private === 'boolean') {
@@ -71,7 +71,7 @@ export class GameRepository extends BaseRepository {
   }
 
   async findGameWithRelationsById(
-    id: string
+    id: string,
   ): Promise<Maybe<SelectGameWithRelations>> {
     return await this.db.query.games.findFirst({
       where: eq(this.schema.games.gameId, id),

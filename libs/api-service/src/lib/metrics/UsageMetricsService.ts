@@ -12,23 +12,23 @@ export class UsageMetricsService {
   constructor(
     private processId: string,
     private cacheRepo: CacheRepository,
-    private gameRepo: GameRepository
+    private gameRepo: GameRepository,
   ) {
     const connectionOptions = { connection: this.cacheRepo.client };
     this.processTrackerQueue = new Queue(
       `process-tracker/${processId}`,
-      connectionOptions
+      connectionOptions,
     );
     this.processTrackerWorker = new Worker(
       `process-tracker/${processId}`,
       this.trackProcess.bind(this),
-      connectionOptions
+      connectionOptions,
     );
     this.metricCleanupQueue = new Queue('metric-cleanup', connectionOptions);
     this.metricCleanupWorker = new Worker(
       'metric-cleanup',
       this.cleanupMetrics.bind(this),
-      connectionOptions
+      connectionOptions,
     );
   }
 
@@ -41,7 +41,7 @@ export class UsageMetricsService {
       {
         every: 5000,
       },
-      { data: { processId: this.processId } }
+      { data: { processId: this.processId } },
     );
   }
 
@@ -63,7 +63,7 @@ export class UsageMetricsService {
       }
       logger.info(
         { processId: this.processId },
-        'Cleaning up process client counts'
+        'Cleaning up process client counts',
       );
       hasProcessStopped = true;
       await this.cacheRepo.removeProcess(processId);

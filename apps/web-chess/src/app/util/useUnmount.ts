@@ -9,6 +9,6 @@ export const useUnmount = (func: () => void): void => {
     () => () => {
       funcRef.current();
     },
-    []
+    [],
   );
 };

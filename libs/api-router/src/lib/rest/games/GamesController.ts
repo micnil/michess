@@ -12,7 +12,7 @@ import { RestContext } from '../../model/RestContext';
 import { zValidator } from '../util/zValidator';
 
 export const GamesController = (
-  gameService: GamesService
+  gameService: GamesService,
 ): Hono<RestContext> => {
   return new Hono<RestContext>()
     .post('/', zValidator('json', CreateGameV1Schema), async (c) => {
@@ -30,12 +30,12 @@ export const GamesController = (
         {
           userId: c.get('session').userId,
         },
-        'Fetching player games'
+        'Fetching player games',
       );
       const query: PlayerGameInfoQueryV1 = c.req.valid('query');
       const response = await gameService.queryPlayerGames(
         c.get('session').userId,
-        query
+        query,
       );
       return c.json(response);
     });

@@ -17,7 +17,7 @@ import { FenParts } from '../model/FenParts';
 import { FenValidationError } from '../model/FenValidationError';
 
 function assertPiecePlacementPart(
-  piecePlacementPart: string
+  piecePlacementPart: string,
 ): asserts piecePlacementPart is FenPiecePlacementPart {
   const match = piecePlacementPart.match(FenPiecePlacementPartRegex);
   if (!match?.groups?.piecePlacement) {
@@ -26,7 +26,7 @@ function assertPiecePlacementPart(
 }
 
 function assertSideToMovePart(
-  sideToMovePart: string
+  sideToMovePart: string,
 ): asserts sideToMovePart is FenSideToMovePart {
   const match = sideToMovePart.match(FenSideToMovePartRegex);
   if (!match?.groups?.sideToMove) {
@@ -35,7 +35,7 @@ function assertSideToMovePart(
 }
 
 function assertCastlingAbilityPart(
-  castlingAbilityPart: string
+  castlingAbilityPart: string,
 ): asserts castlingAbilityPart is FenCastlingAbilityPart {
   const match = castlingAbilityPart.match(FenCastlingAbilityPartRegex);
   if (!match?.groups?.castlingAbility) {
@@ -44,21 +44,21 @@ function assertCastlingAbilityPart(
 }
 
 function assertEnPassantTargetSquarePart(
-  enPassantTargetSquarePart: string
+  enPassantTargetSquarePart: string,
 ): asserts enPassantTargetSquarePart is FenEnPassantTargetSquarePart {
   const match = enPassantTargetSquarePart.match(
-    FenEnPassantTargetSquarePartRegex
+    FenEnPassantTargetSquarePartRegex,
   );
   if (!match?.groups?.enPassant) {
     throw new FenValidationError(
       'FenEnPassantTargetSquarePart',
-      enPassantTargetSquarePart
+      enPassantTargetSquarePart,
     );
   }
 }
 
 function assertHalfMoveClockPart(
-  halfMoveClockPart: string
+  halfMoveClockPart: string,
 ): asserts halfMoveClockPart is FenHalfMoveClockPart {
   const match = halfMoveClockPart.match(FenHalfMoveClockPartRegex);
   if (!match?.groups?.halfMoveClock) {
@@ -67,7 +67,7 @@ function assertHalfMoveClockPart(
 }
 
 function assertFullMoveCounterPart(
-  fullMoveCounterPart: string
+  fullMoveCounterPart: string,
 ): asserts fullMoveCounterPart is FenFullMoveCounterPart {
   const match = fullMoveCounterPart.match(FenFullMoveCounterPartRegex);
   if (!match?.groups?.fullMoveCounter) {

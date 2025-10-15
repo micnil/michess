@@ -21,7 +21,7 @@ export type MoveGeneratorContext = {
 const from = (
   chessPosition: ChessPosition,
   chessBitboards: ChessBitboard,
-  moveMasks: MoveMaskBitboards
+  moveMasks: MoveMaskBitboards,
 ): MoveGeneratorContext => {
   const isTurn = (color: Color): boolean => chessPosition.turn === color;
 
@@ -35,7 +35,7 @@ const from = (
     isTurn,
     castlingRights: CastlingAbility.toCastlingRights(
       chessPosition.turn,
-      Array.from(chessPosition.castlingAbility.values())
+      Array.from(chessPosition.castlingAbility.values()),
     ),
   };
 };

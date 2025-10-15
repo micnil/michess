@@ -9,18 +9,18 @@ import { MakeMoveResponseV1 } from './game/MakeMoveResponseV1';
 export type ClientToServerEvents = {
   'make-move': (
     move: MakeMovePayloadV1,
-    callback: (response: MakeMoveResponseV1) => void
+    callback: (response: MakeMoveResponseV1) => void,
   ) => void;
   'join-game': (
     joinGamePayload: JoinGamePayloadV1,
-    callback: (response: GameDetailsResponseV1) => void
+    callback: (response: GameDetailsResponseV1) => void,
   ) => void;
   'leave-game': (
     leaveGamePayload: LeaveGamePayloadV1,
-    callback: (response: EventResponse<void>) => void
+    callback: (response: EventResponse<void>) => void,
   ) => void;
   'make-action': (
     actionPayload: MakeActionPayloadV1,
-    callback: (response: GameDetailsResponseV1) => void
+    callback: (response: GameDetailsResponseV1) => void,
   ) => void;
 };

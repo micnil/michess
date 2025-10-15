@@ -15,9 +15,9 @@ export const ApiProvider: React.FC<ApiProviderProps> = ({ children }) => {
       Api.create(
         RestClient.create(),
         AuthClient.create(),
-        SocketClient.create()
+        SocketClient.create(),
       ),
-    []
+    [],
   );
 
   return <ApiContext.Provider value={api}>{children}</ApiContext.Provider>;

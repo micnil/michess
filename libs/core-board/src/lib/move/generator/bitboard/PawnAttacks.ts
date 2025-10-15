@@ -10,19 +10,19 @@ const PAWN_ATTACKS: PawnAttacksType = Object.fromEntries(
     const whiteAttacks = [index - 7, index - 9].filter(
       (targetIndex) =>
         IndexBoardUtil.withinBoard(targetIndex) &&
-        IndexBoardUtil.isNeighbors(index, targetIndex)
+        IndexBoardUtil.isNeighbors(index, targetIndex),
     );
     const blackAttacks = [index + 7, index + 9].filter(
       (targetIndex) =>
         IndexBoardUtil.withinBoard(targetIndex) &&
-        IndexBoardUtil.isNeighbors(index, targetIndex)
+        IndexBoardUtil.isNeighbors(index, targetIndex),
     );
     const attacks: Record<Color, Bitboard> = {
       white: new Bitboard().setIndices(whiteAttacks),
       black: new Bitboard().setIndices(blackAttacks),
     };
     return [coord, attacks];
-  })
+  }),
 ) as PawnAttacksType;
 
 export const PawnAttacks = {

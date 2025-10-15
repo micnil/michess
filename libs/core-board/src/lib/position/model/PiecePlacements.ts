@@ -1,4 +1,3 @@
-
 import { Color } from '../../common/Color';
 import { Coordinate } from '../../common/Coordinate';
 import { Piece } from '../../common/Piece';
@@ -40,6 +39,5 @@ export const PiecePlacements = {
     ['f7', Piece.Pawn(Color.Black)],
     ['g7', Piece.Pawn(Color.Black)],
     ['h7', Piece.Pawn(Color.Black)],
-  ] satisfies [Coordinate, Piece][]
-),
+  ] satisfies [Coordinate, Piece][]),
 };

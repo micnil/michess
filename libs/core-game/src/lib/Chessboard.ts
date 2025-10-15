@@ -54,7 +54,7 @@ const isInsufficientMaterial = (piecePlacements: PiecePlacements): boolean => {
 
 const isThreeFoldRepetition = (
   positionHash: ZobristHash,
-  boardHistory: BoardStateHistoryItem[]
+  boardHistory: BoardStateHistoryItem[],
 ): boolean => {
   let occurrences = 1;
   for (let index = boardHistory.length - 1; index >= 0; index--) {
@@ -72,7 +72,7 @@ const isThreeFoldRepetition = (
 
 const makeMove = (
   { position, positionHash }: BoardState,
-  move: MoveOption
+  move: MoveOption,
 ): {
   boardState: BoardState;
 } => {
@@ -118,7 +118,7 @@ const perft = (boardState: BoardState, depth: number): { nodes: number } => {
 
 const from = (
   state: BoardState,
-  history: BoardStateHistoryItem[] = []
+  history: BoardStateHistoryItem[] = [],
 ): Chessboard => {
   const moveGen = MoveGenerator(state.position);
   return {
@@ -173,7 +173,7 @@ const from = (
           position: newPosition.position,
           positionHash: newPosition.positionHash,
         },
-        newHistory
+        newHistory,
       );
     },
 
@@ -229,7 +229,7 @@ const from = (
         history.length > 0 ? history[0].positionHash : state.positionHash;
       const initialBoard = from(
         { position: initialPosition, positionHash: initialPositionHash },
-        []
+        [],
       );
 
       // If syncPoint is 0, start from initial position, otherwise play moves up to syncPoint
@@ -249,7 +249,7 @@ const from = (
 
 const fromPosition = (
   position: ChessPosition,
-  moves: Move[] = []
+  moves: Move[] = [],
 ): Chessboard => {
   const positionHash = ZobristHash.fromChessPosition(position);
   let board = from({ position, positionHash });

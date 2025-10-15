@@ -27,7 +27,7 @@ describe('ChessboardContextProvider', () => {
       const { getByTestId } = render(
         <ChessboardContextProvider size={400}>
           <TestComponent />
-        </ChessboardContextProvider>
+        </ChessboardContextProvider>,
       );
 
       expect(getByTestId('squares-count').textContent).toBe('64');
@@ -39,7 +39,7 @@ describe('ChessboardContextProvider', () => {
       const { getByTestId } = render(
         <ChessboardContextProvider size={400} orientation="white">
           <TestComponent />
-        </ChessboardContextProvider>
+        </ChessboardContextProvider>,
       );
 
       expect(getByTestId('squares-count').textContent).toBe('64');
@@ -51,7 +51,7 @@ describe('ChessboardContextProvider', () => {
       const { getByTestId } = render(
         <ChessboardContextProvider size={400} orientation="black">
           <TestComponent />
-        </ChessboardContextProvider>
+        </ChessboardContextProvider>,
       );
 
       expect(getByTestId('squares-count').textContent).toBe('64');
@@ -63,7 +63,7 @@ describe('ChessboardContextProvider', () => {
       const { getByTestId } = render(
         <ChessboardContextProvider size={400} orientation="white">
           <TestComponent />
-        </ChessboardContextProvider>
+        </ChessboardContextProvider>,
       );
 
       expect(getByTestId('first-square-coord').textContent).toBe('a8');
@@ -74,7 +74,7 @@ describe('ChessboardContextProvider', () => {
       const { getByTestId } = render(
         <ChessboardContextProvider size={400} orientation="black">
           <TestComponent />
-        </ChessboardContextProvider>
+        </ChessboardContextProvider>,
       );
 
       expect(getByTestId('first-square-coord').textContent).toBe('h1');

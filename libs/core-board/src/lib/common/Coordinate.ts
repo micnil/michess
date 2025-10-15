@@ -1,6 +1,6 @@
 import { SQUARE_COORDINATES_WHITE } from '../constants/board';
 
-export type Coordinate = typeof SQUARE_COORDINATES_WHITE[number];
+export type Coordinate = (typeof SQUARE_COORDINATES_WHITE)[number];
 
 const coordToIndex = (coord: Coordinate): number => {
   const file = coord.charCodeAt(0) - 97;

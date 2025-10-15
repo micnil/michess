@@ -15,8 +15,8 @@ describe('ChessGame', () => {
           .filter(
             (action) =>
               action.type === 'accept_draw' &&
-              action.reason === 'threefold_repetition'
-          )
+              action.reason === 'threefold_repetition',
+          ),
       ).toHaveLength(0);
 
       // Bongcloud draw (magnus - hikaru game).
@@ -70,8 +70,8 @@ describe('ChessGame', () => {
           .filter(
             (action) =>
               action.type === 'accept_draw' &&
-              action.reason === 'threefold_repetition'
-          )
+              action.reason === 'threefold_repetition',
+          ),
       ).toHaveLength(0);
 
       const threeFoldRepetitionGame = almostThreeFoldRepetition
@@ -90,7 +90,7 @@ describe('ChessGame', () => {
         .filter(
           (action) =>
             action.type === 'accept_draw' &&
-            action.reason === 'threefold_repetition'
+            action.reason === 'threefold_repetition',
         )[0];
 
       expect(acceptDrawAction).toBeDefined();
@@ -98,7 +98,7 @@ describe('ChessGame', () => {
       expect(threeFoldRepetitionGame.getState().result).toBeUndefined();
       const drawnGame = threeFoldRepetitionGame.makeAction(
         'player1',
-        acceptDrawAction
+        acceptDrawAction,
       );
       expect(drawnGame.getState().result?.type).toEqual('draw');
     });
@@ -117,7 +117,7 @@ describe('ChessGame', () => {
         GameStateMock.fromPartial({
           initialPosition: position,
           status: 'IN_PROGRESS',
-        })
+        }),
       );
       const actions = chessGame.getAdditionalActions();
 
@@ -126,7 +126,7 @@ describe('ChessGame', () => {
         expect.arrayContaining([
           expect.objectContaining({ type: 'offer_draw' }),
           expect.objectContaining({ type: 'resign' }),
-        ])
+        ]),
       );
     });
 
@@ -199,7 +199,7 @@ describe('ChessGame', () => {
       const gameWithPlayer1 = chessGame.joinGame(player1, Color.White);
       const gameWithBothPlayers = gameWithPlayer1.joinGame(
         player2,
-        Color.Black
+        Color.Black,
       );
       const gameState = gameWithBothPlayers.getState();
 
@@ -231,7 +231,7 @@ describe('ChessGame', () => {
       const gameWithPlayer1 = chessGame.joinGame(player1, Color.White);
       const gameWithBothPlayers = gameWithPlayer1.joinGame(
         player2,
-        Color.Black
+        Color.Black,
       );
 
       expect(() => {
@@ -248,10 +248,10 @@ describe('ChessGame', () => {
 
       expect(gameWithPlayer.getPosition()).toEqual(chessGame.getPosition());
       expect(gameWithPlayer.getState().movesRecord).toEqual(
-        chessGame.getState().movesRecord
+        chessGame.getState().movesRecord,
       );
       expect(gameWithPlayer.getState().result).toEqual(
-        chessGame.getState().result
+        chessGame.getState().result,
       );
     });
   });
@@ -261,14 +261,14 @@ describe('ChessGame', () => {
       const chessGame = ChessGame.fromGameState(
         GameStateMock.fromPartial({
           initialPosition: FenParser.toChessPosition(
-            'r1bqkbnr/ppp2ppp/2np4/4p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR w KQkq - 0 1'
+            'r1bqkbnr/ppp2ppp/2np4/4p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR w KQkq - 0 1',
           ),
           players: {
             white: { id: 'player1', name: 'Player One' },
             black: { id: 'player2', name: 'Player Two' },
           },
           status: 'IN_PROGRESS',
-        })
+        }),
       );
 
       expect(chessGame.getState().result).toBeUndefined();
@@ -289,14 +289,14 @@ describe('ChessGame', () => {
       const chessGame = ChessGame.fromGameState(
         GameStateMock.fromPartial({
           initialPosition: FenParser.toChessPosition(
-            '3k4/5K2/8/8/8/8/6Q1/8 w - - 0 1'
+            '3k4/5K2/8/8/8/8/6Q1/8 w - - 0 1',
           ),
           players: {
             white: { id: 'player1', name: 'Player One' },
             black: { id: 'player2', name: 'Player Two' },
           },
           status: 'IN_PROGRESS',
-        })
+        }),
       );
 
       expect(chessGame.getState().result).toBeUndefined();

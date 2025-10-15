@@ -2,7 +2,7 @@ import { Position } from '@michess/common-utils';
 
 export const domToSvgSpace = (
   svg: SVGSVGElement,
-  position: Position
+  position: Position,
 ): Position => {
   const pt = svg.createSVGPoint();
 

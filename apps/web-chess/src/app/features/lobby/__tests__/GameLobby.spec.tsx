@@ -60,7 +60,7 @@ describe('GameLobby', () => {
             },
           ],
         });
-      })
+      }),
     );
 
     const { findByText } = render(<GameLobby />);

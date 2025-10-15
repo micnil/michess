@@ -5,7 +5,7 @@ const ColorEnum = {
   Black: 'black',
 } as const;
 
-export type Color = typeof ColorEnum[keyof typeof ColorEnum];
+export type Color = (typeof ColorEnum)[keyof typeof ColorEnum];
 
 export const Color = Object.freeze({
   ...ColorEnum,

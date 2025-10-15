@@ -2,7 +2,7 @@ import { EventEmitter } from 'events';
 
 export function createEventIterable<T>(
   emitter: EventEmitter,
-  eventType: string
+  eventType: string,
 ): AsyncIterable<T, T, undefined> {
   return {
     [Symbol.asyncIterator](): AsyncIterator<T> {
@@ -40,7 +40,7 @@ export function createEventIterable<T>(
           isListening = false;
           emitter.off(eventType, eventHandler);
           resolverQueue.forEach((resolve) =>
-            resolve({ done: true, value: undefined })
+            resolve({ done: true, value: undefined }),
           );
           return { done: true, value: undefined };
         },

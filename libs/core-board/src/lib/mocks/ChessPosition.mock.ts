@@ -35,7 +35,7 @@ const convertPiecesToMap = (pieces: PiecesInput): PiecePlacements => {
 export const createChessPositionMock = (
   partialChessPosition?: Partial<Omit<ChessPosition, 'pieces'>> & {
     pieces?: PiecesInput;
-  }
+  },
 ): ChessPosition => {
   let finalPieces: PiecePlacements;
 

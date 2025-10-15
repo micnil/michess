@@ -10,7 +10,7 @@ export const UsernameField: FC<Props> = ({ isUsernameAvailable, ...props }) => {
   const usernameInputRef = useRef<HTMLInputElement | null>(null);
   useEffect(() => {
     usernameInputRef.current?.setCustomValidity(
-      isUsernameAvailable ? '' : 'Username is already taken'
+      isUsernameAvailable ? '' : 'Username is already taken',
     );
     if (isUsernameAvailable === false) {
       usernameInputRef.current?.reportValidity();

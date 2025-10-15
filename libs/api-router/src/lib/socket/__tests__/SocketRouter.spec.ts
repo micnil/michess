@@ -26,7 +26,6 @@ const apiMock: Api = {
   usageMetrics: new UsageMetricsService({} as never, {} as never, {} as never),
 };
 
-
 const leaveAllRooms = (socket: ServerSocket) => {
   socket.rooms.forEach((room) => {
     if (room !== socket.id) {
@@ -131,7 +130,7 @@ describe('SocketRouter', () => {
 
       const response = await clientSocket1.emitWithAck(
         'join-game',
-        joinGamePayload
+        joinGamePayload,
       );
 
       expect(response.status).toEqual('ok');
@@ -158,12 +157,12 @@ describe('SocketRouter', () => {
 
       const response: MakeMoveResponseV1 = await clientSocket1.emitWithAck(
         'make-move',
-        makeMovePayload
+        makeMovePayload,
       );
 
       expect(response.status).toEqual('ok');
       expect(response.status === 'ok' && response.data).toEqual(
-        makeMovePayload
+        makeMovePayload,
       );
       expect(apiMock.games.makeMove).toHaveBeenCalled();
     });

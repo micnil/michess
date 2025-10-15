@@ -37,7 +37,7 @@ export type ChessGame = {
 const makeAction = (
   gameState: GameStateInternal,
   playerId: string,
-  action: GameActionOption
+  action: GameActionOption,
 ): {
   gameState: GameStateInternal;
 } => {
@@ -45,14 +45,14 @@ const makeAction = (
     gameState.players.white?.id === playerId
       ? Color.White
       : gameState.players.black?.id === playerId
-      ? Color.Black
-      : undefined;
+        ? Color.Black
+        : undefined;
 
   if (playerColor) {
     if (gameState.additionalActions.isActionAvailable(playerColor, action)) {
       const newActions = gameState.additionalActions.useAction(
         playerColor,
-        action
+        action,
       );
       switch (action.type) {
         case 'accept_draw':
@@ -62,7 +62,7 @@ const makeAction = (
               ...gameState,
               result: ChessGameResult.fromChessGameAction(
                 action,
-                gameState.board.position.turn
+                gameState.board.position.turn,
               ),
               additionalActions: newActions,
             },
@@ -81,7 +81,7 @@ const makeAction = (
       }
     } else {
       throw new Error(
-        `Action ${action.type} is not available for turn ${gameState.board.position.turn}`
+        `Action ${action.type} is not available for turn ${gameState.board.position.turn}`,
       );
     }
   } else {
@@ -92,7 +92,7 @@ const makeAction = (
 const joinGame = (
   players: GamePlayers,
   playerInfo: PlayerInfo,
-  color?: Color
+  color?: Color,
 ): GamePlayers => {
   const availableSides: Color[] = [
     players.white ? null : ('white' as const),
@@ -124,11 +124,11 @@ const joinGame = (
 };
 
 const evalResultFromBoard = (
-  board: Chessboard
+  board: Chessboard,
 ): ChessGameResult | undefined => {
   if (board.isCheckmate) {
     return ChessGameResult.toCheckmate(
-      board.position.turn === Color.White ? Color.Black : Color.White
+      board.position.turn === Color.White ? Color.Black : Color.White,
     );
   } else if (board.isStalemate || board.isInsufficientMaterial) {
     return { type: 'draw' };
@@ -138,7 +138,7 @@ const evalResultFromBoard = (
 };
 
 const fromGameStateInternal = (
-  gameStateInternal: GameStateInternal
+  gameStateInternal: GameStateInternal,
 ): ChessGame => {
   const { board, additionalActions, result } = gameStateInternal;
   const getState = (): GameState => {
@@ -173,8 +173,8 @@ const fromGameStateInternal = (
         gameStateInternal.status === 'READY'
           ? 'IN_PROGRESS'
           : result
-          ? 'ENDED'
-          : gameStateInternal.status;
+            ? 'ENDED'
+            : gameStateInternal.status;
       return fromGameStateInternal({
         ...gameStateInternal,
         board: newBoard,
@@ -183,7 +183,7 @@ const fromGameStateInternal = (
           ...gameStateInternal.meta,
           startedAt: gameStateInternal.meta.startedAt ?? new Date(),
           endedAt:
-            gameStateInternal.meta.endedAt ?? result ? new Date() : undefined,
+            (gameStateInternal.meta.endedAt ?? result) ? new Date() : undefined,
         },
         result,
         additionalActions: additionalActions.updateBoard(newStatus, newBoard),
@@ -205,7 +205,7 @@ const fromGameStateInternal = (
         status: 'ENDED',
         additionalActions: gameStateInternal.additionalActions.updateBoard(
           'ENDED',
-          board
+          board,
         ),
       });
     },
@@ -225,7 +225,7 @@ const fromGameStateInternal = (
     },
     hasNewActionOptions: (oldChess: ChessGame): boolean => {
       return !gameStateInternal.additionalActions.hasExactOptions(
-        oldChess.getAdditionalActions()
+        oldChess.getAdditionalActions(),
       );
     },
     hasNewStatus: (oldChess: ChessGame): boolean => {
@@ -242,8 +242,8 @@ const fromGameStateInternal = (
             gameStateInternal.status === 'READY'
               ? 'WAITING'
               : gameStateInternal.status === 'WAITING'
-              ? 'EMPTY'
-              : gameStateInternal.status,
+                ? 'EMPTY'
+                : gameStateInternal.status,
         });
       } else {
         return fromGameStateInternal(gameStateInternal);
@@ -259,7 +259,7 @@ const fromChessPosition = (chessPosition: ChessPosition): ChessGame => {
 const fromGameState = (gameState: GameState): ChessGame => {
   const board = Chessboard.fromPosition(
     gameState.initialPosition,
-    gameState.movesRecord
+    gameState.movesRecord,
   );
   const result = gameState.result || evalResultFromBoard(board);
   return fromGameStateInternal({
@@ -271,7 +271,7 @@ const fromGameState = (gameState: GameState): ChessGame => {
     additionalActions: ChessGameActions.from(
       gameState.actionRecord,
       board,
-      gameState.status
+      gameState.status,
     ),
   });
 };

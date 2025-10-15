@@ -83,7 +83,7 @@ export const MovesRecord: FC<Props> = ({ moves, orientation, peekActions }) => {
                     onClick={() =>
                       peekActions.toMove(
                         move.moveNumber * 2 +
-                          (move.turn === Color.Black ? 1 : 0)
+                          (move.turn === Color.Black ? 1 : 0),
                       )
                     }
                     style={{

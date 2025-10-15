@@ -60,7 +60,7 @@ const useGameStore = create<GameStore>()((set, get) => ({
   setViewModel: (viewModel) => {
     const chessboard = Chessboard.fromPosition(
       ChessPosition.standardInitial(),
-      viewModel?.moves ?? []
+      viewModel?.moves ?? [],
     );
     set({ viewModel, chessboard });
   },
@@ -111,14 +111,14 @@ export const useRemoteGame = (props: Props): RemoteChessGame => {
       auth?.session.userId
         ? games.observeGameState(props.gameId, auth?.session.userId)
         : undefined,
-    [games, props.gameId, auth?.session.userId]
+    [games, props.gameId, auth?.session.userId],
   );
   useObservable(gameObservable, (gameState) => {
     setViewModel(gameState);
   });
   const movesObservable = useMemo(
     () => games.observeMovesForGame(props.gameId),
-    [games, props.gameId]
+    [games, props.gameId],
   );
   useObservable(movesObservable, (move) => {
     setChessboard((prev) => prev.playMove(move));

@@ -21,7 +21,7 @@ import { ApiErrorMapper } from './util/ApiErrorMapper';
 type Socket = IoSocket<ClientToServerEvents, ServerToClientEvents>;
 
 const convertIncomingHeadersToHeaders = (
-  incomingHeaders: IncomingHttpHeaders
+  incomingHeaders: IncomingHttpHeaders,
 ): Headers => {
   const headers = new Headers();
 
@@ -38,11 +38,11 @@ const convertIncomingHeadersToHeaders = (
 const leaveGame = async (
   socket: Socket,
   api: Api,
-  leaveGamePayloadV1: LeaveGamePayloadV1
+  leaveGamePayloadV1: LeaveGamePayloadV1,
 ) => {
   const gameState = await api.games.leaveGame(
     socket.data.session,
-    leaveGamePayloadV1
+    leaveGamePayloadV1,
   );
 
   socket.leave(leaveGamePayloadV1.gameId);
@@ -91,7 +91,7 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
         socketId: socket.id,
         recovered: socket.recovered,
       },
-      'User connected'
+      'User connected',
     );
 
     socket.on('join-game', async (payload: unknown, callback) => {
@@ -104,11 +104,11 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
             gameId: joinGamePayloadV1.gameId,
             side: joinGamePayloadV1.side,
           },
-          `User joining game`
+          `User joining game`,
         );
         const gameState = await api.games.joinGame(
           socket.data.session,
-          joinGamePayloadV1
+          joinGamePayloadV1,
         );
         if (!socket.rooms.has(joinGamePayloadV1.gameId)) {
           socket.join(joinGamePayloadV1.gameId);
@@ -130,7 +130,7 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
             userId: socket.data.session.userId,
             gameId: leaveGamePayloadV1.gameId,
           },
-          `User leaving game`
+          `User leaving game`,
         );
         await leaveGame(socket, api, leaveGamePayloadV1);
         callback(EventResponse.ok(undefined));
@@ -145,11 +145,11 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
         const makeMovePayloadV1 = MakeMovePayloadV1Schema.parse(payload);
         logger.debug(
           { ...makeMovePayloadV1, rooms: Array.from(socket.rooms) },
-          'Received make-move event'
+          'Received make-move event',
         );
         const gameDetails = await api.games.makeMove(
           socket.data.session,
-          makeMovePayloadV1
+          makeMovePayloadV1,
         );
         socket
           .to(makeMovePayloadV1.gameId)
@@ -174,11 +174,11 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
             gameId: makeActionPayload.gameId,
             action: makeActionPayload.action,
           },
-          'User made action'
+          'User made action',
         );
         const gameDetails = await api.games.makeAction(
           socket.data.session,
-          makeActionPayload
+          makeActionPayload,
         );
         socket.to(makeActionPayload.gameId).emit('game-updated', gameDetails);
         callback(EventResponse.ok(gameDetails));
@@ -195,14 +195,14 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
           reason,
           socketRooms: Array.from(socket.rooms),
         },
-        'User disconnecting'
+        'User disconnecting',
       );
       const gameIds = Array.from(socket.rooms)
         .map((room) => z.uuid().safeParse(room))
         .filter((result) => result.success)
         .map((result) => result.data);
       await Promise.all(
-        gameIds.map((gameId) => leaveGame(socket, api, { gameId }))
+        gameIds.map((gameId) => leaveGame(socket, api, { gameId })),
       );
     });
 
@@ -215,7 +215,7 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
           socketId: socket.id,
           error,
         },
-        'Socket error'
+        'Socket error',
       );
     });
 

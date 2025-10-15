@@ -16,7 +16,7 @@ describe('FenParser', () => {
           CastlingAbility.WhiteQueen,
           CastlingAbility.BlackKing,
           CastlingAbility.BlackQueen,
-        ])
+        ]),
       );
       expect(boardState.enPassant).toBeUndefined();
       expect(boardState.turn).toEqual('white');
@@ -36,7 +36,7 @@ describe('FenParser', () => {
           CastlingAbility.WhiteQueen,
           CastlingAbility.BlackKing,
           CastlingAbility.BlackQueen,
-        ])
+        ]),
       );
       expect(boardState.enPassant).toBeUndefined();
       expect(boardState.turn).toEqual('white');
@@ -73,7 +73,7 @@ describe('FenParser', () => {
           CastlingAbility.WhiteKing,
           CastlingAbility.WhiteQueen,
           CastlingAbility.BlackQueen,
-        ])
+        ]),
       );
     });
   });
@@ -94,7 +94,7 @@ describe('FenParser', () => {
         fullMoves: 1,
       });
       expect(FenParser.toFenStr(chessPosition)).toBe(
-        '8/8/8/8/8/8/8/8 w KQkq - 0 1'
+        '8/8/8/8/8/8/8/8 w KQkq - 0 1',
       );
     });
 
@@ -113,7 +113,7 @@ describe('FenParser', () => {
         fullMoves: 1,
       });
       expect(FenParser.toFenStr(chessPosition)).toBe(
-        'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+        'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
       );
     });
 

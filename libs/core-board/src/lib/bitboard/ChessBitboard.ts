@@ -51,18 +51,18 @@ export type ChessBitboard = ColoredPieceBitboards & {
 };
 
 const fromPieceBitboards = (
-  bitboards: ColoredPieceBitboards
+  bitboards: ColoredPieceBitboards,
 ): ChessBitboard => {
   const colors: Color[] = ['white', 'black'];
   const pieces: PieceType[] = ['p', 'n', 'b', 'r', 'q', 'k'];
 
   const whiteOccupied = Object.values(bitboards.white).reduce(
     (acc, bb) => acc.union(bb),
-    new Bitboard()
+    new Bitboard(),
   );
   const blackOccupied = Object.values(bitboards.black).reduce(
     (acc, bb) => acc.union(bb),
-    new Bitboard()
+    new Bitboard(),
   );
   const occupiedBoard = whiteOccupied.union(blackOccupied);
   const empty = occupiedBoard.invert();
@@ -167,7 +167,7 @@ const fromPiecePlacements = (placements?: PiecePlacements): ChessBitboard => {
     for (const [coord, piece] of placements.entries()) {
       const { color, type } = piece;
       bitboards[color][type] = bitboards[color][type].setCoord(
-        coord as Coordinate
+        coord as Coordinate,
       );
     }
   }

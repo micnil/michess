@@ -27,7 +27,7 @@ export class GamesService {
   constructor(
     private gameRepository: GameRepository,
     private moveRepository: MoveRepository,
-    private actionRepository: ActionRepository
+    private actionRepository: ActionRepository,
   ) {}
 
   async createGame(data: CreateGameV1): Promise<GameDetailsV1> {
@@ -50,12 +50,12 @@ export class GamesService {
       private: false,
     });
     const gameDetails = games.map(
-      GameDetailsMapper.fromSelectGameWithRelations
+      GameDetailsMapper.fromSelectGameWithRelations,
     );
 
     return PageResponseMapper.toPageResponse({
       data: gameDetails.map((game) =>
-        GameDetailsMapper.toLobbyGameItemV1(game)
+        GameDetailsMapper.toLobbyGameItemV1(game),
       ),
       limit,
       totalItems: totalCount,
@@ -65,7 +65,7 @@ export class GamesService {
 
   async queryPlayerGames(
     userId: string,
-    query: PlayerGameInfoQueryV1
+    query: PlayerGameInfoQueryV1,
   ): Promise<PlayerGameInfoPageResponseV1> {
     const { page, limit } = query;
     const { games, totalCount } = await this.gameRepository.queryGames({
@@ -78,12 +78,12 @@ export class GamesService {
     });
     logger.info(games);
     const gameDetails = games.map(
-      GameDetailsMapper.fromSelectGameWithRelations
+      GameDetailsMapper.fromSelectGameWithRelations,
     );
 
     return PageResponseMapper.toPageResponse({
       data: gameDetails.map((game) =>
-        GameDetailsMapper.toPlayerGameInfoV1(game, userId)
+        GameDetailsMapper.toPlayerGameInfoV1(game, userId),
       ),
       limit,
       totalItems: totalCount,
@@ -93,10 +93,10 @@ export class GamesService {
 
   async joinGame(
     session: Session,
-    data: JoinGamePayloadV1
+    data: JoinGamePayloadV1,
   ): Promise<GameDetailsV1> {
     const dbGame = await this.gameRepository.findGameWithRelationsById(
-      data.gameId
+      data.gameId,
     );
     assertDefined(dbGame, `Game '${data.gameId}' not found`);
     const gameDetails = GameDetailsMapper.fromSelectGameWithRelations(dbGame);
@@ -108,12 +108,12 @@ export class GamesService {
       const updatedGame = chessGame.joinGame(
         // TODO
         { id: session.userId, name: 'Anonymous' },
-        data.side
+        data.side,
       );
       const updatedGameState = updatedGame.getState();
       await this.gameRepository.updateGame(
         gameDetails.id,
-        GameDetailsMapper.toInsertGame(updatedGameState)
+        GameDetailsMapper.toInsertGame(updatedGameState),
       );
       return GameDetailsMapper.toGameDetailsV1({
         game: updatedGameState,
@@ -124,10 +124,10 @@ export class GamesService {
 
   async leaveGame(
     session: Session,
-    data: LeaveGamePayloadV1
+    data: LeaveGamePayloadV1,
   ): Promise<Maybe<GameDetailsV1>> {
     const dbGame = await this.gameRepository.findGameWithRelationsById(
-      data.gameId
+      data.gameId,
     );
     assertDefined(dbGame, `Game '${data.gameId}' not found`);
     const gameDetails = GameDetailsMapper.fromSelectGameWithRelations(dbGame);
@@ -137,7 +137,7 @@ export class GamesService {
       const updatedGameState = updatedGame.getState();
       await this.gameRepository.updateGame(
         gameDetails.id,
-        GameDetailsMapper.toInsertGame(updatedGameState)
+        GameDetailsMapper.toInsertGame(updatedGameState),
       );
       return GameDetailsMapper.toGameDetailsV1({
         game: updatedGameState,
@@ -148,10 +148,10 @@ export class GamesService {
 
   async makeMove(
     session: Session,
-    data: MakeMovePayloadV1
+    data: MakeMovePayloadV1,
   ): Promise<Maybe<GameDetailsV1>> {
     const dbGame = await this.gameRepository.findGameWithRelationsById(
-      data.gameId
+      data.gameId,
     );
     assertDefined(dbGame, `Game '${data.gameId}' not found`);
     const moveToPlay = Move.fromUci(data.uci);
@@ -169,9 +169,13 @@ export class GamesService {
       chessGame.hasNewStatus(updatedGame) ||
       chessGame.hasNewActionOptions(updatedGame)
     ) {
+      logger.info(
+        updatedGameState,
+        'Game status or action options changed, updating game',
+      );
       await this.gameRepository.updateGame(
         gameDetails.id,
-        GameDetailsMapper.toInsertGame(updatedGameState)
+        GameDetailsMapper.toInsertGame(updatedGameState),
       );
       return GameDetailsMapper.toGameDetailsV1({
         game: updatedGameState,
@@ -184,10 +188,10 @@ export class GamesService {
 
   async makeAction(
     session: Session,
-    data: MakeActionPayloadV1
+    data: MakeActionPayloadV1,
   ): Promise<GameDetailsV1> {
     const dbGame = await this.gameRepository.findGameWithRelationsById(
-      data.gameId
+      data.gameId,
     );
     const gameActionIn: GameActionIn = {
       type: data.action.type,
@@ -199,7 +203,7 @@ export class GamesService {
     const updatedGameState = updatedGame.getState();
     await this.gameRepository.updateGame(
       gameDetails.id,
-      GameDetailsMapper.toInsertGame(updatedGameState)
+      GameDetailsMapper.toInsertGame(updatedGameState),
     );
     const action = updatedGameState.actionRecord.at(-1);
     action &&

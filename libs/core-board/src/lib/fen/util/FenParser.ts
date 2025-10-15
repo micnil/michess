@@ -35,20 +35,20 @@ const charToCastlingAbility = (char: string): CastlingAbility => {
 };
 
 const castlingAbilityFromFen = (
-  fenCastlingAbility: FenCastlingAbilityPart
+  fenCastlingAbility: FenCastlingAbilityPart,
 ): Set<CastlingAbility> => {
   if (fenCastlingAbility === '-') {
     return new Set();
   } else {
     const list: CastlingAbility[] = [...fenCastlingAbility].map(
-      charToCastlingAbility
+      charToCastlingAbility,
     );
     return new Set(list);
   }
 };
 
 const enPassantCoordinateFromFenStr = (
-  fenEnPassantTargetSquare: FenEnPassantTargetSquarePart
+  fenEnPassantTargetSquare: FenEnPassantTargetSquarePart,
 ): Maybe<Coordinate> => {
   if (fenEnPassantTargetSquare === '-') {
     return undefined;

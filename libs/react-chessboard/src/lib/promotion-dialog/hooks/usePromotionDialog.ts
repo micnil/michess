@@ -16,7 +16,7 @@ export type UsePromotionDialogReturn = {
   promotionDialog: PromotionDialogState;
   showPromotionDialog: (
     coordinate: Coordinate,
-    color: Color
+    color: Color,
   ) => Promise<PieceType>;
   hidePromotionDialog: () => void;
   handlePromotionSelect: (pieceType: PieceType) => void;
@@ -41,7 +41,7 @@ export const usePromotionDialog = (): UsePromotionDialogReturn => {
         });
       });
     },
-    []
+    [],
   );
 
   const hidePromotionDialog = useCallback(() => {
@@ -60,7 +60,7 @@ export const usePromotionDialog = (): UsePromotionDialogReturn => {
       }
       hidePromotionDialog();
     },
-    [hidePromotionDialog]
+    [hidePromotionDialog],
   );
 
   const handlePromotionCancel = useCallback(() => {

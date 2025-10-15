@@ -9,7 +9,7 @@ type Schema = typeof schema;
 const dbLogger: Logger = {
   logQuery: (query: string, params: unknown[]) => {
     logger.trace(
-      `Executing query: ${query}, with params: ${JSON.stringify(params)}`
+      `Executing query: ${query}, with params: ${JSON.stringify(params)}`,
     );
   },
 };

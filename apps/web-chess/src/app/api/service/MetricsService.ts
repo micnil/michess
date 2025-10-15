@@ -5,7 +5,7 @@ import { SocketClient } from '../infra/SocketClient';
 export class MetricsService {
   constructor(
     private restClient: RestClient,
-    private socketClient: SocketClient
+    private socketClient: SocketClient,
   ) {}
 
   getUsage(): Promise<UsageMetricsV1> {

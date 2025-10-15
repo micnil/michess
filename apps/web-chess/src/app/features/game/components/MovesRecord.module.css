@@ -1,7 +1,8 @@
 .fadedVertical :global(.rt-ScrollAreaViewport) {
   overflow-y: auto;
 
-  mask-image: linear-gradient(
+  mask-image:
+    linear-gradient(
       to top,
       transparent 0,
       black var(--top-mask-size),
@@ -27,7 +28,8 @@
 .fadedHorizontal :global(.rt-ScrollAreaViewport) {
   overflow-x: auto;
 
-  mask-image: linear-gradient(
+  mask-image:
+    linear-gradient(
       to left,
       transparent 0,
       black var(--top-mask-size),

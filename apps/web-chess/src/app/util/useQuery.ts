@@ -34,9 +34,9 @@ export function useQuery<
   TQueryFnData = unknown,
   TError = Error,
   TData = TQueryFnData,
-  TQueryKey extends QueryKey = QueryKey
+  TQueryKey extends QueryKey = QueryKey,
 >(
-  options: UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>
+  options: UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
 ): UseQueryResult<TData, TError> {
   const { isAuthenticated } = useAuth();
 

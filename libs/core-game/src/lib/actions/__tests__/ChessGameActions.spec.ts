@@ -23,17 +23,20 @@ describe('ChessGameActions', () => {
       expect(
         afterOfferDraw.isActionAvailable(
           Color.Black,
-          GameActionOption.acceptDraw(Color.Black)
-        )
-      ).toBe(true);
-      expect(
-        afterOfferDraw.isActionAvailable(Color.Black, GameActionOption.resign())
+          GameActionOption.acceptDraw(Color.Black),
+        ),
       ).toBe(true);
       expect(
         afterOfferDraw.isActionAvailable(
           Color.Black,
-          GameActionOption.offerDraw()
-        )
+          GameActionOption.resign(),
+        ),
+      ).toBe(true);
+      expect(
+        afterOfferDraw.isActionAvailable(
+          Color.Black,
+          GameActionOption.offerDraw(),
+        ),
       ).toBe(false);
     });
 
@@ -47,11 +50,11 @@ describe('ChessGameActions', () => {
           },
         ],
         ChessboardMock.standardInitial(),
-        'IN_PROGRESS'
+        'IN_PROGRESS',
       );
 
       expect(
-        actions.isActionAvailable(Color.Black, { type: 'accept_draw' })
+        actions.isActionAvailable(Color.Black, { type: 'accept_draw' }),
       ).toBe(true);
 
       const afterAcceptDraw = actions.useAction(Color.Black, {
@@ -61,20 +64,20 @@ describe('ChessGameActions', () => {
       expect(
         afterAcceptDraw.isActionAvailable(
           Color.Black,
-          GameActionOption.offerDraw()
-        )
+          GameActionOption.offerDraw(),
+        ),
       ).toBe(false);
       expect(
         afterAcceptDraw.isActionAvailable(
           Color.Black,
-          GameActionOption.resign()
-        )
+          GameActionOption.resign(),
+        ),
       ).toBe(false);
       expect(
         afterAcceptDraw.isActionAvailable(
           Color.Black,
-          GameActionOption.acceptDraw(Color.Black)
-        )
+          GameActionOption.acceptDraw(Color.Black),
+        ),
       ).toBe(false);
     });
   });
@@ -88,23 +91,23 @@ describe('ChessGameActions', () => {
       });
 
       const withClaimDraw = initialActions.addOption(
-        GameActionOption.acceptDrawThreeFold()
+        GameActionOption.acceptDrawThreeFold(),
       );
 
       expect(
         withClaimDraw.isActionAvailable(
           Color.White,
-          GameActionOption.acceptDrawThreeFold()
-        )
+          GameActionOption.acceptDrawThreeFold(),
+        ),
       ).toBe(true);
       expect(
         withClaimDraw.isActionAvailable(
           Color.White,
-          GameActionOption.offerDraw()
-        )
+          GameActionOption.offerDraw(),
+        ),
       ).toBe(false);
       expect(
-        withClaimDraw.isActionAvailable(Color.White, GameActionOption.resign())
+        withClaimDraw.isActionAvailable(Color.White, GameActionOption.resign()),
       ).toBe(true);
     });
   });

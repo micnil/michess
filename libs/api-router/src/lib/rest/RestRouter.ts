@@ -21,13 +21,13 @@ export const RestRouter = {
       .use(
         pinoLogger({
           pino: logger,
-        })
+        }),
       )
       .use(
         cors({
           credentials: true,
           origin: config.cors.origins,
-        })
+        }),
       );
 
     honoApp.on(['POST', 'GET'], '/auth/**', (c) => api.auth.handle(c.req.raw));
@@ -41,7 +41,7 @@ export const RestRouter = {
           const session = await api.auth.getSession(c.req.raw.headers);
           c.set('session', session);
           await next();
-        })
+        }),
       )
       .use(
         '*',
@@ -51,7 +51,7 @@ export const RestRouter = {
             return c.json({ error: 'Unauthorized' });
           }
           await next();
-        })
+        }),
       );
 
     honoApp.route('/games', gamesController);

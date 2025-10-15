@@ -11,7 +11,7 @@ export type ChessGameResult = {
 export const ChessGameResult = {
   fromChessGameAction: (
     action: GameActionOption,
-    turn: Color
+    turn: Color,
   ): Maybe<ChessGameResult> => {
     switch (action.type) {
       case 'accept_draw':

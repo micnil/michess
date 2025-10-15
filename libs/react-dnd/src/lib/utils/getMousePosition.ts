@@ -2,7 +2,7 @@ import { Position } from '@michess/common-utils';
 
 export const getMousePosition = (
   svg: SVGSVGElement,
-  evt: MouseEvent
+  evt: MouseEvent,
 ): Position => {
   const ctm = svg.getScreenCTM();
   if (!ctm) throw new Error('No Current Transformation Matrix (CTM) found');

@@ -1,8 +1,8 @@
-import { Position } from "@michess/common-utils";
+import { Position } from '@michess/common-utils';
 
 export const clientToSvgPosition = (
   svg: SVGSVGElement,
-  pos: Position
+  pos: Position,
 ): Position => {
   const ctm = svg.getScreenCTM();
   if (!ctm) throw new Error('No Current Transformation Matrix (CTM) found');

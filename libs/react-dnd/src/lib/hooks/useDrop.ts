@@ -65,7 +65,7 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
           ownerSVGElement.removeEventListener('pointerup', handleReleaseEvent);
           ownerSVGElement.removeEventListener(
             'pointercancel',
-            handleReleaseEvent
+            handleReleaseEvent,
           );
         };
 
@@ -75,7 +75,7 @@ export const useDrop = ({ id, onDrop }: Options): Drop => {
         dropzoneRef.current = { element, unsubscribeEvents };
       }
     },
-    [handlePress, id, draggingId]
+    [handlePress, id, draggingId],
   );
 
   return {

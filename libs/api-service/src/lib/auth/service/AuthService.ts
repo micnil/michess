@@ -15,7 +15,7 @@ export class AuthService {
     sql: Sql,
     cacheRepo: CacheRepository,
     emailClient: EmailClient,
-    config: AuthConfig
+    config: AuthConfig,
   ) {
     const db = DatabaseClient.from(sql);
     this.auth = AuthClient.from(
@@ -54,7 +54,7 @@ export class AuthService {
           clientId: config.google.clientId,
           clientSecret: config.google.clientSecret,
         },
-      }
+      },
     );
   }
 

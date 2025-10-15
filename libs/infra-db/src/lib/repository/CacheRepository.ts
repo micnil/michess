@@ -19,7 +19,7 @@ export class CacheRepository {
 
   async setProcessUp(
     processId: string,
-    expirationSeconds: number
+    expirationSeconds: number,
   ): Promise<void> {
     await this.redisClient
       .multi()
@@ -59,7 +59,7 @@ export class CacheRepository {
     }
 
     const counts = await this.redisClient.mget(
-      processes.map((p: string) => `process:${p}:total-clients`)
+      processes.map((p: string) => `process:${p}:total-clients`),
     );
     const total = counts.reduce((sum, count) => {
       const num = parseInt(count || '0');
@@ -80,7 +80,7 @@ export class CacheRepository {
   async getProcessStates(): Promise<{ processId: string; isUp: boolean }[]> {
     const processes = await this.redisClient.smembers('processes');
     const states = await this.redisClient.mget(
-      processes.map((p: string) => `process:${p}:is-up`)
+      processes.map((p: string) => `process:${p}:is-up`),
     );
 
     return processes.map((processId: string, index: number) => ({
@@ -92,7 +92,7 @@ export class CacheRepository {
   async set(
     key: CacheKey,
     value: CacheValue,
-    expirationSeconds?: CacheExpiration
+    expirationSeconds?: CacheExpiration,
   ): Promise<void> {
     if (expirationSeconds) {
       await this.redisClient.setex(key, expirationSeconds, value);
@@ -115,7 +115,7 @@ export class CacheRepository {
   async setJson<T>(
     key: CacheKey,
     value: T,
-    expirationSeconds?: CacheExpiration
+    expirationSeconds?: CacheExpiration,
   ): Promise<void> {
     const jsonValue = JSON.stringify(value);
     await this.set(key, jsonValue, expirationSeconds);

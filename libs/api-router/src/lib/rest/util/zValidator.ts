@@ -7,10 +7,10 @@ import { RestContext } from '../../model/RestContext';
 
 export const zValidator = <
   T extends ZodSchema,
-  Target extends keyof ValidationTargets
+  Target extends keyof ValidationTargets,
 >(
   target: Target,
-  schema: T
+  schema: T,
 ) =>
   zv<T, Target, RestContext, string>(target, schema, (result, c) => {
     if (!result.success) {

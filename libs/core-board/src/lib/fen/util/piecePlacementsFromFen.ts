@@ -17,7 +17,7 @@ const charToPieceType = (char: string): PieceType => {
 
 const pieceSquareFromLetter = (
   char: string,
-  coord: Coordinate
+  coord: Coordinate,
 ): PiecePlacement => {
   const pieceType = charToPieceType(char);
   const color = char === char.toLowerCase() ? 'black' : 'white';
@@ -28,7 +28,7 @@ const pieceSquareFromLetter = (
 };
 
 const piecePlacementsFromFenPiecePlacement = (
-  piecePlacementPart: FenPiecePlacementPart
+  piecePlacementPart: FenPiecePlacementPart,
 ): PiecePlacements => {
   const coordIter = coordIterator();
   const piecePlacements = piecePlacementPart

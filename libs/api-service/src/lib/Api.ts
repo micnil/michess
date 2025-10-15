@@ -17,7 +17,7 @@ const from = (
   repos: Repositories,
   sql: Sql,
   emailClient: EmailClient,
-  authConfig: AuthConfig
+  authConfig: AuthConfig,
 ): Api => {
   const processId = randomUUID();
   const gamesService = new GamesService(repos.game, repos.move, repos.action);
@@ -25,12 +25,12 @@ const from = (
     sql,
     repos.cache,
     emailClient,
-    authConfig
+    authConfig,
   );
   const usageMetrics = new UsageMetricsService(
     processId,
     repos.cache,
-    repos.game
+    repos.game,
   );
 
   return {

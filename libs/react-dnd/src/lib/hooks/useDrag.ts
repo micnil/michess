@@ -16,7 +16,7 @@ type Options = {
 
 const setTranslate = (
   element: SVGGraphicsElement,
-  mousePos: Position
+  mousePos: Position,
 ): void => {
   const transformList = element?.transform.baseVal;
 
@@ -26,7 +26,7 @@ const setTranslate = (
   const svgTransform = transformList?.getItem(0);
   svgTransform.setTranslate(
     mousePos.x - elemWidth / 2,
-    mousePos.y - elemHeight / 2
+    mousePos.y - elemHeight / 2,
   );
 };
 
@@ -44,7 +44,7 @@ export const useDrag = ({ id }: Options): Drag => {
 
   const isPressing = useDragDropStore((state) => state.isPressing);
   const previewPosition: Maybe<Position> = usePointerStore((state) =>
-    draggingId === id && !!previewRef.current ? state.position : undefined
+    draggingId === id && !!previewRef.current ? state.position : undefined,
   );
 
   useEffect(() => {
@@ -63,23 +63,23 @@ export const useDrag = ({ id }: Options): Drag => {
       e.preventDefault();
       const elements = dragRef.current?.element.ownerDocument.elementsFromPoint(
         e.clientX,
-        e.clientY
+        e.clientY,
       );
       const underlyingDropzone = elements?.find(
         (el) =>
           (el instanceof SVGElement || el instanceof HTMLElement) &&
-          !!el.dataset.dropzoneId
+          !!el.dataset.dropzoneId,
       );
       underlyingDropzone?.dispatchEvent(
         new PointerEvent('pointerdown', {
           clientX: e.clientX,
           clientY: e.clientY,
           bubbles: false,
-        })
+        }),
       );
       handlePress(id);
     },
-    [handlePress, id]
+    [handlePress, id],
   );
 
   const register = useCallback(
@@ -93,7 +93,7 @@ export const useDrag = ({ id }: Options): Drag => {
         const unsubscribeEvents = () => {
           dragRef.current?.element.removeEventListener(
             'pointerdown',
-            handlePressEvent
+            handlePressEvent,
           );
           element.removeEventListener('touchstart', handleTouchStart);
         };
@@ -106,7 +106,7 @@ export const useDrag = ({ id }: Options): Drag => {
         dragRef.current = { element, unsubscribeEvents };
       }
     },
-    [handlePressEvent]
+    [handlePressEvent],
   );
 
   const registerPreview = useCallback(
@@ -119,7 +119,7 @@ export const useDrag = ({ id }: Options): Drag => {
         assertDefined(svg, 'Must register svg elements');
       }
     },
-    [draggingId, id]
+    [draggingId, id],
   );
 
   return {

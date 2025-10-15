@@ -2,7 +2,7 @@ type UnfoldIterator<Value, Seed> = (seed: Seed) => [Value, Seed] | false;
 
 export const unfold = <Value, Seed>(
   fn: UnfoldIterator<Value, Seed>,
-  seed: Seed
+  seed: Seed,
 ): Value[] => {
   let pair = fn(seed);
   const result = [];

@@ -51,7 +51,7 @@ export const ChessboardContextProvider = <TMoveMeta,>({
   const [uncontrolledChessboard, setChessboard] = useState<Chessboard>(() => {
     return Chessboard.fromPosition(
       FenParser.toChessPosition(positionFen),
-      moveHistory
+      moveHistory,
     );
   });
 
@@ -85,7 +85,7 @@ export const ChessboardContextProvider = <TMoveMeta,>({
   useEffect(() => {
     if (moveHistory) {
       setChessboard((prevChessboard) =>
-        prevChessboard.updateMoves(moveHistory || [])
+        prevChessboard.updateMoves(moveHistory || []),
       );
     }
   }, [moveHistory]);
@@ -99,7 +99,7 @@ export const ChessboardContextProvider = <TMoveMeta,>({
       }
       onMoveRef.current?.(payload);
     },
-    [controlledChessboard]
+    [controlledChessboard],
   );
 
   const latestMove = chessboard.movesRecord.at(-1);
@@ -110,7 +110,7 @@ export const ChessboardContextProvider = <TMoveMeta,>({
 
   const moveOptionsMap = shouldShowMoveOptions
     ? MoveOptionsMap.fromMoveOptions(
-        chessboard.moveOptions.map((option) => MoveOption.toMove(option))
+        chessboard.moveOptions.map((option) => MoveOption.toMove(option)),
       )
     : {};
 
@@ -121,11 +121,11 @@ export const ChessboardContextProvider = <TMoveMeta,>({
         ? 'black_win'
         : 'white_win'
       : chessboard.isStalemate ||
-        chessboard.isInsufficientMaterial ||
-        chessboard.isThreeFoldRepetition ||
-        chessboard.isFiftyMoveRule
-      ? 'draw'
-      : undefined);
+          chessboard.isInsufficientMaterial ||
+          chessboard.isThreeFoldRepetition ||
+          chessboard.isFiftyMoveRule
+        ? 'draw'
+        : undefined);
 
   return (
     <ChessboardContext.Provider

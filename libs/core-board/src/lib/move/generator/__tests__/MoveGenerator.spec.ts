@@ -26,7 +26,7 @@ describe('MoveGenerator', () => {
           pieces: {
             d4: { type: 'b', color: Color.White },
           },
-        })
+        }),
       );
 
       const { moves } = moveGenerator.generateMoves();
@@ -55,7 +55,7 @@ describe('MoveGenerator', () => {
             target: Coordinate.toIndex('c3'),
             capture: false,
           },
-        ])
+        ]),
       );
     });
   });
@@ -76,7 +76,7 @@ describe('MoveGenerator', () => {
           pieces: {
             d4: { type: 'r', color: Color.White },
           },
-        })
+        }),
       );
 
       const { moves } = context.generateMoves();
@@ -105,7 +105,7 @@ describe('MoveGenerator', () => {
             target: Coordinate.toIndex('e4'),
             capture: false,
           },
-        ])
+        ]),
       );
     });
   });
@@ -116,7 +116,7 @@ describe('MoveGenerator', () => {
           pieces: {
             c3: P,
           },
-        })
+        }),
       );
 
       const { moves } = moveGenerator.generateMoves();
@@ -137,7 +137,7 @@ describe('MoveGenerator', () => {
             c3: p,
           },
           turn: Color.Black,
-        })
+        }),
       );
 
       const { moves } = context.generateMoves();
@@ -157,7 +157,7 @@ describe('MoveGenerator', () => {
           pieces: {
             c2: P,
           },
-        })
+        }),
       );
 
       const { moves } = context.generateMoves();
@@ -183,7 +183,7 @@ describe('MoveGenerator', () => {
             c5: P,
             d6: p,
           },
-        })
+        }),
       );
 
       const { moves } = context.generateMoves();
@@ -200,7 +200,7 @@ describe('MoveGenerator', () => {
             start: Coordinate.toIndex('c5'),
             target: Coordinate.toIndex('d6'),
           },
-        ])
+        ]),
       );
     });
 
@@ -213,7 +213,7 @@ describe('MoveGenerator', () => {
           },
           enPassant: 'd6',
           turn: Color.White,
-        })
+        }),
       );
 
       const { moves } = context.generateMoves();
@@ -241,7 +241,7 @@ describe('MoveGenerator', () => {
             e7: P,
           },
           turn: Color.White,
-        })
+        }),
       );
 
       const { moves } = context.generateMoves();
@@ -272,7 +272,7 @@ describe('MoveGenerator', () => {
             target: Coordinate.toIndex('e8'),
             promotion: 'n',
           },
-        ])
+        ]),
       );
     });
 
@@ -283,7 +283,7 @@ describe('MoveGenerator', () => {
             d2: p,
           },
           turn: Color.Black,
-        })
+        }),
       );
 
       const { moves } = context.generateMoves();
@@ -314,7 +314,7 @@ describe('MoveGenerator', () => {
             target: Coordinate.toIndex('d1'),
             promotion: 'n',
           },
-        ])
+        ]),
       );
     });
 
@@ -326,7 +326,7 @@ describe('MoveGenerator', () => {
             h8: p,
           },
           turn: Color.White,
-        })
+        }),
       );
 
       const { moves } = context.generateMoves();
@@ -357,7 +357,7 @@ describe('MoveGenerator', () => {
             target: Coordinate.toIndex('h8'),
             promotion: 'n',
           },
-        ])
+        ]),
       );
     });
 
@@ -381,7 +381,7 @@ describe('MoveGenerator', () => {
             e8: { type: PieceType.Rook, color: Color.Black },
           },
           turn: Color.White,
-        })
+        }),
       );
       const { moves } = context.generateMoves();
       expect(moves).not.toEqual(
@@ -390,7 +390,7 @@ describe('MoveGenerator', () => {
             start: Coordinate.toIndex('e4'),
             target: Coordinate.toIndex('d5'),
           }),
-        ])
+        ]),
       );
     });
 
@@ -413,7 +413,7 @@ describe('MoveGenerator', () => {
             a8: { type: PieceType.Queen, color: Color.White },
           },
           turn: Color.Black,
-        })
+        }),
       );
 
       const { moves } = context.generateMoves();
@@ -424,7 +424,7 @@ describe('MoveGenerator', () => {
             start: Coordinate.toIndex('e4'),
             target: Coordinate.toIndex('e3'),
           }),
-        ])
+        ]),
       );
     });
 
@@ -449,7 +449,7 @@ describe('MoveGenerator', () => {
           },
           enPassant: 'e6',
           turn: Color.White,
-        })
+        }),
       );
       const { moves } = context.generateMoves();
       // Should not be able to capture en-passant
@@ -459,7 +459,7 @@ describe('MoveGenerator', () => {
             start: Coordinate.toIndex('f5'),
             target: Coordinate.toIndex('e6'),
           }),
-        ])
+        ]),
       );
     });
 
@@ -484,11 +484,11 @@ describe('MoveGenerator', () => {
           },
           enPassant: 'd3',
           turn: Color.Black,
-        })
+        }),
       );
       const { moves } = context.generateMoves();
       const pawnMoves = moves.filter(
-        (m) => m.start === Coordinate.toIndex('e4')
+        (m) => m.start === Coordinate.toIndex('e4'),
       );
 
       // Cannot push dues to check. But can do ep-capture of checker.
@@ -523,13 +523,13 @@ describe('MoveGenerator', () => {
           },
           enPassant: 'd3',
           turn: Color.Black,
-        })
+        }),
       );
 
       const { moves } = context.generateMoves();
 
       const pawnMoves = moves.filter(
-        (m) => m.start === Coordinate.toIndex('e4')
+        (m) => m.start === Coordinate.toIndex('e4'),
       );
       expect(pawnMoves).toEqual([
         expect.objectContaining({
@@ -558,7 +558,7 @@ describe('MoveGenerator', () => {
           pieces: {
             d4: { type: 'q', color: Color.White },
           },
-        })
+        }),
       );
       const { moves } = context.generateMoves();
 
@@ -595,7 +595,7 @@ describe('MoveGenerator', () => {
             target: Coordinate.toIndex('c3'),
             capture: false,
           }, // down-left
-        ])
+        ]),
       );
     });
 
@@ -618,12 +618,12 @@ describe('MoveGenerator', () => {
             e1: { type: PieceType.King, color: Color.White },
           },
           turn: Color.White,
-        })
+        }),
       );
       const { moves } = context.generateMoves();
 
       const queenMoves = moves.filter(
-        (m) => m.start === Coordinate.toIndex('f4')
+        (m) => m.start === Coordinate.toIndex('f4'),
       );
       expect(queenMoves).toEqual([
         expect.objectContaining({
@@ -652,7 +652,7 @@ describe('MoveGenerator', () => {
             d3: { type: 'p', color: Color.White },
             d5: { type: 'p', color: Color.Black },
           },
-        })
+        }),
       );
 
       const { moves } = context.generateMoves();
@@ -665,7 +665,7 @@ describe('MoveGenerator', () => {
             target: Coordinate.toIndex('d5'),
             capture: true,
           },
-        ])
+        ]),
       );
       expect(moves).not.toEqual(
         expect.arrayContaining([
@@ -679,7 +679,7 @@ describe('MoveGenerator', () => {
             target: Coordinate.toIndex('d3'),
             capture: false,
           }, // cannot move to d3 (own piece)
-        ])
+        ]),
       );
     });
 
@@ -700,7 +700,7 @@ describe('MoveGenerator', () => {
             d4: { type: 'q', color: Color.White },
             e5: { type: 'p', color: Color.Black },
           },
-        })
+        }),
       );
 
       const { moves } = context.generateMoves();
@@ -712,7 +712,7 @@ describe('MoveGenerator', () => {
             target: Coordinate.toIndex('e5'),
             capture: true,
           },
-        ])
+        ]),
       );
     });
 
@@ -735,7 +735,7 @@ describe('MoveGenerator', () => {
             e8: { type: PieceType.Rook, color: Color.Black },
           },
           turn: Color.White,
-        })
+        }),
       );
 
       const { moves } = context.generateMoves();
@@ -768,7 +768,7 @@ describe('MoveGenerator', () => {
             start: Coordinate.toIndex('e4'),
             target: Coordinate.toIndex('e2'),
           }),
-        ])
+        ]),
       );
       // Should not allow horizontal or diagonal moves
       expect(moves).not.toEqual(
@@ -789,7 +789,7 @@ describe('MoveGenerator', () => {
             start: Coordinate.toIndex('e4'),
             target: Coordinate.toIndex('f5'),
           }),
-        ])
+        ]),
       );
     });
 
@@ -812,7 +812,7 @@ describe('MoveGenerator', () => {
             a8: { type: PieceType.Queen, color: Color.White },
           },
           turn: Color.Black,
-        })
+        }),
       );
       const { moves } = context.generateMoves();
       // Only moves allowed are along the a7-h1 diagonal
@@ -842,7 +842,7 @@ describe('MoveGenerator', () => {
             start: Coordinate.toIndex('e4'),
             target: Coordinate.toIndex('a8'),
           }),
-        ])
+        ]),
       );
       // Should not allow vertical or horizontal moves
       expect(moves).not.toEqual(
@@ -863,7 +863,7 @@ describe('MoveGenerator', () => {
             start: Coordinate.toIndex('e4'),
             target: Coordinate.toIndex('d3'),
           }),
-        ])
+        ]),
       );
     });
 
@@ -886,7 +886,7 @@ describe('MoveGenerator', () => {
             f4: { type: PieceType.Rook, color: Color.Black },
           },
           turn: Color.White,
-        })
+        }),
       );
       const { moves } = context.generateMoves();
 
@@ -904,7 +904,7 @@ describe('MoveGenerator', () => {
             start: Coordinate.toIndex('e4'),
             target: Coordinate.toIndex('c4'),
           }),
-        ])
+        ]),
       );
       // Should not allow vertical or diagonal moves
       expect(moves).not.toEqual(
@@ -925,7 +925,7 @@ describe('MoveGenerator', () => {
             start: Coordinate.toIndex('e4'),
             target: Coordinate.toIndex('f5'),
           }),
-        ])
+        ]),
       );
     });
   });
@@ -947,7 +947,7 @@ describe('MoveGenerator', () => {
           pieces: {
             d4: { type: 'n', color: Color.White },
           },
-        })
+        }),
       );
       const { moves } = context.generateMoves();
 
@@ -993,7 +993,7 @@ describe('MoveGenerator', () => {
             target: Coordinate.toIndex('f5'),
             capture: false,
           }, // f5
-        ])
+        ]),
       );
     });
 
@@ -1015,7 +1015,7 @@ describe('MoveGenerator', () => {
             b5: { type: 'p', color: Color.Black },
             f5: { type: 'p', color: Color.Black },
           },
-        })
+        }),
       );
 
       const { moves } = context.generateMoves();
@@ -1032,7 +1032,7 @@ describe('MoveGenerator', () => {
             target: Coordinate.toIndex('f5'),
             capture: true,
           },
-        ])
+        ]),
       );
     });
 
@@ -1054,7 +1054,7 @@ describe('MoveGenerator', () => {
             b5: { type: 'p', color: Color.White },
             f5: { type: 'q', color: Color.White },
           },
-        })
+        }),
       );
 
       const { moves } = context.generateMoves();
@@ -1072,7 +1072,7 @@ describe('MoveGenerator', () => {
             target: Coordinate.toIndex('f5'),
             capture: false,
           },
-        ])
+        ]),
       );
     });
 
@@ -1095,7 +1095,7 @@ describe('MoveGenerator', () => {
             d8: { type: 'r', color: Color.White },
           },
           turn: Color.Black,
-        })
+        }),
       );
       const { moves } = context.generateMoves();
 
@@ -1104,7 +1104,7 @@ describe('MoveGenerator', () => {
           expect.objectContaining<Partial<MoveOption>>({
             start: Coordinate.toIndex('d4'),
           }),
-        ])
+        ]),
       );
     });
 
@@ -1128,12 +1128,12 @@ describe('MoveGenerator', () => {
             e1: { type: PieceType.King, color: Color.White },
           },
           turn: Color.Black,
-        })
+        }),
       );
       const { moves } = context.generateMoves();
 
       const knightMoves = moves.filter(
-        (m) => m.start === Coordinate.toIndex('g6')
+        (m) => m.start === Coordinate.toIndex('g6'),
       );
 
       expect(knightMoves).toEqual([
@@ -1172,7 +1172,7 @@ describe('MoveGenerator', () => {
           },
           castlingAbility: new Set([CastlingAbility.BlackKing]),
           turn: Color.Black,
-        })
+        }),
       );
       const { moves } = context.generateMoves();
       expect(moves).toEqual(
@@ -1183,7 +1183,7 @@ describe('MoveGenerator', () => {
             capture: false,
             castling: CastlingRight.KingSide,
           },
-        ])
+        ]),
       );
     });
     it('only allows king moves when in double check', () => {
@@ -1207,13 +1207,13 @@ describe('MoveGenerator', () => {
             g7: { type: PieceType.Knight, color: Color.White },
           },
           turn: Color.Black,
-        })
+        }),
       );
       const { moves } = context.generateMoves();
 
       // Only king moves should be allowed
       expect(moves.every((m) => m.start === Coordinate.toIndex('e8'))).toBe(
-        true
+        true,
       );
       expect(moves.length).toBe(4);
     });
@@ -1236,7 +1236,7 @@ describe('MoveGenerator', () => {
             g1: { type: PieceType.Rook, color: Color.Black },
           },
           turn: Color.White,
-        })
+        }),
       );
 
       const { moves } = context.generateMoves();
@@ -1245,13 +1245,13 @@ describe('MoveGenerator', () => {
         expect.objectContaining({
           start: Coordinate.toIndex('e1'),
           target: Coordinate.toIndex('f1'),
-        })
+        }),
       );
       expect(moves).not.toContainEqual(
         expect.objectContaining({
           start: Coordinate.toIndex('e1'),
           target: Coordinate.toIndex('d1'),
-        })
+        }),
       );
     });
 
@@ -1271,7 +1271,7 @@ describe('MoveGenerator', () => {
           pieces: {
             d4: { type: 'k', color: Color.White },
           },
-        })
+        }),
       );
 
       const { moves } = context.generateMoves();
@@ -1318,7 +1318,7 @@ describe('MoveGenerator', () => {
             target: Coordinate.toIndex('c5'),
             capture: false,
           }, // up-left
-        ])
+        ]),
       );
     });
 
@@ -1340,7 +1340,7 @@ describe('MoveGenerator', () => {
             e4: { type: 'p', color: Color.Black },
             c3: { type: 'p', color: Color.Black },
           },
-        })
+        }),
       );
 
       const { moves } = context.generateMoves();
@@ -1357,7 +1357,7 @@ describe('MoveGenerator', () => {
             target: Coordinate.toIndex('c3'),
             capture: true,
           },
-        ])
+        ]),
       );
     });
 
@@ -1379,7 +1379,7 @@ describe('MoveGenerator', () => {
             e4: { type: 'q', color: Color.White },
             e3: { type: 'p', color: Color.White },
           },
-        })
+        }),
       );
       const { moves } = context.generateMoves();
 
@@ -1396,7 +1396,7 @@ describe('MoveGenerator', () => {
             target: Coordinate.toIndex('e3'),
             capture: false,
           }, // e3
-        ])
+        ]),
       );
     });
 
@@ -1420,7 +1420,7 @@ describe('MoveGenerator', () => {
           },
           castlingAbility: new Set([CastlingAbility.WhiteKing]),
           turn: Color.White,
-        })
+        }),
       );
 
       const { moves } = context.generateMoves();
@@ -1433,7 +1433,7 @@ describe('MoveGenerator', () => {
             capture: false,
             castling: CastlingRight.KingSide,
           },
-        ])
+        ]),
       );
     });
 
@@ -1457,7 +1457,7 @@ describe('MoveGenerator', () => {
           },
           castlingAbility: new Set([CastlingAbility.WhiteQueen]),
           turn: Color.White,
-        })
+        }),
       );
       const { moves } = context.generateMoves();
 
@@ -1469,7 +1469,7 @@ describe('MoveGenerator', () => {
             capture: false,
             castling: CastlingRight.QueenSide,
           },
-        ])
+        ]),
       );
     });
 
@@ -1494,7 +1494,7 @@ describe('MoveGenerator', () => {
           },
           castlingAbility: new Set([CastlingAbility.WhiteKing]),
           turn: Color.White,
-        })
+        }),
       );
       const { moves } = context.generateMoves();
 
@@ -1506,7 +1506,7 @@ describe('MoveGenerator', () => {
             capture: false,
             castling: CastlingRight.KingSide,
           },
-        ])
+        ]),
       );
     });
 
@@ -1531,7 +1531,7 @@ describe('MoveGenerator', () => {
           },
           castlingAbility: new Set([CastlingAbility.WhiteQueen]),
           turn: Color.White,
-        })
+        }),
       );
       const { moves } = context.generateMoves();
 
@@ -1544,7 +1544,7 @@ describe('MoveGenerator', () => {
             capture: false,
             castling: CastlingRight.QueenSide,
           },
-        ])
+        ]),
       );
     });
 
@@ -1570,7 +1570,7 @@ describe('MoveGenerator', () => {
           },
           castlingAbility: new Set([CastlingAbility.WhiteKing]),
           turn: Color.White,
-        })
+        }),
       );
 
       const { moves } = context.generateMoves();
@@ -1583,7 +1583,7 @@ describe('MoveGenerator', () => {
             capture: false,
             castling: CastlingRight.KingSide,
           },
-        ])
+        ]),
       );
     });
 
@@ -1608,7 +1608,7 @@ describe('MoveGenerator', () => {
           },
           castlingAbility: new Set([CastlingAbility.WhiteKing]),
           turn: Color.White,
-        })
+        }),
       );
 
       const { moves } = context.generateMoves();
@@ -1621,7 +1621,7 @@ describe('MoveGenerator', () => {
             capture: false,
             castling: CastlingRight.KingSide,
           },
-        ])
+        ]),
       );
     });
 
@@ -1646,7 +1646,7 @@ describe('MoveGenerator', () => {
           },
           castlingAbility: new Set([CastlingAbility.WhiteKing]),
           turn: Color.White,
-        })
+        }),
       );
 
       const { moves } = context.generateMoves();
@@ -1659,7 +1659,7 @@ describe('MoveGenerator', () => {
             capture: false,
             castling: CastlingRight.KingSide,
           },
-        ])
+        ]),
       );
     });
   });

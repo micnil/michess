@@ -13,7 +13,7 @@ export class AuthService {
 
   constructor(
     private authClient: AuthClient,
-    private socketClient: SocketClient
+    private socketClient: SocketClient,
   ) {}
 
   toAuthState(sessionData: BetterAuthSessionData): AuthState {
@@ -65,7 +65,7 @@ export class AuthService {
     if (error) {
       throw new Error(
         error.message || 'Failed to check username availability',
-        { cause: error }
+        { cause: error },
       );
     }
 

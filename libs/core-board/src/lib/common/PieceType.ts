@@ -9,7 +9,7 @@ const PieceTypeEnum = {
   King: 'k',
 } as const;
 
-export type PieceType = typeof PieceTypeEnum[keyof typeof PieceTypeEnum];
+export type PieceType = (typeof PieceTypeEnum)[keyof typeof PieceTypeEnum];
 
 export const PieceType = Object.freeze({
   ...PieceTypeEnum,

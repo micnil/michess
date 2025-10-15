@@ -4,7 +4,7 @@ import { MoveOptions } from '../model/MoveOptions';
 
 export const canMoveTo = (
   moveOptions: Maybe<MoveOptions>,
-  toCoord: Coordinate
+  toCoord: Coordinate,
 ) => {
   return moveOptions
     ? moveOptions.some((moveOption) => moveOption.to === toCoord)

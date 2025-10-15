@@ -18,7 +18,7 @@ export type MoveNotation = {
 const addCheckNotation = (
   san: string,
   isCheck: boolean,
-  isCheckmate: boolean
+  isCheckmate: boolean,
 ): string => {
   if (isCheckmate) return san + '#';
   if (isCheck) return san + '+';
@@ -29,7 +29,7 @@ const getDisambiguation = (
   moveOption: MoveOption,
   piece: Piece,
   allLegalMoves: MoveOption[],
-  pieces: PiecePlacements
+  pieces: PiecePlacements,
 ): string => {
   const ambiguousMoves = allLegalMoves.filter((move) => {
     const isSameMove =
@@ -50,13 +50,13 @@ const getDisambiguation = (
   const fromRank = Coordinate.toRank(move.from);
 
   const sameFile = ambiguousMoves.some(
-    (move) => Coordinate.fromIndex(move.start)[0] === fromFile
+    (move) => Coordinate.fromIndex(move.start)[0] === fromFile,
   );
 
   if (!sameFile) return fromFile;
 
   const sameRank = ambiguousMoves.some(
-    (move) => Coordinate.fromIndex(move.start)[1] === fromRank
+    (move) => Coordinate.fromIndex(move.start)[1] === fromRank,
   );
 
   return sameRank ? move.from : fromRank;
@@ -68,7 +68,7 @@ const getDisambiguation = (
 const moveOptionToSan = (
   moveOption: MoveOption,
   pieces: PiecePlacements,
-  allLegalMoves: MoveOption[]
+  allLegalMoves: MoveOption[],
 ): string => {
   const move = MoveOption.toMove(moveOption);
   const piece = pieces.get(move.from);

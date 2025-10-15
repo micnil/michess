@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 
 export const useObservable = <T>(
   observable: Maybe<Observable<T>>,
-  callback: (value: T) => void
+  callback: (value: T) => void,
 ) => {
   const callbackRef = useRef(callback);
 

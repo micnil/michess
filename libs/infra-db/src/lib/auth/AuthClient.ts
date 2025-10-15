@@ -17,7 +17,7 @@ type SendEmailCb = (
     url: string;
     token: string;
   },
-  request?: Request
+  request?: Request,
 ) => Promise<void>;
 type Emails = {
   verification: SendEmailCb;
@@ -37,7 +37,7 @@ export const AuthClient = {
     db: DatabaseClient,
     secondaryStorage: SecondaryStorage,
     emails?: Emails,
-    oauthConfig?: OAuthConfig
+    oauthConfig?: OAuthConfig,
   ) {
     return betterAuth({
       emailAndPassword: {
@@ -55,7 +55,7 @@ export const AuthClient = {
               // the trigger runs. So we need to manually fetch the updated user
               // and copy the properties over.
               const updatedUser = await context?.internalAdapter.findUserById(
-                user.id
+                user.id,
               );
               Object.assign(user, updatedUser);
             },

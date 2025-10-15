@@ -157,18 +157,18 @@ export const GameDetailsMapper = {
       opponent: game.players.white
         ? game.players.white
         : game.players.black
-        ? game.players.black
-        : {
-            id: 'anon',
-            name: 'Anonymous',
-          },
+          ? game.players.black
+          : {
+              id: 'anon',
+              name: 'Anonymous',
+            },
       variant: game.variant as GameVariantV1,
       createdAt: game.createdAt.toISOString(),
       availableColor: !game.players.white
         ? 'white'
         : !game.players.black
-        ? 'black'
-        : 'spectator',
+          ? 'black'
+          : 'spectator',
     };
   },
   toPlayerGameInfoV1(game: GameDetails, playerId: string): PlayerGameInfoV1 {
@@ -176,12 +176,12 @@ export const GameDetailsMapper = {
       game.players.white?.id === playerId
         ? 'white'
         : game.players.black?.id === playerId
-        ? 'black'
-        : 'white'; // Should not happen, but fail gracefully
+          ? 'black'
+          : 'white'; // Should not happen, but fail gracefully
     const opponent: PlayerInfo =
       ownSide === 'white'
-        ? game.players.black ?? { id: 'anon', name: 'Anonymous' }
-        : game.players.white ?? { id: 'anon', name: 'Anonymous' };
+        ? (game.players.black ?? { id: 'anon', name: 'Anonymous' })
+        : (game.players.white ?? { id: 'anon', name: 'Anonymous' });
     const initialTurn = game.initialPosition.turn;
     return {
       id: game.id,

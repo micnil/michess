@@ -6,7 +6,7 @@ export class ApiError extends Error {
     code: string,
     message: string,
     details?: any,
-    errorOptions?: ErrorOptions
+    errorOptions?: ErrorOptions,
   ) {
     super(message, errorOptions);
     this.code = code;

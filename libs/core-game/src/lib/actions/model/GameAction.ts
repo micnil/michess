@@ -14,7 +14,7 @@ export type GameAction = {
 const from = (
   color: Color,
   moveNumber: number,
-  option: GameActionOption
+  option: GameActionOption,
 ): GameAction => {
   switch (option.type) {
     case 'accept_draw':

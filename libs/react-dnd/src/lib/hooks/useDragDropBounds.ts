@@ -50,20 +50,20 @@ export const useDragDropBounds = (): DragDropBounds => {
         const unsubscribeEvents = () => {
           element.ownerDocument.removeEventListener(
             'pointerdown',
-            handlePressEvent
+            handlePressEvent,
           );
           element.ownerDocument.removeEventListener(
             'pointermove',
-            handleMoveEvent
+            handleMoveEvent,
           );
           element.ownerDocument.removeEventListener(
             'pointerup',
-            handleReleaseEvent
+            handleReleaseEvent,
           );
 
           element.ownerDocument.removeEventListener(
             'pointercancel',
-            handleReleaseEvent
+            handleReleaseEvent,
           );
         };
 
@@ -72,12 +72,12 @@ export const useDragDropBounds = (): DragDropBounds => {
         element.ownerDocument.addEventListener('pointerup', handleReleaseEvent);
         element.ownerDocument.addEventListener(
           'pointercancel',
-          handleReleaseEvent
+          handleReleaseEvent,
         );
         dropzoneRef.current = { element, unsubscribeEvents };
       }
     },
-    [handleMove, handlePress, handleRelease, setPosition]
+    [handleMove, handlePress, handleRelease, setPosition],
   );
 
   return {

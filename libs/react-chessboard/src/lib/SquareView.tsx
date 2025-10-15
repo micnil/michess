@@ -13,7 +13,7 @@ type Props = {
   draggingFromCoord?: Maybe<Coordinate>;
   showPromotionDialog: (
     coordinate: Coordinate,
-    color: Color
+    color: Color,
   ) => Promise<PieceType>;
   color: Color;
   position: Position;
@@ -69,7 +69,7 @@ export const SquareView: React.FC<Props> = ({
     show: boolean,
     x: number,
     y: number,
-    size: number
+    size: number,
   ) => {
     if (!show) return '';
     return `M ${x} ${y}
@@ -126,7 +126,7 @@ export const SquareView: React.FC<Props> = ({
             showPossibleMoveIndicator,
             position.x,
             position.y,
-            size
+            size,
           )}
         />
       ) : (

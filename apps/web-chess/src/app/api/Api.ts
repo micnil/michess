@@ -15,7 +15,7 @@ export const Api = {
   create(
     restClient: RestClient,
     authClient: AuthClient,
-    socketClient: SocketClient
+    socketClient: SocketClient,
   ): Api {
     const auth = new AuthService(authClient, socketClient);
     const games = new GameService(restClient, socketClient, auth);

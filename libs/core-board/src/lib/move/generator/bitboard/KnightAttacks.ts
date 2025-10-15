@@ -11,11 +11,11 @@ export const KNIGHT_ATTACKS: Record<Coordinate, Bitboard> = Object.fromEntries(
       .filter(
         (targetIndex) =>
           IndexBoardUtil.withinBoard(targetIndex) &&
-          IndexBoardUtil.chebyshevDistance(index, targetIndex) <= 2
+          IndexBoardUtil.chebyshevDistance(index, targetIndex) <= 2,
       )
       .reduce((acc, targetIndex) => acc.setIndex(targetIndex), new Bitboard());
     return [coord, attacks];
-  })
+  }),
 ) as Record<Coordinate, Bitboard>;
 
 export const KnightAttacks = {

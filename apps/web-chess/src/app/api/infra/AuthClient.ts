@@ -5,7 +5,7 @@ export type AuthClient = ReturnType<
   typeof createAuthClient<{
     plugins: [
       ReturnType<typeof anonymousClient>,
-      ReturnType<typeof usernameClient>
+      ReturnType<typeof usernameClient>,
     ];
   }>
 >;
