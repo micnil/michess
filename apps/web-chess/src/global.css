@@ -7,13 +7,16 @@ body,
   tab-size: 4;
   scroll-behavior: smooth;
 }
+
+html {
+  overflow-x: clip;
+}
+
 body {
   margin: 0;
   height: 100%;
 }
 #root {
-  display: flex;
-  flex-direction: column;
   height: 100%;
 }
 

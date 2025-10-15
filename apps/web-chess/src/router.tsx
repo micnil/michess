@@ -1,6 +1,6 @@
 import { Maybe } from '@michess/common-utils';
 import { Color } from '@michess/core-board';
-import { Card, Container, Theme } from '@radix-ui/themes';
+import { Box, Card, Container, Theme } from '@radix-ui/themes';
 import {
   createRootRoute,
   createRoute,
@@ -25,25 +25,28 @@ const RootLayout = () => (
     accentColor="amber"
     appearance="dark"
     panelBackground="translucent"
+    hasBackground={true}
     grayColor="sand"
     style={{
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column',
+      minHeight: '100dvh',
+      display: 'grid',
+      gridTemplateRows: 'auto 1fr',
     }}
   >
     <QueryProvider>
       <ApiProvider>
         <BackgroundGradient />
-        <Card asChild size={'1'} style={{ borderRadius: '0px' }}>
-          <header>
-            <Container>
-              <Navbar />
-            </Container>
-          </header>
-        </Card>
+        <Box mb={'5'}>
+          <Card asChild size={'1'}>
+            <header>
+              <Container>
+                <Navbar />
+              </Container>
+            </header>
+          </Card>
+        </Box>
 
-        <Container asChild height="100%" mt="4">
+        <Container asChild minHeight="100%">
           <main>
             <Outlet />
           </main>
