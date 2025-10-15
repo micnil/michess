@@ -211,14 +211,25 @@ const fromGameStateInternal = (
     },
     getAdditionalActions: () => gameStateInternal.additionalActions.value(),
     joinGame: (playerInfo: PlayerInfo, side?: Color): ChessGame => {
-      const newPlayers = joinGame(gameStateInternal.players, playerInfo, side);
-      const bothSidesTaken = !!newPlayers.black && !!newPlayers.white;
+      if (
+        gameStateInternal.status === 'WAITING' ||
+        gameStateInternal.status === 'EMPTY'
+      ) {
+        const newPlayers = joinGame(
+          gameStateInternal.players,
+          playerInfo,
+          side,
+        );
+        const bothSidesTaken = !!newPlayers.black && !!newPlayers.white;
 
-      return fromGameStateInternal({
-        ...gameStateInternal,
-        players: newPlayers,
-        status: bothSidesTaken ? 'READY' : 'WAITING',
-      });
+        return fromGameStateInternal({
+          ...gameStateInternal,
+          players: newPlayers,
+          status: bothSidesTaken ? 'READY' : 'WAITING',
+        });
+      } else {
+        return fromGameStateInternal(gameStateInternal);
+      }
     },
     isPlayerInGame: (playerId: string): boolean => {
       return getPlayerEntry(playerId) !== undefined;

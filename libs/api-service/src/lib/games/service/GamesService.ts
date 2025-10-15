@@ -10,7 +10,6 @@ import {
   PlayerGameInfoPageResponseV1,
   PlayerGameInfoQueryV1,
 } from '@michess/api-schema';
-import { logger } from '@michess/be-utils';
 import { assertDefined, Maybe } from '@michess/common-utils';
 import { Move } from '@michess/core-board';
 import { ChessGame, GameActionIn } from '@michess/core-game';
@@ -76,7 +75,6 @@ export class GamesService {
       playerId: userId,
       status: query.status ? [query.status] : ['ENDED', 'IN_PROGRESS'],
     });
-    logger.info(games);
     const gameDetails = games.map(
       GameDetailsMapper.fromSelectGameWithRelations,
     );
@@ -135,6 +133,7 @@ export class GamesService {
     if (chessGame.isPlayerInGame(session.userId)) {
       const updatedGame = chessGame.leaveGame(session.userId);
       const updatedGameState = updatedGame.getState();
+
       await this.gameRepository.updateGame(
         gameDetails.id,
         GameDetailsMapper.toInsertGame(updatedGameState),
@@ -169,10 +168,6 @@ export class GamesService {
       chessGame.hasNewStatus(updatedGame) ||
       chessGame.hasNewActionOptions(updatedGame)
     ) {
-      logger.info(
-        updatedGameState,
-        'Game status or action options changed, updating game',
-      );
       await this.gameRepository.updateGame(
         gameDetails.id,
         GameDetailsMapper.toInsertGame(updatedGameState),
