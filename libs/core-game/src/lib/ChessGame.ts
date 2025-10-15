@@ -60,6 +60,11 @@ const makeAction = (
           return {
             gameState: {
               ...gameState,
+              status: 'ENDED',
+              meta: {
+                ...gameState.meta,
+                endedAt: gameState.meta.endedAt ?? new Date(),
+              },
               result: ChessGameResult.fromChessGameAction(
                 action,
                 gameState.board.position.turn,
