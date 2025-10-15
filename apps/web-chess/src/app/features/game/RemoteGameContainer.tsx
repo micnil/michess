@@ -47,9 +47,10 @@ export const RemoteGameContainer = ({
 
   return (
     <Grid
-      columns={{ initial: '1', sm: '1fr auto 1fr' }}
+      columns={{ initial: 'auto', sm: '1fr auto 1fr' }}
       rows={'auto 1fr'}
       height={'100%'}
+      justify={'center'}
       gapX={{ initial: '0', sm: '4' }}
     >
       <Box gridColumn={{ initial: '1', sm: '2' }}>
