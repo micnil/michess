@@ -10,7 +10,10 @@ const readEnvStrict = (key: string): string => {
 
 const getConfig = (): AppConfig => {
   const DATABASE_URL = readEnvStrict('DATABASE_URL');
+  const env =
+    process.env.NODE_ENV === 'production' ? 'production' : 'development';
   return {
+    env,
     database: {
       url: DATABASE_URL,
     },
@@ -24,15 +27,29 @@ const getConfig = (): AppConfig => {
     cors: {
       origins: (process.env.CORS_ORIGINS || 'http://localhost:4200').split(','),
     },
-    email: {
-      host: readEnvStrict('EMAIL_HOST'),
-      port: parseInt(readEnvStrict('EMAIL_PORT'), 10),
-      secure: (process.env.EMAIL_SECURE || 'false').toLowerCase() === 'true',
-      auth: {
-        user: readEnvStrict('EMAIL_USER'),
-        pass: readEnvStrict('EMAIL_PASS'),
-      },
-    },
+    email:
+      env === 'development'
+        ? {
+            transportType: 'smtp',
+            smtp: {
+              host: readEnvStrict('EMAIL_HOST'),
+              port: parseInt(readEnvStrict('EMAIL_PORT'), 10),
+              secure:
+                (process.env.EMAIL_SECURE || 'false').toLowerCase() === 'true',
+              auth: {
+                user: readEnvStrict('EMAIL_USER'),
+                pass: readEnvStrict('EMAIL_PASS'),
+              },
+            },
+          }
+        : {
+            transportType: 'ses',
+            ses: {
+              region: readEnvStrict('AWS_REGION'),
+              accessKeyId: readEnvStrict('AWS_ACCESS_KEY_ID'),
+              secretAccessKey: readEnvStrict('AWS_SECRET_ACCESS_KEY'),
+            },
+          },
     auth: {
       google: {
         clientId: readEnvStrict('GOOGLE_OAUTH_CLIENT_ID'),

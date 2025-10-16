@@ -1,6 +1,7 @@
 import { EmailConfig } from '@michess/infra-email';
 
 export type AppConfig = {
+  env: 'development' | 'production';
   database: {
     url: string;
   };
