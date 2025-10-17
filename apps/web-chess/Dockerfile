@@ -60,7 +60,9 @@ ENV PORT=3000
 EXPOSE 3000
 
 # Start Caddy
-CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]# =================================================================================================
+CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
+
+# =================================================================================================
 # Build instructions:
 #
 # Build: docker build -t web-chess:latest -f apps/web-chess/Dockerfile .
