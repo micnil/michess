@@ -44,7 +44,7 @@ RUN pnpm nx build node-chess --configuration=production
 # Creates a clean installation of *only* the production dependencies for the final built app.
 # This ensures the final image doesn't contain any devDependencies from the entire monorepo.
 # =================================================================================================
-FROM base as prod-deps
+FROM base AS prod-deps
 
 # The Nx build process generates a package.json for the specific app
 COPY --from=builder /usr/src/app/dist/apps/node-chess/package.json ./package.json
