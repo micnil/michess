@@ -76,7 +76,12 @@ echo "✅ Docker image built successfully: $TAG"
 echo ""
 echo "🚀 To run the container:"
 if [ -f "apps/$APP_NAME/.env.local" ]; then
-    echo "   docker run -p 5000:5000 --env-file apps/$APP_NAME/.env.local $TAG"
+    # Try to extract PORT from .env.local, default to 5000
+    PORT=$(grep "^PORT=" "apps/$APP_NAME/.env.local" 2>/dev/null | head -1 | cut -d'=' -f2 | tr -d ' "' | tr -d '\r' || echo "5000")
+    if [ -z "$PORT" ]; then
+        PORT="5000"
+    fi
+    echo "   docker run -p $PORT:$PORT --env-file apps/$APP_NAME/.env.local $TAG"
 else
     echo "   docker run -p 5000:5000 $TAG"
 fi

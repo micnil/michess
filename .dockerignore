@@ -75,3 +75,12 @@ temp/
 .nx/
 .cache/
 .turbo/
+.nyc_output/
+
+# Lock files and package managers (except the main ones)
+yarn.lock
+package-lock.json
+
+# Misc
+*.tgz
+*.tar.gz

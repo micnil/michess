@@ -1,15 +1,8 @@
-# =================================================================================================
-# Multi-stage Dockerfile for node-chess backend application
-#
-# Optimized for monorepo with proper dependency caching and minimal final image size.
-# Based on best practices for Node.js applications in production.
-# =================================================================================================
 
 # =================================================================================================
 # Stage 1: Base Image
 #
-# Sets up the basic environment with a specific Node.js version and installs pnpm.
-# Using a specific version for reproducible builds.
+# Sets up the base Node.js environment with PNPM package manager.
 # =================================================================================================
 ARG NODE_VERSION=20
 FROM node:${NODE_VERSION}-slim AS base
@@ -23,10 +16,8 @@ WORKDIR /usr/src/app
 # =================================================================================================
 # Stage 2: Dependencies
 #
-# Installs all dependencies for the entire monorepo. This layer is cached and will only be
-# re-built when package manifests or the lockfile change, speeding up subsequent builds.
-# We install all dependencies (not just --prod) because the Nx build process might
-# require some devDependencies.
+# Installs all dependencies for the monorepo using PNPM (including
+# devDependencies which is needed by nx during build).
 # =================================================================================================
 FROM base AS deps
 
@@ -74,15 +65,19 @@ ENV NODE_ENV=production
 ENV PORT=5000
 
 # Create a non-root user for security
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nodejs
+RUN addgroup --system --gid 1001 nodejs && \
+  adduser --system --uid 1001 --gid 1001 nodejs
 
 COPY --from=builder /usr/src/app/dist/apps/node-chess .
 COPY --from=prod-deps /usr/src/app/node_modules ./node_modules
 
+# Ensure proper permissions
+RUN chown -R nodejs:nodejs /usr/src/app
+
 USER nodejs
 
 EXPOSE $PORT
+
 
 # The command to start the node-chess application
 CMD [ "node", "main.js" ]
@@ -93,10 +88,3 @@ CMD [ "node", "main.js" ]
 # Build: docker build -t node-chess:latest -f apps/node-chess/Dockerfile .
 # Run:   docker run -p 5000:5000 --env-file apps/node-chess/.env.local node-chess:latest
 # =================================================================================================
-
-# =============================================================================
-# Build instructions:
-#
-# Build: docker build -t node-chess:latest -f apps/node-chess/Dockerfile .
-# Run:   docker run -p 5000:5000 --env-file apps/node-chess/.env.local node-chess:latest
-# =============================================================================
