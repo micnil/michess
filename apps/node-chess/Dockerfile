@@ -79,6 +79,9 @@ USER nodejs
 
 EXPOSE $PORT
 
+# Health check - verify the application is responding
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:${PORT}/api/health || exit 1
 
 # The command to start the node-chess application
 CMD [ "node", "main.js" ]

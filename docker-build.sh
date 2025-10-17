@@ -75,15 +75,31 @@ docker build \
 echo "✅ Docker image built successfully: $TAG"
 echo ""
 echo "🚀 To run the container:"
+
+# Try to extract PORT from .env files (local takes precedence over .env)
+PORT=""
+if [ -f "apps/$APP_NAME/.env" ]; then
+    PORT=$(grep "^PORT=" "apps/$APP_NAME/.env" 2>/dev/null | head -1 | cut -d'=' -f2 | tr -d ' "' | tr -d '\r' || echo "")
+fi
 if [ -f "apps/$APP_NAME/.env.local" ]; then
-    # Try to extract PORT from .env.local, default to 5000
-    PORT=$(grep "^PORT=" "apps/$APP_NAME/.env.local" 2>/dev/null | head -1 | cut -d'=' -f2 | tr -d ' "' | tr -d '\r' || echo "5000")
-    if [ -z "$PORT" ]; then
-        PORT="5000"
+    LOCAL_PORT=$(grep "^PORT=" "apps/$APP_NAME/.env.local" 2>/dev/null | head -1 | cut -d'=' -f2 | tr -d ' "' | tr -d '\r' || echo "")
+    if [ -n "$LOCAL_PORT" ]; then
+        PORT="$LOCAL_PORT"
     fi
+fi
+
+# Default to 3000 if no port found
+if [ -z "$PORT" ]; then
+    PORT="3000"
+fi
+
+# Show appropriate run command
+if [ -f "apps/$APP_NAME/.env.local" ]; then
     echo "   docker run -p $PORT:$PORT --env-file apps/$APP_NAME/.env.local $TAG"
+elif [ -f "apps/$APP_NAME/.env" ]; then
+    echo "   docker run -p $PORT:$PORT --env-file apps/$APP_NAME/.env $TAG"
 else
-    echo "   docker run -p 5000:5000 $TAG"
+    echo "   docker run -p $PORT:$PORT $TAG"
 fi
 echo ""
 echo "🔍 To inspect the image:"

@@ -1,0 +1,45 @@
+
+
+:{$PORT:3000} {
+    # Root directory for static files
+    root * /srv
+    
+    # Enable file server for static assets
+    file_server
+    
+    # Reverse proxy for API calls
+    handle /api/* {
+        reverse_proxy {$API_BACKEND_URL:http://localhost:5000}
+    }
+    
+    # Reverse proxy for WebSocket connections (Socket.IO)
+    handle /socket.io/* {
+        reverse_proxy {$API_BACKEND_URL:http://localhost:5000}
+    }
+    
+    # Handle SPA routing - serve index.html for all non-API routes
+    try_files {path} /index.html
+    
+    # Security headers
+    header {
+        X-Content-Type-Options nosniff
+        X-XSS-Protection "1; mode=block"
+        X-Frame-Options DENY
+    }
+    
+    # Cache static assets
+    @static {
+        path *.css *.js *.png *.jpg *.jpeg *.gif *.ico *.svg *.woff *.woff2 *.ttf *.eot
+    }
+    header @static {
+        Cache-Control "public, max-age=31536000, immutable"
+    }
+    
+    # Don't cache HTML files
+    @html {
+        path *.html
+    }
+    header @html {
+        Cache-Control "no-cache, no-store, must-revalidate"
+    }
+}
