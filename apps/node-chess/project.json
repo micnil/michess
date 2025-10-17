@@ -18,6 +18,7 @@
         "tsConfig": "apps/node-chess/tsconfig.app.json",
         "assets": ["apps/node-chess/src/assets"],
         "generatePackageJson": true,
+        "external": ["@opentelemetry/auto-instrumentations-node"],
         "esbuildOptions": {
           "sourcemap": true,
           "outExtension": {
