@@ -1,0 +1,77 @@
+# =============================================================================
+# .dockerignore for michess monorepo
+# Applies to all Docker builds from workspace root
+# =============================================================================
+
+# Development and build artifacts
+node_modules/
+dist/
+coverage/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+
+# Docker files (excluding our own)
+.dockerignore
+docker-compose*.yml
+
+# Documentation
+README.md
+*.md
+docs/
+
+# Test files and configs
+**/*.spec.ts
+**/*.test.ts
+**/__tests__/
+**/__mocks__/
+jest.config.*
+*.spec.js
+*.test.js
+
+# Linting and formatting
+.eslintrc*
+.prettierrc*
+.editorconfig
+
+# Build tools and examples
+tools/
+examples/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Cache directories
+.nx/
+.cache/
+.turbo/
