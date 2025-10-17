@@ -8,6 +8,7 @@ const start = (app: App, appConfig: AppConfig): ServerType => {
   const server = serve({
     fetch: app.restRouter.fetch,
     port: appConfig.server.port,
+    hostname: '0.0.0.0',
   }).on('listening', () => {
     logger.info('Server is running on:');
     logger.info(server.address());
