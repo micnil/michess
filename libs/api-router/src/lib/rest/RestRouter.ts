@@ -30,6 +30,7 @@ export const RestRouter = {
         }),
       );
 
+    honoApp.on(['GET'], '/health', (c) => c.json({ status: 'ok' }));
     honoApp.on(['POST', 'GET'], '/auth/**', (c) => api.auth.handle(c.req.raw));
 
     honoApp
