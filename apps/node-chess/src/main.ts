@@ -2,13 +2,10 @@ import { App } from '@michess/api-router';
 import { Api } from '@michess/api-service';
 import { Repositories } from '@michess/infra-db';
 import { EmailClient } from '@michess/infra-email';
-import dotenv from 'dotenv';
 import Redis from 'ioredis';
 import postgres from 'postgres';
 import { AppConfigService } from './config/service/AppConfigService';
 import { Server } from './Server';
-
-dotenv.config();
 
 const main = async () => {
   const appConfig = AppConfigService.get();

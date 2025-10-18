@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "start:web": "nx serve web-chess",
-    "start:node": "nx serve node-chess | pino-pretty",
+    "start:node": "dotenv -e ./apps/node-chess/.env -c -- nx serve node-chess | pino-pretty",
     "start:db": "dotenv -e ./apps/node-chess/.env -c -- docker-compose up -d --wait postgres redis",
     "clean:db": "docker-compose down -v && pnpm run start:db && pnpm run migration:run",
     "build": "nx build",
