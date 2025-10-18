@@ -12,6 +12,7 @@ import {
   UsageMetricsService,
 } from '@michess/api-service';
 import { createEventIterator } from '@michess/be-utils';
+import Redis from 'ioredis-mock';
 import { createServer } from 'node:http';
 import { Server, Socket as ServerSocket } from 'socket.io';
 import { Socket as ClientSocket, io as ioClient } from 'socket.io-client';
@@ -49,6 +50,7 @@ describe('SocketRouter', () => {
   let clientSocket2: ClientSocket;
   let serverSocket1: ServerSocket;
   let serverSocket2: ServerSocket;
+  const redis = new Redis();
 
   let httpServer: ReturnType<typeof createServer>;
 
@@ -71,7 +73,7 @@ describe('SocketRouter', () => {
   beforeAll(async () => {
     apiMock.auth.getSession = jest.fn().mockResolvedValue(sessionMock);
     httpServer = createServer();
-    io = SocketRouter.from(apiMock, { cors: { origins: ['*'] } });
+    io = SocketRouter.from(apiMock, redis, { cors: { origins: ['*'] } });
     io.attach(httpServer);
 
     using connectionIter = createEventIterator<ServerSocket>(io, 'connection');

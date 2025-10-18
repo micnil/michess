@@ -7,12 +7,15 @@ describe('EmailCLient', () => {
 
   beforeEach(() => {
     mockConfig = {
-      host: 'smtp.test.com',
-      port: 587,
-      secure: false,
-      auth: {
-        user: 'test@test.com',
-        pass: 'testpass',
+      transportType: 'smtp',
+      smtp: {
+        host: 'smtp.test.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: 'test@test.com',
+          pass: 'testpass',
+        },
       },
     };
     emailClient = new EmailClient(mockConfig, 'noreply@test.com');
