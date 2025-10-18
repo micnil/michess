@@ -12,7 +12,7 @@ export const Footer: FC = () => {
         direction={{ initial: 'column', sm: 'row' }}
       >
         <Text size="2" color="gray">
-          © {new Date().getFullYear()} MiChess. All rights reserved.
+          © {new Date().getFullYear()} micnil
         </Text>
 
         <Flex gap="3" align="center">
