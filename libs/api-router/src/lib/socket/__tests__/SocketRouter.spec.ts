@@ -27,6 +27,17 @@ const apiMock: Api = {
   usageMetrics: new UsageMetricsService({} as never, {} as never, {} as never),
 };
 
+const waitFor = <T>(
+  socket: ServerSocket | ClientSocket,
+  event: string,
+): Promise<T> => {
+  return new Promise((resolve) => {
+    socket.once(event, (data) => {
+      resolve(data);
+    });
+  });
+};
+
 const leaveAllRooms = (socket: ServerSocket) => {
   socket.rooms.forEach((room) => {
     if (room !== socket.id) {
@@ -126,14 +137,15 @@ describe('SocketRouter', () => {
 
       apiMock.games.joinGame = jest.fn().mockResolvedValue(mockGameState);
 
-      clientSocket2.on('game-updated', (data) => {
-        expect(data).toEqual(mockGameState);
-      });
+      const gameUpdatedPromise = waitFor(clientSocket2, 'game-updated');
 
       const response = await clientSocket1.emitWithAck(
         'join-game',
         joinGamePayload,
       );
+      const gameUpdatedData = await gameUpdatedPromise;
+
+      expect(gameUpdatedData).toEqual(mockGameState);
 
       expect(response.status).toEqual('ok');
       expect(response.status === 'ok' && response.data).toEqual(mockGameState);
