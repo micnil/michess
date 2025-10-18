@@ -24,8 +24,8 @@ WORKDIR /usr/src/app
 # =================================================================================================
 FROM base AS deps
 
-COPY ../../package.json ../../pnpm-lock.yaml ./
-COPY ../../patches/ ./patches/
+COPY package.json pnpm-lock.yaml ./
+COPY patches/ ./patches/
 RUN pnpm fetch
 RUN pnpm install --frozen-lockfile
 
@@ -38,7 +38,7 @@ FROM base AS dev-tools
 COPY --from=deps /usr/src/app/node_modules ./node_modules
 
 # Copy the entire workspace for full context
-COPY ../../ .
+COPY . .
 
 # Default command keeps container running for manual access
 CMD ["tail", "-f", "/dev/null"]
