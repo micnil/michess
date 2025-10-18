@@ -1,6 +1,6 @@
-import { Box, Flex, Link, Text } from '@radix-ui/themes';
-import { Link as RouterLink } from '@tanstack/react-router';
+import { Box, Flex, Text } from '@radix-ui/themes';
 import { FC } from 'react';
+import { Link } from '../../components/Link';
 
 export const Footer: FC = () => {
   return (
@@ -16,8 +16,8 @@ export const Footer: FC = () => {
         </Text>
 
         <Flex gap="3" align="center">
-          <Link asChild size="2" color="gray">
-            <RouterLink to="/privacy-policy">Privacy Policy</RouterLink>
+          <Link to="/privacy-policy" size="2" color="gray">
+            Privacy Policy
           </Link>
         </Flex>
       </Flex>

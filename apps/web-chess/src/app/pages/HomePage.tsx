@@ -1,9 +1,9 @@
 import { Box, Flex, Grid } from '@radix-ui/themes';
 import { useNavigate } from '@tanstack/react-router';
 import React from 'react';
-import { Footer } from '../components/Footer';
 import { GameLobby } from '../features/lobby/GameLobby';
 import { StatsContainer } from '../features/metrics/StatsContainer';
+import { Footer } from '../features/navigation/Footer';
 import { PlayerGamesOverview } from '../features/player-games-overview/PlayerGamesOverview';
 
 export const HomePage: React.FC = () => {

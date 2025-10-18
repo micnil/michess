@@ -10,7 +10,7 @@ import {
 import { ApiProvider } from './app/api/context/ApiProvider';
 import { QueryProvider } from './app/api/context/QueryProvider';
 import { BackgroundGradient } from './app/components/BackgroundGradient';
-import { Navbar } from './app/features/navbar/Navbar';
+import { Navbar } from './app/features/navigation/Navbar';
 import { EmailVerificationPage } from './app/pages/EmailVerificationPage';
 import GamePage from './app/pages/GamePage';
 import { HomePage } from './app/pages/HomePage';
