@@ -11,6 +11,9 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
+# Install curl for health checks
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /usr/src/app
 
 # =================================================================================================
@@ -78,10 +81,6 @@ RUN chown -R nodejs:nodejs /usr/src/app
 USER nodejs
 
 EXPOSE $PORT
-
-# Health check - verify the application is responding
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:${PORT}/api/health || exit 1
 
 # The command to start the node-chess application
 CMD [ "node", "main.js" ]
