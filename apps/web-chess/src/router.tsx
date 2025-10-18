@@ -14,6 +14,7 @@ import { Navbar } from './app/features/navbar/Navbar';
 import { EmailVerificationPage } from './app/pages/EmailVerificationPage';
 import GamePage from './app/pages/GamePage';
 import { HomePage } from './app/pages/HomePage';
+import { PrivacyPolicyPage } from './app/pages/PrivacyPolicyPage';
 import { RequestResetPasswordPage } from './app/pages/RequestResetPasswordPage';
 import { ResetPasswordPage } from './app/pages/ResetPasswordPage';
 import { SignInPage } from './app/pages/SignInPage';
@@ -158,6 +159,14 @@ const welcomeRoute = createRoute({
   },
 });
 
+const privacyPolicyRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/privacy-policy',
+  component: function PrivacyPolicyComponent() {
+    return <PrivacyPolicyPage />;
+  },
+});
+
 const routeTree = rootRoute.addChildren([
   signupRoute,
   signinRoute,
@@ -168,6 +177,7 @@ const routeTree = rootRoute.addChildren([
   forgotPasswordRoute,
   resetPasswordRoute,
   welcomeRoute,
+  privacyPolicyRoute,
 ]);
 
 export const router = createRouter({ routeTree });

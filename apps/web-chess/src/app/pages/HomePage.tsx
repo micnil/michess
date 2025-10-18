@@ -1,6 +1,7 @@
-import { Box, Grid } from '@radix-ui/themes';
+import { Box, Flex, Grid } from '@radix-ui/themes';
 import { useNavigate } from '@tanstack/react-router';
 import React from 'react';
+import { Footer } from '../components/Footer';
 import { GameLobby } from '../features/lobby/GameLobby';
 import { StatsContainer } from '../features/metrics/StatsContainer';
 import { PlayerGamesOverview } from '../features/player-games-overview/PlayerGamesOverview';
@@ -17,29 +18,40 @@ export const HomePage: React.FC = () => {
   };
 
   return (
-    <Grid
-      columns={{ initial: '1', sm: '2fr 1fr' }}
-      gap="4"
-      width="100%"
-      px={{ initial: '2', lg: '0' }}
+    <Flex
+      direction="column"
+      style={{
+        minHeight: 'calc(100vh - 96px)', // Account for header space
+      }}
     >
-      <Box>
-        <Grid gap="4">
+      <Box style={{ flex: 1 }}>
+        <Grid
+          columns={{ initial: '1', sm: '2fr 1fr' }}
+          gap="4"
+          width="100%"
+          px={{ initial: '2', lg: '0' }}
+        >
           <Box>
-            <GameLobby
-              onCreateGame={handleCreateGame}
-              onJoinGame={handleJoinGame}
-            />
+            <Grid gap="4">
+              <Box>
+                <GameLobby
+                  onCreateGame={handleCreateGame}
+                  onJoinGame={handleJoinGame}
+                />
+              </Box>
+              <Box>
+                <PlayerGamesOverview onJoinGame={handleJoinGame} />
+              </Box>
+            </Grid>
           </Box>
-          <Box>
-            <PlayerGamesOverview onJoinGame={handleJoinGame} />
+
+          <Box gridColumn={{ initial: '1', sm: '2' }}>
+            <StatsContainer />
           </Box>
         </Grid>
       </Box>
 
-      <Box gridColumn={{ initial: '1', sm: '2' }}>
-        <StatsContainer />
-      </Box>
-    </Grid>
+      <Footer />
+    </Flex>
   );
 };
