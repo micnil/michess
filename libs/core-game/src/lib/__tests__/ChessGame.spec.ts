@@ -234,9 +234,12 @@ describe('ChessGame', () => {
         Color.Black,
       );
 
-      expect(() => {
-        gameWithBothPlayers.joinGame(player3);
-      }).toThrow('Invalid side or side already taken');
+      const gameWithP1P2 = gameWithBothPlayers.joinGame(player3);
+
+      const gameState = gameWithP1P2.getState();
+      expect(gameState.players.white).toEqual(player1);
+      expect(gameState.players.black).toEqual(player2);
+      expect(gameState.status).toBe('READY');
     });
 
     it('should preserve existing game state when a player joins', () => {
