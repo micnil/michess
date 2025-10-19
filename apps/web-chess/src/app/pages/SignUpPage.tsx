@@ -1,4 +1,4 @@
-import { Card, Flex, Text } from '@radix-ui/themes';
+import { Card, Flex, Separator, Text } from '@radix-ui/themes';
 import React from 'react';
 import { Link } from '../components/Link';
 import { OrSeparator } from '../components/OrSeparator';
@@ -16,8 +16,14 @@ export const SignUpPage: React.FC = () => {
             subtitle="Create your account to get started"
           />
           <SignUpFormContainer />
-          <OrSeparator />
-          <SocialSignInContainer />
+          {import.meta.env.MODE === 'development' ? (
+            <>
+              <OrSeparator />
+              <SocialSignInContainer />
+            </>
+          ) : (
+            <Separator size="4" />
+          )}
           <Flex align="center" justify="center" gap="2">
             <Text size="2" color="gray">
               Already have an account?
