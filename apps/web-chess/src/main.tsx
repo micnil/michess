@@ -2,6 +2,7 @@ import { getWebInstrumentations, initializeFaro } from '@grafana/faro-web-sdk';
 import { TracingInstrumentation } from '@grafana/faro-web-tracing';
 import '@radix-ui/themes/styles.css';
 import { RouterProvider } from '@tanstack/react-router';
+import 'core-js/stable';
 import * as ReactDOM from 'react-dom/client';
 import './global.css';
 import { router } from './router';
