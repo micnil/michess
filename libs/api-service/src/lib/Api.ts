@@ -20,7 +20,12 @@ const from = (
   authConfig: AuthConfig,
 ): Api => {
   const processId = randomUUID();
-  const gamesService = new GamesService(repos.game, repos.move, repos.action);
+  const gamesService = new GamesService(
+    repos.game,
+    repos.move,
+    repos.action,
+    repos.cache,
+  );
   const authService = new AuthService(
     sql,
     repos.cache,

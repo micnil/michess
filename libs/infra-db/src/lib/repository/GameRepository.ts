@@ -1,6 +1,6 @@
 import { Maybe } from '@michess/common-utils';
 import { GameStatusType } from '@michess/core-game';
-import { and, count, eq, inArray, sql } from 'drizzle-orm';
+import { and, count, eq, inArray, lt, sql } from 'drizzle-orm';
 import { GameStatusEnum } from '../model/GameStatusEnum';
 import { InsertGame } from '../model/InsertGame';
 import { SelectGame } from '../model/SelectGame';
@@ -16,6 +16,11 @@ type QueryOptions = {
   status?: GameStatusType[];
   playerId?: string;
   private?: boolean;
+};
+
+type DeleteGamesOptions = {
+  olderThan: Date;
+  status: GameStatusType;
 };
 
 type QueryGamesResult = {
@@ -130,5 +135,19 @@ export class GameRepository extends BaseRepository {
 
   async deleteGame(id: string): Promise<void> {
     await this.db.delete(games).where(eq(this.schema.games.gameId, id));
+  }
+
+  async deleteGames(options: DeleteGamesOptions): Promise<void> {
+    const result = await this.db
+      .delete(games)
+      .where(
+        and(
+          eq(
+            this.schema.games.status,
+            GameStatusEnum.fromGameStatusType(options.status),
+          ),
+          lt(this.schema.games.createdAt, options.olderThan),
+        ),
+      );
   }
 }
