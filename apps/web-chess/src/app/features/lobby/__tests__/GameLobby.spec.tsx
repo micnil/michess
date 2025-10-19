@@ -8,10 +8,10 @@ import {
 import { GameLobby } from '../GameLobby';
 
 describe('GameLobby', () => {
-  it('should render the game lobby header', () => {
-    const { getByText } = render(<GameLobby />);
+  it('should render the game lobby header', async () => {
+    const { getByText, findByText } = render(<GameLobby />);
 
-    expect(getByText('Lobby')).toBeTruthy();
+    expect(await findByText('Lobby')).toBeTruthy();
     expect(getByText('+ Create Game')).toBeTruthy();
   });
 
@@ -33,9 +33,9 @@ describe('GameLobby', () => {
       data: gameDetailsMockV1,
     });
 
-    const { getByText } = render(<GameLobby onCreateGame={onCreateGame} />);
+    const { findByText } = render(<GameLobby onCreateGame={onCreateGame} />);
 
-    const createButton = getByText('+ Create Game');
+    const createButton = await findByText('+ Create Game');
     expect(createButton).toBeTruthy();
 
     await user.click(createButton);

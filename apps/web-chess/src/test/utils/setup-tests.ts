@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom/vitest';
 import { fetch } from 'cross-fetch';
 import { server } from '../mocks/node-chess';
 global.fetch = fetch;

@@ -6,6 +6,7 @@
       "vitest/globals",
       "vitest/importMeta",
       "vite/client",
+      "@testing-library/jest-dom/vitest",
       "node",
       "vitest",
       "@nx/react/typings/cssmodule.d.ts",
