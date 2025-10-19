@@ -1,0 +1,12 @@
+# Chess Application - Robots.txt
+
+User-agent: *
+
+Disallow: /game/
+Disallow: /welcome
+Disallow: /email-verification
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /api/
+Crawl-delay: 1
+
