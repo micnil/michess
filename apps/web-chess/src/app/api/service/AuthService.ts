@@ -58,6 +58,9 @@ export class AuthService {
   }
 
   async isUsernameAvailable(username: string): Promise<boolean> {
+    if (username.length < 3) {
+      return true;
+    }
     const { data, error } = await this.authClient.isUsernameAvailable({
       username,
     });

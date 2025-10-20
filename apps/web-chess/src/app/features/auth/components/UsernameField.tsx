@@ -17,5 +17,5 @@ export const UsernameField: FC<Props> = ({ isUsernameAvailable, ...props }) => {
     }
   }, [isUsernameAvailable]);
 
-  return <TextField.Root ref={usernameInputRef} {...props} />;
+  return <TextField.Root minLength={3} ref={usernameInputRef} {...props} />;
 };
