@@ -29,5 +29,6 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'pnpm'
+    - run: pnpm install
     - run: pnpm nx run-many -t build
     - run: pnpm test:all
