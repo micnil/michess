@@ -20,7 +20,7 @@ import { SocketRouter } from '../SocketRouter';
 jest.mock('@michess/api-service');
 
 const apiMock: Api = {
-  games: new GamesService({} as never, {} as never, {} as never),
+  games: new GamesService({} as never, {} as never, {} as never, {} as never),
   auth: new AuthService({} as never, {} as never, {} as never, {
     google: { clientId: '', clientSecret: '' },
   }),
@@ -167,15 +167,18 @@ describe('SocketRouter', () => {
 
       apiMock.games.makeMove = jest.fn().mockResolvedValue(undefined);
 
-      clientSocket2.once('move-made', (data) => {
-        expect(data).toEqual(makeMovePayload);
-      });
+      const moveMadePromise = waitFor<MakeMovePayloadV1>(
+        clientSocket2,
+        'move-made',
+      );
 
       const response: MakeMoveResponseV1 = await clientSocket1.emitWithAck(
         'make-move',
         makeMovePayload,
       );
 
+      const data = await moveMadePromise;
+      expect(data).toEqual(makeMovePayload);
       expect(response.status).toEqual('ok');
       expect(response.status === 'ok' && response.data).toEqual(
         makeMovePayload,
