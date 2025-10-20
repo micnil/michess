@@ -105,7 +105,7 @@ export class GamesService {
     } else {
       const updatedGame = chessGame.joinGame(
         // TODO
-        { id: session.userId, name: 'Anonymous' },
+        { id: session.userId, name: session.name ?? 'Anonymous' },
         data.side,
       );
       const updatedGameState = updatedGame.getState();

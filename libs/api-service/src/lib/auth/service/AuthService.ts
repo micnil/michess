@@ -71,6 +71,8 @@ export class AuthService {
         userId: user.id,
         sessionId: session.id,
         token: session.token,
+        name: user.name ?? undefined,
+        username: user.username ?? undefined,
         expiresAt: session.expiresAt,
         userAgent: session.userAgent ?? undefined,
         ipAddress: session.ipAddress ?? undefined,
