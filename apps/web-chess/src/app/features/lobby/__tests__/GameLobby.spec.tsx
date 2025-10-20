@@ -33,10 +33,9 @@ describe('GameLobby', () => {
       data: gameDetailsMockV1,
     });
 
-    const { findByText } = render(<GameLobby onCreateGame={onCreateGame} />);
+    const { findByRole } = render(<GameLobby onCreateGame={onCreateGame} />);
 
-    const createButton = await findByText('+ Create Game');
-    expect(createButton).toBeTruthy();
+    const createButton = await findByRole('button', { name: '+ Create Game' });
 
     await user.click(createButton);
 
