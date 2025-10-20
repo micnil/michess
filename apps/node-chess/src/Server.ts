@@ -27,8 +27,8 @@ const start = (app: App, appConfig: AppConfig): ServerType => {
 
   // graceful shutdown
   process.on('SIGINT', () => {
+    app.close();
     server.close();
-    app.socketRouter.close();
     process.exit(0);
   });
   process.on('SIGTERM', () => {

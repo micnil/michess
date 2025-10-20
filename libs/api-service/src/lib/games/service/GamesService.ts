@@ -10,24 +10,50 @@ import {
   PlayerGameInfoPageResponseV1,
   PlayerGameInfoQueryV1,
 } from '@michess/api-schema';
+import { logger } from '@michess/be-utils';
 import { assertDefined, Maybe } from '@michess/common-utils';
 import { Move } from '@michess/core-board';
 import { ChessGame, GameActionIn } from '@michess/core-game';
 import {
   ActionRepository,
+  CacheRepository,
   GameRepository,
   MoveRepository,
 } from '@michess/infra-db';
+import { Queue, Worker } from 'bullmq';
 import { Session } from '../../auth/model/Session';
 import { PageResponseMapper } from '../../mapper/PageResponseMapper';
 import { GameDetailsMapper } from '../mapper/GameDetailsMapper';
 
 export class GamesService {
+  private gameCleanupQueue: Queue;
+  private gameCleanupWorker: Worker;
   constructor(
     private gameRepository: GameRepository,
     private moveRepository: MoveRepository,
     private actionRepository: ActionRepository,
-  ) {}
+    private cacheRepo: CacheRepository,
+  ) {
+    const connectionOptions = { connection: this.cacheRepo.client };
+    this.gameCleanupQueue = new Queue(`game-cleanup`, connectionOptions);
+    this.gameCleanupWorker = new Worker(
+      `game-cleanup`,
+      this.cleanupGames.bind(this),
+      connectionOptions,
+    );
+  }
+
+  async close() {
+    logger.info('Closing games service');
+    await this.gameCleanupWorker.close();
+    await this.gameCleanupQueue.close();
+  }
+
+  async initialize() {
+    await this.gameCleanupQueue.upsertJobScheduler('cleanup-games', {
+      pattern: '0 3 * * *',
+    });
+  }
 
   async createGame(data: CreateGameV1): Promise<GameDetailsV1> {
     const createdGame = await this.gameRepository.createGame({
@@ -206,6 +232,15 @@ export class GamesService {
     return GameDetailsMapper.toGameDetailsV1({
       game: updatedGameState,
       availableActions: updatedGame.getAdditionalActions(),
+    });
+  }
+
+  async cleanupGames(): Promise<void> {
+    logger.info('Cleaning up empty games...');
+    const cutoffDate = new Date(Date.now() - 24 * 60 * 60 * 1000); // 24 hours ago
+    await this.gameRepository.deleteGames({
+      status: 'EMPTY',
+      olderThan: cutoffDate,
     });
   }
 }

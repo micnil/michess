@@ -1,5 +1,5 @@
 import { Maybe } from '@michess/common-utils';
-import { Card, Flex, Text } from '@radix-ui/themes';
+import { Card, Flex } from '@radix-ui/themes';
 import { FC } from 'react';
 import { useAuth } from '../api/hooks/useAuth';
 import { Link } from '../components/Link';
@@ -25,9 +25,6 @@ export const WelcomePage: FC<Props> = ({ type }) => {
           />
           {type === 'social' && (
             <Flex direction="column" gap="2">
-              <Text as={'label'} color="gray">
-                Change username
-              </Text>
               <UsernameFormContainer />
             </Flex>
           )}

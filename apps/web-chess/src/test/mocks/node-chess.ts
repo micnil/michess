@@ -14,6 +14,7 @@ export const mswHandlers = [
         image: null,
         id: 'test-user-id',
         name: 'Test User',
+        username: 'testuser',
         email: 'test@example.com',
       },
       session: {

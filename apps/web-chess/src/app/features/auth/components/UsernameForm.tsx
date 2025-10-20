@@ -1,4 +1,4 @@
-import { Button, Flex } from '@radix-ui/themes';
+import { Box, Button, Flex, Text } from '@radix-ui/themes';
 import { FC } from 'react';
 import { Alert } from '../../../components/Alert';
 import { UsernameField } from './UsernameField';
@@ -32,17 +32,22 @@ export const UsernameForm: FC<Props> = ({
     >
       <Flex direction="column" gap="3">
         <Alert text={error} />
-
-        <UsernameField
-          name="username"
-          defaultValue={initialUsername}
-          type="text"
-          placeholder="Username"
-          isUsernameAvailable={isUsernameAvailable}
-          required
-          disabled={isLoading}
-          onChange={(e) => onUsernameChange(e.target.value)}
-        />
+        <Box>
+          <Text as="label" htmlFor="username">
+            Username
+          </Text>
+          <UsernameField
+            id="username"
+            name="username"
+            defaultValue={initialUsername}
+            type="text"
+            placeholder="Username"
+            isUsernameAvailable={isUsernameAvailable}
+            required
+            disabled={isLoading}
+            onChange={(e) => onUsernameChange(e.target.value)}
+          />
+        </Box>
 
         <Button
           mt={'1'}

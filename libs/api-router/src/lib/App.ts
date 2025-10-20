@@ -11,6 +11,7 @@ export type App = {
   restRouter: Hono<any>;
   socketRouter: Server;
   init: () => Promise<void>;
+  close: () => Promise<void>;
 };
 
 const from = (
@@ -24,7 +25,13 @@ const from = (
     restRouter,
     socketRouter,
     init: async () => {
+      await api.games.initialize();
       await api.usageMetrics.initialize();
+    },
+    close: async () => {
+      socketRouter.close();
+      await api.games.close();
+      await api.usageMetrics.close();
     },
   };
 };
