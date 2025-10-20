@@ -1,6 +1,7 @@
 import { Box, Flex, Grid } from '@radix-ui/themes';
 import { useNavigate } from '@tanstack/react-router';
 import React from 'react';
+import { WelcomeCard } from '../components/WelcomeCard';
 import { GameLobby } from '../features/lobby/GameLobby';
 import { StatsContainer } from '../features/metrics/StatsContainer';
 import { Footer } from '../features/navigation/Footer';
@@ -25,6 +26,10 @@ export const HomePage: React.FC = () => {
       }}
     >
       <Box style={{ flex: 1 }}>
+        <Box px={{ initial: '2', lg: '0' }} mb="4">
+          <WelcomeCard />
+        </Box>
+
         <Grid
           columns={{ initial: '1', sm: '2fr 1fr' }}
           gap="4"
