@@ -9,7 +9,7 @@ export default defineConfig({
   cacheDir: '../../node_modules/.vite/apps/web-chess',
   server: {
     port: 4200,
-    host: 'localhost',
+    host: true,
     proxy: {
       '/api': 'http://localhost:5000',
       '/socket.io': {

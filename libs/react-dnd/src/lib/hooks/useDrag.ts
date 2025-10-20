@@ -42,7 +42,7 @@ export const useDrag = ({ id }: Options): Drag => {
   const draggingId = useDragDropStore((state) => state.draggingId);
   const handlePress = useDragDropStore((state) => state.handlePress);
 
-  const isPressing = useDragDropStore((state) => state.isPressing);
+  const isPressing = useDragDropStore((state) => !!state.pressedAt);
   const previewPosition: Maybe<Position> = usePointerStore((state) =>
     draggingId === id && !!previewRef.current ? state.position : undefined,
   );
