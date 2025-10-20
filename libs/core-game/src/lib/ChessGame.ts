@@ -116,12 +116,12 @@ const joinGame = (
   } else if (sideToJoin === 'white' && players.white === undefined) {
     return {
       ...players,
-      white: { id: playerInfo.id, name: playerInfo.name },
+      white: playerInfo,
     };
   } else if (sideToJoin === 'black' && players.black === undefined) {
     return {
       ...players,
-      black: { id: playerInfo.id, name: playerInfo.name },
+      black: playerInfo,
     };
   } else {
     throw new Error('Invalid side or side already taken');

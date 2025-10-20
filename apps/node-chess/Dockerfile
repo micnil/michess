@@ -4,7 +4,7 @@
 #
 # Sets up the base Node.js environment with PNPM package manager.
 # =================================================================================================
-ARG NODE_VERSION=20
+ARG NODE_VERSION=24
 FROM node:${NODE_VERSION}-slim AS base
 
 ENV PNPM_HOME="/pnpm"
