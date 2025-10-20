@@ -69,6 +69,8 @@ describe('SocketRouter', () => {
     userId: 'test-user-id',
     sessionId: 'test-session-id',
     token: 'test-token',
+    name: 'Test User',
+    username: 'testuser',
     expiresAt: new Date(Date.now() + 3600000),
     userAgent: 'test-agent',
     ipAddress: '127.0.0.1',
