@@ -4,9 +4,8 @@ A modern chess application built with React, Next.js, and TypeScript. Features a
 
 ## Screenshots
 
-![Desktop View](screenshots/desktop-view.png)
-
-![Mobile View](screenshots/mobile-view.png)
+<img src="screenshots/desktop-view.png" width="250"/>
+<img src="screenshots/mobile-view.png" height="183"/>
 
 ## Development setup
 
