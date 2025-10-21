@@ -1,6 +1,5 @@
 import { DrawReasonV1, GameActionOptionV1 } from '@michess/api-schema';
-import { Button, Flex, IconButton, Popover } from '@radix-ui/themes';
-import { Separator } from '@radix-ui/themes/dist/cjs/components/context-menu';
+import { Button, Flex, IconButton, Popover, Separator } from '@radix-ui/themes';
 import { ArrowBigLeftIcon, ArrowBigRightIcon, MenuIcon } from 'lucide-react';
 import { FC } from 'react';
 import { Alert } from '../../../components/Alert';
