@@ -1,4 +1,3 @@
-import { noop } from '@michess/common-utils';
 import { useMutation } from '@tanstack/react-query';
 import { useApi } from '../../../api/hooks/useApi';
 import { SocialSignIn } from '../components/SocialSignIn';
@@ -10,11 +9,5 @@ export const SocialSignInContainer = () => {
       await api.auth.signInWithGoogle();
     },
   });
-  return (
-    <SocialSignIn
-      isLoading={isPending}
-      onGoogleSignIn={mutate}
-      onFacebookSignIn={noop}
-    />
-  );
+  return <SocialSignIn isLoading={isPending} onGoogleSignIn={mutate} />;
 };
