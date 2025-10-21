@@ -175,6 +175,7 @@ export class AuthService {
   async signInWithGoogle(): Promise<void> {
     const { data, error } = await this.authClient.signIn.social({
       provider: 'google',
+      newUserCallbackURL: '/welcome?type=social',
       callbackURL: '/',
     });
     if (error) {
