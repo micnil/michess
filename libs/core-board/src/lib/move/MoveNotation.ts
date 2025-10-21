@@ -7,7 +7,9 @@ import { CastlingRight } from '../position/model/CastlingRight';
 import { ChessPosition } from '../position/model/ChessPosition';
 import { PiecePlacements } from '../position/model/PiecePlacements';
 import { MoveGenerator } from './generator/MoveGenerator';
+import { Move } from './Move';
 import { MoveOption } from './MoveOption';
+import { MoveRecord } from './MoveRecord';
 
 export type MoveNotation = {
   displayStr: string;
@@ -114,13 +116,20 @@ const moveOptionToSan = (
 /**
  * Generate move notation from a chess position and move
  */
-const from = (position: ChessPosition, move: MoveOption): MoveNotation => {
+const from = (position: ChessPosition, move: MoveRecord): MoveNotation => {
   const moveGen = MoveGenerator(position);
   const legalMoves = moveGen.generateMoves();
-  const { position: nextPosition } = ChessPosition.makeMove(position, move);
+  const moveOption = legalMoves.moves.find((m) =>
+    Move.isEqual(move, MoveOption.toMove(m)),
+  );
+  assertDefined(moveOption, `Move option not found for move record`);
+  const { position: nextPosition } = ChessPosition.makeMove(
+    position,
+    moveOption,
+  );
   const nextMoveGen = MoveGenerator(nextPosition);
   const { isCheck, isCheckmate } = nextMoveGen.generateMoves();
-  const san = moveOptionToSan(move, position.pieces, legalMoves.moves);
+  const san = moveOptionToSan(moveOption, position.pieces, legalMoves.moves);
 
   return {
     displayStr: addCheckNotation(san, isCheck, isCheckmate),

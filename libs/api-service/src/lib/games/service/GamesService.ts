@@ -130,7 +130,6 @@ export class GamesService {
       return GameDetailsMapper.toGameDetailsV1({ game: gameDetails });
     } else {
       const updatedGame = chessGame.joinGame(
-        // TODO
         { id: session.userId, name: session.name ?? 'Anonymous' },
         data.side,
       );

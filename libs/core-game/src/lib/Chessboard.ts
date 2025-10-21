@@ -5,6 +5,7 @@ import {
   MoveGenerator,
   MoveNotation,
   MoveOption,
+  MoveRecord,
   Piece,
   PiecePlacements,
   PieceType,
@@ -16,7 +17,7 @@ type BoardState = {
   positionHash: ZobristHash;
 };
 type BoardStateHistoryItem = BoardState & {
-  playedMove: MoveOption;
+  playedMove: MoveRecord;
 };
 
 export type Chessboard = BoardState & {
@@ -151,7 +152,7 @@ const from = (
       return moveGen.generateMoves().moves;
     },
     get movesRecord() {
-      return history.map((item) => MoveOption.toMove(item.playedMove));
+      return history.map((item) => item.playedMove);
     },
     get moveNotations() {
       return history.map<MoveNotation>((item) => {
@@ -180,19 +181,25 @@ const from = (
     perft: (depth: number) => {
       return perft(state, depth);
     },
-    playMove: (move: Move): Chessboard => {
+    playMove: (move: Move | MoveRecord): Chessboard => {
       const moveOption = moveGen
         .generateMoves()
         .moves.find((m) => Move.isEqual(MoveOption.toMove(m), move));
       if (moveOption) {
         const newHistory = history.slice();
-        newHistory.push({ ...state, playedMove: moveOption });
+        const playedMove = MoveRecord.isRecord(move)
+          ? move
+          : MoveRecord.fromMove(move);
+        newHistory.push({
+          ...state,
+          playedMove,
+        });
         return from(makeMove(state, moveOption).boardState, newHistory);
       } else {
         throw new Error(`Invalid move: ${Move.toUci(move)}`);
       }
     },
-    playMoves: (moves: Move[]): Chessboard => {
+    playMoves: (moves: Move[] | MoveRecord[]): Chessboard => {
       let board = from(state, history);
       for (const move of moves) {
         board = board.playMove(move);
@@ -203,8 +210,7 @@ const from = (
       // Find the first move that doesn't match between current history and target moves
       const indexOfFirstNonMatchingMove = history.findIndex((item, index) => {
         return (
-          index >= moves.length ||
-          !Move.isEqual(moves[index], MoveOption.toMove(item.playedMove))
+          index >= moves.length || !Move.isEqual(moves[index], item.playedMove)
         );
       });
 
@@ -249,7 +255,7 @@ const from = (
 
 const fromPosition = (
   position: ChessPosition,
-  moves: Move[] = [],
+  moves: Move[] | MoveRecord[] = [],
 ): Chessboard => {
   const positionHash = ZobristHash.fromChessPosition(position);
   let board = from({ position, positionHash });

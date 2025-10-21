@@ -18,6 +18,7 @@ export * from './lib/move/generator/MoveGenerator';
 export * from './lib/move/Move';
 export * from './lib/move/MoveNotation';
 export * from './lib/move/MoveOption';
+export * from './lib/move/MoveRecord';
 export * from './lib/position/model/CastlingAbility';
 export * from './lib/position/model/CastlingRight';
 export * from './lib/position/model/ChessPosition';
