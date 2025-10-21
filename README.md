@@ -2,6 +2,12 @@
 
 A modern chess application built with React, Next.js, and TypeScript. Features a interactive chessboard with move validation and game state management.
 
+## Screenshots
+
+![Desktop View](screenshots/desktop-view.png)
+
+![Mobile View](screenshots/mobile-view.png)
+
 ## Development setup
 
 1. Install dependencies:
