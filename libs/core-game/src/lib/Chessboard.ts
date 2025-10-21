@@ -29,11 +29,11 @@ export type Chessboard = BoardState & {
   isInsufficientMaterial: boolean;
   initialPosition: ChessPosition;
   moveOptions: MoveOption[];
-  movesRecord: Move[];
+  movesRecord: MoveRecord[];
   moveNotations: MoveNotation[];
-  playMove: (move: Move) => Chessboard;
-  playMoves: (moves: Move[]) => Chessboard;
-  updateMoves: (moves: Move[]) => Chessboard;
+  playMove: (move: Move | MoveRecord) => Chessboard;
+  playMoves: (moves: (Move | MoveRecord)[]) => Chessboard;
+  updateMoves: (moves: (Move | MoveRecord)[]) => Chessboard;
   unmakeMove: (toMoveNumber?: number) => Chessboard;
   perft: (depth: number) => { nodes: number };
 };

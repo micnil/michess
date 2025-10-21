@@ -8,6 +8,7 @@ export const moves = pgTable('moves', {
     .references(() => games.gameId, { onDelete: 'cascade' })
     .notNull(),
   uci: varchar('uci', { length: 10 }).notNull(),
+  movedAt: timestamp('moved_at').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 

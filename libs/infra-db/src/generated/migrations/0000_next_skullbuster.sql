@@ -49,6 +49,7 @@ CREATE TABLE "moves" (
 	"move_id" serial PRIMARY KEY NOT NULL,
 	"game_id" uuid NOT NULL,
 	"uci" varchar(10) NOT NULL,
+	"moved_at" timestamp NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint

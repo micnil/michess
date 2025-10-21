@@ -1,5 +1,5 @@
 {
-  "id": "9256b84b-f033-41fe-b9b4-2bcbae93588e",
+  "id": "d79f908f-7524-4e73-9300-5446346c1ac2",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -325,6 +325,12 @@
         "uci": {
           "name": "uci",
           "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "moved_at": {
+          "name": "moved_at",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true
         },

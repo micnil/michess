@@ -147,7 +147,10 @@ export const GameDetailsMapper = {
       initialPosition: ChessPosition.standardInitial(),
       result: toChessGameResult(game),
       resultStr: game.result,
-      movesRecord: game.moves.map((move) => Move.fromUci(move.uci)),
+      movesRecord: game.moves.map((move) => ({
+        ...Move.fromUci(move.uci),
+        timestamp: move.movedAt.getTime(),
+      })),
     };
   },
 

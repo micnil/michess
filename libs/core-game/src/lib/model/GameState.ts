@@ -1,5 +1,5 @@
 import { Maybe } from '@michess/common-utils';
-import { ChessPosition, Move } from '@michess/core-board';
+import { ChessPosition, MoveRecord } from '@michess/core-board';
 import { GameAction } from '../actions/model/GameAction';
 import { ChessGameResult } from './ChessGameResult';
 import { GameMeta } from './GameMeta';
@@ -13,7 +13,7 @@ export type GameState = GameMeta & {
   resultStr: string;
   initialPosition: ChessPosition;
   actionRecord: GameAction[];
-  movesRecord: Move[];
+  movesRecord: MoveRecord[];
 };
 
 export const GameState = {

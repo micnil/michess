@@ -183,11 +183,15 @@ export class GamesService {
     const chessGame = ChessGame.fromGameState(gameDetails);
     const updatedGame = chessGame.play(session.userId, moveToPlay);
     const updatedGameState = updatedGame.getState();
+    const newMove = updatedGameState.movesRecord.at(-1);
 
-    await this.moveRepository.createMove({
-      gameId: gameDetails.id,
-      uci: data.uci,
-    });
+    if (newMove) {
+      await this.moveRepository.createMove({
+        gameId: gameDetails.id,
+        uci: data.uci,
+        movedAt: new Date(newMove.timestamp),
+      });
+    }
 
     if (
       chessGame.hasNewStatus(updatedGame) ||

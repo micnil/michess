@@ -1,6 +1,6 @@
 {
-  "id": "f92f20fb-b05e-4979-9606-744c455f2023",
-  "prevId": "9256b84b-f033-41fe-b9b4-2bcbae93588e",
+  "id": "06a1c4a0-d4f9-482d-bb8b-15fca0fb1409",
+  "prevId": "d79f908f-7524-4e73-9300-5446346c1ac2",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -325,6 +325,12 @@
         "uci": {
           "name": "uci",
           "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "moved_at": {
+          "name": "moved_at",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true
         },
