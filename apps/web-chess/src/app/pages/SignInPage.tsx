@@ -1,4 +1,4 @@
-import { Card, Flex, Separator, Text } from '@radix-ui/themes';
+import { Card, Flex, Text } from '@radix-ui/themes';
 
 import React from 'react';
 import { Link } from '../components/Link';
@@ -29,14 +29,8 @@ export const SignInPage: React.FC<Props> = ({ referer }) => {
           )}
 
           <SignInFormContainer />
-          {import.meta.env.MODE === 'development' ? (
-            <>
-              <OrSeparator />
-              <SocialSignInContainer />
-            </>
-          ) : (
-            <Separator size="4" />
-          )}
+          <OrSeparator />
+          <SocialSignInContainer />
 
           <Flex align="center" justify="center" gap="2">
             <Text size="2" color="gray">

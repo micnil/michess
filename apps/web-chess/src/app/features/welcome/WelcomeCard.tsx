@@ -1,7 +1,7 @@
 import { Box, Button, Card, Flex, Grid, Heading, Text } from '@radix-ui/themes';
 import { XIcon } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../api/hooks/useAuth';
+import { useAuth } from '../../api/hooks/useAuth';
 
 export const WelcomeCard: React.FC = () => {
   const { auth, isLoading } = useAuth();

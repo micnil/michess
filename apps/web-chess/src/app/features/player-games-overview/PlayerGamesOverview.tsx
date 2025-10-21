@@ -2,7 +2,7 @@ import { Card, Flex, Heading, Tabs } from '@radix-ui/themes';
 import React from 'react';
 import { useApi } from '../../api/hooks/useApi';
 import { Alert } from '../../components/Alert';
-import { TabTriggerNotification } from '../../components/TabTriggerNotification';
+import { TabNotification } from '../../components/TabNotification';
 import { useQuery } from '../../util/useQuery';
 import { EndedGameList } from './component/EndedGameList';
 import { OngoingGameList } from './component/OngoingGameList';
@@ -54,7 +54,7 @@ export const PlayerGamesOverview: React.FC<Props> = ({ onJoinGame }) => {
             <Tabs.Trigger value="ongoing">
               <Flex align="center" gap="1">
                 Ongoing
-                {hasPlayerTurnGames && <TabTriggerNotification />}
+                {hasPlayerTurnGames && <TabNotification />}
               </Flex>
             </Tabs.Trigger>
             <Tabs.Trigger value="completed">Completed</Tabs.Trigger>

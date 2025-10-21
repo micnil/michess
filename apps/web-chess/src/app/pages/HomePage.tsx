@@ -1,11 +1,11 @@
 import { Box, Flex, Grid } from '@radix-ui/themes';
 import { useNavigate } from '@tanstack/react-router';
 import React from 'react';
-import { WelcomeCard } from '../components/WelcomeCard';
 import { GameLobby } from '../features/lobby/GameLobby';
 import { StatsContainer } from '../features/metrics/StatsContainer';
 import { Footer } from '../features/navigation/Footer';
 import { PlayerGamesOverview } from '../features/player-games-overview/PlayerGamesOverview';
+import { WelcomeCard } from '../features/welcome/WelcomeCard';
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();

@@ -1,6 +1,6 @@
 import { Box } from '@radix-ui/themes';
 
-export const TabTriggerNotification: React.FC = () => {
+export const TabNotification: React.FC = () => {
   return (
     <Box
       width={'6px'}
