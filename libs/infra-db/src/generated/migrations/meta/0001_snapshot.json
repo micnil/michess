@@ -1,6 +1,6 @@
 {
-  "id": "06a1c4a0-d4f9-482d-bb8b-15fca0fb1409",
-  "prevId": "d79f908f-7524-4e73-9300-5446346c1ac2",
+  "id": "ad053b9e-f9bd-47f1-95d6-cbe91a4254c8",
+  "prevId": "f954f2f9-697a-40c2-a478-7a0259ea0ac7",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -221,6 +221,20 @@
           "primaryKey": false,
           "notNull": false
         },
+        "time_control_classification": {
+          "name": "time_control_classification",
+          "type": "time_control_classification",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'no_clock'"
+        },
+        "time_control": {
+          "name": "time_control",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
         "status": {
           "name": "status",
           "type": "game_status",
@@ -237,8 +251,8 @@
           "notNull": true,
           "default": "'0-0'"
         },
-        "resultReason": {
-          "name": "resultReason",
+        "result_reason": {
+          "name": "result_reason",
           "type": "result_reason",
           "typeSchema": "public",
           "primaryKey": false,
@@ -303,7 +317,20 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "checkConstraints": {},
+      "checkConstraints": {
+        "time_control_standard_check": {
+          "name": "time_control_standard_check",
+          "value": "(\n        \"games\".\"time_control_classification\" NOT IN ('bullet', 'blitz', 'rapid')\n        OR (\n          \"games\".\"time_control\" IS NOT NULL\n          AND \"games\".\"time_control\"->>'initial' IS NOT NULL\n          AND \"games\".\"time_control\"->>'increment' IS NOT NULL\n        )\n      )"
+        },
+        "time_control_correspondence_check": {
+          "name": "time_control_correspondence_check",
+          "value": "(\n        \"games\".\"time_control_classification\" != 'correspondence'\n        OR (\n          \"games\".\"time_control\" IS NOT NULL\n          AND \"games\".\"time_control\"->>'daysPerMove' IS NOT NULL\n        )\n      )"
+        },
+        "time_control_no_clock_check": {
+          "name": "time_control_no_clock_check",
+          "value": "(\n        \"games\".\"time_control_classification\" != 'no_clock'\n        OR \"games\".\"time_control\" IS NULL\n      )"
+        }
+      },
       "isRLSEnabled": false
     },
     "public.moves": {
@@ -555,6 +582,17 @@
         "timeout",
         "resignation",
         "abandoned"
+      ]
+    },
+    "public.time_control_classification": {
+      "name": "time_control_classification",
+      "schema": "public",
+      "values": [
+        "correspondence",
+        "blitz",
+        "bullet",
+        "rapid",
+        "no_clock"
       ]
     },
     "public.variant": {

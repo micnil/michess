@@ -21,6 +21,7 @@ const from = (pgClient: Sql): DatabaseClient => {
     client: pgClient,
     schema,
     logger: dbLogger,
+    casing: 'snake_case',
   });
 
   return drizzleClient;

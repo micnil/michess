@@ -6,6 +6,7 @@ export * from './shared/colorEnum';
 export * from './shared/gameStatusEnum';
 export * from './shared/resultEnum';
 export * from './shared/resultReasonEnum';
+export * from './shared/timeControlClassificationEnum';
 export * from './shared/variantEnum';
 export * from './users';
 export * from './verifications';

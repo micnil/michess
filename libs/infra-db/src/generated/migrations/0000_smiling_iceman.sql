@@ -3,6 +3,7 @@ CREATE TYPE "public"."color" AS ENUM('white', 'black');--> statement-breakpoint
 CREATE TYPE "public"."game_status" AS ENUM('empty', 'waiting', 'ready', 'in-progress', 'end');--> statement-breakpoint
 CREATE TYPE "public"."result" AS ENUM('1-0', '0-1', '1/2-1/2', '0-0');--> statement-breakpoint
 CREATE TYPE "public"."result_reason" AS ENUM('checkmate', 'stalemate', 'timeout', 'resignation', 'abandoned');--> statement-breakpoint
+CREATE TYPE "public"."time_control_classification" AS ENUM('correspondence', 'blitz', 'bullet', 'rapid', 'no_clock');--> statement-breakpoint
 CREATE TYPE "public"."variant" AS ENUM('standard');--> statement-breakpoint
 CREATE TABLE "accounts" (
 	"id" text PRIMARY KEY NOT NULL,
@@ -36,13 +37,34 @@ CREATE TABLE "games" (
 	"is_private" boolean DEFAULT false NOT NULL,
 	"white_player_id" text,
 	"black_player_id" text,
+	"time_control_classification" time_control_classification DEFAULT 'no_clock' NOT NULL,
+	"time_control" jsonb,
 	"status" "game_status" DEFAULT 'empty' NOT NULL,
 	"result" "result" DEFAULT '0-0' NOT NULL,
-	"resultReason" "result_reason",
+	"result_reason" "result_reason",
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	"started_at" timestamp,
-	"ended_at" timestamp
+	"ended_at" timestamp,
+	CONSTRAINT "time_control_standard_check" CHECK ((
+        "games"."time_control_classification" NOT IN ('bullet', 'blitz', 'rapid')
+        OR (
+          "games"."time_control" IS NOT NULL
+          AND "games"."time_control"->>'initial' IS NOT NULL
+          AND "games"."time_control"->>'increment' IS NOT NULL
+        )
+      )),
+	CONSTRAINT "time_control_correspondence_check" CHECK ((
+        "games"."time_control_classification" != 'correspondence'
+        OR (
+          "games"."time_control" IS NOT NULL
+          AND "games"."time_control"->>'daysPerMove' IS NOT NULL
+        )
+      )),
+	CONSTRAINT "time_control_no_clock_check" CHECK ((
+        "games"."time_control_classification" != 'no_clock'
+        OR "games"."time_control" IS NULL
+      ))
 );
 --> statement-breakpoint
 CREATE TABLE "moves" (
