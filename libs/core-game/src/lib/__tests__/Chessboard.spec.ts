@@ -4,6 +4,7 @@ import {
   FenStr,
   Move,
   MoveOption,
+  MoveRecord,
 } from '@michess/core-board';
 import { Chessboard } from '../Chessboard';
 import { castlingTestCases } from './test-cases/castling';
@@ -460,10 +461,9 @@ describe('Chessboard', () => {
         turn: 'white',
       });
 
-      // Start with some moves played
-      const moves: Move[] = [
-        { from: 'e2', to: 'e4' },
-        { from: 'e7', to: 'e5' },
+      const moves: MoveRecord[] = [
+        { from: 'e2', to: 'e4', timestamp: 0 },
+        { from: 'e7', to: 'e5', timestamp: 1 },
       ];
       const board = Chessboard.fromPosition(initialPosition, moves);
 
@@ -497,11 +497,11 @@ describe('Chessboard', () => {
       ]);
 
       // Update with additional moves
-      const newMoves: Move[] = [
-        { from: 'e2', to: 'e4' },
-        { from: 'e7', to: 'e5' },
-        { from: 'd2', to: 'd4' },
-        { from: 'd7', to: 'd6' },
+      const newMoves: MoveRecord[] = [
+        { from: 'e2', to: 'e4', timestamp: 0 },
+        { from: 'e7', to: 'e5', timestamp: 1 },
+        { from: 'd2', to: 'd4', timestamp: 2 },
+        { from: 'd7', to: 'd6', timestamp: 3 },
       ];
 
       const updatedBoard = board.updateMoves(newMoves);
@@ -533,10 +533,10 @@ describe('Chessboard', () => {
       ]);
 
       // Update with moves that diverge at second move
-      const newMoves: Move[] = [
-        { from: 'e2', to: 'e4' },
-        { from: 'd7', to: 'd6' }, // Different from e7-e5
-        { from: 'f2', to: 'f4' }, // Different continuation
+      const newMoves: MoveRecord[] = [
+        { from: 'e2', to: 'e4', timestamp: 0 },
+        { from: 'd7', to: 'd6', timestamp: 1 }, // Different from e7-e5
+        { from: 'f2', to: 'f4', timestamp: 2 }, // Different continuation
       ];
 
       const updatedBoard = board.updateMoves(newMoves);
@@ -577,9 +577,9 @@ describe('Chessboard', () => {
       ]);
 
       // Update with fewer moves
-      const shorterMoves: Move[] = [
-        { from: 'e2', to: 'e4' },
-        { from: 'e7', to: 'e5' },
+      const shorterMoves: MoveRecord[] = [
+        { from: 'e2', to: 'e4', timestamp: 0 },
+        { from: 'e7', to: 'e5', timestamp: 1 },
       ];
 
       const updatedBoard = board.updateMoves(shorterMoves);
