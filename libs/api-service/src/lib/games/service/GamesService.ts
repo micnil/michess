@@ -6,6 +6,7 @@ import {
   LobbyPageResponseV1,
   MakeActionPayloadV1,
   MakeMovePayloadV1,
+  MoveMadeV1,
   PaginationQueryV1,
   PlayerGameInfoPageResponseV1,
   PlayerGameInfoQueryV1,
@@ -60,8 +61,14 @@ export class GamesService {
       variant: 'standard',
       isPrivate: data.isPrivate ?? false,
     });
-    const gameDetails = GameDetailsMapper.fromSelectGame(createdGame);
-    return GameDetailsMapper.toGameDetailsV1({ game: gameDetails });
+    const chessGame = ChessGame.fromGameState(
+      GameDetailsMapper.fromSelectGame(createdGame),
+    );
+    const gameState = chessGame.getState();
+    return GameDetailsMapper.toGameDetailsV1({
+      game: gameState,
+      clock: chessGame.clock.instant,
+    });
   }
 
   async queryLobby(query: PaginationQueryV1): Promise<LobbyPageResponseV1> {
@@ -127,7 +134,10 @@ export class GamesService {
     const chessGame = ChessGame.fromGameState(gameDetails);
 
     if (data.side === 'spectator') {
-      return GameDetailsMapper.toGameDetailsV1({ game: gameDetails });
+      return GameDetailsMapper.toGameDetailsV1({
+        game: gameDetails,
+        clock: chessGame.clock.instant,
+      });
     } else {
       const updatedGame = chessGame.joinGame(
         { id: session.userId, name: session.name ?? 'Anonymous' },
@@ -140,6 +150,7 @@ export class GamesService {
       );
       return GameDetailsMapper.toGameDetailsV1({
         game: updatedGameState,
+        clock: updatedGame.clock.instant,
         availableActions: updatedGame.getAdditionalActions(),
       });
     }
@@ -166,6 +177,7 @@ export class GamesService {
       return GameDetailsMapper.toGameDetailsV1({
         game: updatedGameState,
         availableActions: updatedGame.getAdditionalActions(),
+        clock: updatedGame.clock.instant,
       });
     }
   }
@@ -173,7 +185,7 @@ export class GamesService {
   async makeMove(
     session: Session,
     data: MakeMovePayloadV1,
-  ): Promise<Maybe<GameDetailsV1>> {
+  ): Promise<{ gameDetails: Maybe<GameDetailsV1>; move: MoveMadeV1 }> {
     const dbGame = await this.gameRepository.findGameWithRelationsById(
       data.gameId,
     );
@@ -184,14 +196,12 @@ export class GamesService {
     const updatedGame = chessGame.play(session.userId, moveToPlay);
     const updatedGameState = updatedGame.getState();
     const newMove = updatedGameState.movesRecord.at(-1);
-
-    if (newMove) {
-      await this.moveRepository.createMove({
-        gameId: gameDetails.id,
-        uci: data.uci,
-        movedAt: new Date(newMove.timestamp),
-      });
-    }
+    assertDefined(newMove, 'No move found after playing move');
+    const selectMove = await this.moveRepository.createMove({
+      gameId: gameDetails.id,
+      uci: data.uci,
+      movedAt: new Date(newMove.timestamp),
+    });
 
     if (
       chessGame.hasNewStatus(updatedGame) ||
@@ -201,12 +211,27 @@ export class GamesService {
         gameDetails.id,
         GameDetailsMapper.toInsertGame(updatedGameState),
       );
-      return GameDetailsMapper.toGameDetailsV1({
-        game: updatedGameState,
-        availableActions: updatedGame.getAdditionalActions(),
-      });
+      return {
+        gameDetails: GameDetailsMapper.toGameDetailsV1({
+          game: updatedGameState,
+          clock: updatedGame.clock.instant,
+          availableActions: updatedGame.getAdditionalActions(),
+        }),
+        move: {
+          gameId: data.gameId,
+          uci: data.uci,
+          clock: updatedGame.clock.instant,
+        },
+      };
     } else {
-      return undefined;
+      return {
+        move: {
+          gameId: data.gameId,
+          uci: data.uci,
+          clock: updatedGame.clock.instant,
+        },
+        gameDetails: undefined,
+      };
     }
   }
 
@@ -235,6 +260,7 @@ export class GamesService {
     return GameDetailsMapper.toGameDetailsV1({
       game: updatedGameState,
       availableActions: updatedGame.getAdditionalActions(),
+      clock: updatedGame.clock.instant,
     });
   }
 

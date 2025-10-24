@@ -26,6 +26,7 @@ export * from './lib/game/MakeActionPayloadV1Schema';
 export * from './lib/game/MakeMovePayloadV1';
 export * from './lib/game/MakeMovePayloadV1Schema';
 export * from './lib/game/MakeMoveResponseV1';
+export * from './lib/game/MoveMadeV1';
 export * from './lib/lobby/LobbyGameItemV1';
 export * from './lib/lobby/LobbyPageResponseV1';
 export * from './lib/metrics/UsageMetricsV1';

@@ -4,5 +4,5 @@ export type TimeControlJsonB =
       increment: number;
     }
   | {
-      daysPerMove?: number;
+      daysPerMove: number;
     };

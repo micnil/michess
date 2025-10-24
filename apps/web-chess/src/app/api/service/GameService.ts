@@ -2,7 +2,7 @@ import {
   GameActionOptionV1,
   GameDetailsV1,
   LobbyPageResponseV1,
-  MakeMovePayloadV1,
+  MoveMadeV1,
   PlayerGameInfoPageResponseV1,
 } from '@michess/api-schema';
 import { Maybe, Observable } from '@michess/common-utils';
@@ -180,7 +180,7 @@ export class GameService {
   observeMovesForGame(gameId: string): Observable<Move> {
     return {
       subscribe: (callback: (move: Move) => void) => {
-        const handleMove = (movePayload: MakeMovePayloadV1) => {
+        const handleMove = (movePayload: MoveMadeV1) => {
           if (movePayload.gameId === gameId) {
             try {
               const move = Move.fromUci(movePayload.uci);

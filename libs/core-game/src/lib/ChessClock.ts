@@ -1,48 +1,12 @@
 import { Maybe } from '@michess/common-utils';
 import { Color } from '@michess/core-board';
+import { ClockInstant } from './model/ClockInstant';
 import { ClockSettings } from './model/ClockSettings';
 import { GameState } from './model/GameState';
 
 const MS_PER_SEC = 1000;
 
 const daysToMs = (days: number): number => days * 24 * 60 * 60 * MS_PER_SEC;
-
-type ClockInstant = {
-  whiteMs: number;
-  blackMs: number;
-};
-
-const ClockInstant = {
-  fromSettings(clockSettings: ClockSettings): ClockInstant {
-    if (clockSettings.type === 'standard') {
-      return {
-        whiteMs: clockSettings.initialSec * MS_PER_SEC,
-        blackMs: clockSettings.initialSec * MS_PER_SEC,
-      };
-    } else {
-      return {
-        whiteMs: daysToMs(clockSettings.daysPerMove),
-        blackMs: daysToMs(clockSettings.daysPerMove),
-      };
-    }
-  },
-  update(instant: ClockInstant, color: Color, newTime: number): ClockInstant {
-    if (color === Color.White) {
-      return {
-        whiteMs: newTime,
-        blackMs: instant.blackMs,
-      };
-    } else {
-      return {
-        whiteMs: instant.whiteMs,
-        blackMs: newTime,
-      };
-    }
-  },
-  getTimeMs(instant: ClockInstant, color: Color): number {
-    return color === Color.White ? instant.whiteMs : instant.blackMs;
-  },
-};
 
 type ClockEvent =
   | {

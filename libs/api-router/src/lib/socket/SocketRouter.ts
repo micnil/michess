@@ -147,15 +147,13 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
           { ...makeMovePayloadV1, rooms: Array.from(socket.rooms) },
           'Received make-move event',
         );
-        const gameDetails = await api.games.makeMove(
+        const { gameDetails, move } = await api.games.makeMove(
           socket.data.session,
           makeMovePayloadV1,
         );
-        socket
-          .to(makeMovePayloadV1.gameId)
-          .emit('move-made', makeMovePayloadV1);
+        socket.to(move.gameId).emit('move-made', move);
 
-        callback(EventResponse.ok(makeMovePayloadV1));
+        callback(EventResponse.ok(move));
         if (gameDetails) {
           io.to(makeMovePayloadV1.gameId).emit('game-updated', gameDetails);
         }

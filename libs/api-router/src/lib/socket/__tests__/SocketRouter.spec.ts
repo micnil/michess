@@ -134,6 +134,7 @@ describe('SocketRouter', () => {
         moves: [],
         variant: 'standard',
         actionOptions: [],
+        clock: undefined,
       };
       serverSocket2.join(joinGamePayload.gameId);
 
