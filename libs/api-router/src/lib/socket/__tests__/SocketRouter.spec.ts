@@ -3,6 +3,7 @@ import {
   JoinGamePayloadV1,
   MakeMovePayloadV1,
   MakeMoveResponseV1,
+  MoveMadeV1,
 } from '@michess/api-schema';
 import {
   Api,
@@ -166,12 +167,14 @@ describe('SocketRouter', () => {
       serverSocket1.join(makeMovePayload.gameId);
       serverSocket2.join(makeMovePayload.gameId);
 
-      apiMock.games.makeMove = jest.fn().mockResolvedValue(undefined);
+      const moveV1: MoveMadeV1 = {
+        uci: 'e2e4',
+        gameId: makeMovePayload.gameId,
+        clock: { whiteMs: 300000, blackMs: 300000 },
+      };
+      apiMock.games.makeMove = jest.fn().mockResolvedValue({ move: moveV1 });
 
-      const moveMadePromise = waitFor<MakeMovePayloadV1>(
-        clientSocket2,
-        'move-made',
-      );
+      const moveMadePromise = waitFor<MoveMadeV1>(clientSocket2, 'move-made');
 
       const response: MakeMoveResponseV1 = await clientSocket1.emitWithAck(
         'make-move',
@@ -179,11 +182,9 @@ describe('SocketRouter', () => {
       );
 
       const data = await moveMadePromise;
-      expect(data).toEqual(makeMovePayload);
+      expect(data).toEqual(moveV1);
       expect(response.status).toEqual('ok');
-      expect(response.status === 'ok' && response.data).toEqual(
-        makeMovePayload,
-      );
+      expect(response.status === 'ok' && response.data).toEqual(moveV1);
       expect(apiMock.games.makeMove).toHaveBeenCalled();
     });
   });
