@@ -22,6 +22,7 @@ import {
   MoveRepository,
 } from '@michess/infra-db';
 import { Queue, Worker } from 'bullmq';
+import { TimeControlClassification } from 'libs/core-game/src/lib/model/TimeControlClassification';
 import { Session } from '../../auth/model/Session';
 import { PageResponseMapper } from '../../mapper/PageResponseMapper';
 import { GameDetailsMapper } from '../mapper/GameDetailsMapper';
@@ -57,9 +58,30 @@ export class GamesService {
   }
 
   async createGame(data: CreateGameV1): Promise<GameDetailsV1> {
+    const timeControlClassification =
+      data.timeControl?.type === 'realtime'
+        ? TimeControlClassification.fromRealtime(
+            data.timeControl.initialSec,
+            data.timeControl.incrementSec,
+          )
+        : data.timeControl?.type === 'correspondence'
+          ? 'correspondence'
+          : 'no_clock';
     const createdGame = await this.gameRepository.createGame({
-      variant: 'standard',
+      variant: data.variant,
       isPrivate: data.isPrivate ?? false,
+      timeControlClassification,
+      timeControl:
+        data.timeControl?.type === 'realtime'
+          ? {
+              initial: data.timeControl.initialSec,
+              increment: data.timeControl.incrementSec,
+            }
+          : data.timeControl?.type === 'correspondence'
+            ? {
+                daysPerMove: data.timeControl.daysPerMove,
+              }
+            : undefined,
     });
     const chessGame = ChessGame.fromGameState(
       GameDetailsMapper.fromSelectGame(createdGame),
