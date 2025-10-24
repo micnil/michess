@@ -1,8 +1,11 @@
 import { Maybe } from '@michess/common-utils';
 import { Color } from '@michess/core-board';
 import { ClockSettings } from './model/ClockSettings';
+import { GameState } from './model/GameState';
 
 const MS_PER_SEC = 1000;
+
+const daysToMs = (days: number): number => days * 24 * 60 * 60 * MS_PER_SEC;
 
 type ClockInstant = {
   whiteMs: number;
@@ -11,10 +14,17 @@ type ClockInstant = {
 
 const ClockInstant = {
   fromSettings(clockSettings: ClockSettings): ClockInstant {
-    return {
-      whiteMs: clockSettings.initialSec * MS_PER_SEC,
-      blackMs: clockSettings.initialSec * MS_PER_SEC,
-    };
+    if (clockSettings.type === 'standard') {
+      return {
+        whiteMs: clockSettings.initialSec * MS_PER_SEC,
+        blackMs: clockSettings.initialSec * MS_PER_SEC,
+      };
+    } else {
+      return {
+        whiteMs: daysToMs(clockSettings.daysPerMove),
+        blackMs: daysToMs(clockSettings.daysPerMove),
+      };
+    }
   },
   update(instant: ClockInstant, color: Color, newTime: number): ClockInstant {
     if (color === Color.White) {
@@ -56,17 +66,33 @@ const ClockEvent = {
   },
 };
 
-export class ChessClock<Event extends Maybe<ClockEvent>> {
-  public lastEvent: Event;
+export class ChessClock<Event extends Maybe<ClockEvent> = Maybe<ClockEvent>> {
   constructor(
     private clockSettings: ClockSettings,
-    lastEvent: Event,
-  ) {
-    this.lastEvent = lastEvent;
-  }
+    public lastEvent: Event,
+  ) {}
 
   static from(clockSettings: ClockSettings): ChessClock<undefined> {
     return new ChessClock(clockSettings, undefined);
+  }
+  static fromGameState(gameState: GameState): ChessClock {
+    const initialTurn = gameState.initialPosition.turn;
+    const clockSettings = ClockSettings.fromGameState(gameState);
+    return gameState.movesRecord.reduce<ChessClock<ClockEvent | undefined>>(
+      (clock, moveRecord, index) => {
+        return clock.hit(
+          initialTurn === Color.White
+            ? index % 2 === 0
+              ? Color.White
+              : Color.Black
+            : index % 2 === 0
+              ? Color.Black
+              : Color.White,
+          moveRecord.timestamp,
+        );
+      },
+      ChessClock.from(clockSettings),
+    );
   }
 
   private getClockInstantAt(timestamp: number): ClockInstant {
@@ -137,7 +163,9 @@ export class ChessClock<Event extends Maybe<ClockEvent>> {
     }
 
     const timeLeftAfterHitMs =
-      timeLeftMs + this.clockSettings.incrementSec * MS_PER_SEC;
+      this.clockSettings.type === 'standard'
+        ? timeLeftMs + this.clockSettings.incrementSec * MS_PER_SEC
+        : daysToMs(this.clockSettings.daysPerMove);
     return new ChessClock(this.clockSettings, {
       type: 'hit',
       side,

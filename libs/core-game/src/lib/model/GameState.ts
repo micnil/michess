@@ -5,6 +5,7 @@ import { ChessGameResult } from './ChessGameResult';
 import { GameMeta } from './GameMeta';
 import { GamePlayers } from './GamePlayers';
 import { GameStatusType } from './GameStatusType';
+import { TimeControl } from './TimeControl';
 
 export type GameState = GameMeta & {
   players: GamePlayers;
@@ -14,6 +15,7 @@ export type GameState = GameMeta & {
   initialPosition: ChessPosition;
   actionRecord: GameAction[];
   movesRecord: MoveRecord[];
+  timeControl: TimeControl;
 };
 
 export const GameState = {
@@ -30,6 +32,7 @@ export const GameState = {
     initialPosition: chessPosition,
     id: '',
     variant: 'standard',
+    timeControl: TimeControl.noClock(),
     isPrivate: false,
     startedAt: undefined,
     endedAt: undefined,

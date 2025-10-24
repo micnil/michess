@@ -4,14 +4,18 @@ import { ChessGameActions } from './actions/ChessGameActions';
 import { GameActionIn } from './actions/model/GameActionIn';
 import { GameActionOption } from './actions/model/GameActionOption';
 import { Chessboard } from './Chessboard';
+import { ChessClock } from './ChessClock';
 import { ChessGameResult } from './model/ChessGameResult';
 import { GameMeta } from './model/GameMeta';
 import { GamePlayers } from './model/GamePlayers';
 import { GameState } from './model/GameState';
 import { GameStatusType } from './model/GameStatusType';
 import { PlayerInfo } from './model/PlayerInfo';
+import { TimeControl } from './model/TimeControl';
 
 type GameStateInternal = {
+  timeControl: TimeControl;
+  clock: Maybe<ChessClock>;
   meta: GameMeta;
   players: GamePlayers;
   status: GameStatusType;
@@ -32,6 +36,7 @@ export type ChessGame = {
   isPlayerInGame(playerId: string): boolean;
   hasNewStatus(oldChess: ChessGame): boolean;
   hasNewActionOptions(oldChess: ChessGame): boolean;
+  clock: ChessClock;
 };
 
 const makeAction = (
@@ -154,6 +159,7 @@ const fromGameStateInternal = (
       initialPosition: board.initialPosition,
       movesRecord: board.movesRecord,
       result,
+      timeControl: gameStateInternal.timeControl,
       actionRecord: gameStateInternal.additionalActions.usedActions,
       resultStr: ChessGameResult.toResultString(result),
     };
@@ -184,6 +190,10 @@ const fromGameStateInternal = (
         ...gameStateInternal,
         board: newBoard,
         status: newStatus,
+        clock: gameStateInternal.clock?.hit(
+          board.position.turn,
+          newBoard.movesRecord.at(-1)?.timestamp,
+        ),
         meta: {
           ...gameStateInternal.meta,
           startedAt: gameStateInternal.meta.startedAt ?? new Date(),
@@ -196,6 +206,9 @@ const fromGameStateInternal = (
     }
   };
   return {
+    get clock(): ChessClock {
+      return this.clock;
+    },
     getPosition: () => board.position,
     makeAction: (playerId: string, action: GameActionOption): ChessGame => {
       const { gameState } = makeAction(gameStateInternal, playerId, action);
@@ -284,6 +297,8 @@ const fromGameState = (gameState: GameState): ChessGame => {
     status: gameState.status,
     board,
     result,
+    timeControl: gameState.timeControl,
+    clock: ChessClock.fromGameState(gameState),
     additionalActions: ChessGameActions.from(
       gameState.actionRecord,
       board,
