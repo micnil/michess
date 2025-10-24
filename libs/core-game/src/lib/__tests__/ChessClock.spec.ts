@@ -108,6 +108,23 @@ describe('ChessClock', () => {
       expect(clock4.lastEvent.side).toBe(Color.Black);
       expect(clock4.lastEvent.clock).toEqual(clock3.lastEvent.clock);
     });
+
+    it('should reset time to full daysPerMove on each hit', () => {
+      const clock = ChessClock.from(ClockSettings.correspondence(3));
+      const clock2 = clock.hit(Color.White, 1000);
+
+      // After White hits, Black's clock starts running
+      const oneDayMs = 1 * 24 * 60 * 60 * 1000;
+      const clock3 = clock2.hit(Color.Black, 1000 + oneDayMs); // 1 day elapsed
+
+      assertEqual(clock3.lastEvent.type, 'hit');
+      const fullTimeMs = 3 * 24 * 60 * 60 * 1000; // Full 3 days
+
+      // Black hit after 1 day, so gets reset to full time
+      expect(clock3.lastEvent.clock.blackMs).toBe(fullTimeMs);
+      // White's clock was not running, stays at initial
+      expect(clock3.lastEvent.clock.whiteMs).toBe(fullTimeMs);
+    });
   });
 
   describe('pause', () => {
