@@ -19,10 +19,12 @@ import {
   ActionRepository,
   CacheRepository,
   GameRepository,
+  InsertGame,
   MoveRepository,
 } from '@michess/infra-db';
 import { Queue, Worker } from 'bullmq';
 import { TimeControlClassification } from 'libs/core-game/src/lib/model/TimeControlClassification';
+import { TimeControlJsonB } from 'libs/infra-db/src/lib/model/TimeControlJsonB';
 import { Session } from '../../auth/model/Session';
 import { PageResponseMapper } from '../../mapper/PageResponseMapper';
 import { GameDetailsMapper } from '../mapper/GameDetailsMapper';
@@ -58,30 +60,40 @@ export class GamesService {
   }
 
   async createGame(data: CreateGameV1): Promise<GameDetailsV1> {
-    const timeControlClassification =
+    const {
+      timeControlClassification,
+      timeControl,
+    }: {
+      timeControlClassification: InsertGame['timeControlClassification'];
+      timeControl: TimeControlJsonB | null;
+    } =
       data.timeControl?.type === 'realtime'
-        ? TimeControlClassification.fromRealtime(
-            data.timeControl.initialSec,
-            data.timeControl.incrementSec,
-          )
+        ? {
+            timeControlClassification: TimeControlClassification.fromRealtime(
+              data.timeControl.initialSec,
+              data.timeControl.incrementSec,
+            ),
+            timeControl: {
+              initial: data.timeControl.initialSec,
+              increment: data.timeControl.incrementSec,
+            },
+          }
         : data.timeControl?.type === 'correspondence'
-          ? 'correspondence'
-          : 'no_clock';
+          ? {
+              timeControlClassification: 'correspondence',
+              timeControl: {
+                daysPerMove: data.timeControl.daysPerMove,
+              },
+            }
+          : {
+              timeControlClassification: 'no_clock',
+              timeControl: null,
+            };
     const createdGame = await this.gameRepository.createGame({
       variant: data.variant,
       isPrivate: data.isPrivate ?? false,
       timeControlClassification,
-      timeControl:
-        data.timeControl?.type === 'realtime'
-          ? {
-              initial: data.timeControl.initialSec,
-              increment: data.timeControl.incrementSec,
-            }
-          : data.timeControl?.type === 'correspondence'
-            ? {
-                daysPerMove: data.timeControl.daysPerMove,
-              }
-            : undefined,
+      timeControl,
     });
     const chessGame = ChessGame.fromGameState(
       GameDetailsMapper.fromSelectGame(createdGame),
