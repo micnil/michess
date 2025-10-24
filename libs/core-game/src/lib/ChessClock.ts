@@ -75,24 +75,28 @@ export class ChessClock<Event extends Maybe<ClockEvent> = Maybe<ClockEvent>> {
   static from(clockSettings: ClockSettings): ChessClock<undefined> {
     return new ChessClock(clockSettings, undefined);
   }
-  static fromGameState(gameState: GameState): ChessClock {
-    const initialTurn = gameState.initialPosition.turn;
-    const clockSettings = ClockSettings.fromGameState(gameState);
-    return gameState.movesRecord.reduce<ChessClock<ClockEvent | undefined>>(
-      (clock, moveRecord, index) => {
-        return clock.hit(
-          initialTurn === Color.White
-            ? index % 2 === 0
-              ? Color.White
-              : Color.Black
-            : index % 2 === 0
-              ? Color.Black
-              : Color.White,
-          moveRecord.timestamp,
-        );
-      },
-      ChessClock.from(clockSettings),
-    );
+  static fromGameState(gameState: GameState): Maybe<ChessClock> {
+    if (gameState.timeControl.classification !== 'no_clock') {
+      const initialTurn = gameState.initialPosition.turn;
+      const clockSettings = ClockSettings.fromGameState(gameState);
+      return gameState.movesRecord.reduce<ChessClock<ClockEvent | undefined>>(
+        (clock, moveRecord, index) => {
+          return clock.hit(
+            initialTurn === Color.White
+              ? index % 2 === 0
+                ? Color.White
+                : Color.Black
+              : index % 2 === 0
+                ? Color.Black
+                : Color.White,
+            moveRecord.timestamp,
+          );
+        },
+        ChessClock.from(clockSettings),
+      );
+    } else {
+      return undefined;
+    }
   }
 
   private getClockInstantAt(timestamp: number): ClockInstant {

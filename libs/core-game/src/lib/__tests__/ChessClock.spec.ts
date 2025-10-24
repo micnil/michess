@@ -4,10 +4,7 @@ import { ChessClock } from '../ChessClock';
 import { ClockSettings } from '../model/ClockSettings';
 jest.useFakeTimers();
 describe('ChessClock', () => {
-  const defaultSettings: ClockSettings = {
-    initialSec: 300,
-    incrementSec: 5,
-  };
+  const defaultSettings: ClockSettings = ClockSettings.standard(300, 5);
 
   describe('from', () => {
     it('should create a new unstarted clock', () => {
@@ -75,7 +72,7 @@ describe('ChessClock', () => {
     });
 
     it('should create flag event when time runs out', () => {
-      const settings: ClockSettings = { initialSec: 1, incrementSec: 0 };
+      const settings: ClockSettings = ClockSettings.standard(1, 0);
       const clock = ChessClock.from(settings);
       const clock2 = clock.hit(Color.White, 1000);
       const clock3 = clock2.hit(Color.Black, 3000);
@@ -88,7 +85,7 @@ describe('ChessClock', () => {
     });
 
     it('should not allow hitting after flag (noop)', () => {
-      const settings: ClockSettings = { initialSec: 1, incrementSec: 0 };
+      const settings: ClockSettings = ClockSettings.standard(1, 0);
       const clock = ChessClock.from(settings);
       const clock2 = clock.hit(Color.White, 1000);
       const clock3 = clock2.hit(Color.Black, 3000);
@@ -150,7 +147,7 @@ describe('ChessClock', () => {
     });
 
     it('should create flag event when pausing after time runs out', () => {
-      const settings: ClockSettings = { initialSec: 1, incrementSec: 0 };
+      const settings: ClockSettings = ClockSettings.standard(1, 0);
       const clock = ChessClock.from(settings);
       const clock2 = clock.hit(Color.White, 1000);
       const clock3 = clock2.pause(3000);
@@ -161,7 +158,7 @@ describe('ChessClock', () => {
     });
 
     it('should not allow pausing after flag', () => {
-      const settings: ClockSettings = { initialSec: 1, incrementSec: 0 };
+      const settings: ClockSettings = ClockSettings.standard(1, 0);
       const clock = ChessClock.from(settings);
       const clock2 = clock.hit(Color.White, 1000);
       const clock3 = clock2.pause(3000);
@@ -197,7 +194,7 @@ describe('ChessClock', () => {
 
     it('should not go below zero for flagged player', () => {
       jest.setSystemTime(3000);
-      const settings: ClockSettings = { initialSec: 1, incrementSec: 0 };
+      const settings: ClockSettings = ClockSettings.standard(1, 0);
       const clock = ChessClock.from(settings);
       const clock2 = clock.hit(Color.White, 1000);
 

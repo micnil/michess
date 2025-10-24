@@ -3,6 +3,9 @@ import { GameState } from '../GameState';
 
 const gameStateMock: GameState = {
   id: 'game-id',
+  timeControl: {
+    classification: 'no_clock',
+  },
   players: {
     white: { id: 'player1', name: 'Alice' },
     black: { id: 'player2', name: 'Bob' },
