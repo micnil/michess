@@ -90,6 +90,33 @@ export class ChessClock<Event extends Maybe<ClockEvent> = Maybe<ClockEvent>> {
     return this.getClockInstantAt(Date.now());
   }
 
+  public get flag(): Maybe<{
+    color: Color;
+    timestamp: number;
+    duration: number;
+  }> {
+    if (this.lastEvent && this.lastEvent.type === 'flag') {
+      return {
+        color: this.lastEvent.color,
+        timestamp: this.lastEvent.timestamp,
+        duration: 0,
+      };
+    } else if (this.lastEvent && this.lastEvent.type === 'hit') {
+      const runningSide = Color.opposite(this.lastEvent.side);
+      const timeLeftMs = ClockInstant.getTimeMs(
+        this.lastEvent.clock,
+        runningSide,
+      );
+      return {
+        color: Color.opposite(this.lastEvent.side),
+        timestamp: this.lastEvent.timestamp,
+        duration: timeLeftMs,
+      };
+    } else {
+      return undefined;
+    }
+  }
+
   hit(side: Color, hitTimestamp?: number): ChessClock<ClockEvent> {
     const lastEvent = this.lastEvent;
     if (!lastEvent) {

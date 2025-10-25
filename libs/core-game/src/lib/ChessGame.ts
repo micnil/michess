@@ -5,6 +5,7 @@ import { GameActionIn } from './actions/model/GameActionIn';
 import { GameActionOption } from './actions/model/GameActionOption';
 import { Chessboard } from './Chessboard';
 import { ChessClock } from './ChessClock';
+import { ChessGameError } from './model/ChessGameError';
 import { ChessGameResult } from './model/ChessGameResult';
 import { GameMeta } from './model/GameMeta';
 import { GamePlayers } from './model/GamePlayers';
@@ -46,6 +47,26 @@ const makeAction = (
 ): {
   gameState: GameStateInternal;
 } => {
+  if (gameState.result) {
+    throw new ChessGameError('game_is_over', 'Game is already over');
+  }
+
+  const result = evalResult(gameState.board, gameState.clock);
+  if (result) {
+    const endedAt = new Date();
+    return {
+      gameState: {
+        ...gameState,
+        status: 'ENDED',
+        meta: {
+          ...gameState.meta,
+          endedAt,
+        },
+        result: gameState.result ?? result,
+        clock: gameState.clock?.pause(endedAt.getTime()),
+      },
+    };
+  }
   const playerColor =
     gameState.players.white?.id === playerId
       ? Color.White
@@ -61,22 +82,25 @@ const makeAction = (
       );
       switch (action.type) {
         case 'accept_draw':
-        case 'resign':
+        case 'resign': {
+          const endedAt = gameState.meta.endedAt ?? new Date();
           return {
             gameState: {
               ...gameState,
               status: 'ENDED',
               meta: {
                 ...gameState.meta,
-                endedAt: gameState.meta.endedAt ?? new Date(),
+                endedAt,
               },
               result: ChessGameResult.fromChessGameAction(
                 action,
                 gameState.board.position.turn,
               ),
+              clock: gameState.clock?.pause(endedAt.getTime()),
               additionalActions: newActions,
             },
           };
+        }
         case 'offer_draw':
           return {
             gameState: {
@@ -133,15 +157,19 @@ const joinGame = (
   }
 };
 
-const evalResultFromBoard = (
+const evalResult = (
   board: Chessboard,
+  clock: Maybe<ChessClock>,
 ): ChessGameResult | undefined => {
+  const flagResult = clock ? ChessGameResult.toFlag(clock.instant) : false;
   if (board.isCheckmate) {
     return ChessGameResult.toCheckmate(
       board.position.turn === Color.White ? Color.Black : Color.White,
     );
   } else if (board.isStalemate || board.isInsufficientMaterial) {
     return { type: 'draw' };
+  } else if (flagResult) {
+    return flagResult;
   } else {
     return undefined;
   }
@@ -172,14 +200,25 @@ const fromGameStateInternal = (
   };
   const playMove = (playerId: string, move: Move): ChessGame => {
     if (result) {
-      throw new Error('Game is already over');
+      throw new ChessGameError('game_is_over', 'Game is already over');
     } else if (
       playerId !== gameStateInternal.players[board.position.turn]?.id
     ) {
-      throw new Error('Not your turn');
+      throw new ChessGameError('not_your_turn', 'Not your turn');
     } else {
-      const newBoard = board.playMove(move);
-      const result = evalResultFromBoard(newBoard);
+      const timestamp = Date.now();
+      const newClock = gameStateInternal.clock?.hit(
+        board.position.turn,
+        timestamp,
+      );
+
+      if (newClock?.lastEvent.type === 'flag') {
+        throw new ChessGameError('not_your_turn', 'Not your turn');
+      }
+
+      const newBoard = board.playMove({ ...move, timestamp });
+      const result = evalResult(newBoard, newClock);
+
       const newStatus =
         gameStateInternal.status === 'READY'
           ? 'IN_PROGRESS'
@@ -190,10 +229,7 @@ const fromGameStateInternal = (
         ...gameStateInternal,
         board: newBoard,
         status: newStatus,
-        clock: gameStateInternal.clock?.hit(
-          board.position.turn,
-          newBoard.movesRecord.at(-1)?.timestamp,
-        ),
+        clock: newClock,
         meta: {
           ...gameStateInternal.meta,
           startedAt: gameStateInternal.meta.startedAt ?? new Date(),
@@ -290,7 +326,8 @@ const fromGameState = (gameState: GameState): ChessGame => {
     gameState.initialPosition,
     gameState.movesRecord,
   );
-  const result = gameState.result || evalResultFromBoard(board);
+  const clock = ChessClock.fromGameState(gameState);
+  const result = gameState.result || evalResult(board, clock);
   return fromGameStateInternal({
     meta: { ...GameState.toMeta(gameState) },
     players: gameState.players,
@@ -298,7 +335,7 @@ const fromGameState = (gameState: GameState): ChessGame => {
     board,
     result,
     timeControl: gameState.timeControl,
-    clock: ChessClock.fromGameState(gameState),
+    clock: clock,
     additionalActions: ChessGameActions.from(
       gameState.actionRecord,
       board,

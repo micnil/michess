@@ -222,6 +222,10 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
     }
   });
 
+  api.games.subscribe((gameDetails) => {
+    io.to(gameDetails.id).emit('game-updated', gameDetails);
+  });
+
   return io;
 };
 

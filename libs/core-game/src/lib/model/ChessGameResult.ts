@@ -2,6 +2,7 @@ import { Maybe } from '@michess/common-utils';
 import { Color } from '@michess/core-board';
 import { GameActionOption } from '../actions/model/GameActionOption';
 import { ChessGameResultType } from './ChessGameResultType';
+import { ClockInstant } from './ClockInstant';
 
 export type ChessGameResult = {
   type: ChessGameResultType;
@@ -46,5 +47,18 @@ export const ChessGameResult = {
     return {
       type: winner === Color.White ? 'white_win' : 'black_win',
     };
+  },
+  toFlag: (instant: ClockInstant): Maybe<ChessGameResult> => {
+    if (instant.blackMs === 0) {
+      return {
+        type: 'white_win',
+      };
+    } else if (instant.whiteMs === 0) {
+      return {
+        type: 'black_win',
+      };
+    } else {
+      return undefined;
+    }
   },
 };
