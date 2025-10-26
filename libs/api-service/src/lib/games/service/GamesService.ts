@@ -125,7 +125,7 @@ export class GamesService {
     const gameState = chessGame.getState();
     return GameDetailsMapper.toGameDetailsV1({
       game: gameState,
-      clock: chessGame.clock.instant,
+      clock: chessGame.clock?.instant,
     });
   }
 
@@ -204,7 +204,7 @@ export class GamesService {
     if (data.side === 'spectator') {
       return GameDetailsMapper.toGameDetailsV1({
         game: gameDetails,
-        clock: chessGame.clock.instant,
+        clock: chessGame.clock?.instant,
       });
     } else {
       const updatedGame = chessGame.joinGame(
@@ -218,7 +218,7 @@ export class GamesService {
       );
       return GameDetailsMapper.toGameDetailsV1({
         game: updatedGameState,
-        clock: updatedGame.clock.instant,
+        clock: updatedGame.clock?.instant,
         availableActions: updatedGame.getAdditionalActions(),
       });
     }
@@ -245,7 +245,7 @@ export class GamesService {
       return GameDetailsMapper.toGameDetailsV1({
         game: updatedGameState,
         availableActions: updatedGame.getAdditionalActions(),
-        clock: updatedGame.clock.instant,
+        clock: updatedGame.clock?.instant,
       });
     }
   }
@@ -307,7 +307,7 @@ export class GamesService {
       }
     }
 
-    const newFlag = game.clock.flag;
+    const newFlag = game.clock?.flag;
     if (newFlag) {
       this.timeControlQueue.add(
         'flag_timeout',
@@ -323,7 +323,7 @@ export class GamesService {
       );
     }
 
-    const clockInstant = game.clock.instant;
+    const clockInstant = game.clock?.instant;
     const moveMadeV1: MoveMadeV1 = {
       gameId: data.gameId,
       uci: Move.toUci(move),
@@ -372,7 +372,7 @@ export class GamesService {
     return GameDetailsMapper.toGameDetailsV1({
       game: updatedGameState,
       availableActions: updatedGame.getAdditionalActions(),
-      clock: updatedGame.clock.instant,
+      clock: updatedGame.clock?.instant,
     });
   }
 
@@ -409,7 +409,7 @@ export class GamesService {
       this.notifyObservers(
         GameDetailsMapper.toGameDetailsV1({
           game: chessGame.getState(),
-          clock: chessGame.clock.instant,
+          clock: chessGame.clock?.instant,
           availableActions: chessGame.getAdditionalActions(),
         }),
       );
