@@ -83,6 +83,57 @@ export class GamesService {
     });
   }
 
+  private async loadChessGame(gameId: string): Promise<{
+    chessGame: ChessGame;
+  }> {
+    const dbGame = await this.gameRepository.findGameWithRelationsById(gameId);
+    assertDefined(dbGame, `Game '${gameId}' not found`);
+    const gameDetails = GameDetailsMapper.fromSelectGameWithRelations(dbGame);
+    const chessGame = ChessGame.fromGameState(gameDetails);
+    return { chessGame };
+  }
+
+  private toGameDetailsV1(chessGame: ChessGame): GameDetailsV1 {
+    return GameDetailsMapper.toGameDetailsV1({
+      game: chessGame.getState(),
+      clock: chessGame.clock?.instant,
+      availableActions: chessGame.getAdditionalActions(),
+    });
+  }
+
+  private async updateFlagTimeoutJob(chessGame: ChessGame): Promise<void> {
+    const state = chessGame.getState();
+
+    // If there is an existing flag_timeout job for this game, find it's ID
+    const jobId = await this.timeControlQueue.getDeduplicationJobId(state.id);
+    if (jobId) {
+      // If a job was found, remove it from the queue
+      const result = await this.timeControlQueue.remove(jobId);
+      if (result === 0) {
+        // If the job couldnt be removed it must have been active and locked
+        // (or already executed). Remove the deduplication key so we can add
+        // a new flag timeout job
+        this.timeControlQueue.removeDeduplicationKey(state.id);
+      }
+    }
+
+    const newFlag = chessGame.clock?.flag;
+    if (newFlag) {
+      this.timeControlQueue.add(
+        'flag_timeout',
+        {
+          gameId: state.id,
+          flagTimestamp: newFlag.timestamp,
+        },
+        {
+          deduplication: {
+            id: state.id,
+          },
+        },
+      );
+    }
+  }
+
   async createGame(data: CreateGameV1): Promise<GameDetailsV1> {
     const {
       timeControlClassification,
@@ -122,11 +173,7 @@ export class GamesService {
     const chessGame = ChessGame.fromGameState(
       GameDetailsMapper.fromSelectGame(createdGame),
     );
-    const gameState = chessGame.getState();
-    return GameDetailsMapper.toGameDetailsV1({
-      game: gameState,
-      clock: chessGame.clock?.instant,
-    });
+    return this.toGameDetailsV1(chessGame);
   }
 
   async queryLobby(query: PaginationQueryV1): Promise<LobbyPageResponseV1> {
@@ -194,60 +241,45 @@ export class GamesService {
     session: Session,
     data: JoinGamePayloadV1,
   ): Promise<GameDetailsV1> {
-    const dbGame = await this.gameRepository.findGameWithRelationsById(
-      data.gameId,
-    );
-    assertDefined(dbGame, `Game '${data.gameId}' not found`);
-    const gameDetails = GameDetailsMapper.fromSelectGameWithRelations(dbGame);
-    const chessGame = ChessGame.fromGameState(gameDetails);
-
+    const { chessGame } = await this.loadChessGame(data.gameId);
+    const gameState = chessGame.getState();
     if (data.side === 'spectator') {
       return GameDetailsMapper.toGameDetailsV1({
-        game: gameDetails,
+        game: gameState,
         clock: chessGame.clock?.instant,
       });
-    } else {
-      const updatedGame = chessGame.joinGame(
-        { id: session.userId, name: session.name ?? 'Anonymous' },
-        data.side,
-      );
-      const updatedGameState = updatedGame.getState();
-      await this.gameRepository.updateGame(
-        gameDetails.id,
-        GameDetailsMapper.toInsertGame(updatedGameState),
-      );
-      return GameDetailsMapper.toGameDetailsV1({
-        game: updatedGameState,
-        clock: updatedGame.clock?.instant,
-        availableActions: updatedGame.getAdditionalActions(),
-      });
     }
+
+    const updatedGame = chessGame.joinGame(
+      { id: session.userId, name: session.name ?? 'Anonymous' },
+      data.side,
+    );
+    const updatedGameState = updatedGame.getState();
+    await this.gameRepository.updateGame(
+      gameState.id,
+      GameDetailsMapper.toInsertGame(updatedGameState),
+    );
+    return this.toGameDetailsV1(updatedGame);
   }
 
   async leaveGame(
     session: Session,
     data: LeaveGamePayloadV1,
   ): Promise<Maybe<GameDetailsV1>> {
-    const dbGame = await this.gameRepository.findGameWithRelationsById(
-      data.gameId,
-    );
-    assertDefined(dbGame, `Game '${data.gameId}' not found`);
-    const gameDetails = GameDetailsMapper.fromSelectGameWithRelations(dbGame);
-    const chessGame = ChessGame.fromGameState(gameDetails);
-    if (chessGame.isPlayerInGame(session.userId)) {
-      const updatedGame = chessGame.leaveGame(session.userId);
-      const updatedGameState = updatedGame.getState();
+    const { chessGame } = await this.loadChessGame(data.gameId);
 
-      await this.gameRepository.updateGame(
-        gameDetails.id,
-        GameDetailsMapper.toInsertGame(updatedGameState),
-      );
-      return GameDetailsMapper.toGameDetailsV1({
-        game: updatedGameState,
-        availableActions: updatedGame.getAdditionalActions(),
-        clock: updatedGame.clock?.instant,
-      });
+    if (!chessGame.isPlayerInGame(session.userId)) {
+      return undefined;
     }
+
+    const updatedGame = chessGame.leaveGame(session.userId);
+    const updatedGameState = updatedGame.getState();
+
+    await this.gameRepository.updateGame(
+      chessGame.getState().id,
+      GameDetailsMapper.toInsertGame(updatedGameState),
+    );
+    return this.toGameDetailsV1(updatedGame);
   }
 
   async makeMove(
@@ -255,25 +287,20 @@ export class GamesService {
     data: MakeMovePayloadV1,
   ): Promise<{ gameDetails: Maybe<GameDetailsV1>; move: MoveMadeV1 }> {
     const makeMoveWithLock = async (): Promise<{
-      game: ChessGame;
+      updatedGame: ChessGame;
       move: MoveRecord;
       gameStateUpdated: boolean;
     }> => {
       await using _ = await this.lockService.acquireLock('game', data.gameId);
-      const dbGame = await this.gameRepository.findGameWithRelationsById(
-        data.gameId,
-      );
-      assertDefined(dbGame, `Game '${data.gameId}' not found`);
+      const { chessGame } = await this.loadChessGame(data.gameId);
       const moveToPlay = Move.fromUci(data.uci);
-      const gameDetails = GameDetailsMapper.fromSelectGameWithRelations(dbGame);
-      const chessGame = ChessGame.fromGameState(gameDetails);
       const updatedGame = chessGame.play(session.userId, moveToPlay);
       const updatedGameState = updatedGame.getState();
       const newMove = updatedGameState.movesRecord.at(-1);
       assertDefined(newMove, 'No move found after playing move');
 
       await this.moveRepository.createMove({
-        gameId: gameDetails.id,
+        gameId: updatedGameState.id,
         uci: data.uci,
         movedAt: new Date(newMove.timestamp),
       });
@@ -283,47 +310,18 @@ export class GamesService {
         chessGame.hasNewActionOptions(updatedGame);
       if (gameStateUpdated) {
         await this.gameRepository.updateGame(
-          gameDetails.id,
+          updatedGameState.id,
           GameDetailsMapper.toInsertGame(updatedGameState),
         );
       }
-      return { game: chessGame, move: newMove, gameStateUpdated };
+      return { updatedGame, move: newMove, gameStateUpdated };
     };
 
-    const { game, move, gameStateUpdated } = await makeMoveWithLock();
+    const { updatedGame, move, gameStateUpdated } = await makeMoveWithLock();
 
-    // If there is an existing flag_timeout job for this game, find it's ID
-    const jobId = await this.timeControlQueue.getDeduplicationJobId(
-      data.gameId,
-    );
-    if (jobId) {
-      // If a job was found, remove it from the queue
-      const result = await this.timeControlQueue.remove(jobId);
-      if (result === 0) {
-        // If the job couldnt be removed it must have been active and locked
-        // (or already executed). Remove the deduplication key so we can add
-        // a new flag timeout job
-        this.timeControlQueue.removeDeduplicationKey(data.gameId);
-      }
-    }
+    await this.updateFlagTimeoutJob(updatedGame);
 
-    const newFlag = game.clock?.flag;
-    if (newFlag) {
-      this.timeControlQueue.add(
-        'flag_timeout',
-        {
-          gameId: data.gameId,
-          flagTimestamp: newFlag.timestamp,
-        },
-        {
-          deduplication: {
-            id: data.gameId,
-          },
-        },
-      );
-    }
-
-    const clockInstant = game.clock?.instant;
+    const clockInstant = updatedGame.clock?.instant;
     const moveMadeV1: MoveMadeV1 = {
       gameId: data.gameId,
       uci: Move.toUci(move),
@@ -332,11 +330,7 @@ export class GamesService {
 
     if (gameStateUpdated) {
       return {
-        gameDetails: GameDetailsMapper.toGameDetailsV1({
-          game: game.getState(),
-          clock: clockInstant,
-          availableActions: game.getAdditionalActions(),
-        }),
+        gameDetails: this.toGameDetailsV1(updatedGame),
         move: moveMadeV1,
       };
     } else {
@@ -351,29 +345,20 @@ export class GamesService {
     session: Session,
     data: MakeActionPayloadV1,
   ): Promise<GameDetailsV1> {
-    const dbGame = await this.gameRepository.findGameWithRelationsById(
-      data.gameId,
-    );
+    const { chessGame } = await this.loadChessGame(data.gameId);
     const gameActionIn: GameActionIn = {
       type: data.action.type,
     };
-    assertDefined(dbGame, `Game '${data.gameId}' not found`);
-    const gameDetails = GameDetailsMapper.fromSelectGameWithRelations(dbGame);
-    const chessGame = ChessGame.fromGameState(gameDetails);
     const updatedGame = chessGame.makeAction(session.userId, gameActionIn);
     const updatedGameState = updatedGame.getState();
     await this.gameRepository.updateGame(
-      gameDetails.id,
+      updatedGameState.id,
       GameDetailsMapper.toInsertGame(updatedGameState),
     );
     const action = updatedGameState.actionRecord.at(-1);
     action &&
-      (await this.actionRepository.createAction(gameDetails.id, action));
-    return GameDetailsMapper.toGameDetailsV1({
-      game: updatedGameState,
-      availableActions: updatedGame.getAdditionalActions(),
-      clock: updatedGame.clock?.instant,
-    });
+      (await this.actionRepository.createAction(updatedGameState.id, action));
+    return this.toGameDetailsV1(updatedGame);
   }
 
   async cleanupGames(): Promise<void> {
@@ -388,6 +373,7 @@ export class GamesService {
   async handleFlagTimeout(job: Job<TimeControlJobData>): Promise<void> {
     const { gameId, flagTimestamp } = job.data;
     logger.info({ gameId, flagTimestamp }, 'Handling flag timeout');
+
     const handleFlagTimeoutWithLock = async (): Promise<Maybe<ChessGame>> => {
       await using _ = await this.lockService.acquireLock('game', gameId);
       const dbGame =
@@ -395,24 +381,25 @@ export class GamesService {
       assertDefined(dbGame, `Game '${gameId}' not found`);
       const gameDetails = GameDetailsMapper.fromSelectGameWithRelations(dbGame);
       const chessGame = ChessGame.fromGameState(gameDetails);
+
       const updatedGameState = chessGame.getState();
-      if (updatedGameState.result?.type !== gameDetails.result?.type) {
+      const gameResultChanged =
+        updatedGameState.result?.type !== gameDetails.result?.type;
+
+      if (gameResultChanged) {
         await this.gameRepository.updateGame(
           gameDetails.id,
           GameDetailsMapper.toInsertGame(updatedGameState),
         );
         return chessGame;
+      } else {
+        return undefined;
       }
     };
+
     const chessGame = await handleFlagTimeoutWithLock();
     if (chessGame) {
-      this.notifyObservers(
-        GameDetailsMapper.toGameDetailsV1({
-          game: chessGame.getState(),
-          clock: chessGame.clock?.instant,
-          availableActions: chessGame.getAdditionalActions(),
-        }),
-      );
+      this.notifyObservers(this.toGameDetailsV1(chessGame));
     }
   }
 }
