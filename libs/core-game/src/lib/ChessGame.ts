@@ -37,7 +37,27 @@ export type ChessGame = {
   isPlayerInGame(playerId: string): boolean;
   hasNewStatus(oldChess: ChessGame): boolean;
   hasNewActionOptions(oldChess: ChessGame): boolean;
-  clock: ChessClock;
+  clock: Maybe<ChessClock>;
+};
+
+const endGame = (
+  gameState: GameStateInternal,
+  result: ChessGameResult,
+): GameStateInternal => {
+  const endedAt = new Date();
+  const resultToSet = gameState.result ?? result;
+  const pausedClock = gameState.clock?.pause(endedAt.getTime());
+
+  return {
+    ...gameState,
+    status: 'ENDED',
+    meta: {
+      ...gameState.meta,
+      endedAt,
+    },
+    result: resultToSet,
+    clock: pausedClock,
+  };
 };
 
 const makeAction = (
@@ -51,75 +71,63 @@ const makeAction = (
     throw new ChessGameError('game_is_over', 'Game is already over');
   }
 
-  const result = evalResult(gameState.board, gameState.clock);
-  if (result) {
-    const endedAt = new Date();
+  const currentResult = evalResult(gameState.board, gameState.clock);
+  if (currentResult) {
     return {
-      gameState: {
-        ...gameState,
-        status: 'ENDED',
-        meta: {
-          ...gameState.meta,
-          endedAt,
-        },
-        result: gameState.result ?? result,
-        clock: gameState.clock?.pause(endedAt.getTime()),
-      },
+      gameState: endGame(gameState, currentResult),
     };
   }
-  const playerColor =
-    gameState.players.white?.id === playerId
-      ? Color.White
-      : gameState.players.black?.id === playerId
-        ? Color.Black
-        : undefined;
 
-  if (playerColor) {
-    if (gameState.additionalActions.isActionAvailable(playerColor, action)) {
-      const newActions = gameState.additionalActions.useAction(
-        playerColor,
+  const playerColor = GamePlayers.getColor(gameState.players, playerId);
+
+  if (!playerColor) {
+    throw new ChessGameError('not_in_game', 'Player is not part of the game');
+  }
+
+  if (!gameState.additionalActions.isActionAvailable(playerColor, action)) {
+    throw new ChessGameError(
+      'action_not_available',
+      `Action ${action.type} is not available for turn ${gameState.board.position.turn}`,
+    );
+  }
+
+  const newActions = gameState.additionalActions.useAction(playerColor, action);
+
+  switch (action.type) {
+    case 'accept_draw':
+    case 'resign': {
+      const actionResult = ChessGameResult.fromChessGameAction(
         action,
+        gameState.board.position.turn,
       );
-      switch (action.type) {
-        case 'accept_draw':
-        case 'resign': {
-          const endedAt = gameState.meta.endedAt ?? new Date();
-          return {
-            gameState: {
-              ...gameState,
-              status: 'ENDED',
-              meta: {
-                ...gameState.meta,
-                endedAt,
-              },
-              result: ChessGameResult.fromChessGameAction(
-                action,
-                gameState.board.position.turn,
-              ),
-              clock: gameState.clock?.pause(endedAt.getTime()),
-              additionalActions: newActions,
-            },
-          };
-        }
-        case 'offer_draw':
-          return {
-            gameState: {
-              ...gameState,
-              additionalActions: newActions,
-            },
-          };
-        default:
-          return {
-            gameState,
-          };
+
+      if (!actionResult) {
+        throw new ChessGameError(
+          'action_not_available',
+          `Action ${action.type} did not produce a result`,
+        );
       }
-    } else {
-      throw new Error(
-        `Action ${action.type} is not available for turn ${gameState.board.position.turn}`,
-      );
+
+      return {
+        gameState: {
+          ...endGame(gameState, actionResult),
+          additionalActions: newActions,
+        },
+      };
     }
-  } else {
-    throw new Error('Player is not part of the game');
+    case 'offer_draw': {
+      return {
+        gameState: {
+          ...gameState,
+          additionalActions: newActions,
+        },
+      };
+    }
+    default: {
+      return {
+        gameState,
+      };
+    }
   }
 };
 
@@ -201,49 +209,60 @@ const fromGameStateInternal = (
   const playMove = (playerId: string, move: Move): ChessGame => {
     if (result) {
       throw new ChessGameError('game_is_over', 'Game is already over');
-    } else if (
-      playerId !== gameStateInternal.players[board.position.turn]?.id
-    ) {
-      throw new ChessGameError('not_your_turn', 'Not your turn');
-    } else {
-      const timestamp = Date.now();
-      const newClock = gameStateInternal.clock?.hit(
-        board.position.turn,
-        timestamp,
-      );
-
-      if (newClock?.lastEvent.type === 'flag') {
-        throw new ChessGameError('not_your_turn', 'Not your turn');
-      }
-
-      const newBoard = board.playMove({ ...move, timestamp });
-      const result = evalResult(newBoard, newClock);
-
-      const newStatus =
-        gameStateInternal.status === 'READY'
-          ? 'IN_PROGRESS'
-          : result
-            ? 'ENDED'
-            : gameStateInternal.status;
-      return fromGameStateInternal({
-        ...gameStateInternal,
-        board: newBoard,
-        status: newStatus,
-        clock: newClock,
-        meta: {
-          ...gameStateInternal.meta,
-          startedAt: gameStateInternal.meta.startedAt ?? new Date(),
-          endedAt:
-            (gameStateInternal.meta.endedAt ?? result) ? new Date() : undefined,
-        },
-        result,
-        additionalActions: additionalActions.updateBoard(newStatus, newBoard),
-      });
     }
+
+    const playerColor = GamePlayers.getColor(
+      gameStateInternal.players,
+      playerId,
+    );
+    const currentTurn = board.position.turn;
+
+    if (playerColor !== currentTurn) {
+      throw new ChessGameError('not_your_turn', 'Not your turn');
+    }
+
+    const timestamp = Date.now();
+    const newClock = gameStateInternal.clock?.hit(currentTurn, timestamp);
+
+    if (newClock?.lastEvent.type === 'flag') {
+      throw new ChessGameError(
+        'player_flagged',
+        `Player ${currentTurn} has run out of time`,
+      );
+    }
+
+    const newBoard = board.playMove({ ...move, timestamp });
+    const moveResult = evalResult(newBoard, newClock);
+
+    const shouldStartGame = gameStateInternal.status === 'READY';
+    const shouldEndGame = moveResult !== undefined;
+
+    const newStatus = shouldStartGame
+      ? 'IN_PROGRESS'
+      : shouldEndGame
+        ? 'ENDED'
+        : gameStateInternal.status;
+
+    const startedAt = gameStateInternal.meta.startedAt ?? new Date();
+    const endedAt = shouldEndGame ? new Date() : gameStateInternal.meta.endedAt;
+
+    return fromGameStateInternal({
+      ...gameStateInternal,
+      board: newBoard,
+      status: newStatus,
+      clock: newClock,
+      meta: {
+        ...gameStateInternal.meta,
+        startedAt,
+        endedAt,
+      },
+      result: moveResult,
+      additionalActions: additionalActions.updateBoard(newStatus, newBoard),
+    });
   };
   return {
-    get clock(): ChessClock {
-      return this.clock;
+    get clock(): Maybe<ChessClock> {
+      return gameStateInternal.clock;
     },
     getPosition: () => board.position,
     makeAction: (playerId: string, action: GameActionOption): ChessGame => {
@@ -299,20 +318,30 @@ const fromGameStateInternal = (
     leaveGame: (playerId: string): ChessGame => {
       const playerEntry = getPlayerEntry(playerId);
       const allowedToLeave: GameStatusType[] = ['WAITING', 'READY'];
-      if (playerEntry && allowedToLeave.includes(gameStateInternal.status)) {
-        gameStateInternal.players[playerEntry[0] as Color] = undefined;
-        return fromGameStateInternal({
-          ...gameStateInternal,
-          status:
-            gameStateInternal.status === 'READY'
-              ? 'WAITING'
-              : gameStateInternal.status === 'WAITING'
-                ? 'EMPTY'
-                : gameStateInternal.status,
-        });
-      } else {
+
+      if (!playerEntry || !allowedToLeave.includes(gameStateInternal.status)) {
         return fromGameStateInternal(gameStateInternal);
       }
+
+      const [side] = playerEntry;
+      const newPlayers = {
+        ...gameStateInternal.players,
+        [side]: undefined,
+      };
+
+      const wasReady = gameStateInternal.status === 'READY';
+      const wasWaiting = gameStateInternal.status === 'WAITING';
+      const newStatus = wasReady
+        ? 'WAITING'
+        : wasWaiting
+          ? 'EMPTY'
+          : gameStateInternal.status;
+
+      return fromGameStateInternal({
+        ...gameStateInternal,
+        players: newPlayers,
+        status: newStatus,
+      });
     },
   };
 };
