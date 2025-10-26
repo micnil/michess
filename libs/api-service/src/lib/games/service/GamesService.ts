@@ -14,17 +14,20 @@ import {
 import { logger } from '@michess/be-utils';
 import { assertDefined, Maybe } from '@michess/common-utils';
 import { Move, MoveRecord } from '@michess/core-board';
-import { ChessGame, GameActionIn } from '@michess/core-game';
+import {
+  ChessGame,
+  GameActionIn,
+  TimeControlClassification,
+} from '@michess/core-game';
 import {
   ActionRepository,
   CacheRepository,
   GameRepository,
   InsertGame,
   MoveRepository,
+  TimeControlJsonB,
 } from '@michess/infra-db';
 import { Job, Queue, Worker } from 'bullmq';
-import { TimeControlClassification } from 'libs/core-game/src/lib/model/TimeControlClassification';
-import { TimeControlJsonB } from 'libs/infra-db/src/lib/model/TimeControlJsonB';
 import { Session } from '../../auth/model/Session';
 import { LockService } from '../../lock/service/LockService';
 import { PageResponseMapper } from '../../mapper/PageResponseMapper';

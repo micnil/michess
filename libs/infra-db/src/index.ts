@@ -3,6 +3,7 @@ export * from './lib/DatabaseClient';
 export * from './lib/model/InsertGame';
 export * from './lib/model/SelectGame';
 export * from './lib/model/SelectGameWithRelations';
+export * from './lib/model/TimeControlJsonB';
 export * from './lib/Repositories';
 export * from './lib/repository/ActionRepository';
 export * from './lib/repository/CacheRepository';
