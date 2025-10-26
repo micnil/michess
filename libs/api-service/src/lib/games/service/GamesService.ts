@@ -13,8 +13,8 @@ import {
 } from '@michess/api-schema';
 import { logger } from '@michess/be-utils';
 import { assertDefined, Maybe } from '@michess/common-utils';
-import { Move } from '@michess/core-board';
-import { ChessGame, ChessGameError, GameActionIn } from '@michess/core-game';
+import { Move, MoveRecord } from '@michess/core-board';
+import { ChessGame, GameActionIn } from '@michess/core-game';
 import {
   ActionRepository,
   CacheRepository,
@@ -26,9 +26,9 @@ import { Job, Queue, Worker } from 'bullmq';
 import { TimeControlClassification } from 'libs/core-game/src/lib/model/TimeControlClassification';
 import { TimeControlJsonB } from 'libs/infra-db/src/lib/model/TimeControlJsonB';
 import { Session } from '../../auth/model/Session';
+import { LockService } from '../../lock/service/LockService';
 import { PageResponseMapper } from '../../mapper/PageResponseMapper';
 import { GameDetailsMapper } from '../mapper/GameDetailsMapper';
-import { GameError } from '../model/GameError';
 
 type TimeControlJobData = {
   gameId: string;
@@ -47,6 +47,7 @@ export class GamesService {
     private moveRepository: MoveRepository,
     private actionRepository: ActionRepository,
     private cacheRepo: CacheRepository,
+    private lockService: LockService,
   ) {
     const connectionOptions = { connection: this.cacheRepo.client };
     this.gameCleanupQueue = new Queue(`game-cleanup`, connectionOptions);
@@ -250,97 +251,96 @@ export class GamesService {
     session: Session,
     data: MakeMovePayloadV1,
   ): Promise<{ gameDetails: Maybe<GameDetailsV1>; move: MoveMadeV1 }> {
-    const dbGame = await this.gameRepository.findGameWithRelationsById(
-      data.gameId,
-    );
-    assertDefined(dbGame, `Game '${data.gameId}' not found`);
-    const moveToPlay = Move.fromUci(data.uci);
-    const gameDetails = GameDetailsMapper.fromSelectGameWithRelations(dbGame);
-    const chessGame = ChessGame.fromGameState(gameDetails);
-    try {
-      const job = await this.timeControlQueue.getJob(data.gameId);
-      if (job) {
-        await job.remove();
-      }
-    } catch (error) {
-      // Error means job is active and locked.
-      throw new GameError('game_is_over', 'Cannot make move, game is over', {
-        cause: error,
-      });
-    }
-    try {
+    const makeMoveWithLock = async (): Promise<{
+      game: ChessGame;
+      move: MoveRecord;
+      gameStateUpdated: boolean;
+    }> => {
+      await using _ = await this.lockService.acquireLock('game', data.gameId);
+      const dbGame = await this.gameRepository.findGameWithRelationsById(
+        data.gameId,
+      );
+      assertDefined(dbGame, `Game '${data.gameId}' not found`);
+      const moveToPlay = Move.fromUci(data.uci);
+      const gameDetails = GameDetailsMapper.fromSelectGameWithRelations(dbGame);
+      const chessGame = ChessGame.fromGameState(gameDetails);
       const updatedGame = chessGame.play(session.userId, moveToPlay);
       const updatedGameState = updatedGame.getState();
       const newMove = updatedGameState.movesRecord.at(-1);
       assertDefined(newMove, 'No move found after playing move');
-      const selectMove = await this.moveRepository.createMove({
+
+      await this.moveRepository.createMove({
         gameId: gameDetails.id,
         uci: data.uci,
         movedAt: new Date(newMove.timestamp),
       });
-      const newFlag = updatedGame.clock.flag;
-      if (newFlag) {
-        this.timeControlQueue.add(
-          'flag_timeout',
-          {
-            gameId: data.gameId,
-            flagTimestamp: newFlag.timestamp,
-          },
-          {
-            delay: newFlag.duration,
-          },
-        );
-      }
 
-      if (
+      const gameStateUpdated =
         chessGame.hasNewStatus(updatedGame) ||
-        chessGame.hasNewActionOptions(updatedGame)
-      ) {
+        chessGame.hasNewActionOptions(updatedGame);
+      if (gameStateUpdated) {
         await this.gameRepository.updateGame(
           gameDetails.id,
           GameDetailsMapper.toInsertGame(updatedGameState),
         );
-        return {
-          gameDetails: GameDetailsMapper.toGameDetailsV1({
-            game: updatedGameState,
-            clock: updatedGame.clock.instant,
-            availableActions: updatedGame.getAdditionalActions(),
-          }),
-          move: {
-            gameId: selectMove.gameId,
-            uci: selectMove.uci,
-            clock: updatedGame.clock.instant,
-          },
-        };
-      } else {
-        return {
-          move: {
-            gameId: data.gameId,
-            uci: data.uci,
-            clock: updatedGame.clock.instant,
-          },
-          gameDetails: undefined,
-        };
       }
-    } catch (error) {
-      if (error instanceof ChessGameError) {
-        if (error.code === 'player_flagged') {
-          const flag = chessGame.clock.flag;
-          this.timeControlQueue.add(
-            'flag_timeout',
-            {
-              gameId: data.gameId,
-              flagTimestamp: flag?.timestamp ?? Date.now(),
-            },
-            {
-              delay: 0,
-            },
-          );
-        }
-        throw error;
-      } else {
-        throw error;
+      return { game: chessGame, move: newMove, gameStateUpdated };
+    };
+
+    const { game, move, gameStateUpdated } = await makeMoveWithLock();
+
+    // If there is an existing flag_timeout job for this game, find it's ID
+    const jobId = await this.timeControlQueue.getDeduplicationJobId(
+      data.gameId,
+    );
+    if (jobId) {
+      // If a job was found, remove it from the queue
+      const result = await this.timeControlQueue.remove(jobId);
+      if (result === 0) {
+        // If the job couldnt be removed it must have been active and locked
+        // (or already executed). Remove the deduplication key so we can add
+        // a new flag timeout job
+        this.timeControlQueue.removeDeduplicationKey(data.gameId);
       }
+    }
+
+    const newFlag = game.clock.flag;
+    if (newFlag) {
+      this.timeControlQueue.add(
+        'flag_timeout',
+        {
+          gameId: data.gameId,
+          flagTimestamp: newFlag.timestamp,
+        },
+        {
+          deduplication: {
+            id: data.gameId,
+          },
+        },
+      );
+    }
+
+    const clockInstant = game.clock.instant;
+    const moveMadeV1: MoveMadeV1 = {
+      gameId: data.gameId,
+      uci: Move.toUci(move),
+      clock: clockInstant,
+    };
+
+    if (gameStateUpdated) {
+      return {
+        gameDetails: GameDetailsMapper.toGameDetailsV1({
+          game: game.getState(),
+          clock: clockInstant,
+          availableActions: game.getAdditionalActions(),
+        }),
+        move: moveMadeV1,
+      };
+    } else {
+      return {
+        move: moveMadeV1,
+        gameDetails: undefined,
+      };
     }
   }
 
@@ -385,19 +385,27 @@ export class GamesService {
   async handleFlagTimeout(job: Job<TimeControlJobData>): Promise<void> {
     const { gameId, flagTimestamp } = job.data;
     logger.info({ gameId, flagTimestamp }, 'Handling flag timeout');
-    const dbGame = await this.gameRepository.findGameWithRelationsById(gameId);
-    assertDefined(dbGame, `Game '${gameId}' not found`);
-    const gameDetails = GameDetailsMapper.fromSelectGameWithRelations(dbGame);
-    const chessGame = ChessGame.fromGameState(gameDetails);
-    const updatedGameState = chessGame.getState();
-    if (updatedGameState.result) {
-      this.gameRepository.updateGame(
-        gameDetails.id,
-        GameDetailsMapper.toInsertGame(updatedGameState),
-      );
+    const handleFlagTimeoutWithLock = async (): Promise<Maybe<ChessGame>> => {
+      await using _ = await this.lockService.acquireLock('game', gameId);
+      const dbGame =
+        await this.gameRepository.findGameWithRelationsById(gameId);
+      assertDefined(dbGame, `Game '${gameId}' not found`);
+      const gameDetails = GameDetailsMapper.fromSelectGameWithRelations(dbGame);
+      const chessGame = ChessGame.fromGameState(gameDetails);
+      const updatedGameState = chessGame.getState();
+      if (updatedGameState.result?.type !== gameDetails.result?.type) {
+        await this.gameRepository.updateGame(
+          gameDetails.id,
+          GameDetailsMapper.toInsertGame(updatedGameState),
+        );
+        return chessGame;
+      }
+    };
+    const chessGame = await handleFlagTimeoutWithLock();
+    if (chessGame) {
       this.notifyObservers(
         GameDetailsMapper.toGameDetailsV1({
-          game: updatedGameState,
+          game: chessGame.getState(),
           clock: chessGame.clock.instant,
           availableActions: chessGame.getAdditionalActions(),
         }),
