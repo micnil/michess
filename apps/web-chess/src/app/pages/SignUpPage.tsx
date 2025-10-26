@@ -1,7 +1,7 @@
 import { Card, Flex, Text } from '@radix-ui/themes';
 import React from 'react';
 import { Link } from '../components/Link';
-import { OrSeparator } from '../components/OrSeparator';
+import { TextSeparator } from '../components/TextSeparator';
 import { AuthCardHeader } from '../features/auth/components/AuthCardHeader';
 import { SignUpFormContainer } from '../features/auth/container/SignUpFormContainer';
 import { SocialSignInContainer } from '../features/auth/container/SocialSignInContainer';
@@ -16,7 +16,7 @@ export const SignUpPage: React.FC = () => {
             subtitle="Create your account to get started"
           />
           <SignUpFormContainer />
-          <OrSeparator />
+          <TextSeparator text="OR" />
           <SocialSignInContainer />
           <Flex align="center" justify="center" gap="2">
             <Text size="2" color="gray">

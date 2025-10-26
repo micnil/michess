@@ -2,7 +2,7 @@ import { Card, Flex, Text } from '@radix-ui/themes';
 
 import { FC } from 'react';
 import { Link } from '../components/Link';
-import { OrSeparator } from '../components/OrSeparator';
+import { TextSeparator } from '../components/TextSeparator';
 import { AuthCardHeader } from '../features/auth/components/AuthCardHeader';
 import { RequestResetPasswordFormContainer } from '../features/auth/container/RequestResetPasswordFormContainer';
 
@@ -16,7 +16,7 @@ export const RequestResetPasswordPage: FC = () => {
             subtitle="Enter your email to reset your password"
           />
           <RequestResetPasswordFormContainer />
-          <OrSeparator />
+          <TextSeparator text="OR" />
           <Flex align="center" justify="center" gap="2">
             <Text size="2" color="gray">
               Remembered your login?
