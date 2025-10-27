@@ -14,28 +14,28 @@ export const CreateGameForm: FC<Props> = ({ onSubmit, loading, error }) => {
   const [timeControl, setTimeControl] = useState<'realtime' | 'no_clock'>(
     'realtime',
   );
-  return (
-    <form
-      onSubmit={(formEvent) => {
-        formEvent.preventDefault();
-        const form = formEvent.target as HTMLFormElement;
-        const formData = new FormData(form);
-        const timeControlValue = formData.get('timeControl') as Maybe<string>;
-        const [initialSec, incrementSec] =
-          timeControlValue?.split('|').map(Number) || [];
 
-        onSubmit({
-          realtime:
-            timeControl === 'realtime'
-              ? {
-                  initialSec: initialSec || 300,
-                  incrementSec: incrementSec || 0,
-                }
-              : undefined,
-          public: formData.get('public') === 'on',
-        });
-      }}
-    >
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+    const timeControlValue = formData.get('timeControl') as Maybe<string>;
+    const [minutes, incrementSec] =
+      timeControlValue?.split('|').map(Number) || [];
+
+    onSubmit({
+      realtime:
+        timeControl === 'realtime'
+          ? {
+              initialSec: minutes * 60 || 300,
+              incrementSec: incrementSec || 0,
+            }
+          : undefined,
+      public: formData.get('public') === 'on',
+    });
+  };
+  return (
+    <form onSubmit={handleSubmit}>
       <Flex direction="column" gap="4">
         <Alert text={error} />
         <SegmentedControl.Root
