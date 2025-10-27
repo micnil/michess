@@ -1,4 +1,5 @@
 import { ApiErrorData } from '@michess/api-schema';
+import { ChessGameError } from '@michess/core-game';
 import { ZodError, prettifyError } from 'zod';
 
 export const ApiErrorMapper = {
@@ -8,6 +9,11 @@ export const ApiErrorMapper = {
         code: 'INPUT_VALIDATION_ERROR',
         message: prettifyError(error),
         details: error.issues,
+      };
+    } else if (error instanceof ChessGameError) {
+      return {
+        code: error.code,
+        message: error.message,
       };
     } else {
       return {
