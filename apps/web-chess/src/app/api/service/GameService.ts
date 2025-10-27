@@ -1,4 +1,5 @@
 import {
+  CreateGameV1,
   GameActionOptionV1,
   GameDetailsV1,
   LobbyPageResponseV1,
@@ -9,6 +10,7 @@ import { Maybe, Observable } from '@michess/common-utils';
 import { Move } from '@michess/core-board';
 import { RestClient } from '../infra/RestClient';
 import { SocketClient } from '../infra/SocketClient';
+import { CreateGameInput } from '../model/CreateGameInput';
 import { GameViewModel } from '../model/GameViewModel';
 import { PlayerGameViewModel } from '../model/PlayerGameViewModel';
 import { AuthService } from './AuthService';
@@ -66,12 +68,27 @@ export class GameService {
     };
   }
 
-  async createGame(isPrivate: boolean): Promise<GameDetailsV1> {
+  async createGame(createGameIn: CreateGameInput): Promise<GameDetailsV1> {
+    const createGameV1: CreateGameV1 = {
+      variant: 'standard',
+      isPrivate: !createGameIn.public,
+      timeControl: !!createGameIn.realtime
+        ? {
+            type: 'realtime',
+            initialSec: createGameIn.realtime.initialSec,
+            incrementSec: createGameIn.realtime.incrementSec,
+          }
+        : createGameIn.correspondence
+          ? {
+              type: 'correspondence',
+              daysPerMove: createGameIn.correspondence.daysPerMove,
+            }
+          : undefined,
+    };
+
     const response = await this.restClient
       .post<GameDetailsV1>('games', {
-        json: {
-          isPrivate,
-        },
+        json: createGameV1,
       })
       .json();
     return response;

@@ -1,4 +1,3 @@
-import { noop } from '@michess/common-utils';
 import {
   Box,
   Button,
@@ -9,7 +8,6 @@ import {
   Skeleton,
   Text,
 } from '@radix-ui/themes';
-import { useMutation } from '@tanstack/react-query';
 import React, { use } from 'react';
 import { ApiContext } from '../../api/context/ApiContext';
 import { Alert } from '../../components/Alert';
@@ -61,24 +59,6 @@ export const GameLobby: React.FC<Props> = ({ onCreateGame, onJoinGame }) => {
     refetchInterval: 5000,
   });
 
-  const { mutateAsync: createAndJoinGame, error: createError } = useMutation({
-    mutationFn: async () => {
-      const gameDetails = await api.games.createGame(false);
-      await api.games.joinGame(gameDetails.id);
-      return gameDetails;
-    },
-  });
-
-  const handleCreateGame = () => {
-    createAndJoinGame()
-      .then((gameDetails) => {
-        if (onCreateGame) {
-          onCreateGame(gameDetails.id);
-        }
-      })
-      .catch(noop);
-  };
-
   const games = lobbyData?.items || [];
 
   return (
@@ -95,7 +75,7 @@ export const GameLobby: React.FC<Props> = ({ onCreateGame, onJoinGame }) => {
           </Skeleton>
         </Flex>
 
-        <Alert text={createError?.message ?? queryError?.message} />
+        <Alert text={queryError?.message} />
 
         <Skeleton loading={isPending}>
           <Flex direction="column" gap="2">
@@ -148,7 +128,7 @@ export const GameLobby: React.FC<Props> = ({ onCreateGame, onJoinGame }) => {
       </Card>
       <Dialog.Content>
         <Dialog.Title>Create New Game</Dialog.Title>
-        <CreateGameFormContainer />
+        <CreateGameFormContainer onCreateGame={onCreateGame} />
       </Dialog.Content>
     </Dialog.Root>
   );
