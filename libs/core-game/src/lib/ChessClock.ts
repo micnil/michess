@@ -93,13 +93,13 @@ export class ChessClock<Event extends Maybe<ClockEvent> = Maybe<ClockEvent>> {
   public get flag(): Maybe<{
     color: Color;
     timestamp: number;
-    duration: number;
+    timeLeftMs: number;
   }> {
     if (this.lastEvent && this.lastEvent.type === 'flag') {
       return {
         color: this.lastEvent.color,
         timestamp: this.lastEvent.timestamp,
-        duration: 0,
+        timeLeftMs: 0,
       };
     } else if (this.lastEvent && this.lastEvent.type === 'hit') {
       const runningSide = Color.opposite(this.lastEvent.side);
@@ -110,7 +110,7 @@ export class ChessClock<Event extends Maybe<ClockEvent> = Maybe<ClockEvent>> {
       return {
         color: Color.opposite(this.lastEvent.side),
         timestamp: this.lastEvent.timestamp,
-        duration: timeLeftMs,
+        timeLeftMs,
       };
     } else {
       return undefined;

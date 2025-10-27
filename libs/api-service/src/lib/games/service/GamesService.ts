@@ -129,6 +129,7 @@ export class GamesService {
           deduplication: {
             id: state.id,
           },
+          delay: newFlag.timeLeftMs,
         },
       );
     }
