@@ -232,10 +232,10 @@ const fromGameStateInternal = (
     }
 
     const newBoard = board.playMove({ ...move, timestamp });
-    const moveResult = evalResult(newBoard, newClock);
+    const gameResult = evalResult(newBoard, newClock);
 
     const shouldStartGame = gameStateInternal.status === 'READY';
-    const shouldEndGame = moveResult !== undefined;
+    const shouldEndGame = gameResult !== undefined;
 
     const newStatus = shouldStartGame
       ? 'IN_PROGRESS'
@@ -256,7 +256,7 @@ const fromGameStateInternal = (
         startedAt,
         endedAt,
       },
-      result: moveResult,
+      result: gameResult,
       additionalActions: additionalActions.updateBoard(newStatus, newBoard),
     });
   };
@@ -357,10 +357,12 @@ const fromGameState = (gameState: GameState): ChessGame => {
   );
   const clock = ChessClock.fromGameState(gameState);
   const result = gameState.result || evalResult(board, clock);
+  const status =
+    gameState.status !== 'ENDED' && !!result ? 'ENDED' : gameState.status;
   return fromGameStateInternal({
     meta: { ...GameState.toMeta(gameState) },
     players: gameState.players,
-    status: gameState.status,
+    status,
     board,
     result,
     timeControl: gameState.timeControl,
