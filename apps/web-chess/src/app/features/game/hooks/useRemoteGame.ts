@@ -1,4 +1,4 @@
-import { GameActionOptionV1 } from '@michess/api-schema';
+import { ClockV1, GameActionOptionV1 } from '@michess/api-schema';
 import { Maybe } from '@michess/common-utils';
 import { ChessPosition, Move } from '@michess/core-board';
 import { Chessboard } from '@michess/core-game';
@@ -47,6 +47,7 @@ type GameStoreState = {
 type GameStoreActions = {
   setChessboard: (fn: (old: Chessboard) => Chessboard) => void;
   setViewModel: (viewModel: Maybe<PlayerGameViewModel>) => void;
+  setClock: (clock: ClockV1) => void;
 };
 
 type GameStore = GameStoreState & GameStoreActions;
@@ -54,6 +55,16 @@ type GameStore = GameStoreState & GameStoreActions;
 const useGameStore = create<GameStore>()((set, get) => ({
   viewModel: undefined,
   chessboard: Chessboard.fromPosition(ChessPosition.standardInitial()),
+  setClock: (clock) => {
+    set((state) => ({
+      viewModel: state.viewModel
+        ? {
+            ...state.viewModel,
+            clock,
+          }
+        : undefined,
+    }));
+  },
   setChessboard: (fn: (old: Chessboard) => Chessboard) =>
     set({ chessboard: fn(get().chessboard) }),
 
@@ -69,7 +80,8 @@ const useGameStore = create<GameStore>()((set, get) => ({
 export const useRemoteGame = (props: Props): RemoteChessGame => {
   const { games } = useApi();
   const { auth } = useAuth();
-  const { chessboard, setChessboard, viewModel, setViewModel } = useGameStore();
+  const { chessboard, setChessboard, viewModel, setViewModel, setClock } =
+    useGameStore();
 
   const {
     mutate: joinGame,
@@ -120,8 +132,11 @@ export const useRemoteGame = (props: Props): RemoteChessGame => {
     () => games.observeMovesForGame(props.gameId),
     [games, props.gameId],
   );
-  useObservable(movesObservable, (move) => {
-    setChessboard((prev) => prev.playMove(move));
+  useObservable(movesObservable, (event) => {
+    setChessboard((prev) => prev.playMove(event.move));
+    if (event.clock) {
+      setClock(event.clock);
+    }
   });
 
   const handleMove = (move: MovePayload) => {

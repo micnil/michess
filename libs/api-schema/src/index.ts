@@ -5,6 +5,7 @@ export * from './lib/common/EventResponse';
 export * from './lib/common/PageResponseV1';
 export * from './lib/common/PaginationQueryV1';
 export * from './lib/common/PaginationQueryV1Schema';
+export * from './lib/game/ClockV1';
 export * from './lib/game/CreateGameV1';
 export * from './lib/game/CreateGameV1Schema';
 export * from './lib/game/DrawReasonV1';

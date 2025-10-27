@@ -12,6 +12,7 @@ import { RestClient } from '../infra/RestClient';
 import { SocketClient } from '../infra/SocketClient';
 import { CreateGameInput } from '../model/CreateGameInput';
 import { GameViewModel } from '../model/GameViewModel';
+import { MoveEvent } from '../model/MoveEvent';
 import { PlayerGameViewModel } from '../model/PlayerGameViewModel';
 import { AuthService } from './AuthService';
 
@@ -194,14 +195,14 @@ export class GameService {
     };
   }
 
-  observeMovesForGame(gameId: string): Observable<Move> {
+  observeMovesForGame(gameId: string): Observable<MoveEvent> {
     return {
-      subscribe: (callback: (move: Move) => void) => {
+      subscribe: (callback: (move: MoveEvent) => void) => {
         const handleMove = (movePayload: MoveMadeV1) => {
           if (movePayload.gameId === gameId) {
             try {
               const move = Move.fromUci(movePayload.uci);
-              callback(move);
+              callback({ move, clock: movePayload.clock });
             } catch (error) {
               console.error(
                 'Failed to parse move from UCI:',
