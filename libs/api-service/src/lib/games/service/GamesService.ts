@@ -107,9 +107,23 @@ export class GamesService {
     // If there is an existing flag_timeout job for this game, find it's ID
     const jobId = await this.timeControlQueue.getDeduplicationJobId(state.id);
     if (jobId) {
+      logger.debug(
+        {
+          jobId,
+        },
+        'Removing flag job',
+      );
       // If a job was found, remove it from the queue
       const result = await this.timeControlQueue.remove(jobId);
       if (result === 0) {
+        logger.info(
+          {
+            result,
+            jobId,
+            gameId: state.id,
+          },
+          'Failed to remove flag job. Removing deduplication key instead.',
+        );
         // If the job couldnt be removed it must have been active and locked
         // (or already executed). Remove the deduplication key so we can add
         // a new flag timeout job
@@ -119,6 +133,15 @@ export class GamesService {
 
     const newFlag = chessGame.clock?.flag;
     if (newFlag) {
+      logger.debug(
+        {
+          gameId: state.id,
+          color: newFlag.color,
+          flagTimestamp: new Date(newFlag.timestamp).toISOString(),
+          timeLeftSec: newFlag.timeLeftMs / 1000,
+        },
+        'Scheduling new flag timeout job',
+      );
       this.timeControlQueue.add(
         'flag_timeout',
         {

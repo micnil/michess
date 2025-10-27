@@ -366,7 +366,7 @@ const fromGameState = (gameState: GameState): ChessGame => {
     board,
     result,
     timeControl: gameState.timeControl,
-    clock: clock,
+    clock,
     additionalActions: ChessGameActions.from(
       gameState.actionRecord,
       board,
