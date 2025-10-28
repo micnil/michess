@@ -127,35 +127,44 @@ export class CountdownClock {
   }
 
   optimisticToggle(): CountdownClock {
-    const newTicking = this.ticking ? Color.opposite(this.ticking) : undefined;
+    // First move - white has just played, black's clock starts
+    if (!this.ticking) {
+      return new CountdownClock({
+        clockV1: {
+          whiteMs: this.getTimeLeftMs('white'),
+          blackMs: this.getTimeLeftMs('black'),
+        },
+        receivedAt: Date.now(),
+        ticking: 'black',
+        timeControl: this.timeControl,
+        lastKnownSyncedClock: this.lastKnownSyncedClock,
+      });
+    } else {
+      const newTicking = Color.opposite(this.ticking);
+      const currentPlayerTimeMs = this.getTimeLeftMs(this.ticking);
+      const nextPlayerTimeMs = this.getTimeLeftMs(Color.opposite(this.ticking));
 
-    const currentPlayerTimeMs = this.ticking
-      ? this.getTimeLeftMs(this.ticking)
-      : 0;
-    const nextPlayerTimeMs = this.ticking
-      ? this.getTimeLeftMs(Color.opposite(this.ticking))
-      : 0;
+      const updatedCurrentPlayerTimeMs = this.resetOnToggle
+        ? this.incrementMs
+        : currentPlayerTimeMs + this.incrementMs;
 
-    const updatedCurrentPlayerTimeMs = this.resetOnToggle
-      ? this.incrementMs
-      : currentPlayerTimeMs + this.incrementMs;
-
-    return new CountdownClock({
-      clockV1: {
-        whiteMs:
-          this.ticking === 'white'
-            ? updatedCurrentPlayerTimeMs
-            : nextPlayerTimeMs,
-        blackMs:
-          this.ticking === 'black'
-            ? updatedCurrentPlayerTimeMs
-            : nextPlayerTimeMs,
-      },
-      receivedAt: Date.now(),
-      ticking: newTicking,
-      timeControl: this.timeControl,
-      lastKnownSyncedClock: this.lastKnownSyncedClock,
-    });
+      return new CountdownClock({
+        clockV1: {
+          whiteMs:
+            this.ticking === 'white'
+              ? updatedCurrentPlayerTimeMs
+              : nextPlayerTimeMs,
+          blackMs:
+            this.ticking === 'black'
+              ? updatedCurrentPlayerTimeMs
+              : nextPlayerTimeMs,
+        },
+        receivedAt: Date.now(),
+        ticking: newTicking,
+        timeControl: this.timeControl,
+        lastKnownSyncedClock: this.lastKnownSyncedClock,
+      });
+    }
   }
 
   resetToLastSynced(): CountdownClock {
