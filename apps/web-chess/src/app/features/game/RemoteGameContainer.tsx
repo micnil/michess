@@ -34,8 +34,18 @@ export const RemoteGameContainer = ({
     isPeeking,
   } = usePeekBoardState(chessboard);
   const { auth } = useAuth();
-  const { players, playerSide, result, isReadOnly, actionOptions } = gameState;
+  const {
+    players,
+    playerSide,
+    result,
+    isReadOnly,
+    actionOptions,
+    clock,
+    status,
+  } = gameState;
   orientation = playerSide !== 'spectator' ? playerSide : orientation;
+
+  const isInProgress = status === 'IN_PROGRESS';
 
   const blackPlayer = { ...players.black, color: Color.Black };
   const whitePlayer = { ...players.white, color: Color.White };
@@ -59,6 +69,7 @@ export const RemoteGameContainer = ({
           <Inset>
             <PlayerInfo
               isPlayerAnonymous={auth?.user?.isAnonymous || false}
+              clock={clock}
               playerSide={playerSide}
               username={topPlayer?.username}
               avatar={topPlayer?.avatar}
@@ -83,6 +94,7 @@ export const RemoteGameContainer = ({
               />
             </Skeleton>
             <PlayerInfo
+              clock={clock}
               isPlayerAnonymous={auth?.user?.isAnonymous || false}
               playerSide={playerSide}
               username={bottomPlayer?.username}

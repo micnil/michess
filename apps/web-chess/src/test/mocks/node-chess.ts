@@ -55,6 +55,10 @@ export const mswHandlers = [
   http.post('/api/games', () => {
     return HttpResponse.json<GameDetailsV1>({
       id: 'new-game-id',
+      timeControl: {
+        classification: 'no_clock',
+      },
+      clock: undefined,
       players: { white: undefined, black: undefined },
       variant: 'standard',
       isPrivate: false,

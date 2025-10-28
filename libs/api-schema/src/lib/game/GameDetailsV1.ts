@@ -6,6 +6,7 @@ import { GameActionOptionV1 } from './GameActionOptionV1';
 import { GameResultV1Schema } from './GameResultV1Schema';
 import { GameStatusTypeV1 } from './GameStatusTypeV1';
 import { MoveV1 } from './MoveV1';
+import { TimeControlV1 } from './TimeControlV1';
 
 export type GameDetailsV1 = {
   id: string;
@@ -16,6 +17,7 @@ export type GameDetailsV1 = {
     white?: Maybe<PlayerInfoV1>;
     black?: Maybe<PlayerInfoV1>;
   };
+  timeControl: TimeControlV1;
   clock: Maybe<ClockV1>;
   actionOptions: GameActionOptionV1[];
   moves: MoveV1[];

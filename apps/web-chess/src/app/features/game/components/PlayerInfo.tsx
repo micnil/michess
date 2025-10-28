@@ -1,6 +1,8 @@
 import { Color } from '@michess/core-board';
 import { Avatar, Badge, Flex, Skeleton, Text } from '@radix-ui/themes';
 import React from 'react';
+import { CountdownClock } from '../../../api/model/CountdownClock';
+import { Clock } from './Clock';
 
 type PlayerInfoProps = {
   username?: string;
@@ -10,6 +12,7 @@ type PlayerInfoProps = {
   avatar?: string;
   isPlayerTurn?: boolean;
   isLoading?: boolean;
+  clock?: CountdownClock;
 };
 
 export const PlayerInfo: React.FC<PlayerInfoProps> = ({
@@ -19,6 +22,7 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
   color,
   avatar,
   isPlayerTurn = false,
+  clock,
   isLoading,
 }) => {
   const getInitials = (name: string): string => {
@@ -80,6 +84,7 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
           </Skeleton>
         </Flex>
       </Flex>
+      {clock && <Clock clock={clock} color={color} />}
     </Flex>
   );
 };

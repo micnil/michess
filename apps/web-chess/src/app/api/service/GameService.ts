@@ -1,15 +1,19 @@
 import {
+  ClockV1,
   CreateGameV1,
   GameActionOptionV1,
   GameDetailsV1,
+  GameStatusTypeV1,
   LobbyPageResponseV1,
   MoveMadeV1,
   PlayerGameInfoPageResponseV1,
+  TimeControlV1,
 } from '@michess/api-schema';
 import { Maybe, Observable } from '@michess/common-utils';
-import { Move } from '@michess/core-board';
+import { Color, Move } from '@michess/core-board';
 import { RestClient } from '../infra/RestClient';
 import { SocketClient } from '../infra/SocketClient';
+import { CountdownClock } from '../model/CountdownClock';
 import { CreateGameInput } from '../model/CreateGameInput';
 import { GameViewModel } from '../model/GameViewModel';
 import { MoveEvent } from '../model/MoveEvent';
@@ -23,12 +27,36 @@ export class GameService {
     private auth: AuthService,
   ) {}
 
+  toClock(
+    gameStatus: GameStatusTypeV1,
+    turn: Color,
+    timeControl: TimeControlV1,
+    clockV1: Maybe<ClockV1>,
+  ): Maybe<CountdownClock> {
+    if (clockV1) {
+      return CountdownClock.fromRemote({
+        clockV1,
+        ticking: gameStatus === 'IN_PROGRESS' ? turn : undefined,
+        timeControl,
+        receivedAt: Date.now(),
+      });
+    } else {
+      return undefined;
+    }
+  }
+
   toGameViewModel(gameDetails: GameDetailsV1): GameViewModel {
     return {
       status: gameDetails.status,
       moves: gameDetails.moves.map((m) => Move.fromUci(m.uci)),
       result: gameDetails.result,
       startedAt: gameDetails.startedAt,
+      clock: this.toClock(
+        gameDetails.status,
+        gameDetails.moves.length % 2 === 0 ? 'white' : 'black',
+        gameDetails.timeControl,
+        gameDetails.clock,
+      ),
       players: {
         white: gameDetails.players.white
           ? {
@@ -202,7 +230,10 @@ export class GameService {
           if (movePayload.gameId === gameId) {
             try {
               const move = Move.fromUci(movePayload.uci);
-              callback({ move, clock: movePayload.clock });
+              callback({
+                move,
+                clock: movePayload.clock,
+              });
             } catch (error) {
               console.error(
                 'Failed to parse move from UCI:',

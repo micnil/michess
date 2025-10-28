@@ -136,6 +136,9 @@ describe('SocketRouter', () => {
       const mockGameState: GameDetailsV1 = {
         id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
         status: 'WAITING',
+        timeControl: {
+          classification: 'no_clock',
+        },
         players: { white: { name: 'Test User', id: 'u1' }, black: undefined },
         isPrivate: false,
         moves: [],

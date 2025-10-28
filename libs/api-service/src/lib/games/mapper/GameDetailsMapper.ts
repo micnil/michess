@@ -254,6 +254,7 @@ export const GameDetailsMapper = {
       id: game.id,
       status: game.status,
       clock,
+      timeControl: game.timeControl,
       players: {
         white: game.players.white
           ? {

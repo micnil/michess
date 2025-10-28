@@ -1,5 +1,6 @@
-import { ClockV1, GameResultV1, GameStatusTypeV1 } from '@michess/api-schema';
+import { GameResultV1, GameStatusTypeV1 } from '@michess/api-schema';
 import { Move } from '@michess/core-board';
+import { CountdownClock } from './CountdownClock';
 
 export type GameViewModel = {
   moves: Move[];
@@ -10,5 +11,5 @@ export type GameViewModel = {
     black?: { username: string; avatar?: string };
   };
   startedAt?: Date;
-  clock?: ClockV1;
+  clock?: CountdownClock;
 };

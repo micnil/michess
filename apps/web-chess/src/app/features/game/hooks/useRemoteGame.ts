@@ -1,4 +1,4 @@
-import { ClockV1, GameActionOptionV1 } from '@michess/api-schema';
+import { GameActionOptionV1 } from '@michess/api-schema';
 import { Maybe } from '@michess/common-utils';
 import { ChessPosition, Move } from '@michess/core-board';
 import { Chessboard } from '@michess/core-game';
@@ -8,6 +8,7 @@ import { useEffect, useMemo } from 'react';
 import { create } from 'zustand';
 import { useApi } from '../../../api/hooks/useApi';
 import { useAuth } from '../../../api/hooks/useAuth';
+import { CountdownClock } from '../../../api/model/CountdownClock';
 import { PlayerGameViewModel } from '../../../api/model/PlayerGameViewModel';
 import { useObservable } from '../../../util/useObservable';
 
@@ -47,7 +48,7 @@ type GameStoreState = {
 type GameStoreActions = {
   setChessboard: (fn: (old: Chessboard) => Chessboard) => void;
   setViewModel: (viewModel: Maybe<PlayerGameViewModel>) => void;
-  setClock: (clock: ClockV1) => void;
+  setClock: (fn: (store: GameStoreState) => Maybe<CountdownClock>) => void;
 };
 
 type GameStore = GameStoreState & GameStoreActions;
@@ -55,18 +56,18 @@ type GameStore = GameStoreState & GameStoreActions;
 const useGameStore = create<GameStore>()((set, get) => ({
   viewModel: undefined,
   chessboard: Chessboard.fromPosition(ChessPosition.standardInitial()),
-  setClock: (clock) => {
+  setClock: (fn: (store: GameStoreState) => Maybe<CountdownClock>) => {
     set((state) => ({
       viewModel: state.viewModel
         ? {
             ...state.viewModel,
-            clock,
+            clock: fn(state),
           }
         : undefined,
     }));
   },
   setChessboard: (fn: (old: Chessboard) => Chessboard) =>
-    set({ chessboard: fn(get().chessboard) }),
+    set(({ chessboard }) => ({ chessboard: fn(chessboard) })),
 
   setViewModel: (viewModel) => {
     const chessboard = Chessboard.fromPosition(
@@ -134,16 +135,24 @@ export const useRemoteGame = (props: Props): RemoteChessGame => {
   );
   useObservable(movesObservable, (event) => {
     setChessboard((prev) => prev.playMove(event.move));
-    if (event.clock) {
-      setClock(event.clock);
-    }
+    setClock(({ viewModel, chessboard }) =>
+      event.clock
+        ? viewModel?.clock?.sync({
+            clockV1: event.clock,
+            receivedAt: Date.now(),
+            ticking: chessboard.position.turn,
+          })
+        : undefined,
+    );
   });
 
   const handleMove = (move: MovePayload) => {
     // Optimistic update
+    setClock((store) => store.viewModel?.clock?.optimisticToggle());
     setChessboard((prev) => prev.playMove(move));
     makeMoveRemote(move).catch(() => {
       // Revert on error
+      setClock((store) => store.viewModel?.clock?.resetToLastSynced());
       setChessboard((prev) => prev.unmakeMove());
     });
   };
