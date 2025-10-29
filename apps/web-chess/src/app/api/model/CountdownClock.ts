@@ -105,6 +105,10 @@ export class CountdownClock {
     return this.getTimeLeftMs('black');
   }
 
+  isCloseToFlag(color: Color): boolean {
+    return this.getTimeLeftMs(color) <= 10000;
+  }
+
   getFormattedClock(color: Color): string {
     const totalSeconds = Math.max(
       0,
