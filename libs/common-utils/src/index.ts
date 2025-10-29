@@ -1,4 +1,5 @@
 export * from './lib/assertDefined';
+export * from './lib/assertEqual';
 export * from './lib/counter';
 export * from './lib/countProps';
 export * from './lib/immutability/insertItems';

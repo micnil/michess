@@ -9,7 +9,6 @@ import { PiecePlacements } from '../position/model/PiecePlacements';
 import { MoveGenerator } from './generator/MoveGenerator';
 import { Move } from './Move';
 import { MoveOption } from './MoveOption';
-import { MoveRecord } from './MoveRecord';
 
 export type MoveNotation = {
   displayStr: string;
@@ -116,7 +115,7 @@ const moveOptionToSan = (
 /**
  * Generate move notation from a chess position and move
  */
-const from = (position: ChessPosition, move: MoveRecord): MoveNotation => {
+const from = (position: ChessPosition, move: Move): MoveNotation => {
   const moveGen = MoveGenerator(position);
   const legalMoves = moveGen.generateMoves();
   const moveOption = legalMoves.moves.find((m) =>

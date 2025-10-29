@@ -20,6 +20,10 @@ describe('GameLobby', () => {
     const onCreateGame = vi.fn();
     const gameDetailsMockV1: GameDetailsV1 = {
       actionOptions: [],
+      clock: undefined,
+      timeControl: {
+        classification: 'no_clock',
+      },
       id: 'new-game-id',
       variant: 'standard',
       status: 'READY',

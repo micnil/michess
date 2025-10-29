@@ -2,8 +2,8 @@ import { Card, Flex, Text } from '@radix-ui/themes';
 
 import React from 'react';
 import { Link } from '../components/Link';
-import { OrSeparator } from '../components/OrSeparator';
 import { SuccessMessage } from '../components/SuccessMessage';
+import { TextSeparator } from '../components/TextSeparator';
 import { AuthCardHeader } from '../features/auth/components/AuthCardHeader';
 import { SignInFormContainer } from '../features/auth/container/SignInFormContainer';
 import { SocialSignInContainer } from '../features/auth/container/SocialSignInContainer';
@@ -29,7 +29,7 @@ export const SignInPage: React.FC<Props> = ({ referer }) => {
           )}
 
           <SignInFormContainer />
-          <OrSeparator />
+          <TextSeparator text="OR" />
           <SocialSignInContainer />
 
           <Flex align="center" justify="center" gap="2">

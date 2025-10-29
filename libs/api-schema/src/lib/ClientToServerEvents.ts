@@ -4,12 +4,12 @@ import { JoinGamePayloadV1 } from './game/JoinGamePayloadV1';
 import { LeaveGamePayloadV1 } from './game/LeaveGamePayloadV1';
 import { MakeActionPayloadV1 } from './game/MakeActionPayloadV1';
 import { MakeMovePayloadV1 } from './game/MakeMovePayloadV1';
-import { MakeMoveResponseV1 } from './game/MakeMoveResponseV1';
+import { MoveMadeV1 } from './game/MoveMadeV1';
 
 export type ClientToServerEvents = {
   'make-move': (
     move: MakeMovePayloadV1,
-    callback: (response: MakeMoveResponseV1) => void,
+    callback: (response: EventResponse<MoveMadeV1>) => void,
   ) => void;
   'join-game': (
     joinGamePayload: JoinGamePayloadV1,

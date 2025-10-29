@@ -8,6 +8,7 @@ import { useEffect, useMemo } from 'react';
 import { create } from 'zustand';
 import { useApi } from '../../../api/hooks/useApi';
 import { useAuth } from '../../../api/hooks/useAuth';
+import { CountdownClock } from '../../../api/model/CountdownClock';
 import { PlayerGameViewModel } from '../../../api/model/PlayerGameViewModel';
 import { useObservable } from '../../../util/useObservable';
 
@@ -47,6 +48,7 @@ type GameStoreState = {
 type GameStoreActions = {
   setChessboard: (fn: (old: Chessboard) => Chessboard) => void;
   setViewModel: (viewModel: Maybe<PlayerGameViewModel>) => void;
+  setClock: (fn: (store: GameStoreState) => Maybe<CountdownClock>) => void;
 };
 
 type GameStore = GameStoreState & GameStoreActions;
@@ -54,8 +56,18 @@ type GameStore = GameStoreState & GameStoreActions;
 const useGameStore = create<GameStore>()((set, get) => ({
   viewModel: undefined,
   chessboard: Chessboard.fromPosition(ChessPosition.standardInitial()),
+  setClock: (fn: (store: GameStoreState) => Maybe<CountdownClock>) => {
+    set((state) => ({
+      viewModel: state.viewModel
+        ? {
+            ...state.viewModel,
+            clock: fn(state),
+          }
+        : undefined,
+    }));
+  },
   setChessboard: (fn: (old: Chessboard) => Chessboard) =>
-    set({ chessboard: fn(get().chessboard) }),
+    set(({ chessboard }) => ({ chessboard: fn(chessboard) })),
 
   setViewModel: (viewModel) => {
     const chessboard = Chessboard.fromPosition(
@@ -69,7 +81,8 @@ const useGameStore = create<GameStore>()((set, get) => ({
 export const useRemoteGame = (props: Props): RemoteChessGame => {
   const { games } = useApi();
   const { auth } = useAuth();
-  const { chessboard, setChessboard, viewModel, setViewModel } = useGameStore();
+  const { chessboard, setChessboard, viewModel, setViewModel, setClock } =
+    useGameStore();
 
   const {
     mutate: joinGame,
@@ -120,15 +133,26 @@ export const useRemoteGame = (props: Props): RemoteChessGame => {
     () => games.observeMovesForGame(props.gameId),
     [games, props.gameId],
   );
-  useObservable(movesObservable, (move) => {
-    setChessboard((prev) => prev.playMove(move));
+  useObservable(movesObservable, (event) => {
+    setChessboard((prev) => prev.playMove(event.move));
+    setClock(({ viewModel, chessboard }) =>
+      event.clock
+        ? viewModel?.clock?.sync({
+            clockV1: event.clock,
+            receivedAt: Date.now(),
+            ticking: chessboard.position.turn,
+          })
+        : undefined,
+    );
   });
 
   const handleMove = (move: MovePayload) => {
     // Optimistic update
+    setClock((store) => store.viewModel?.clock?.optimisticToggle());
     setChessboard((prev) => prev.playMove(move));
     makeMoveRemote(move).catch(() => {
       // Revert on error
+      setClock((store) => store.viewModel?.clock?.resetToLastSynced());
       setChessboard((prev) => prev.unmakeMove());
     });
   };

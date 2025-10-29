@@ -23,6 +23,8 @@ import {
   SelectGame,
   SelectGameWithRelations,
 } from '@michess/infra-db';
+import { ClockInstant } from 'libs/core-game/src/lib/model/ClockInstant';
+import { TimeControl } from 'libs/core-game/src/lib/model/TimeControl';
 
 const TO_RESULT_TYPE_MAPPING: Record<
   SelectGameWithRelations['result'],
@@ -109,6 +111,37 @@ const toGameActions = (game: SelectGameWithRelations): GameAction[] => {
     .filter(isDefined);
 };
 
+const toTimeControl = ({
+  timeControl,
+  timeControlClassification,
+}: SelectGame): TimeControl => {
+  switch (timeControlClassification) {
+    case 'bullet':
+    case 'blitz':
+    case 'rapid':
+      return {
+        classification: timeControlClassification,
+        incrementSec:
+          timeControl && 'increment' in timeControl ? timeControl.increment : 0,
+        initialSec:
+          timeControl && 'initial' in timeControl ? timeControl.initial : 0,
+      };
+    case 'correspondence':
+      return {
+        classification: timeControlClassification,
+        daysPerMove:
+          timeControl && 'daysPerMove' in timeControl
+            ? timeControl.daysPerMove
+            : 0,
+      };
+    case 'no_clock':
+    default:
+      return {
+        classification: 'no_clock',
+      };
+  }
+};
+
 const toChessGameResult = ({
   result,
 }: SelectGame | SelectGameWithRelations): Maybe<ChessGameResult> => {
@@ -118,6 +151,7 @@ const toChessGameResult = ({
       }
     : undefined;
 };
+
 export const GameDetailsMapper = {
   fromSelectGame(game: SelectGame): GameDetails {
     return {
@@ -125,6 +159,7 @@ export const GameDetailsMapper = {
         white: undefined,
         black: undefined,
       },
+      timeControl: toTimeControl(game),
       actionRecord: [],
       result: toChessGameResult(game),
       status: FROM_STATUS_TYPE_MAPPING[game.status],
@@ -139,6 +174,7 @@ export const GameDetailsMapper = {
     const players = toGamePlayers(game);
     return {
       ...toGameMeta(game),
+      timeControl: toTimeControl(game),
       actionRecord: toGameActions(game),
       players,
       status: FROM_STATUS_TYPE_MAPPING[game.status],
@@ -207,14 +243,18 @@ export const GameDetailsMapper = {
   },
   toGameDetailsV1({
     game,
+    clock,
     availableActions,
   }: {
     game: GameDetails;
+    clock: Maybe<ClockInstant>;
     availableActions?: GameActionOption[];
   }): GameDetailsV1 {
     return {
       id: game.id,
       status: game.status,
+      clock,
+      timeControl: game.timeControl,
       players: {
         white: game.players.white
           ? {

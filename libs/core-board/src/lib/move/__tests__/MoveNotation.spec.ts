@@ -1,10 +1,8 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import { Color } from '../../common/Color';
-import { Coordinate } from '../../common/Coordinate';
 import { PieceType } from '../../common/PieceType';
 import { FenParser } from '../../fen/util/FenParser';
-import { CastlingRight } from '../../position/model/CastlingRight';
 import { ChessPosition } from '../../position/model/ChessPosition';
 import { MoveNotation } from '../MoveNotation';
 
@@ -14,9 +12,8 @@ describe('MoveNotation', () => {
       const position = ChessPosition.standardInitial();
 
       const notation = MoveNotation.from(position, {
-        start: 52,
-        target: 36,
-        capture: false,
+        from: 'e2',
+        to: 'e4',
       });
       expect(notation.displayStr).toBe('e4');
     });
@@ -25,9 +22,8 @@ describe('MoveNotation', () => {
       const position = ChessPosition.standardInitial();
 
       const notation = MoveNotation.from(position, {
-        start: Coordinate.toIndex('g1'),
-        target: Coordinate.toIndex('f3'),
-        capture: false,
+        from: 'g1',
+        to: 'f3',
       });
       expect(notation.displayStr).toEqual('Nf3');
     });
@@ -38,10 +34,8 @@ describe('MoveNotation', () => {
       const position = FenParser.toChessPosition(fenString);
 
       const notation = MoveNotation.from(position, {
-        start: Coordinate.toIndex('e1'),
-        target: Coordinate.toIndex('g1'),
-        castling: CastlingRight.KingSide,
-        capture: false,
+        from: 'e1',
+        to: 'g1',
       });
       expect(notation.displayStr).toBe('O-O');
     });
@@ -52,10 +46,8 @@ describe('MoveNotation', () => {
       const position = FenParser.toChessPosition(fenString);
 
       const notation = MoveNotation.from(position, {
-        start: Coordinate.toIndex('e1'),
-        target: Coordinate.toIndex('c1'),
-        castling: CastlingRight.QueenSide,
-        capture: false,
+        from: 'e1',
+        to: 'c1',
       });
       expect(notation.displayStr).toBe('O-O-O');
     });
@@ -66,14 +58,12 @@ describe('MoveNotation', () => {
       const position = FenParser.toChessPosition(fen);
 
       const notation1 = MoveNotation.from(position, {
-        start: Coordinate.toIndex('c3'),
-        target: Coordinate.toIndex('d5'),
-        capture: true,
+        from: 'c3',
+        to: 'd5',
       });
       const notation2 = MoveNotation.from(position, {
-        start: Coordinate.toIndex('f4'),
-        target: Coordinate.toIndex('d5'),
-        capture: true,
+        from: 'f4',
+        to: 'd5',
       });
       expect(notation1.displayStr).toBe('Ncxd5');
       expect(notation2.displayStr).toBe('Nfxd5');
@@ -87,9 +77,8 @@ describe('MoveNotation', () => {
       const position = FenParser.toChessPosition(fenString);
 
       const notation = MoveNotation.from(position, {
-        start: Coordinate.toIndex('a7'),
-        target: Coordinate.toIndex('a8'),
-        capture: false,
+        from: 'a7',
+        to: 'a8',
         promotion: PieceType.Queen,
       });
       expect(notation.displayStr).toMatch(/=Q$/); // Should end with =Q

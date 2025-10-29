@@ -4,14 +4,19 @@ import { ChessGameActions } from './actions/ChessGameActions';
 import { GameActionIn } from './actions/model/GameActionIn';
 import { GameActionOption } from './actions/model/GameActionOption';
 import { Chessboard } from './Chessboard';
+import { ChessClock } from './ChessClock';
+import { ChessGameError } from './model/ChessGameError';
 import { ChessGameResult } from './model/ChessGameResult';
 import { GameMeta } from './model/GameMeta';
 import { GamePlayers } from './model/GamePlayers';
 import { GameState } from './model/GameState';
 import { GameStatusType } from './model/GameStatusType';
 import { PlayerInfo } from './model/PlayerInfo';
+import { TimeControl } from './model/TimeControl';
 
 type GameStateInternal = {
+  timeControl: TimeControl;
+  clock: Maybe<ChessClock>;
   meta: GameMeta;
   players: GamePlayers;
   status: GameStatusType;
@@ -32,6 +37,27 @@ export type ChessGame = {
   isPlayerInGame(playerId: string): boolean;
   hasNewStatus(oldChess: ChessGame): boolean;
   hasNewActionOptions(oldChess: ChessGame): boolean;
+  clock: Maybe<ChessClock>;
+};
+
+const endGame = (
+  gameState: GameStateInternal,
+  result: ChessGameResult,
+): GameStateInternal => {
+  const endedAt = new Date();
+  const resultToSet = gameState.result ?? result;
+  const pausedClock = gameState.clock?.pause(endedAt.getTime());
+
+  return {
+    ...gameState,
+    status: 'ENDED',
+    meta: {
+      ...gameState.meta,
+      endedAt,
+    },
+    result: resultToSet,
+    clock: pausedClock,
+  };
 };
 
 const makeAction = (
@@ -41,56 +67,67 @@ const makeAction = (
 ): {
   gameState: GameStateInternal;
 } => {
-  const playerColor =
-    gameState.players.white?.id === playerId
-      ? Color.White
-      : gameState.players.black?.id === playerId
-        ? Color.Black
-        : undefined;
+  if (gameState.result) {
+    throw new ChessGameError('game_is_over', 'Game is already over');
+  }
 
-  if (playerColor) {
-    if (gameState.additionalActions.isActionAvailable(playerColor, action)) {
-      const newActions = gameState.additionalActions.useAction(
-        playerColor,
+  const currentResult = evalResult(gameState.board, gameState.clock);
+  if (currentResult) {
+    return {
+      gameState: endGame(gameState, currentResult),
+    };
+  }
+
+  const playerColor = GamePlayers.getColor(gameState.players, playerId);
+
+  if (!playerColor) {
+    throw new ChessGameError('not_in_game', 'Player is not part of the game');
+  }
+
+  if (!gameState.additionalActions.isActionAvailable(playerColor, action)) {
+    throw new ChessGameError(
+      'action_not_available',
+      `Action ${action.type} is not available for turn ${gameState.board.position.turn}`,
+    );
+  }
+
+  const newActions = gameState.additionalActions.useAction(playerColor, action);
+
+  switch (action.type) {
+    case 'accept_draw':
+    case 'resign': {
+      const actionResult = ChessGameResult.fromChessGameAction(
         action,
+        gameState.board.position.turn,
       );
-      switch (action.type) {
-        case 'accept_draw':
-        case 'resign':
-          return {
-            gameState: {
-              ...gameState,
-              status: 'ENDED',
-              meta: {
-                ...gameState.meta,
-                endedAt: gameState.meta.endedAt ?? new Date(),
-              },
-              result: ChessGameResult.fromChessGameAction(
-                action,
-                gameState.board.position.turn,
-              ),
-              additionalActions: newActions,
-            },
-          };
-        case 'offer_draw':
-          return {
-            gameState: {
-              ...gameState,
-              additionalActions: newActions,
-            },
-          };
-        default:
-          return {
-            gameState,
-          };
+
+      if (!actionResult) {
+        throw new ChessGameError(
+          'action_not_available',
+          `Action ${action.type} did not produce a result`,
+        );
       }
-    } else {
-      throw new Error(
-        `Action ${action.type} is not available for turn ${gameState.board.position.turn}`,
-      );
+
+      return {
+        gameState: {
+          ...endGame(gameState, actionResult),
+          additionalActions: newActions,
+        },
+      };
     }
-  } else {
-    throw new Error('Player is not part of the game');
+    case 'offer_draw': {
+      return {
+        gameState: {
+          ...gameState,
+          additionalActions: newActions,
+        },
+      };
+    }
+    default: {
+      return {
+        gameState,
+      };
+    }
   }
 };
 
@@ -128,15 +165,19 @@ const joinGame = (
   }
 };
 
-const evalResultFromBoard = (
+const evalResult = (
   board: Chessboard,
+  clock: Maybe<ChessClock>,
 ): ChessGameResult | undefined => {
+  const flagResult = clock ? ChessGameResult.toFlag(clock.instant) : false;
   if (board.isCheckmate) {
     return ChessGameResult.toCheckmate(
       board.position.turn === Color.White ? Color.Black : Color.White,
     );
   } else if (board.isStalemate || board.isInsufficientMaterial) {
     return { type: 'draw' };
+  } else if (flagResult) {
+    return flagResult;
   } else {
     return undefined;
   }
@@ -154,6 +195,7 @@ const fromGameStateInternal = (
       initialPosition: board.initialPosition,
       movesRecord: board.movesRecord,
       result,
+      timeControl: gameStateInternal.timeControl,
       actionRecord: gameStateInternal.additionalActions.usedActions,
       resultStr: ChessGameResult.toResultString(result),
     };
@@ -166,36 +208,62 @@ const fromGameStateInternal = (
   };
   const playMove = (playerId: string, move: Move): ChessGame => {
     if (result) {
-      throw new Error('Game is already over');
-    } else if (
-      playerId !== gameStateInternal.players[board.position.turn]?.id
-    ) {
-      throw new Error('Not your turn');
-    } else {
-      const newBoard = board.playMove(move);
-      const result = evalResultFromBoard(newBoard);
-      const newStatus =
-        gameStateInternal.status === 'READY'
-          ? 'IN_PROGRESS'
-          : result
-            ? 'ENDED'
-            : gameStateInternal.status;
-      return fromGameStateInternal({
-        ...gameStateInternal,
-        board: newBoard,
-        status: newStatus,
-        meta: {
-          ...gameStateInternal.meta,
-          startedAt: gameStateInternal.meta.startedAt ?? new Date(),
-          endedAt:
-            (gameStateInternal.meta.endedAt ?? result) ? new Date() : undefined,
-        },
-        result,
-        additionalActions: additionalActions.updateBoard(newStatus, newBoard),
-      });
+      throw new ChessGameError('game_is_over', 'Game is already over');
     }
+
+    const playerColor = GamePlayers.getColor(
+      gameStateInternal.players,
+      playerId,
+    );
+    const currentTurn = board.position.turn;
+
+    if (playerColor !== currentTurn) {
+      throw new ChessGameError('not_your_turn', 'Not your turn');
+    }
+
+    const timestamp = Date.now();
+    const newClock = gameStateInternal.clock?.hit(currentTurn, timestamp);
+
+    if (newClock?.lastEvent.type === 'flag') {
+      throw new ChessGameError(
+        'player_flagged',
+        `Player ${currentTurn} has run out of time`,
+      );
+    }
+
+    const newBoard = board.playMove({ ...move, timestamp });
+    const gameResult = evalResult(newBoard, newClock);
+
+    const shouldStartGame = gameStateInternal.status === 'READY';
+    const shouldEndGame = gameResult !== undefined;
+
+    const newStatus = shouldStartGame
+      ? 'IN_PROGRESS'
+      : shouldEndGame
+        ? 'ENDED'
+        : gameStateInternal.status;
+
+    const startedAt = gameStateInternal.meta.startedAt ?? new Date();
+    const endedAt = shouldEndGame ? new Date() : gameStateInternal.meta.endedAt;
+
+    return fromGameStateInternal({
+      ...gameStateInternal,
+      board: newBoard,
+      status: newStatus,
+      clock: newClock,
+      meta: {
+        ...gameStateInternal.meta,
+        startedAt,
+        endedAt,
+      },
+      result: gameResult,
+      additionalActions: additionalActions.updateBoard(newStatus, newBoard),
+    });
   };
   return {
+    get clock(): Maybe<ChessClock> {
+      return gameStateInternal.clock;
+    },
     getPosition: () => board.position,
     makeAction: (playerId: string, action: GameActionOption): ChessGame => {
       const { gameState } = makeAction(gameStateInternal, playerId, action);
@@ -250,20 +318,30 @@ const fromGameStateInternal = (
     leaveGame: (playerId: string): ChessGame => {
       const playerEntry = getPlayerEntry(playerId);
       const allowedToLeave: GameStatusType[] = ['WAITING', 'READY'];
-      if (playerEntry && allowedToLeave.includes(gameStateInternal.status)) {
-        gameStateInternal.players[playerEntry[0] as Color] = undefined;
-        return fromGameStateInternal({
-          ...gameStateInternal,
-          status:
-            gameStateInternal.status === 'READY'
-              ? 'WAITING'
-              : gameStateInternal.status === 'WAITING'
-                ? 'EMPTY'
-                : gameStateInternal.status,
-        });
-      } else {
+
+      if (!playerEntry || !allowedToLeave.includes(gameStateInternal.status)) {
         return fromGameStateInternal(gameStateInternal);
       }
+
+      const [side] = playerEntry;
+      const newPlayers = {
+        ...gameStateInternal.players,
+        [side]: undefined,
+      };
+
+      const wasReady = gameStateInternal.status === 'READY';
+      const wasWaiting = gameStateInternal.status === 'WAITING';
+      const newStatus = wasReady
+        ? 'WAITING'
+        : wasWaiting
+          ? 'EMPTY'
+          : gameStateInternal.status;
+
+      return fromGameStateInternal({
+        ...gameStateInternal,
+        players: newPlayers,
+        status: newStatus,
+      });
     },
   };
 };
@@ -277,13 +355,18 @@ const fromGameState = (gameState: GameState): ChessGame => {
     gameState.initialPosition,
     gameState.movesRecord,
   );
-  const result = gameState.result || evalResultFromBoard(board);
+  const clock = ChessClock.fromGameState(gameState);
+  const result = gameState.result || evalResult(board, clock);
+  const status =
+    gameState.status !== 'ENDED' && !!result ? 'ENDED' : gameState.status;
   return fromGameStateInternal({
     meta: { ...GameState.toMeta(gameState) },
     players: gameState.players,
-    status: gameState.status,
+    status,
     board,
     result,
+    timeControl: gameState.timeControl,
+    clock,
     additionalActions: ChessGameActions.from(
       gameState.actionRecord,
       board,

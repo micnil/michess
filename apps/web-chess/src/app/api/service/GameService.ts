@@ -1,15 +1,22 @@
 import {
+  ClockV1,
+  CreateGameV1,
   GameActionOptionV1,
   GameDetailsV1,
+  GameStatusTypeV1,
   LobbyPageResponseV1,
-  MakeMovePayloadV1,
+  MoveMadeV1,
   PlayerGameInfoPageResponseV1,
+  TimeControlV1,
 } from '@michess/api-schema';
 import { Maybe, Observable } from '@michess/common-utils';
-import { Move } from '@michess/core-board';
+import { Color, Move } from '@michess/core-board';
 import { RestClient } from '../infra/RestClient';
 import { SocketClient } from '../infra/SocketClient';
+import { CountdownClock } from '../model/CountdownClock';
+import { CreateGameInput } from '../model/CreateGameInput';
 import { GameViewModel } from '../model/GameViewModel';
+import { MoveEvent } from '../model/MoveEvent';
 import { PlayerGameViewModel } from '../model/PlayerGameViewModel';
 import { AuthService } from './AuthService';
 
@@ -20,12 +27,36 @@ export class GameService {
     private auth: AuthService,
   ) {}
 
+  toClock(
+    gameStatus: GameStatusTypeV1,
+    turn: Color,
+    timeControl: TimeControlV1,
+    clockV1: Maybe<ClockV1>,
+  ): Maybe<CountdownClock> {
+    if (clockV1) {
+      return CountdownClock.fromRemote({
+        clockV1,
+        ticking: gameStatus === 'IN_PROGRESS' ? turn : undefined,
+        timeControl,
+        receivedAt: Date.now(),
+      });
+    } else {
+      return undefined;
+    }
+  }
+
   toGameViewModel(gameDetails: GameDetailsV1): GameViewModel {
     return {
       status: gameDetails.status,
       moves: gameDetails.moves.map((m) => Move.fromUci(m.uci)),
       result: gameDetails.result,
       startedAt: gameDetails.startedAt,
+      clock: this.toClock(
+        gameDetails.status,
+        gameDetails.moves.length % 2 === 0 ? 'white' : 'black',
+        gameDetails.timeControl,
+        gameDetails.clock,
+      ),
       players: {
         white: gameDetails.players.white
           ? {
@@ -66,12 +97,27 @@ export class GameService {
     };
   }
 
-  async createGame(isPrivate: boolean): Promise<GameDetailsV1> {
+  async createGame(createGameIn: CreateGameInput): Promise<GameDetailsV1> {
+    const createGameV1: CreateGameV1 = {
+      variant: 'standard',
+      isPrivate: !createGameIn.public,
+      timeControl: !!createGameIn.realtime
+        ? {
+            type: 'realtime',
+            initialSec: createGameIn.realtime.initialSec,
+            incrementSec: createGameIn.realtime.incrementSec,
+          }
+        : createGameIn.correspondence
+          ? {
+              type: 'correspondence',
+              daysPerMove: createGameIn.correspondence.daysPerMove,
+            }
+          : undefined,
+    };
+
     const response = await this.restClient
       .post<GameDetailsV1>('games', {
-        json: {
-          isPrivate,
-        },
+        json: createGameV1,
       })
       .json();
     return response;
@@ -177,14 +223,17 @@ export class GameService {
     };
   }
 
-  observeMovesForGame(gameId: string): Observable<Move> {
+  observeMovesForGame(gameId: string): Observable<MoveEvent> {
     return {
-      subscribe: (callback: (move: Move) => void) => {
-        const handleMove = (movePayload: MakeMovePayloadV1) => {
+      subscribe: (callback: (move: MoveEvent) => void) => {
+        const handleMove = (movePayload: MoveMadeV1) => {
           if (movePayload.gameId === gameId) {
             try {
               const move = Move.fromUci(movePayload.uci);
-              callback(move);
+              callback({
+                move,
+                clock: movePayload.clock,
+              });
             } catch (error) {
               console.error(
                 'Failed to parse move from UCI:',

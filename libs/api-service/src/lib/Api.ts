@@ -5,6 +5,7 @@ import { Sql } from 'postgres';
 import { AuthConfig } from './auth/model/AuthConfig';
 import { AuthService } from './auth/service/AuthService';
 import { GamesService } from './games/service/GamesService';
+import { LockService } from './lock/service/LockService';
 import { UsageMetricsService } from './metrics/UsageMetricsService';
 
 export type Api = {
@@ -20,11 +21,13 @@ const from = (
   authConfig: AuthConfig,
 ): Api => {
   const processId = randomUUID();
+  const lockService = new LockService(repos.cache.client);
   const gamesService = new GamesService(
     repos.game,
     repos.move,
     repos.action,
     repos.cache,
+    lockService,
   );
   const authService = new AuthService(
     sql,

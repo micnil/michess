@@ -3,6 +3,7 @@ import {
   JoinGamePayloadV1,
   MakeMovePayloadV1,
   MakeMoveResponseV1,
+  MoveMadeV1,
 } from '@michess/api-schema';
 import {
   Api,
@@ -20,7 +21,13 @@ import { SocketRouter } from '../SocketRouter';
 jest.mock('@michess/api-service');
 
 const apiMock: Api = {
-  games: new GamesService({} as never, {} as never, {} as never, {} as never),
+  games: new GamesService(
+    {} as never,
+    {} as never,
+    {} as never,
+    {} as never,
+    {} as never,
+  ),
   auth: new AuthService({} as never, {} as never, {} as never, {
     google: { clientId: '', clientSecret: '' },
   }),
@@ -129,11 +136,15 @@ describe('SocketRouter', () => {
       const mockGameState: GameDetailsV1 = {
         id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
         status: 'WAITING',
+        timeControl: {
+          classification: 'no_clock',
+        },
         players: { white: { name: 'Test User', id: 'u1' }, black: undefined },
         isPrivate: false,
         moves: [],
         variant: 'standard',
         actionOptions: [],
+        clock: undefined,
       };
       serverSocket2.join(joinGamePayload.gameId);
 
@@ -165,12 +176,14 @@ describe('SocketRouter', () => {
       serverSocket1.join(makeMovePayload.gameId);
       serverSocket2.join(makeMovePayload.gameId);
 
-      apiMock.games.makeMove = jest.fn().mockResolvedValue(undefined);
+      const moveV1: MoveMadeV1 = {
+        uci: 'e2e4',
+        gameId: makeMovePayload.gameId,
+        clock: { whiteMs: 300000, blackMs: 300000 },
+      };
+      apiMock.games.makeMove = jest.fn().mockResolvedValue({ move: moveV1 });
 
-      const moveMadePromise = waitFor<MakeMovePayloadV1>(
-        clientSocket2,
-        'move-made',
-      );
+      const moveMadePromise = waitFor<MoveMadeV1>(clientSocket2, 'move-made');
 
       const response: MakeMoveResponseV1 = await clientSocket1.emitWithAck(
         'make-move',
@@ -178,11 +191,9 @@ describe('SocketRouter', () => {
       );
 
       const data = await moveMadePromise;
-      expect(data).toEqual(makeMovePayload);
+      expect(data).toEqual(moveV1);
       expect(response.status).toEqual('ok');
-      expect(response.status === 'ok' && response.data).toEqual(
-        makeMovePayload,
-      );
+      expect(response.status === 'ok' && response.data).toEqual(moveV1);
       expect(apiMock.games.makeMove).toHaveBeenCalled();
     });
   });
