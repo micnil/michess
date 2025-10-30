@@ -44,7 +44,7 @@ export const PlayerGamesOverview: React.FC<Props> = ({ onJoinGame }) => {
   const hasPlayerTurnGames =
     ongoingGamesPage?.items.some((game) => game.turn === game.ownSide) ?? false;
   return (
-    <Card size="3" style={{ padding: '24px' }}>
+    <Card size={{ initial: '1', sm: '3' }}>
       <Tabs.Root defaultValue={isNoOngoingGames ? 'completed' : 'ongoing'}>
         <Flex justify="between" align="center" mb="4">
           <Heading size="4" weight="medium">
