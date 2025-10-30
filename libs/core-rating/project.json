@@ -1,0 +1,30 @@
+{
+  "name": "core-rating",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/core-rating/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/core-rating",
+        "tsConfig": "libs/core-rating/tsconfig.lib.json",
+        "packageJson": "libs/core-rating/package.json",
+        "main": "libs/core-rating/src/index.ts",
+        "assets": ["libs/core-rating/*.md"]
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/core-rating/jest.config.ts"
+      }
+    }
+  }
+}
