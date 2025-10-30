@@ -9,6 +9,11 @@ type Props = {
 export const TimeControlRadioCards = (props: Props) => {
   return (
     <RadioCards.Root
+      style={{
+        gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
+        columnGap: 'var(--space-2)',
+        rowGap: 'var(--space-4)',
+      }}
       name={props.name}
       onValueChange={(val) => {
         props.onValueChange?.(val as TimeControlStr);

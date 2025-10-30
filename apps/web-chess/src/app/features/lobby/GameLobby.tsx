@@ -126,7 +126,7 @@ export const GameLobby: React.FC<Props> = ({ onCreateGame, onJoinGame }) => {
           </Flex>
         </Skeleton>
       </Card>
-      <Dialog.Content>
+      <Dialog.Content aria-describedby={undefined} size="2" maxWidth={'450px'}>
         <Dialog.Title>Create New Game</Dialog.Title>
         <CreateGameFormContainer onCreateGame={onCreateGame} />
       </Dialog.Content>
