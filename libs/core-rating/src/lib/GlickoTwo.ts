@@ -78,13 +78,12 @@ const f = (
 };
 
 const updateRatingDeviation = (
-  oldDeviation: number,
-  volatility: number,
+  phi: number,
+  sigma: number,
   elapsedPeriodsSinceLastUpdate: number,
 ): number => {
   return Math.sqrt(
-    Math.pow(oldDeviation, 2) +
-      elapsedPeriodsSinceLastUpdate * Math.pow(volatility, 2),
+    Math.pow(phi, 2) + elapsedPeriodsSinceLastUpdate * Math.pow(sigma, 2),
   );
 };
 
@@ -101,10 +100,8 @@ const algorithm = (
   if (gameResults.length === 0) {
     return {
       rating: actualPlayer.rating,
-      deviation: updateRatingDeviation(
-        phi,
-        sigma,
-        elapsedPeriodsSinceLastUpdate,
+      deviation: convertDeviationFromGlickoScale(
+        updateRatingDeviation(phi, sigma, elapsedPeriodsSinceLastUpdate),
       ),
       volatility: actualPlayer.volatility,
     };
