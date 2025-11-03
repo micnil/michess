@@ -9,6 +9,7 @@ const DEFAULT_PLAYER: Player = {
   deviation: 350,
   volatility: 0.06,
 };
+const CONVERGENCE_EPSILON = 0.000001;
 
 const convertRatingToGlickoScale = (rating: number) => {
   return (rating - 1500) / GLICKO_SCALE_DENOMINATOR;
@@ -76,14 +77,38 @@ const f = (
   };
 };
 
-const algorithm = (player: Maybe<Player>, gameResults: GameResult[]) => {
+const updateRatingDeviation = (
+  oldDeviation: number,
+  volatility: number,
+  elapsedPeriodsSinceLastUpdate: number,
+): number => {
+  return Math.sqrt(
+    Math.pow(oldDeviation, 2) +
+      elapsedPeriodsSinceLastUpdate * Math.pow(volatility, 2),
+  );
+};
+
+const algorithm = (
+  player: Maybe<Player>,
+  gameResults: GameResult[],
+  elapsedPeriodsSinceLastUpdate = 1,
+): Player => {
   const actualPlayer = player || DEFAULT_PLAYER;
-
-  const { rating, deviation, volatility } = actualPlayer;
-
   // Step 2: Convert to Glicko-2 scale
   const { phi, mu } = convertToGlickoScale(actualPlayer);
-  const siigma = volatility;
+  const sigma = actualPlayer.volatility;
+
+  if (gameResults.length === 0) {
+    return {
+      rating: actualPlayer.rating,
+      deviation: updateRatingDeviation(
+        phi,
+        sigma,
+        elapsedPeriodsSinceLastUpdate,
+      ),
+      volatility: actualPlayer.volatility,
+    };
+  }
 
   // Step 3: Compute the estimated variance
   const upsilon =
@@ -95,19 +120,21 @@ const algorithm = (player: Maybe<Player>, gameResults: GameResult[]) => {
     }, 0);
 
   // Step 4: Compute the estimated rating improvement
-  const delta =
-    upsilon *
-    gameResults.reduce((sum, gameResult) => {
+  const gameOutcomeRatingImprovementFactor = gameResults.reduce(
+    (sum, gameResult) => {
       const opponentPlayer = convertToGlickoScale(gameResult.opponent);
       const EValue = E(mu, opponentPlayer.mu, opponentPlayer.phi);
       return sum + g(opponentPlayer.phi) * (gameResult.score - EValue);
-    }, 0);
+    },
+    0,
+  );
+  const delta = upsilon * gameOutcomeRatingImprovementFactor;
 
   // Step 5: Determine new volatility
-  const fFunction = f(delta, phi, upsilon, siigma);
+  const fFunction = f(delta, phi, upsilon, sigma);
   const deltaSquared = Math.pow(delta, 2);
   const phiSquared = Math.pow(phi, 2);
-  let alpha = Math.log(Math.pow(siigma, 2));
+  let alpha = Math.log(Math.pow(sigma, 2));
 
   const iterateKappa = (kappa: number): number => {
     if (fFunction(alpha - kappa * TAO) < 0) {
@@ -124,9 +151,7 @@ const algorithm = (player: Maybe<Player>, gameResults: GameResult[]) => {
   let fAlpha = fFunction(alpha);
   let fBeta = fFunction(beta);
 
-  const EPSILON = 0.000001;
-
-  while (Math.abs(beta - alpha) > EPSILON) {
+  while (Math.abs(beta - alpha) > CONVERGENCE_EPSILON) {
     const c = alpha + ((alpha - beta) * fAlpha) / (fBeta - fAlpha);
     const fC = fFunction(c);
     if (fC * fBeta < 0) {
@@ -141,18 +166,15 @@ const algorithm = (player: Maybe<Player>, gameResults: GameResult[]) => {
   const newSigma = Math.exp(alpha / 2);
 
   // Step 6: Update deviation to new pre-rating deviation
-  const phiStar = Math.sqrt(Math.pow(phi, 2) + Math.pow(newSigma, 2));
+  const phiStar = updateRatingDeviation(
+    phi,
+    newSigma,
+    elapsedPeriodsSinceLastUpdate,
+  );
 
-  // Step 7: Update ratomg and deviation
+  // Step 7: Update rating and deviation
   const newPhi = 1 / Math.sqrt(1 / Math.pow(phiStar, 2) + 1 / upsilon);
-  const newMu =
-    mu +
-    Math.pow(newPhi, 2) *
-      gameResults.reduce((sum, gameResult) => {
-        const opponentPlayer = convertToGlickoScale(gameResult.opponent);
-        const EValue = E(mu, opponentPlayer.mu, opponentPlayer.phi);
-        return sum + g(opponentPlayer.phi) * (gameResult.score - EValue);
-      }, 0);
+  const newMu = mu + Math.pow(newPhi, 2) * gameOutcomeRatingImprovementFactor;
 
   const { rating: newRating, deviation: newDeviation } = convertFromGlickoScale(
     newMu,
