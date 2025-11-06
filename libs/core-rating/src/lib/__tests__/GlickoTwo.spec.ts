@@ -1,8 +1,9 @@
 import { GlickoTwo } from '../GlickoTwo';
-import { Player } from '../model/Player';
+import { RatingProfile } from '../model/RatingProfile';
+
 describe('GlickoTwo', () => {
   it('should handle the example calculation from the report', () => {
-    const player: Player = {
+    const player: RatingProfile = {
       rating: 1500,
       deviation: 200,
       volatility: 0.06,
@@ -28,7 +29,7 @@ describe('GlickoTwo', () => {
   });
 
   it('should handle a player with no games played', () => {
-    const player: Player = {
+    const player: RatingProfile = {
       rating: 1500,
       deviation: 60,
       volatility: 0.06,
