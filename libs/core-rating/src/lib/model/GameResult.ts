@@ -1,6 +1,6 @@
-import { RatingProfile } from './RatingProfile';
+import { Rating } from './Rating';
 
 export type GameResult = {
-  opponent: RatingProfile;
+  opponent: Rating;
   score: number; // 1 = win, 0.5 = draw, 0 = loss
 };

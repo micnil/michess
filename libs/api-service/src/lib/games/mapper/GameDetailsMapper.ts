@@ -293,6 +293,8 @@ export const GameDetailsMapper = {
       status: TO_STATUS_TYPE_MAPPING[game.status],
       startedAt: game.startedAt ?? null,
       endedAt: game.endedAt ?? null,
+      blackRatingId: game.players.black?.rating?.id ?? null,
+      whiteRatingId: game.players.white?.rating?.id ?? null,
       result: game.result ? FROM_RESULT_TYPE_MAPPING[game.result.type] : '0-0',
     };
   },

@@ -31,6 +31,7 @@ import { Job, Queue, Worker } from 'bullmq';
 import { Session } from '../../auth/model/Session';
 import { LockService } from '../../lock/service/LockService';
 import { PageResponseMapper } from '../../mapper/PageResponseMapper';
+import { RatingsService } from '../../user/service/RatingsService';
 import { GameDetailsMapper } from '../mapper/GameDetailsMapper';
 
 type TimeControlJobData = {
@@ -50,6 +51,7 @@ export class GamesService {
     private moveRepository: MoveRepository,
     private actionRepository: ActionRepository,
     private cacheRepo: CacheRepository,
+    private ratingsService: RatingsService,
     private lockService: LockService,
   ) {
     const connectionOptions = { connection: this.cacheRepo.client };
@@ -274,8 +276,18 @@ export class GamesService {
       });
     }
 
+    const gameRating = await this.ratingsService.getRatingByPlayerId(
+      session.userId,
+      gameState.variant,
+      gameState.timeControl.classification,
+    );
+
     const updatedGame = chessGame.joinGame(
-      { id: session.userId, name: session.name ?? 'Anonymous' },
+      {
+        id: session.userId,
+        name: session.name ?? 'Anonymous',
+        rating: gameRating,
+      },
       data.side,
     );
     const updatedGameState = updatedGame.getState();

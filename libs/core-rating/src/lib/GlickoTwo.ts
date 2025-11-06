@@ -1,14 +1,10 @@
 import { Maybe } from '@michess/common-utils';
 import { GameResult } from './model/GameResult';
-import { RatingProfile } from './model/RatingProfile';
+import { Rating } from './model/Rating';
 
 const TAO = 0.5;
 const GLICKO_SCALE_DENOMINATOR = 173.7178;
-const DEFAULT_PLAYER: RatingProfile = {
-  rating: 1500,
-  deviation: 350,
-  volatility: 0.06,
-};
+
 const CONVERGENCE_EPSILON = 0.000001;
 
 const convertRatingToGlickoScale = (rating: number) => {
@@ -17,11 +13,9 @@ const convertRatingToGlickoScale = (rating: number) => {
 const convertDeviationToGlickoScale = (deviation: number) => {
   return deviation / GLICKO_SCALE_DENOMINATOR;
 };
-const convertToGlickoScale = (
-  player: RatingProfile,
-): { phi: number; mu: number } => {
+const convertToGlickoScale = (player: Rating): { phi: number; mu: number } => {
   return {
-    mu: convertRatingToGlickoScale(player.rating),
+    mu: convertRatingToGlickoScale(player.value),
     phi: convertDeviationToGlickoScale(player.deviation),
   };
 };
@@ -90,22 +84,22 @@ const updateRatingDeviation = (
 };
 
 const algorithm = (
-  player: Maybe<RatingProfile>,
+  rating: Maybe<Rating>,
   gameResults: GameResult[],
   elapsedPeriodsSinceLastUpdate = 1,
-): RatingProfile => {
-  const actualPlayer = player || DEFAULT_PLAYER;
+): Rating => {
+  const actualRating = rating || Rating.default();
   // Step 2: Convert to Glicko-2 scale
-  const { phi, mu } = convertToGlickoScale(actualPlayer);
-  const sigma = actualPlayer.volatility;
+  const { phi, mu } = convertToGlickoScale(actualRating);
+  const sigma = actualRating.volatility;
 
   if (gameResults.length === 0) {
     return {
-      rating: actualPlayer.rating,
+      value: actualRating.value,
       deviation: convertDeviationFromGlickoScale(
         updateRatingDeviation(phi, sigma, elapsedPeriodsSinceLastUpdate),
       ),
-      volatility: actualPlayer.volatility,
+      volatility: actualRating.volatility,
     };
   }
 
@@ -181,7 +175,7 @@ const algorithm = (
   );
 
   return {
-    rating: newRating,
+    value: newRating,
     deviation: newDeviation,
     volatility: newSigma,
   };
