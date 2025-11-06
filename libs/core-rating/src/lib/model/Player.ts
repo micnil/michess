@@ -1,5 +1,5 @@
-export type Player = {
-  rating: number;
-  deviation: number;
-  volatility: number;
+import { RatingProfile } from './RatingProfile';
+
+export type Player = RatingProfile & {
+  timestamp: number;
 };

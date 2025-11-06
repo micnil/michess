@@ -1,10 +1,10 @@
 import { Maybe } from '@michess/common-utils';
 import { GameResult } from './model/GameResult';
-import { Player } from './model/Player';
+import { RatingProfile } from './model/RatingProfile';
 
 const TAO = 0.5;
 const GLICKO_SCALE_DENOMINATOR = 173.7178;
-const DEFAULT_PLAYER: Player = {
+const DEFAULT_PLAYER: RatingProfile = {
   rating: 1500,
   deviation: 350,
   volatility: 0.06,
@@ -17,7 +17,9 @@ const convertRatingToGlickoScale = (rating: number) => {
 const convertDeviationToGlickoScale = (deviation: number) => {
   return deviation / GLICKO_SCALE_DENOMINATOR;
 };
-const convertToGlickoScale = (player: Player): { phi: number; mu: number } => {
+const convertToGlickoScale = (
+  player: RatingProfile,
+): { phi: number; mu: number } => {
   return {
     mu: convertRatingToGlickoScale(player.rating),
     phi: convertDeviationToGlickoScale(player.deviation),
@@ -88,10 +90,10 @@ const updateRatingDeviation = (
 };
 
 const algorithm = (
-  player: Maybe<Player>,
+  player: Maybe<RatingProfile>,
   gameResults: GameResult[],
   elapsedPeriodsSinceLastUpdate = 1,
-): Player => {
+): RatingProfile => {
   const actualPlayer = player || DEFAULT_PLAYER;
   // Step 2: Convert to Glicko-2 scale
   const { phi, mu } = convertToGlickoScale(actualPlayer);
