@@ -1,5 +1,5 @@
 {
-  "id": "4316715b-5adb-46c2-8271-d9f5974593ab",
+  "id": "03b319a6-4160-4703-8068-36d0cf5eb0bf",
   "prevId": "ad053b9e-f9bd-47f1-95d6-cbe91a4254c8",
   "version": "7",
   "dialect": "postgresql",
@@ -221,6 +221,18 @@
           "primaryKey": false,
           "notNull": false
         },
+        "white_rating_id": {
+          "name": "white_rating_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "black_rating_id": {
+          "name": "black_rating_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "time_control_classification": {
           "name": "time_control_classification",
           "type": "time_control_classification",
@@ -306,6 +318,32 @@
           "tableTo": "users",
           "columnsFrom": [
             "black_player_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "games_white_rating_id_ratings_id_fk": {
+          "name": "games_white_rating_id_ratings_id_fk",
+          "tableFrom": "games",
+          "tableTo": "ratings",
+          "columnsFrom": [
+            "white_rating_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "games_black_rating_id_ratings_id_fk": {
+          "name": "games_black_rating_id_ratings_id_fk",
+          "tableFrom": "games",
+          "tableTo": "ratings",
+          "columnsFrom": [
+            "black_rating_id"
           ],
           "columnsTo": [
             "id"

@@ -13,6 +13,7 @@ import { games } from './games';
 import { timeControlClassificationEnum } from './shared/timeControlClassificationEnum';
 import { variantEnum } from './shared/variantEnum';
 import { users } from './users';
+
 export const ratings = pgTable(
   'ratings',
   {

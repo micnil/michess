@@ -11,8 +11,12 @@ CREATE TABLE "ratings" (
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+ALTER TABLE "games" ADD COLUMN "white_rating_id" integer;--> statement-breakpoint
+ALTER TABLE "games" ADD COLUMN "black_rating_id" integer;--> statement-breakpoint
 ALTER TABLE "ratings" ADD CONSTRAINT "ratings_player_id_users_id_fk" FOREIGN KEY ("player_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "ratings" ADD CONSTRAINT "ratings_game_id_games_game_id_fk" FOREIGN KEY ("game_id") REFERENCES "public"."games"("game_id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "ratings" ADD CONSTRAINT "ratings_game_variant_tc_fk" FOREIGN KEY ("game_id","variant","time_control_classification") REFERENCES "public"."games"("game_id","variant","time_control_classification") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "idx_ratings_player_variant_tc_created" ON "ratings" USING btree ("player_id","variant","time_control_classification","timestamp" DESC NULLS LAST);--> statement-breakpoint
+ALTER TABLE "games" ADD CONSTRAINT "games_white_rating_id_ratings_id_fk" FOREIGN KEY ("white_rating_id") REFERENCES "public"."ratings"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "games" ADD CONSTRAINT "games_black_rating_id_ratings_id_fk" FOREIGN KEY ("black_rating_id") REFERENCES "public"."ratings"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "games" ADD CONSTRAINT "game_variant_tc_unique" UNIQUE("game_id","variant","time_control_classification");

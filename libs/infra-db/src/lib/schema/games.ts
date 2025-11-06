@@ -1,7 +1,9 @@
 import { relations, sql } from 'drizzle-orm';
 import {
+  AnyPgColumn,
   boolean,
   check,
+  integer,
   jsonb,
   pgTable,
   text,
@@ -12,6 +14,7 @@ import {
 import { TimeControlJsonB } from '../model/TimeControlJsonB';
 import { actions } from './actions';
 import { moves } from './moves';
+import { ratings } from './ratings';
 import { gameStatusEnum } from './shared/gameStatusEnum';
 import { resultEnum } from './shared/resultEnum';
 import { resultReasonEnum } from './shared/resultReasonEnum';
@@ -33,6 +36,18 @@ export const games = pgTable(
     blackPlayerId: text('black_player_id').references(() => users.id, {
       onDelete: 'set null',
     }),
+    whiteRatingId: integer('white_rating_id').references(
+      (): AnyPgColumn => ratings.id,
+      {
+        onDelete: 'set null',
+      },
+    ),
+    blackRatingId: integer('black_rating_id').references(
+      (): AnyPgColumn => ratings.id,
+      {
+        onDelete: 'set null',
+      },
+    ),
     timeControlClassification: timeControlClassificationEnum(
       'time_control_classification',
     )
@@ -96,5 +111,15 @@ export const gamesRelations = relations(games, ({ many, one }) => ({
   blackPlayer: one(users, {
     fields: [games.blackPlayerId],
     references: [users.id],
+  }),
+  whiteRating: one(ratings, {
+    fields: [games.whiteRatingId],
+    references: [ratings.id],
+    relationName: 'whiteRating',
+  }),
+  blackRating: one(ratings, {
+    fields: [games.blackRatingId],
+    references: [ratings.id],
+    relationName: 'blackRating',
   }),
 }));
