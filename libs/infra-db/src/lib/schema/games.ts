@@ -6,6 +6,7 @@ import {
   pgTable,
   text,
   timestamp,
+  unique,
   uuid,
 } from 'drizzle-orm/pg-core';
 import { TimeControlJsonB } from '../model/TimeControlJsonB';
@@ -47,8 +48,8 @@ export const games = pgTable(
     startedAt: timestamp('started_at'),
     endedAt: timestamp('ended_at'),
   },
-  (table) => ({
-    timeControlStandardCheck: check(
+  (table) => [
+    check(
       'time_control_standard_check',
       sql`(
         ${table.timeControlClassification} NOT IN ('bullet', 'blitz', 'rapid')
@@ -59,7 +60,7 @@ export const games = pgTable(
         )
       )`,
     ),
-    timeControlCorrespondenceCheck: check(
+    check(
       'time_control_correspondence_check',
       sql`(
         ${table.timeControlClassification} != 'correspondence'
@@ -69,14 +70,20 @@ export const games = pgTable(
         )
       )`,
     ),
-    timeControlNoClockCheck: check(
+    check(
       'time_control_no_clock_check',
       sql`(
         ${table.timeControlClassification} != 'no_clock'
         OR ${table.timeControl} IS NULL
       )`,
     ),
-  }),
+    // Composite unique constraint for foreign key reference
+    unique('game_variant_tc_unique').on(
+      table.gameId,
+      table.variant,
+      table.timeControlClassification,
+    ),
+  ],
 );
 
 export const gamesRelations = relations(games, ({ many, one }) => ({

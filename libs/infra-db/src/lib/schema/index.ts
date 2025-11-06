@@ -2,6 +2,7 @@ export * from './accounts';
 export * from './actions';
 export * from './games';
 export * from './moves';
+export * from './ratings';
 export * from './shared/colorEnum';
 export * from './shared/gameStatusEnum';
 export * from './shared/resultEnum';
