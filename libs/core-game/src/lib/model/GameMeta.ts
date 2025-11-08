@@ -6,7 +6,6 @@ export type GameMeta = {
   variant: GameVariantType;
   isPrivate: boolean;
   startedAt: Maybe<Date>;
-  endedAt: Maybe<Date>;
   createdAt: Date;
   updatedAt: Date;
 };

@@ -33,6 +33,7 @@ import { LockService } from '../../lock/service/LockService';
 import { PageResponseMapper } from '../../mapper/PageResponseMapper';
 import { RatingsService } from '../../user/service/RatingsService';
 import { GameDetailsMapper } from '../mapper/GameDetailsMapper';
+import { GameMapper } from '../mapper/GameMapper';
 
 type TimeControlJobData = {
   gameId: string;
@@ -90,17 +91,9 @@ export class GamesService {
   }> {
     const dbGame = await this.gameRepository.findGameWithRelationsById(gameId);
     assertDefined(dbGame, `Game '${gameId}' not found`);
-    const gameDetails = GameDetailsMapper.fromSelectGameWithRelations(dbGame);
-    const chessGame = ChessGame.fromGameState(gameDetails);
-    return { chessGame };
-  }
 
-  private toGameDetailsV1(chessGame: ChessGame): GameDetailsV1 {
-    return GameDetailsMapper.toGameDetailsV1({
-      game: chessGame.getState(),
-      clock: chessGame.clock?.instant,
-      availableActions: chessGame.getAdditionalActions(),
-    });
+    const chessGame = GameMapper.fromSelectGameWithRelations(dbGame);
+    return { chessGame };
   }
 
   private async updateFlagTimeoutJob(chessGame: ChessGame): Promise<void> {
@@ -196,10 +189,9 @@ export class GamesService {
       timeControlClassification,
       timeControl,
     });
-    const chessGame = ChessGame.fromGameState(
-      GameDetailsMapper.fromSelectGame(createdGame),
-    );
-    return this.toGameDetailsV1(chessGame);
+
+    const chessGame = GameMapper.fromSelectGame(createdGame);
+    return GameMapper.toGameDetailsV1(chessGame);
   }
 
   async queryLobby(query: PaginationQueryV1): Promise<LobbyPageResponseV1> {
@@ -270,10 +262,7 @@ export class GamesService {
     const { chessGame } = await this.loadChessGame(data.gameId);
     const gameState = chessGame.getState();
     if (data.side === 'spectator') {
-      return GameDetailsMapper.toGameDetailsV1({
-        game: gameState,
-        clock: chessGame.clock?.instant,
-      });
+      return GameMapper.toGameDetailsV1(chessGame, true);
     }
 
     const gameRating = await this.ratingsService.getRatingByPlayerId(
@@ -295,7 +284,7 @@ export class GamesService {
       gameState.id,
       GameDetailsMapper.toInsertGame(updatedGameState),
     );
-    return this.toGameDetailsV1(updatedGame);
+    return GameMapper.toGameDetailsV1(updatedGame);
   }
 
   async leaveGame(
@@ -315,7 +304,7 @@ export class GamesService {
       chessGame.getState().id,
       GameDetailsMapper.toInsertGame(updatedGameState),
     );
-    return this.toGameDetailsV1(updatedGame);
+    return GameMapper.toGameDetailsV1(updatedGame);
   }
 
   async makeMove(
@@ -366,7 +355,7 @@ export class GamesService {
 
     if (gameStateUpdated) {
       return {
-        gameDetails: this.toGameDetailsV1(updatedGame),
+        gameDetails: GameMapper.toGameDetailsV1(updatedGame),
         move: moveMadeV1,
       };
     } else {
@@ -394,7 +383,7 @@ export class GamesService {
     const action = updatedGameState.actionRecord.at(-1);
     action &&
       (await this.actionRepository.createAction(updatedGameState.id, action));
-    return this.toGameDetailsV1(updatedGame);
+    return GameMapper.toGameDetailsV1(updatedGame);
   }
 
   async cleanupGames(): Promise<void> {
@@ -415,18 +404,11 @@ export class GamesService {
       const dbGame =
         await this.gameRepository.findGameWithRelationsById(gameId);
       assertDefined(dbGame, `Game '${gameId}' not found`);
-      const gameDetails = GameDetailsMapper.fromSelectGameWithRelations(dbGame);
-      const chessGame = ChessGame.fromGameState(gameDetails);
+      const chessGame = GameMapper.fromSelectGameWithRelations(dbGame);
 
-      const updatedGameState = chessGame.getState();
-      const gameResultChanged =
-        updatedGameState.result?.type !== gameDetails.result?.type;
-
-      if (gameResultChanged) {
-        await this.gameRepository.updateGame(
-          gameDetails.id,
-          GameDetailsMapper.toInsertGame(updatedGameState),
-        );
+      const insertGame = GameMapper.toInsertGame(chessGame);
+      if (insertGame.result !== dbGame.result) {
+        await this.gameRepository.updateGame(chessGame.id, insertGame);
         return chessGame;
       } else {
         return undefined;
@@ -435,7 +417,7 @@ export class GamesService {
 
     const chessGame = await handleFlagTimeoutWithLock();
     if (chessGame) {
-      this.notifyObservers(this.toGameDetailsV1(chessGame));
+      this.notifyObservers(GameMapper.toGameDetailsV1(chessGame));
     }
   }
 }

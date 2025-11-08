@@ -24,7 +24,6 @@ export const GameState = {
     variant: gameState.variant,
     isPrivate: gameState.isPrivate,
     startedAt: gameState.startedAt,
-    endedAt: gameState.endedAt,
     createdAt: gameState.createdAt,
     updatedAt: gameState.updatedAt,
   }),
@@ -35,7 +34,6 @@ export const GameState = {
     timeControl: TimeControl.noClock(),
     isPrivate: false,
     startedAt: undefined,
-    endedAt: undefined,
     createdAt: new Date(),
     updatedAt: new Date(),
     players: {

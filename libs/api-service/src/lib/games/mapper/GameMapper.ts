@@ -6,26 +6,25 @@ import {
   PlayerInfoV1,
 } from '@michess/api-schema';
 import { isDefined, Maybe } from '@michess/common-utils';
-import { ChessPosition, Color, Move } from '@michess/core-board';
+import { Color, Move } from '@michess/core-board';
 import {
+  ChessGame,
   ChessGameResult,
   ChessGameResultType,
-  ClockInstant,
   DrawReasonType,
   GameAction,
-  GameActionOption,
-  GameDetails,
   GameMeta,
   GamePlayers,
   GameStatusType,
   PlayerInfo,
-  TimeControl,
+  TimeControlIn,
 } from '@michess/core-game';
 import {
   InsertGame,
   SelectGame,
   SelectGameWithRelations,
 } from '@michess/infra-db';
+import z from 'zod';
 
 const TO_RESULT_TYPE_MAPPING: Record<
   SelectGameWithRelations['result'],
@@ -77,14 +76,28 @@ const toGameMeta = (game: SelectGameWithRelations | SelectGame): GameMeta => ({
 const toPlayerInfo = (player: {
   id: string;
   name: string | null;
+  rating: SelectGameWithRelations['whiteRating'];
 }): PlayerInfo => ({
   id: player.id,
   name: player.name ?? 'Anonymous',
+  rating: player.rating
+    ? {
+        deviation: player.rating.deviation,
+        id: player.rating.id,
+        value: player.rating.rating,
+        timestamp: player.rating.timestamp,
+        volatility: player.rating.volatility,
+      }
+    : undefined,
 });
 
 const toGamePlayers = (game: SelectGameWithRelations): GamePlayers => ({
-  white: game.whitePlayer ? toPlayerInfo(game.whitePlayer) : undefined,
-  black: game.blackPlayer ? toPlayerInfo(game.blackPlayer) : undefined,
+  white: game.whitePlayer
+    ? toPlayerInfo({ ...game.whitePlayer, rating: game.whiteRating })
+    : undefined,
+  black: game.blackPlayer
+    ? toPlayerInfo({ ...game.blackPlayer, rating: game.blackRating })
+    : undefined,
 });
 
 const toGameActions = (game: SelectGameWithRelations): GameAction[] => {
@@ -111,35 +124,13 @@ const toGameActions = (game: SelectGameWithRelations): GameAction[] => {
     .filter(isDefined);
 };
 
-const toTimeControl = ({
-  timeControl,
-  timeControlClassification,
-}: SelectGame): TimeControl => {
-  switch (timeControlClassification) {
-    case 'bullet':
-    case 'blitz':
-    case 'rapid':
-      return {
-        classification: timeControlClassification,
-        incrementSec:
-          timeControl && 'increment' in timeControl ? timeControl.increment : 0,
-        initialSec:
-          timeControl && 'initial' in timeControl ? timeControl.initial : 0,
-      };
-    case 'correspondence':
-      return {
-        classification: timeControlClassification,
-        daysPerMove:
-          timeControl && 'daysPerMove' in timeControl
-            ? timeControl.daysPerMove
-            : 0,
-      };
-    case 'no_clock':
-    default:
-      return {
-        classification: 'no_clock',
-      };
-  }
+const toPlayerInfoV1 = (player: PlayerInfo): PlayerInfoV1 => {
+  return {
+    id: player.id,
+    name: player.name,
+    rating: player.rating?.value,
+    ratingDiff: player.ratingDiff,
+  };
 };
 
 const toChessGameResult = ({
@@ -154,9 +145,24 @@ const toChessGameResult = ({
     : undefined;
 };
 
-export const GameDetailsMapper = {
-  fromSelectGame(game: SelectGame): GameDetails {
-    return {
+const toTimeControl = (game: SelectGame): TimeControlIn => {
+  return {
+    classification: game.timeControlClassification,
+    daysPerMove:
+      z.object({ daysPerMove: z.number().min(0) }).safeParse(game.timeControl)
+        .data?.daysPerMove ?? 0,
+    incrementSec:
+      z.object({ increment: z.number().min(0) }).safeParse(game.timeControl)
+        .data?.increment ?? 0,
+    initialSec:
+      z.object({ initial: z.number().min(0) }).safeParse(game.timeControl).data
+        ?.initial ?? 0,
+  };
+};
+
+export const GameMapper = {
+  fromSelectGame(game: SelectGame): ChessGame {
+    return ChessGame.from({
       players: {
         white: undefined,
         black: undefined,
@@ -165,16 +171,15 @@ export const GameDetailsMapper = {
       actionRecord: [],
       result: toChessGameResult(game),
       status: FROM_STATUS_TYPE_MAPPING[game.status],
-      resultStr: game.result,
-      initialPosition: ChessPosition.standardInitial(),
+      initialPosition: undefined,
       movesRecord: [],
       ...toGameMeta(game),
-    };
+    });
   },
 
-  fromSelectGameWithRelations(game: SelectGameWithRelations): GameDetails {
+  fromSelectGameWithRelations(game: SelectGameWithRelations): ChessGame {
     const players = toGamePlayers(game);
-    return {
+    return ChessGame.from({
       ...toGameMeta(game),
       timeControl: toTimeControl(game),
       actionRecord: toGameActions(game),
@@ -182,46 +187,38 @@ export const GameDetailsMapper = {
       status: FROM_STATUS_TYPE_MAPPING[game.status],
       variant: game.variant ?? 'standard',
       isPrivate: game.isPrivate,
-      initialPosition: ChessPosition.standardInitial(),
+      initialPosition: undefined,
       result: toChessGameResult(game),
-      resultStr: game.result,
       movesRecord: game.moves.map((move) => ({
         ...Move.fromUci(move.uci),
         timestamp: move.movedAt.getTime(),
       })),
-    };
+    });
   },
 
-  toPlayerInfoV1(player: PlayerInfo): PlayerInfoV1 {
+  toLobbyGameItemV1(game: ChessGame): LobbyGameItemV1 {
+    const gameState = game.getState();
     return {
-      id: player.id,
-      name: player.name,
-      rating: player.rating?.value,
-      ratingDiff: player.ratingDiff,
-    };
-  },
-
-  toLobbyGameItemV1(game: GameDetails): LobbyGameItemV1 {
-    return {
-      id: game.id,
-      opponent: game.players.white
-        ? this.toPlayerInfoV1(game.players.white)
-        : game.players.black
-          ? this.toPlayerInfoV1(game.players.black)
+      id: gameState.id,
+      opponent: gameState.players.white
+        ? toPlayerInfoV1(gameState.players.white)
+        : gameState.players.black
+          ? toPlayerInfoV1(gameState.players.black)
           : {
               id: 'anon',
               name: 'Anonymous',
             },
-      variant: game.variant as GameVariantV1,
-      createdAt: game.createdAt.toISOString(),
-      availableColor: !game.players.white
+      variant: gameState.variant as GameVariantV1,
+      createdAt: gameState.createdAt.toISOString(),
+      availableColor: !gameState.players.white
         ? 'white'
-        : !game.players.black
+        : !gameState.players.black
           ? 'black'
           : 'spectator',
     };
   },
-  toPlayerGameInfoV1(game: GameDetails, playerId: string): PlayerGameInfoV1 {
+  toPlayerGameInfoV1(chessGame: ChessGame, playerId: string): PlayerGameInfoV1 {
+    const game = chessGame.getState();
     const ownSide =
       game.players.white?.id === playerId
         ? 'white'
@@ -252,15 +249,13 @@ export const GameDetailsMapper = {
         : undefined,
     };
   },
-  toGameDetailsV1({
-    game,
-    clock,
-    availableActions,
-  }: {
-    game: GameDetails;
-    clock: Maybe<ClockInstant>;
-    availableActions?: GameActionOption[];
-  }): GameDetailsV1 {
+  toGameDetailsV1(chessGame: ChessGame, isSpectator?: boolean): GameDetailsV1 {
+    const game = chessGame.getState();
+    const clock = chessGame.clock?.instant;
+    const availableActions = isSpectator
+      ? []
+      : chessGame.getAdditionalActions();
+
     return {
       id: game.id,
       status: game.status,
@@ -300,7 +295,8 @@ export const GameDetailsMapper = {
     };
   },
 
-  toInsertGame(game: GameDetails): InsertGame {
+  toInsertGame(chessGame: ChessGame): InsertGame {
+    const game = chessGame.getState();
     return {
       isPrivate: game.isPrivate,
       whitePlayerId: game.players.white ? game.players.white.id : null,

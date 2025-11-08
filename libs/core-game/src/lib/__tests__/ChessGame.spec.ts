@@ -141,6 +141,7 @@ describe('ChessGame', () => {
 
       const chessGame = ChessGame.fromChessPosition(position).setResult({
         type: 'white_win',
+        timestamp: Date.now(),
       });
 
       const actions = chessGame.getAdditionalActions();

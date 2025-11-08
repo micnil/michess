@@ -36,4 +36,5 @@ export * from './lib/player/PlayerGameInfoPageResponseV1';
 export * from './lib/player/PlayerGameInfoQueryV1';
 export * from './lib/player/PlayerGameInfoQueryV1Schema';
 export * from './lib/player/PlayerGameInfoV1';
+export * from './lib/player/PlayerInfoV1';
 export * from './lib/ServerToClientEvents';

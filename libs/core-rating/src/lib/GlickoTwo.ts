@@ -1,6 +1,6 @@
 import { Maybe } from '@michess/common-utils';
-import { GameResult } from './model/GameResult';
 import { Rating } from './model/Rating';
+import { Score } from './model/Score';
 
 const TAO = 0.5;
 const GLICKO_SCALE_DENOMINATOR = 173.7178;
@@ -85,7 +85,7 @@ const updateRatingDeviation = (
 
 const algorithm = (
   rating: Maybe<Rating>,
-  gameResults: GameResult[],
+  gameResults: Score[],
   elapsedPeriodsSinceLastUpdate = 1,
 ): Rating => {
   const actualRating = rating || Rating.default();
@@ -117,7 +117,7 @@ const algorithm = (
     (sum, gameResult) => {
       const opponentPlayer = convertToGlickoScale(gameResult.opponent);
       const EValue = E(mu, opponentPlayer.mu, opponentPlayer.phi);
-      return sum + g(opponentPlayer.phi) * (gameResult.score - EValue);
+      return sum + g(opponentPlayer.phi) * (gameResult.value - EValue);
     },
     0,
   );

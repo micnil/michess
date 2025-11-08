@@ -58,6 +58,8 @@ export class GameRepository extends BaseRepository {
         with: {
           whitePlayer: true,
           blackPlayer: true,
+          blackRating: true,
+          whiteRating: true,
           moves: true,
           actions: true,
         },
@@ -85,6 +87,8 @@ export class GameRepository extends BaseRepository {
         whitePlayer: true,
         blackPlayer: true,
         actions: true,
+        whiteRating: true,
+        blackRating: true,
       },
     });
   }

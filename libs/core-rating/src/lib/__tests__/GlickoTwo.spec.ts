@@ -9,14 +9,14 @@ describe('GlickoTwo', () => {
       volatility: 0.06,
     };
     const result = GlickoTwo.algorithm(player, [
-      { opponent: { value: 1400, deviation: 30, volatility: 0.06 }, score: 1 },
+      { opponent: { value: 1400, deviation: 30, volatility: 0.06 }, value: 1 },
       {
         opponent: { value: 1550, deviation: 100, volatility: 0.06 },
-        score: 0,
+        value: 0,
       },
       {
         opponent: { value: 1700, deviation: 300, volatility: 0.06 },
-        score: 0,
+        value: 0,
       },
     ]);
 

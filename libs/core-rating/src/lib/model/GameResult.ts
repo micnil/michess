@@ -1,6 +1,5 @@
-import { Rating } from './Rating';
+import { Score } from './Score';
 
-export type GameResult = {
-  opponent: Rating;
-  score: number; // 1 = win, 0.5 = draw, 0 = loss
+export type GameResult = Score & {
+  timestamp: Date;
 };
