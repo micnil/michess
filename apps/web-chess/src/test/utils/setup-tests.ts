@@ -2,6 +2,15 @@ import '@testing-library/jest-dom/vitest';
 import { fetch } from 'cross-fetch';
 import { server } from '../mocks/node-chess';
 global.fetch = fetch;
+// Mock the ResizeObserver
+const ResizeObserverMock = vi.fn(() => ({
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
+}));
+
+// Stub the global ResizeObserver
+vi.stubGlobal('ResizeObserver', ResizeObserverMock);
 vi.mock('socket.io-client', async () => {
   return {
     io: vi.fn(() => ({
