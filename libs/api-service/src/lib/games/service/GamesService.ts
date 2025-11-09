@@ -32,7 +32,6 @@ import { Session } from '../../auth/model/Session';
 import { LockService } from '../../lock/service/LockService';
 import { PageResponseMapper } from '../../mapper/PageResponseMapper';
 import { RatingsService } from '../../user/service/RatingsService';
-import { GameDetailsMapper } from '../mapper/GameDetailsMapper';
 import { GameMapper } from '../mapper/GameMapper';
 
 type TimeControlJobData = {
@@ -204,14 +203,10 @@ export class GamesService {
       status: ['WAITING'],
       private: false,
     });
-    const gameDetails = games.map(
-      GameDetailsMapper.fromSelectGameWithRelations,
-    );
+    const chessGames = games.map(GameMapper.fromSelectGameWithRelations);
 
     return PageResponseMapper.toPageResponse({
-      data: gameDetails.map((game) =>
-        GameDetailsMapper.toLobbyGameItemV1(game),
-      ),
+      data: chessGames.map((game) => GameMapper.toLobbyGameItemV1(game)),
       limit,
       totalItems: totalCount,
       page,
@@ -231,13 +226,11 @@ export class GamesService {
       playerId: userId,
       status: query.status ? [query.status] : ['ENDED', 'IN_PROGRESS'],
     });
-    const gameDetails = games.map(
-      GameDetailsMapper.fromSelectGameWithRelations,
-    );
+    const gameDetails = games.map(GameMapper.fromSelectGameWithRelations);
 
     return PageResponseMapper.toPageResponse({
       data: gameDetails.map((game) =>
-        GameDetailsMapper.toPlayerGameInfoV1(game, userId),
+        GameMapper.toPlayerGameInfoV1(game, userId),
       ),
       limit,
       totalItems: totalCount,
@@ -279,10 +272,9 @@ export class GamesService {
       },
       data.side,
     );
-    const updatedGameState = updatedGame.getState();
     await this.gameRepository.updateGame(
       gameState.id,
-      GameDetailsMapper.toInsertGame(updatedGameState),
+      GameMapper.toInsertGame(updatedGame),
     );
     return GameMapper.toGameDetailsV1(updatedGame);
   }
@@ -298,11 +290,10 @@ export class GamesService {
     }
 
     const updatedGame = chessGame.leaveGame(session.userId);
-    const updatedGameState = updatedGame.getState();
 
     await this.gameRepository.updateGame(
-      chessGame.getState().id,
-      GameDetailsMapper.toInsertGame(updatedGameState),
+      updatedGame.id,
+      GameMapper.toInsertGame(updatedGame),
     );
     return GameMapper.toGameDetailsV1(updatedGame);
   }
@@ -325,7 +316,7 @@ export class GamesService {
       assertDefined(newMove, 'No move found after playing move');
 
       await this.moveRepository.createMove({
-        gameId: updatedGameState.id,
+        gameId: updatedGame.id,
         uci: data.uci,
         movedAt: new Date(newMove.timestamp),
       });
@@ -335,8 +326,8 @@ export class GamesService {
         chessGame.hasNewActionOptions(updatedGame);
       if (gameStateUpdated) {
         await this.gameRepository.updateGame(
-          updatedGameState.id,
-          GameDetailsMapper.toInsertGame(updatedGameState),
+          updatedGame.id,
+          GameMapper.toInsertGame(updatedGame),
         );
       }
       return { updatedGame, move: newMove, gameStateUpdated };
@@ -377,8 +368,8 @@ export class GamesService {
     const updatedGame = chessGame.makeAction(session.userId, gameActionIn);
     const updatedGameState = updatedGame.getState();
     await this.gameRepository.updateGame(
-      updatedGameState.id,
-      GameDetailsMapper.toInsertGame(updatedGameState),
+      updatedGame.id,
+      GameMapper.toInsertGame(updatedGame),
     );
     const action = updatedGameState.actionRecord.at(-1);
     action &&
