@@ -1,6 +1,10 @@
 import { Maybe } from '@michess/common-utils';
-import { GameStatusType } from '@michess/core-game';
-import { and, count, eq, inArray, lt, sql } from 'drizzle-orm';
+import {
+  GameStatusType,
+  GameVariantType,
+  TimeControlClassification,
+} from '@michess/core-game';
+import { and, asc, count, eq, gt, inArray, lt, or, sql } from 'drizzle-orm';
 import { GameStatusEnum } from '../model/GameStatusEnum';
 import { InsertGame } from '../model/InsertGame';
 import { SelectGame } from '../model/SelectGame';
@@ -9,13 +13,21 @@ import { games } from '../schema';
 import { BaseRepository } from './BaseRepository';
 
 type QueryOptions = {
-  page: {
+  page?: {
     page: number;
     pageSize: number;
   };
   status?: GameStatusType[];
   playerId?: string;
+  variant?: GameVariantType;
+  timeControlClassification?: TimeControlClassification;
+  completedAfter?: Date;
+  completedBefore?: Date;
   private?: boolean;
+};
+type QuerySortOptions = {
+  sortBy: 'createdAt' | 'endedAt';
+  sortOrder: 'asc' | 'desc';
 };
 
 type DeleteGamesOptions = {
@@ -33,8 +45,10 @@ export class GameRepository extends BaseRepository {
       where: eq(this.schema.games.gameId, id),
     });
   }
-
-  async queryGames(options: QueryOptions): Promise<QueryGamesResult> {
+  async queryGames(
+    options: QueryOptions,
+    sortOptions?: QuerySortOptions,
+  ): Promise<QueryGamesResult> {
     // Build the where condition for reuse
     const andConditions = [];
     if (options.status) {
@@ -48,13 +62,39 @@ export class GameRepository extends BaseRepository {
     if (typeof options.private === 'boolean') {
       andConditions.push(eq(games.isPrivate, options.private));
     }
+    if (options.playerId) {
+      andConditions.push(
+        or(
+          eq(games.whitePlayerId, options.playerId),
+          eq(games.blackPlayerId, options.playerId),
+        ),
+      );
+    }
+    if (options.variant) {
+      andConditions.push(eq(games.variant, options.variant));
+    }
+    if (options.timeControlClassification) {
+      andConditions.push(
+        eq(games.timeControlClassification, options.timeControlClassification),
+      );
+    }
+    if (options.completedAfter) {
+      andConditions.push(gt(games.endedAt, options.completedAfter));
+    }
+    if (options.completedBefore) {
+      andConditions.push(lt(games.endedAt, options.completedBefore));
+    }
     const statusFilter =
       andConditions.length > 0 ? and(...andConditions) : undefined;
 
     const [gamesResult, countResult] = await Promise.all([
       // Get paginated games with relations
       this.db.query.games.findMany({
-        orderBy: (games, { desc }) => [desc(games.createdAt)],
+        orderBy: (games, { desc }) => [
+          sortOptions?.sortOrder === 'asc'
+            ? asc(games[sortOptions?.sortBy || 'createdAt'])
+            : desc(games[sortOptions?.sortBy || 'createdAt']),
+        ],
         with: {
           whitePlayer: true,
           blackPlayer: true,
@@ -63,8 +103,10 @@ export class GameRepository extends BaseRepository {
           moves: true,
           actions: true,
         },
-        offset: (options.page.page - 1) * options.page.pageSize,
-        limit: options.page.pageSize,
+        offset: options.page
+          ? (options.page.page - 1) * options.page.pageSize
+          : undefined,
+        limit: options.page?.pageSize,
         where: statusFilter,
       }),
       // Get total count with same filter

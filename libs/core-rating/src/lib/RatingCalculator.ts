@@ -30,6 +30,32 @@ const compute = (
   };
 };
 
+const decay = (
+  ratingSnapshot: RatingSnapshot,
+  currentDate: Date,
+): RatingSnapshot => {
+  const elapsedPeriodsSinceLastUpdate =
+    (Date.now() - ratingSnapshot.timestamp.getTime()) /
+    (1000 * 60 * 60 * 24 * 5); // 1 period = 5 days
+  const updatedRating = GlickoTwo.algorithm(
+    {
+      value: ratingSnapshot.value,
+      deviation: ratingSnapshot.deviation,
+      volatility: ratingSnapshot.volatility,
+    },
+    [],
+    elapsedPeriodsSinceLastUpdate,
+  );
+  return {
+    id: ratingSnapshot.id,
+    timestamp: currentDate,
+    value: updatedRating.value,
+    deviation: updatedRating.deviation,
+    volatility: updatedRating.volatility,
+  };
+};
+
 export const RatingCalculator = {
   compute,
+  decay,
 };

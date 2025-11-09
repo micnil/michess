@@ -6,6 +6,7 @@ import {
   FenStr,
   Move,
 } from '@michess/core-board';
+import { GameResult } from '@michess/core-rating';
 import { ChessGameActions } from './actions/ChessGameActions';
 import { GameActionIn } from './actions/model/GameActionIn';
 import { GameActionOption } from './actions/model/GameActionOption';
@@ -14,6 +15,7 @@ import { ChessClock } from './ChessClock';
 import { ChessGameError } from './model/ChessGameError';
 import { ChessGameIn } from './model/ChessGameIn';
 import { ChessGameResult } from './model/ChessGameResult';
+import { ChessGameResultType } from './model/ChessGameResultType';
 import { GameMeta } from './model/GameMeta';
 import { GamePlayers } from './model/GamePlayers';
 import { GameState } from './model/GameState';
@@ -44,6 +46,7 @@ export type ChessGame = {
   isPlayerInGame(playerId: string): boolean;
   hasNewStatus(oldChess: ChessGame): boolean;
   hasNewActionOptions(oldChess: ChessGame): boolean;
+  getPlayerGameResult(playerId: string): Maybe<GameResult>;
   clock: Maybe<ChessClock>;
   id: string;
 };
@@ -313,6 +316,33 @@ const fromGameStateInternal = (
     },
     isPlayerInGame: (playerId: string): boolean => {
       return getPlayerEntry(playerId) !== undefined;
+    },
+    getPlayerGameResult: (playerId: string): Maybe<GameResult> => {
+      const playerEntry = getPlayerEntry(playerId);
+      if (!playerEntry) {
+        throw new ChessGameError(
+          'not_in_game',
+          'Player is not part of the game',
+        );
+      }
+      const [side] = playerEntry;
+      if (!gameStateInternal.result) {
+        throw new ChessGameError('game_not_over', 'Game has not ended yet');
+      }
+      const opponentRating =
+        gameStateInternal.players[Color.opposite(side)]?.rating;
+      if (opponentRating) {
+        return {
+          opponent: opponentRating,
+          timestamp: new Date(gameStateInternal.result.timestamp),
+          value: ChessGameResultType.toScore(
+            gameStateInternal.result.type,
+            side,
+          ),
+        };
+      } else {
+        return undefined;
+      }
     },
     hasNewActionOptions: (oldChess: ChessGame): boolean => {
       return !gameStateInternal.additionalActions.hasExactOptions(
