@@ -12,6 +12,7 @@ import {
 } from '@michess/infra-db';
 import { Job, Queue, Worker } from 'bullmq';
 import { GameMapper } from '../../games/mapper/GameMapper';
+import { LockService } from '../../lock/service/LockService';
 
 type UpdateRatingJobData = {
   playerId: string;
@@ -31,6 +32,7 @@ export class RatingsService {
     private readonly ratingRepository: RatingRepository,
     private readonly gameRepository: GameRepository,
     private readonly cacheRepository: CacheRepository,
+    private readonly lockService: LockService,
   ) {
     const connectionOptions = { connection: this.cacheRepository.client };
 
@@ -158,6 +160,15 @@ export class RatingsService {
       );
       return;
     }
+
+    // Remove deduplication key and acquire lock
+    // This allows new jobs to be queued while we process, but they'll wait for the lock
+    const deduplicationId = `${playerId}-${variant}-${timeControlClassification}`;
+    await using _ = await this.lockService.acquireLock(
+      'rating',
+      deduplicationId,
+    );
+    await this.updateRatingQueue.removeDeduplicationKey(deduplicationId);
 
     // Capture the "until" timestamp at the start to define our processing window
     const processingEndTime = new Date();

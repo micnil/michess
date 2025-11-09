@@ -1,1 +1,1 @@
-export type ResourceType = 'game' | 'user';
+export type ResourceType = 'game' | 'user' | 'rating';
