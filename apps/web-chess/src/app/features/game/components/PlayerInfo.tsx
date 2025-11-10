@@ -1,5 +1,6 @@
 import { Color } from '@michess/core-board';
-import { Avatar, Badge, Box, Flex, Skeleton, Text } from '@radix-ui/themes';
+import { Avatar, Badge, Flex, Skeleton, Text } from '@radix-ui/themes';
+import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
 import React from 'react';
 import { CountdownClock } from '../../../api/model/CountdownClock';
 import { Clock } from './Clock';
@@ -67,19 +68,26 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
               >
                 {displayUsername}
               </Text>
-              <Box>
+              <Flex align="center">
                 {rating !== undefined ? (
                   <Text color={'gray'}>{rating}</Text>
                 ) : undefined}
                 {ratingDiff !== undefined ? (
-                  <Text
-                    ml={'1'}
-                    color={ratingDiff.startsWith('+') ? 'green' : 'red'}
-                  >
-                    {ratingDiff}
-                  </Text>
+                  <>
+                    <Text
+                      ml="1"
+                      color={ratingDiff.startsWith('+') ? 'green' : 'red'}
+                    >
+                      {ratingDiff}
+                    </Text>
+                    {ratingDiff.startsWith('+') ? (
+                      <ArrowUpRight color={'green'} />
+                    ) : (
+                      <ArrowDownRight color={'tomato'} />
+                    )}
+                  </>
                 ) : undefined}
-              </Box>
+              </Flex>
             </Flex>
           </Skeleton>
 
