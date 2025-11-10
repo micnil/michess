@@ -1,14 +1,3 @@
-// export type GameState = GameMeta & {
-//   players: GamePlayers;
-//   status: GameStatusType;
-//   result: Maybe<ChessGameResult>;
-//   resultStr: string;
-//   initialPosition: ChessPosition;
-//   actionRecord: GameAction[];
-//   movesRecord: MoveRecord[];
-//   timeControl: TimeControl;
-// };
-
 import { Maybe } from '@michess/common-utils';
 import { FenStr, MoveRecord } from '@michess/core-board';
 import { RatingSnapshot } from '@michess/core-rating';
