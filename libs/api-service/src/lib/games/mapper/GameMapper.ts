@@ -265,7 +265,9 @@ export const GameMapper = {
         white: game.players.white
           ? {
               id: game.players.white.id,
-              rating: game.players.white.rating?.value,
+              rating: game.players.white.rating?.value
+                ? Math.round(game.players.white.rating.value)
+                : undefined,
               ratingDiff: game.players.white.ratingDiff,
               name: game.players.white.name,
             }
@@ -273,7 +275,9 @@ export const GameMapper = {
         black: game.players.black
           ? {
               id: game.players.black.id,
-              rating: game.players.black.rating?.value,
+              rating: game.players.black.rating?.value
+                ? Math.round(game.players.black.rating.value)
+                : undefined,
               ratingDiff: game.players.black.ratingDiff,
               name: game.players.black.name,
             }

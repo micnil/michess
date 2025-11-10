@@ -451,13 +451,14 @@ const from = (chessGameIn: ChessGameIn): ChessGame => {
     startedAt: chessGameIn.startedAt,
     isPrivate: chessGameIn.isPrivate,
     variant: chessGameIn.variant,
-    players: GamePlayers.from(chessGameIn.players),
+    players: GamePlayers.from(chessGameIn.players, chessGameIn.result),
     status: chessGameIn.status,
     result: chessGameIn.result,
     resultStr: ChessGameResult.toResultString(chessGameIn.result),
     initialPosition: FenParser.toChessPosition(
       chessGameIn.initialPosition ?? FenStr.standardInitial(),
     ),
+
     actionRecord: chessGameIn.actionRecord,
     movesRecord: chessGameIn.movesRecord,
     timeControl,

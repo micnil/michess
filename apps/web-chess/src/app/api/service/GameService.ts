@@ -46,6 +46,18 @@ export class GameService {
   }
 
   toGameViewModel(gameDetails: GameDetailsV1): GameViewModel {
+    const whiteRatingDiff = gameDetails.players.white?.ratingDiff;
+    const whiteRatingDiffText = whiteRatingDiff
+      ? whiteRatingDiff > 0
+        ? `+ ${whiteRatingDiff}`
+        : `- ${Math.abs(whiteRatingDiff)}`
+      : undefined;
+    const blackRatingDiff = gameDetails.players.black?.ratingDiff;
+    const blackRatingDiffText = blackRatingDiff
+      ? blackRatingDiff > 0
+        ? `+ ${blackRatingDiff}`
+        : `- ${Math.abs(blackRatingDiff)}`
+      : undefined;
     return {
       status: gameDetails.status,
       moves: gameDetails.moves.map((m) => Move.fromUci(m.uci)),
@@ -62,12 +74,16 @@ export class GameService {
           ? {
               username: gameDetails.players.white.name,
               avatar: undefined,
+              rating: gameDetails.players.white.rating?.toString(),
+              ratingDiff: whiteRatingDiffText,
             }
           : undefined,
         black: gameDetails.players.black
           ? {
               username: gameDetails.players.black.name,
               avatar: undefined,
+              rating: gameDetails.players.black.rating?.toString(),
+              ratingDiff: blackRatingDiffText,
             }
           : undefined,
       },
