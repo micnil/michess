@@ -40,7 +40,7 @@ const leaveGame = async (
   api: Api,
   leaveGamePayloadV1: LeaveGamePayloadV1,
 ) => {
-  const gameState = await api.games.leaveGame(
+  const gameState = await api.gameplay.leaveGame(
     socket.data.session,
     leaveGamePayloadV1,
   );
@@ -106,7 +106,7 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
           },
           `User joining game`,
         );
-        const gameState = await api.games.joinGame(
+        const gameState = await api.gameplay.joinGame(
           socket.data.session,
           joinGamePayloadV1,
         );
@@ -147,7 +147,7 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
           { ...makeMovePayloadV1, rooms: Array.from(socket.rooms) },
           'Received make-move event',
         );
-        const { gameDetails, move } = await api.games.makeMove(
+        const { gameDetails, move } = await api.gameplay.makeMove(
           socket.data.session,
           makeMovePayloadV1,
         );
@@ -174,7 +174,7 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
           },
           'User made action',
         );
-        const gameDetails = await api.games.makeAction(
+        const gameDetails = await api.gameplay.makeAction(
           socket.data.session,
           makeActionPayload,
         );
@@ -222,7 +222,7 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
     }
   });
 
-  api.games.subscribe((gameDetails) => {
+  api.gameplay.subscribe((gameDetails) => {
     io.to(gameDetails.id).emit('game-updated', gameDetails);
   });
 

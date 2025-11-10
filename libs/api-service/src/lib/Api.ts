@@ -5,6 +5,7 @@ import { Sql } from 'postgres';
 import { AuthConfig } from './auth/model/AuthConfig';
 import { AuthService } from './auth/service/AuthService';
 import { GameJobSchedulerService } from './games/service/GameJobSchedulerService';
+import { GameplayService } from './games/service/GameplayService';
 import { GamesService } from './games/service/GamesService';
 import { LockService } from './lock/service/LockService';
 import { UsageMetricsService } from './metrics/UsageMetricsService';
@@ -12,6 +13,7 @@ import { RatingsService } from './user/service/RatingsService';
 
 export type Api = {
   games: GamesService;
+  gameplay: GameplayService;
   auth: AuthService;
   usageMetrics: UsageMetricsService;
   gameJobScheduler: GameJobSchedulerService;
@@ -35,7 +37,8 @@ const from = (
     repos.game,
     repos.cache,
   );
-  const gamesService = new GamesService(
+  const gamesService = new GamesService(repos.game);
+  const gameplayService = new GameplayService(
     repos.game,
     repos.move,
     repos.action,
@@ -57,6 +60,7 @@ const from = (
 
   return {
     games: gamesService,
+    gameplay: gameplayService,
     auth: authService,
     usageMetrics,
     gameJobScheduler: gameJobSchedulerService,

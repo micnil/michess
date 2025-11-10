@@ -30,7 +30,7 @@ const from = (
     },
     close: async () => {
       socketRouter.close();
-      await api.games.close();
+      await api.gameplay.close();
       await api.gameJobScheduler.close();
       await api.usageMetrics.close();
     },
