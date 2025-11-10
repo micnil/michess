@@ -7,6 +7,7 @@ import { AuthService } from './auth/service/AuthService';
 import { GamesService } from './games/service/GamesService';
 import { LockService } from './lock/service/LockService';
 import { UsageMetricsService } from './metrics/UsageMetricsService';
+import { RatingsService } from './user/service/RatingsService';
 
 export type Api = {
   games: GamesService;
@@ -22,11 +23,18 @@ const from = (
 ): Api => {
   const processId = randomUUID();
   const lockService = new LockService(repos.cache.client);
+  const ratingsService = new RatingsService(
+    repos.rating,
+    repos.game,
+    repos.cache,
+    lockService,
+  );
   const gamesService = new GamesService(
     repos.game,
     repos.move,
     repos.action,
     repos.cache,
+    ratingsService,
     lockService,
   );
   const authService = new AuthService(

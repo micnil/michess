@@ -4,6 +4,7 @@ import { ActionRepository } from './repository/ActionRepository';
 import { CacheRepository } from './repository/CacheRepository';
 import { GameRepository } from './repository/GameRepository';
 import { MoveRepository } from './repository/MoveRepository';
+import { RatingRepository } from './repository/RatingRepository';
 import { UserRepository } from './repository/UserRepository';
 
 export type Repositories = {
@@ -12,6 +13,7 @@ export type Repositories = {
   move: MoveRepository;
   action: ActionRepository;
   cache: CacheRepository;
+  rating: RatingRepository;
 };
 
 const from = (sql: Sql, redis: Redis): Repositories => {
@@ -21,6 +23,7 @@ const from = (sql: Sql, redis: Redis): Repositories => {
     move: new MoveRepository(sql),
     action: new ActionRepository(sql),
     cache: new CacheRepository(redis),
+    rating: new RatingRepository(sql),
   };
 };
 

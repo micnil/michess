@@ -1,12 +1,21 @@
-import { isDefined, Maybe } from '@michess/common-utils';
-import { ChessPosition, Color, Move } from '@michess/core-board';
+import { assertDefined, isDefined, Maybe } from '@michess/common-utils';
+import {
+  ChessPosition,
+  Color,
+  FenParser,
+  FenStr,
+  Move,
+} from '@michess/core-board';
+import { GameResult } from '@michess/core-rating';
 import { ChessGameActions } from './actions/ChessGameActions';
 import { GameActionIn } from './actions/model/GameActionIn';
 import { GameActionOption } from './actions/model/GameActionOption';
 import { Chessboard } from './Chessboard';
 import { ChessClock } from './ChessClock';
 import { ChessGameError } from './model/ChessGameError';
+import { ChessGameIn } from './model/ChessGameIn';
 import { ChessGameResult } from './model/ChessGameResult';
+import { ChessGameResultType } from './model/ChessGameResultType';
 import { GameMeta } from './model/GameMeta';
 import { GamePlayers } from './model/GamePlayers';
 import { GameState } from './model/GameState';
@@ -37,23 +46,24 @@ export type ChessGame = {
   isPlayerInGame(playerId: string): boolean;
   hasNewStatus(oldChess: ChessGame): boolean;
   hasNewActionOptions(oldChess: ChessGame): boolean;
+  getPlayerGameResult(playerId: string): Maybe<GameResult>;
   clock: Maybe<ChessClock>;
+  id: string;
 };
 
 const endGame = (
   gameState: GameStateInternal,
   result: ChessGameResult,
 ): GameStateInternal => {
-  const endedAt = new Date();
   const resultToSet = gameState.result ?? result;
-  const pausedClock = gameState.clock?.pause(endedAt.getTime());
+  const pausedClock = gameState.clock?.pause(resultToSet.timestamp);
 
   return {
     ...gameState,
     status: 'ENDED',
+    players: GamePlayers.from(gameState.players, resultToSet),
     meta: {
       ...gameState.meta,
-      endedAt,
     },
     result: resultToSet,
     clock: pausedClock,
@@ -175,7 +185,7 @@ const evalResult = (
       board.position.turn === Color.White ? Color.Black : Color.White,
     );
   } else if (board.isStalemate || board.isInsufficientMaterial) {
-    return { type: 'draw' };
+    return ChessGameResult.toDraw();
   } else if (flagResult) {
     return flagResult;
   } else {
@@ -235,18 +245,14 @@ const fromGameStateInternal = (
     const gameResult = evalResult(newBoard, newClock);
 
     const shouldStartGame = gameStateInternal.status === 'READY';
-    const shouldEndGame = gameResult !== undefined;
 
     const newStatus = shouldStartGame
       ? 'IN_PROGRESS'
-      : shouldEndGame
-        ? 'ENDED'
-        : gameStateInternal.status;
+      : gameStateInternal.status;
 
     const startedAt = gameStateInternal.meta.startedAt ?? new Date();
-    const endedAt = shouldEndGame ? new Date() : gameStateInternal.meta.endedAt;
 
-    return fromGameStateInternal({
+    const updatedGameState: GameStateInternal = {
       ...gameStateInternal,
       board: newBoard,
       status: newStatus,
@@ -254,13 +260,21 @@ const fromGameStateInternal = (
       meta: {
         ...gameStateInternal.meta,
         startedAt,
-        endedAt,
       },
       result: gameResult,
       additionalActions: additionalActions.updateBoard(newStatus, newBoard),
-    });
+    };
+
+    if (gameResult) {
+      return fromGameStateInternal(endGame(updatedGameState, gameResult));
+    } else {
+      return fromGameStateInternal(updatedGameState);
+    }
   };
   return {
+    get id(): string {
+      return gameStateInternal.meta.id;
+    },
     get clock(): Maybe<ChessClock> {
       return gameStateInternal.clock;
     },
@@ -306,6 +320,33 @@ const fromGameStateInternal = (
     },
     isPlayerInGame: (playerId: string): boolean => {
       return getPlayerEntry(playerId) !== undefined;
+    },
+    getPlayerGameResult: (playerId: string): Maybe<GameResult> => {
+      const playerEntry = getPlayerEntry(playerId);
+      if (!playerEntry) {
+        throw new ChessGameError(
+          'not_in_game',
+          'Player is not part of the game',
+        );
+      }
+      const [side] = playerEntry;
+      if (!gameStateInternal.result) {
+        throw new ChessGameError('game_not_over', 'Game has not ended yet');
+      }
+      const opponentRating =
+        gameStateInternal.players[Color.opposite(side)]?.rating;
+      if (opponentRating) {
+        return {
+          opponent: opponentRating,
+          timestamp: new Date(gameStateInternal.result.timestamp),
+          value: ChessGameResultType.toScore(
+            gameStateInternal.result.type,
+            side,
+          ),
+        };
+      } else {
+        return undefined;
+      }
     },
     hasNewActionOptions: (oldChess: ChessGame): boolean => {
       return !gameStateInternal.additionalActions.hasExactOptions(
@@ -375,7 +416,59 @@ const fromGameState = (gameState: GameState): ChessGame => {
   });
 };
 
+const from = (chessGameIn: ChessGameIn): ChessGame => {
+  const timeControl: TimeControl = (() => {
+    switch (chessGameIn.timeControl.classification) {
+      case 'bullet':
+      case 'blitz':
+      case 'rapid': {
+        assertDefined(chessGameIn.timeControl.initialSec);
+        assertDefined(chessGameIn.timeControl.incrementSec);
+        return {
+          classification: chessGameIn.timeControl.classification,
+          initialSec: chessGameIn.timeControl.initialSec,
+          incrementSec: chessGameIn.timeControl.incrementSec,
+        };
+      }
+      case 'correspondence': {
+        assertDefined(chessGameIn.timeControl.daysPerMove);
+        return {
+          classification: 'correspondence',
+          daysPerMove: chessGameIn.timeControl.daysPerMove,
+        };
+      }
+      case 'no_clock':
+      default:
+        return {
+          classification: 'no_clock',
+        };
+    }
+  })();
+  return fromGameState({
+    id: chessGameIn.id,
+    createdAt: chessGameIn.createdAt,
+    updatedAt: chessGameIn.updatedAt,
+    startedAt: chessGameIn.startedAt,
+    isPrivate: chessGameIn.isPrivate,
+    variant: chessGameIn.variant,
+    players: GamePlayers.from(chessGameIn.players, chessGameIn.result),
+    status: chessGameIn.status,
+    result: chessGameIn.result,
+    resultStr: ChessGameResult.toResultString(chessGameIn.result),
+    initialPosition: FenParser.toChessPosition(
+      chessGameIn.initialPosition ?? FenStr.standardInitial(),
+    ),
+
+    actionRecord: chessGameIn.actionRecord,
+    movesRecord: chessGameIn.movesRecord,
+    timeControl,
+  });
+};
+
 export const ChessGame = {
-  fromChessPosition,
+  /** For testing */
   fromGameState,
+
+  fromChessPosition,
+  from,
 };
