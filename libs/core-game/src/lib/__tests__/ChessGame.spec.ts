@@ -149,6 +149,101 @@ describe('ChessGame', () => {
     });
   });
 
+  describe('makeAction', () => {
+    it('should calculate rating diffs when game ends by resignation', () => {
+      const chessGame = ChessGame.fromGameState(
+        GameStateMock.fromPartial({
+          players: {
+            white: {
+              id: 'player1',
+              name: 'Player One',
+              rating: {
+                id: 1,
+                value: 1500,
+                deviation: 200,
+                volatility: 0.06,
+                timestamp: new Date(),
+              },
+            },
+            black: {
+              id: 'player2',
+              name: 'Player Two',
+              rating: {
+                id: 2,
+                value: 1600,
+                deviation: 180,
+                volatility: 0.06,
+                timestamp: new Date(),
+              },
+            },
+          },
+          status: 'IN_PROGRESS',
+        }),
+      );
+
+      const updatedGame = chessGame.makeAction('player2', { type: 'resign' });
+
+      const whitePlayer = updatedGame.getState().players.white;
+      const blackPlayer = updatedGame.getState().players.black;
+
+      expect(whitePlayer?.ratingDiff).toBeDefined();
+      expect(blackPlayer?.ratingDiff).toBeDefined();
+      expect(whitePlayer?.ratingDiff).toBeGreaterThan(0); // Winner gains rating
+      expect(blackPlayer?.ratingDiff).toBeLessThan(0); // Loser loses rating
+    });
+
+    it('should calculate equal rating diffs for draw by agreement', () => {
+      const chessGame = ChessGame.fromGameState(
+        GameStateMock.fromPartial({
+          players: {
+            white: {
+              id: 'player1',
+              name: 'Player One',
+              rating: {
+                id: 1,
+                value: 1500,
+                deviation: 200,
+                volatility: 0.06,
+                timestamp: new Date(),
+              },
+            },
+            black: {
+              id: 'player2',
+              name: 'Player Two',
+              rating: {
+                id: 2,
+                value: 1600,
+                deviation: 180,
+                volatility: 0.06,
+                timestamp: new Date(),
+              },
+            },
+          },
+          status: 'IN_PROGRESS',
+        }),
+      );
+
+      // White offers draw
+      const gameWithOffer = chessGame.makeAction('player1', {
+        type: 'offer_draw',
+      });
+
+      // Black accepts
+      const drawnGame = gameWithOffer.makeAction('player2', {
+        type: 'accept_draw',
+      });
+
+      const whitePlayer = drawnGame.getState().players.white;
+      const blackPlayer = drawnGame.getState().players.black;
+
+      expect(whitePlayer?.ratingDiff).toBeDefined();
+      expect(blackPlayer?.ratingDiff).toBeDefined();
+      // In a draw, lower rated player gains, higher rated loses
+      expect(whitePlayer?.ratingDiff).toBeGreaterThan(0);
+      expect(blackPlayer?.ratingDiff).toBeLessThan(0);
+    });
+  });
+
   describe('joinGame', () => {
     it('should allow a player to join as white when white slot is empty', () => {
       const position = createChessPositionMock();
@@ -316,6 +411,438 @@ describe('ChessGame', () => {
       expect(gameState.result).toBeDefined();
       expect(gameState.result?.type).toBe<ChessGameResultType>('draw');
       expect(gameState.status).toBe<GameStatusType>('ENDED');
+    });
+
+    it('should pause clock when checkmate occurs', () => {
+      const chessGame = ChessGame.fromGameState(
+        GameStateMock.fromPartial({
+          initialPosition: FenParser.toChessPosition(
+            'r1bqkbnr/ppp2ppp/2np4/4p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR w KQkq - 0 1',
+          ),
+          players: {
+            white: { id: 'player1', name: 'Player One' },
+            black: { id: 'player2', name: 'Player Two' },
+          },
+          status: 'IN_PROGRESS',
+          timeControl: {
+            classification: 'blitz',
+            initialSec: 300,
+            incrementSec: 0,
+          },
+        }),
+      );
+
+      const clockBeforeMove = chessGame.clock;
+      expect(clockBeforeMove).toBeDefined();
+
+      // Scholar's mate
+      const updatedGame = chessGame.play('player1', {
+        from: 'f3',
+        to: 'f7',
+        promotion: undefined,
+      });
+
+      const clockAfterMove = updatedGame.clock;
+      expect(updatedGame.getState().status).toBe('ENDED');
+      expect(clockAfterMove?.lastEvent?.type).toBe('pause');
+    });
+
+    it('should pause clock when stalemate occurs', () => {
+      const chessGame = ChessGame.fromGameState(
+        GameStateMock.fromPartial({
+          initialPosition: FenParser.toChessPosition(
+            '3k4/5K2/8/8/8/8/6Q1/8 w - - 0 1',
+          ),
+          players: {
+            white: { id: 'player1', name: 'Player One' },
+            black: { id: 'player2', name: 'Player Two' },
+          },
+          status: 'IN_PROGRESS',
+          timeControl: {
+            classification: 'rapid',
+            initialSec: 600,
+            incrementSec: 5,
+          },
+        }),
+      );
+
+      const clockBeforeMove = chessGame.clock;
+      expect(clockBeforeMove).toBeDefined();
+
+      const updatedGame = chessGame.play('player1', {
+        from: 'g2',
+        to: 'b7',
+        promotion: undefined,
+      });
+
+      const clockAfterMove = updatedGame.clock;
+      expect(updatedGame.getState().status).toBe('ENDED');
+      expect(updatedGame.getState().result?.type).toBe('draw');
+      expect(clockAfterMove?.lastEvent?.type).toBe('pause');
+    });
+
+    it('should calculate rating diffs when game ends by checkmate', () => {
+      const chessGame = ChessGame.fromGameState(
+        GameStateMock.fromPartial({
+          initialPosition: FenParser.toChessPosition(
+            'r1bqkbnr/ppp2ppp/2np4/4p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR w KQkq - 0 1',
+          ),
+          players: {
+            white: {
+              id: 'player1',
+              name: 'Player One',
+              rating: {
+                id: 1,
+                value: 1500,
+                deviation: 200,
+                volatility: 0.06,
+                timestamp: new Date(),
+              },
+            },
+            black: {
+              id: 'player2',
+              name: 'Player Two',
+              rating: {
+                id: 2,
+                value: 1600,
+                deviation: 180,
+                volatility: 0.06,
+                timestamp: new Date(),
+              },
+            },
+          },
+          status: 'IN_PROGRESS',
+        }),
+      );
+
+      const updatedGame = chessGame.play('player1', {
+        from: 'f3',
+        to: 'f7',
+        promotion: undefined,
+      });
+
+      const whitePlayer = updatedGame.getState().players.white;
+      const blackPlayer = updatedGame.getState().players.black;
+
+      expect(whitePlayer?.ratingDiff).toBeDefined();
+      expect(blackPlayer?.ratingDiff).toBeDefined();
+      expect(whitePlayer?.ratingDiff).toBeGreaterThan(0); // Winner gains rating
+      expect(blackPlayer?.ratingDiff).toBeLessThan(0); // Loser loses rating
+    });
+  });
+
+  describe('Game status transitions', () => {
+    it('should transition from READY to IN_PROGRESS on first move', () => {
+      const chessGame = ChessGame.fromGameState(
+        GameStateMock.fromPartial({
+          players: {
+            white: { id: 'player1', name: 'Player One' },
+            black: { id: 'player2', name: 'Player Two' },
+          },
+          status: 'READY',
+        }),
+      );
+
+      expect(chessGame.getState().status).toBe('READY');
+      expect(chessGame.getState().startedAt).toBeUndefined();
+
+      const updatedGame = chessGame.play('player1', {
+        from: 'e2',
+        to: 'e4',
+      });
+
+      expect(updatedGame.getState().status).toBe('IN_PROGRESS');
+      expect(updatedGame.getState().startedAt).toBeDefined();
+    });
+
+    it('should set startedAt timestamp only once', () => {
+      const chessGame = ChessGame.fromGameState(
+        GameStateMock.fromPartial({
+          players: {
+            white: { id: 'player1', name: 'Player One' },
+            black: { id: 'player2', name: 'Player Two' },
+          },
+          status: 'READY',
+        }),
+      );
+
+      const game1 = chessGame.play('player1', { from: 'e2', to: 'e4' });
+      const startedAt1 = game1.getState().startedAt;
+
+      const game2 = game1.play('player2', { from: 'e7', to: 'e5' });
+      const startedAt2 = game2.getState().startedAt;
+
+      expect(startedAt1).toEqual(startedAt2);
+    });
+  });
+
+  describe('leaveGame', () => {
+    it('should not allow leaving during IN_PROGRESS game', () => {
+      const chessGame = ChessGame.fromGameState(
+        GameStateMock.fromPartial({
+          players: {
+            white: { id: 'player1', name: 'Player One' },
+            black: { id: 'player2', name: 'Player Two' },
+          },
+          status: 'IN_PROGRESS',
+        }),
+      );
+
+      const updatedGame = chessGame.leaveGame('player1');
+
+      // Should return unchanged game
+      expect(updatedGame.getState().players.white).toBeDefined();
+      expect(updatedGame.getState().status).toBe('IN_PROGRESS');
+    });
+
+    it('should not allow leaving after game has ENDED', () => {
+      const chessGame = ChessGame.fromGameState(
+        GameStateMock.fromPartial({
+          players: {
+            white: { id: 'player1', name: 'Player One' },
+            black: { id: 'player2', name: 'Player Two' },
+          },
+          status: 'ENDED',
+          result: { type: 'white_win', timestamp: Date.now() },
+        }),
+      );
+
+      const updatedGame = chessGame.leaveGame('player1');
+
+      expect(updatedGame.getState().players.white).toBeDefined();
+      expect(updatedGame.getState().status).toBe('ENDED');
+    });
+
+    it('should transition READY to WAITING when one player leaves', () => {
+      const chessGame = ChessGame.fromGameState(
+        GameStateMock.fromPartial({
+          players: {
+            white: { id: 'player1', name: 'Player One' },
+            black: { id: 'player2', name: 'Player Two' },
+          },
+          status: 'READY',
+        }),
+      );
+
+      const updatedGame = chessGame.leaveGame('player1');
+
+      expect(updatedGame.getState().players.white).toBeUndefined();
+      expect(updatedGame.getState().players.black).toBeDefined();
+      expect(updatedGame.getState().status).toBe('WAITING');
+    });
+
+    it('should transition WAITING to EMPTY when last player leaves', () => {
+      const chessGame = ChessGame.fromGameState(
+        GameStateMock.fromPartial({
+          players: {
+            white: { id: 'player1', name: 'Player One' },
+            black: undefined,
+          },
+          status: 'WAITING',
+        }),
+      );
+
+      const updatedGame = chessGame.leaveGame('player1');
+
+      expect(updatedGame.getState().players.white).toBeUndefined();
+      expect(updatedGame.getState().status).toBe('EMPTY');
+    });
+  });
+
+  describe('getPlayerGameResult', () => {
+    it('should throw error when player is not in game', () => {
+      const chessGame = ChessGame.fromGameState(
+        GameStateMock.fromPartial({
+          players: {
+            white: { id: 'player1', name: 'Player One' },
+            black: { id: 'player2', name: 'Player Two' },
+          },
+          status: 'ENDED',
+          result: { type: 'white_win', timestamp: Date.now() },
+        }),
+      );
+
+      expect(() => {
+        chessGame.getPlayerGameResult('player3');
+      }).toThrow('Player is not part of the game');
+    });
+
+    it('should throw error when game has not ended', () => {
+      const chessGame = ChessGame.fromGameState(
+        GameStateMock.fromPartial({
+          players: {
+            white: { id: 'player1', name: 'Player One' },
+            black: { id: 'player2', name: 'Player Two' },
+          },
+          status: 'IN_PROGRESS',
+        }),
+      );
+
+      expect(() => {
+        chessGame.getPlayerGameResult('player1');
+      }).toThrow('Game has not ended yet');
+    });
+
+    it('should return undefined when opponent has no rating', () => {
+      const chessGame = ChessGame.fromGameState(
+        GameStateMock.fromPartial({
+          players: {
+            white: {
+              id: 'player1',
+              name: 'Player One',
+              rating: {
+                id: 1,
+                value: 1500,
+                deviation: 200,
+                volatility: 0.06,
+                timestamp: new Date(),
+              },
+            },
+            black: { id: 'player2', name: 'Player Two' }, // No rating
+          },
+          status: 'ENDED',
+          result: { type: 'white_win', timestamp: Date.now() },
+        }),
+      );
+
+      const result = chessGame.getPlayerGameResult('player1');
+      expect(result).toBeUndefined();
+    });
+
+    it('should return game result with correct score for winner', () => {
+      const chessGame = ChessGame.fromGameState(
+        GameStateMock.fromPartial({
+          players: {
+            white: {
+              id: 'player1',
+              name: 'Player One',
+              rating: {
+                id: 1,
+                value: 1500,
+                deviation: 200,
+                volatility: 0.06,
+                timestamp: new Date(),
+              },
+            },
+            black: {
+              id: 'player2',
+              name: 'Player Two',
+              rating: {
+                id: 2,
+                value: 1600,
+                deviation: 180,
+                volatility: 0.06,
+                timestamp: new Date(),
+              },
+            },
+          },
+          status: 'ENDED',
+          result: { type: 'white_win', timestamp: Date.now() },
+        }),
+      );
+
+      const result = chessGame.getPlayerGameResult('player1');
+      expect(result).toBeDefined();
+      expect(result?.value).toBe(1); // Win
+      expect(result?.opponent.value).toBe(1600);
+      expect(result?.opponent.deviation).toBe(180);
+      expect(result?.opponent.volatility).toBe(0.06);
+    });
+
+    it('should return game result with correct score for loser', () => {
+      const chessGame = ChessGame.fromGameState(
+        GameStateMock.fromPartial({
+          players: {
+            white: {
+              id: 'player1',
+              name: 'Player One',
+              rating: {
+                id: 1,
+                value: 1500,
+                deviation: 200,
+                volatility: 0.06,
+                timestamp: new Date(),
+              },
+            },
+            black: {
+              id: 'player2',
+              name: 'Player Two',
+              rating: {
+                id: 2,
+                value: 1600,
+                deviation: 180,
+                volatility: 0.06,
+                timestamp: new Date(),
+              },
+            },
+          },
+          status: 'ENDED',
+          result: { type: 'white_win', timestamp: Date.now() },
+        }),
+      );
+
+      const result = chessGame.getPlayerGameResult('player2');
+      expect(result).toBeDefined();
+      expect(result?.value).toBe(0); // Loss
+    });
+
+    it('should return game result with correct score for draw', () => {
+      const chessGame = ChessGame.fromGameState(
+        GameStateMock.fromPartial({
+          players: {
+            white: {
+              id: 'player1',
+              name: 'Player One',
+              rating: {
+                id: 1,
+                value: 1500,
+                deviation: 200,
+                volatility: 0.06,
+                timestamp: new Date(),
+              },
+            },
+            black: {
+              id: 'player2',
+              name: 'Player Two',
+              rating: {
+                id: 2,
+                value: 1600,
+                deviation: 180,
+                volatility: 0.06,
+                timestamp: new Date(),
+              },
+            },
+          },
+          status: 'ENDED',
+          result: { type: 'draw', timestamp: Date.now() },
+        }),
+      );
+
+      const result1 = chessGame.getPlayerGameResult('player1');
+      const result2 = chessGame.getPlayerGameResult('player2');
+      expect(result1?.value).toBe(0.5); // Draw
+      expect(result2?.value).toBe(0.5); // Draw
+    });
+  });
+
+  describe('Insufficient material', () => {
+    it('should end game in draw when insufficient material (two kings)', () => {
+      const chessGame = ChessGame.fromGameState(
+        GameStateMock.fromPartial({
+          initialPosition: FenParser.toChessPosition(
+            '8/8/8/8/8/3k4/8/3K4 w - - 0 1', // Just two kings
+          ),
+          players: {
+            white: { id: 'player1', name: 'Player One' },
+            black: { id: 'player2', name: 'Player Two' },
+          },
+          status: 'IN_PROGRESS',
+        }),
+      );
+
+      // This position should already be detected as a draw
+      expect(chessGame.getState().result?.type).toBe('draw');
+      expect(chessGame.getState().status).toBe('ENDED');
     });
   });
 });
