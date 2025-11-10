@@ -4,6 +4,7 @@ import { http, HttpResponse, server } from '../../../../test/mocks/node-chess';
 import {
   render,
   socketClient,
+  within,
 } from '../../../../test/utils/custom-testing-library';
 import { GameLobby } from '../GameLobby';
 
@@ -15,7 +16,7 @@ describe('GameLobby', () => {
     expect(getByText('+ Create Game')).toBeTruthy();
   });
 
-  it('should call onCreateGame when create button is clicked', async () => {
+  it('should call onCreateGame when a game is created', async () => {
     const user = userEvent.setup();
     const onCreateGame = vi.fn();
     const gameDetailsMockV1: GameDetailsV1 = {
@@ -43,6 +44,11 @@ describe('GameLobby', () => {
 
     await user.click(createButton);
 
+    const dialog = await findByRole('dialog');
+    const createGameButton = within(dialog).getByRole('button', {
+      name: 'Create Game',
+    });
+    await user.click(createGameButton);
     expect(onCreateGame).toHaveBeenCalledTimes(1);
   });
 

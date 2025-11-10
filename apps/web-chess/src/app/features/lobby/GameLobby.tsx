@@ -84,7 +84,8 @@ export const GameLobby: React.FC<Props> = ({ onCreateGame, onJoinGame }) => {
                 <Flex align="center" gap="4">
                   <Box style={{ minWidth: '120px' }}>
                     <Text weight="medium" size="3">
-                      {game.opponent.name}
+                      {game.opponent.name}{' '}
+                      {game.opponent.rating ? `(${game.opponent.rating})` : ''}
                     </Text>
                   </Box>
                   <Flex align="center" gap="2" style={{ minWidth: '100px' }}>

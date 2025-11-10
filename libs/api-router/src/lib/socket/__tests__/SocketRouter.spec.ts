@@ -8,6 +8,7 @@ import {
 import {
   Api,
   AuthService,
+  GameplayService,
   GamesService,
   Session,
   UsageMetricsService,
@@ -21,7 +22,9 @@ import { SocketRouter } from '../SocketRouter';
 jest.mock('@michess/api-service');
 
 const apiMock: Api = {
-  games: new GamesService(
+  games: new GamesService({} as never),
+  gameplay: new GameplayService(
+    {} as never,
     {} as never,
     {} as never,
     {} as never,
@@ -32,6 +35,7 @@ const apiMock: Api = {
     google: { clientId: '', clientSecret: '' },
   }),
   usageMetrics: new UsageMetricsService({} as never, {} as never, {} as never),
+  gameJobScheduler: {} as never,
 };
 
 const waitFor = <T>(
@@ -148,7 +152,7 @@ describe('SocketRouter', () => {
       };
       serverSocket2.join(joinGamePayload.gameId);
 
-      apiMock.games.joinGame = jest.fn().mockResolvedValue(mockGameState);
+      apiMock.gameplay.joinGame = jest.fn().mockResolvedValue(mockGameState);
 
       const gameUpdatedPromise = waitFor(clientSocket2, 'game-updated');
 
@@ -162,7 +166,7 @@ describe('SocketRouter', () => {
 
       expect(response.status).toEqual('ok');
       expect(response.status === 'ok' && response.data).toEqual(mockGameState);
-      expect(apiMock.games.joinGame).toHaveBeenCalled();
+      expect(apiMock.gameplay.joinGame).toHaveBeenCalled();
     });
   });
 
@@ -181,7 +185,7 @@ describe('SocketRouter', () => {
         gameId: makeMovePayload.gameId,
         clock: { whiteMs: 300000, blackMs: 300000 },
       };
-      apiMock.games.makeMove = jest.fn().mockResolvedValue({ move: moveV1 });
+      apiMock.gameplay.makeMove = jest.fn().mockResolvedValue({ move: moveV1 });
 
       const moveMadePromise = waitFor<MoveMadeV1>(clientSocket2, 'move-made');
 
@@ -194,7 +198,7 @@ describe('SocketRouter', () => {
       expect(data).toEqual(moveV1);
       expect(response.status).toEqual('ok');
       expect(response.status === 'ok' && response.data).toEqual(moveV1);
-      expect(apiMock.games.makeMove).toHaveBeenCalled();
+      expect(apiMock.gameplay.makeMove).toHaveBeenCalled();
     });
   });
 });

@@ -1,5 +1,6 @@
 import { Color } from '@michess/core-board';
 import { Avatar, Badge, Flex, Skeleton, Text } from '@radix-ui/themes';
+import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
 import React from 'react';
 import { CountdownClock } from '../../../api/model/CountdownClock';
 import { Clock } from './Clock';
@@ -13,6 +14,8 @@ type PlayerInfoProps = {
   isPlayerTurn?: boolean;
   isLoading?: boolean;
   clock?: CountdownClock;
+  rating?: string;
+  ratingDiff?: string;
 };
 
 export const PlayerInfo: React.FC<PlayerInfoProps> = ({
@@ -23,6 +26,8 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
   avatar,
   isPlayerTurn = false,
   clock,
+  rating,
+  ratingDiff,
   isLoading,
 }) => {
   const getInitials = (name: string): string => {
@@ -52,16 +57,38 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
         </Skeleton>
         <Flex direction="column" gap="2">
           <Skeleton loading={isLoading}>
-            <Text
-              size="3"
-              weight="bold"
-              color="gray"
-              highContrast
-              trim="both"
-              title={displayUsername}
-            >
-              {displayUsername}
-            </Text>
+            <Flex align={'center'} gap={'2'}>
+              <Text
+                size="3"
+                weight="bold"
+                color="gray"
+                highContrast
+                trim="both"
+                title={displayUsername}
+              >
+                {displayUsername}
+              </Text>
+              <Flex align="center">
+                {rating !== undefined ? (
+                  <Text color={'gray'}>{rating}</Text>
+                ) : undefined}
+                {ratingDiff !== undefined ? (
+                  <>
+                    <Text
+                      ml="1"
+                      color={ratingDiff.startsWith('+') ? 'green' : 'red'}
+                    >
+                      {ratingDiff}
+                    </Text>
+                    {ratingDiff.startsWith('+') ? (
+                      <ArrowUpRight color={'green'} />
+                    ) : (
+                      <ArrowDownRight color={'tomato'} />
+                    )}
+                  </>
+                ) : undefined}
+              </Flex>
+            </Flex>
           </Skeleton>
 
           <Flex align="center" gap="1">

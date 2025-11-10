@@ -5,6 +5,7 @@ import { ChessGameResultType } from './ChessGameResultType';
 import { ClockInstant } from './ClockInstant';
 
 export type ChessGameResult = {
+  timestamp: number;
   type: ChessGameResultType;
   // reason?: 'resignation' | 'stalemate' | 'threefold_repetition' | 'fifty_moves';
 };
@@ -18,10 +19,12 @@ export const ChessGameResult = {
       case 'accept_draw':
         return {
           type: 'draw',
+          timestamp: Date.now(),
         };
       case 'resign':
         return {
           type: turn === Color.White ? 'white_win' : 'black_win',
+          timestamp: Date.now(),
         };
       default:
         return undefined;
@@ -46,16 +49,25 @@ export const ChessGameResult = {
   toCheckmate: (winner: Color): ChessGameResult => {
     return {
       type: winner === Color.White ? 'white_win' : 'black_win',
+      timestamp: Date.now(),
+    };
+  },
+  toDraw: (): ChessGameResult => {
+    return {
+      type: 'draw',
+      timestamp: Date.now(),
     };
   },
   toFlag: (instant: ClockInstant): Maybe<ChessGameResult> => {
     if (instant.blackMs === 0) {
       return {
         type: 'white_win',
+        timestamp: Date.now(),
       };
     } else if (instant.whiteMs === 0) {
       return {
         type: 'black_win',
+        timestamp: Date.now(),
       };
     } else {
       return undefined;

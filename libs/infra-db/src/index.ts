@@ -9,5 +9,6 @@ export * from './lib/repository/ActionRepository';
 export * from './lib/repository/CacheRepository';
 export * from './lib/repository/GameRepository';
 export * from './lib/repository/MoveRepository';
+export * from './lib/repository/RatingRepository';
 export * from './lib/repository/UserRepository';
 export * as schema from './lib/schema';

@@ -18,7 +18,6 @@ const gameStateMock: GameState = {
   createdAt: new Date(),
   updatedAt: new Date(),
   startedAt: undefined,
-  endedAt: undefined,
   variant: 'standard',
   status: 'IN_PROGRESS',
   actionRecord: [],

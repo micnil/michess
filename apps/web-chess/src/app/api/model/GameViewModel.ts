@@ -7,8 +7,18 @@ export type GameViewModel = {
   result?: GameResultV1;
   status: GameStatusTypeV1;
   players: {
-    white?: { username: string; avatar?: string };
-    black?: { username: string; avatar?: string };
+    white?: {
+      username: string;
+      avatar?: string;
+      rating?: string;
+      ratingDiff?: string;
+    };
+    black?: {
+      username: string;
+      avatar?: string;
+      rating?: string;
+      ratingDiff?: string;
+    };
   };
   startedAt?: Date;
   clock?: CountdownClock;
