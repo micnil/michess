@@ -152,6 +152,18 @@ export class GamesService {
     }
   }
 
+  private async handleGameEnd(
+    chessGame: ChessGame,
+    previousGame?: ChessGame,
+  ): Promise<void> {
+    const state = chessGame.getState();
+    // If previous game was not provided assume that it was IN_PROGRESS.
+    const previousStatus = previousGame?.getState().status ?? 'IN_PROGRESS';
+    if (previousStatus !== 'ENDED' && state.status === 'ENDED') {
+      await this.ratingsService.queueRatingUpdateForGame(state);
+    }
+  }
+
   async createGame(data: CreateGameV1): Promise<GameDetailsV1> {
     const {
       timeControlClassification,
@@ -345,6 +357,7 @@ export class GamesService {
     };
 
     if (gameStateUpdated) {
+      await this.handleGameEnd(updatedGame);
       return {
         gameDetails: GameMapper.toGameDetailsV1(updatedGame),
         move: moveMadeV1,
@@ -374,6 +387,9 @@ export class GamesService {
     const action = updatedGameState.actionRecord.at(-1);
     action &&
       (await this.actionRepository.createAction(updatedGameState.id, action));
+
+    await this.handleGameEnd(updatedGame, chessGame);
+
     return GameMapper.toGameDetailsV1(updatedGame);
   }
 
@@ -408,6 +424,7 @@ export class GamesService {
 
     const chessGame = await handleFlagTimeoutWithLock();
     if (chessGame) {
+      await this.handleGameEnd(chessGame);
       this.notifyObservers(GameMapper.toGameDetailsV1(chessGame));
     }
   }
