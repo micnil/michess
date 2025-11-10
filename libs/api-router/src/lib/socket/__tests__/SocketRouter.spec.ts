@@ -33,6 +33,7 @@ const apiMock: Api = {
     google: { clientId: '', clientSecret: '' },
   }),
   usageMetrics: new UsageMetricsService({} as never, {} as never, {} as never),
+  gameJobScheduler: {} as never,
 };
 
 const waitFor = <T>(

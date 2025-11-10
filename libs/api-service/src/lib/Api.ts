@@ -4,6 +4,7 @@ import { randomUUID } from 'crypto';
 import { Sql } from 'postgres';
 import { AuthConfig } from './auth/model/AuthConfig';
 import { AuthService } from './auth/service/AuthService';
+import { GameJobSchedulerService } from './games/service/GameJobSchedulerService';
 import { GamesService } from './games/service/GamesService';
 import { LockService } from './lock/service/LockService';
 import { UsageMetricsService } from './metrics/UsageMetricsService';
@@ -13,6 +14,7 @@ export type Api = {
   games: GamesService;
   auth: AuthService;
   usageMetrics: UsageMetricsService;
+  gameJobScheduler: GameJobSchedulerService;
 };
 
 const from = (
@@ -28,6 +30,10 @@ const from = (
     repos.game,
     repos.cache,
     lockService,
+  );
+  const gameJobSchedulerService = new GameJobSchedulerService(
+    repos.game,
+    repos.cache,
   );
   const gamesService = new GamesService(
     repos.game,
@@ -53,6 +59,7 @@ const from = (
     games: gamesService,
     auth: authService,
     usageMetrics,
+    gameJobScheduler: gameJobSchedulerService,
   };
 };
 export const Api = {

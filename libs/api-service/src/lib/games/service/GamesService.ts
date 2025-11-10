@@ -40,8 +40,6 @@ type TimeControlJobData = {
 };
 
 export class GamesService {
-  private gameCleanupQueue: Queue;
-  private gameCleanupWorker: Worker;
   private timeControlQueue: Queue<TimeControlJobData>;
   private timeControlWorker: Worker;
 
@@ -55,12 +53,6 @@ export class GamesService {
     private lockService: LockService,
   ) {
     const connectionOptions = { connection: this.cacheRepo.client };
-    this.gameCleanupQueue = new Queue(`game-cleanup`, connectionOptions);
-    this.gameCleanupWorker = new Worker(
-      `game-cleanup`,
-      this.cleanupGames.bind(this),
-      connectionOptions,
-    );
 
     this.timeControlQueue = new Queue(`time-control`, connectionOptions);
     this.timeControlWorker = new Worker<TimeControlJobData>(
@@ -72,17 +64,9 @@ export class GamesService {
 
   async close() {
     logger.info('Closing games service');
-    await this.gameCleanupWorker.close();
-    await this.gameCleanupQueue.close();
     await this.timeControlWorker.close();
     await this.timeControlQueue.close();
     this.observers.clear();
-  }
-
-  async initialize() {
-    await this.gameCleanupQueue.upsertJobScheduler('cleanup-games', {
-      pattern: '0 3 * * *',
-    });
   }
 
   private async loadChessGame(gameId: string): Promise<{
@@ -392,15 +376,6 @@ export class GamesService {
     await this.handleGameEnd(updatedGame, chessGame);
 
     return GameMapper.toGameDetailsV1(updatedGame);
-  }
-
-  async cleanupGames(): Promise<void> {
-    logger.info('Cleaning up empty games...');
-    const cutoffDate = new Date(Date.now() - 24 * 60 * 60 * 1000); // 24 hours ago
-    await this.gameRepository.deleteGames({
-      status: 'EMPTY',
-      olderThan: cutoffDate,
-    });
   }
 
   async handleFlagTimeout(job: Job<TimeControlJobData>): Promise<void> {
