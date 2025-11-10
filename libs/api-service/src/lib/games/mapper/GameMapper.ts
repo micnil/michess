@@ -145,7 +145,7 @@ const toChessGameResult = ({
     : undefined;
 };
 
-const toTimeControl = (game: SelectGame): TimeControlIn => {
+const toTimeControlIn = (game: SelectGame): TimeControlIn => {
   return {
     classification: game.timeControlClassification,
     daysPerMove:
@@ -167,7 +167,7 @@ export const GameMapper = {
         white: undefined,
         black: undefined,
       },
-      timeControl: toTimeControl(game),
+      timeControl: toTimeControlIn(game),
       actionRecord: [],
       result: toChessGameResult(game),
       status: FROM_STATUS_TYPE_MAPPING[game.status],
@@ -181,7 +181,7 @@ export const GameMapper = {
     const players = toGamePlayers(game);
     return ChessGame.from({
       ...toGameMeta(game),
-      timeControl: toTimeControl(game),
+      timeControl: toTimeControlIn(game),
       actionRecord: toGameActions(game),
       players,
       status: FROM_STATUS_TYPE_MAPPING[game.status],

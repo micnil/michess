@@ -284,8 +284,9 @@ export class GamesService {
       },
       data.side,
     );
+
     await this.gameRepository.updateGame(
-      gameState.id,
+      updatedGame.id,
       GameMapper.toInsertGame(updatedGame),
     );
     return GameMapper.toGameDetailsV1(updatedGame);

@@ -61,6 +61,7 @@ const endGame = (
   return {
     ...gameState,
     status: 'ENDED',
+    players: GamePlayers.from(gameState.players, resultToSet),
     meta: {
       ...gameState.meta,
     },
@@ -244,17 +245,14 @@ const fromGameStateInternal = (
     const gameResult = evalResult(newBoard, newClock);
 
     const shouldStartGame = gameStateInternal.status === 'READY';
-    const shouldEndGame = gameResult !== undefined;
 
     const newStatus = shouldStartGame
       ? 'IN_PROGRESS'
-      : shouldEndGame
-        ? 'ENDED'
-        : gameStateInternal.status;
+      : gameStateInternal.status;
 
     const startedAt = gameStateInternal.meta.startedAt ?? new Date();
 
-    return fromGameStateInternal({
+    const updatedGameState: GameStateInternal = {
       ...gameStateInternal,
       board: newBoard,
       status: newStatus,
@@ -265,7 +263,13 @@ const fromGameStateInternal = (
       },
       result: gameResult,
       additionalActions: additionalActions.updateBoard(newStatus, newBoard),
-    });
+    };
+
+    if (gameResult) {
+      return fromGameStateInternal(endGame(updatedGameState, gameResult));
+    } else {
+      return fromGameStateInternal(updatedGameState);
+    }
   };
   return {
     get id(): string {

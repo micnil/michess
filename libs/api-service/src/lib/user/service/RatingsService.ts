@@ -220,24 +220,27 @@ export class RatingsService {
       }
     }
 
-    const newRating = RatingCalculator.decay(latestRating, processingEndTime);
-    await this.ratingRepository.createRating({
-      playerId,
-      variant,
-      timeControlClassification,
-      rating: newRating.value,
-      deviation: newRating.deviation,
-      volatility: newRating.volatility,
-      timestamp: processingEndTime,
-    });
+    // Decay rating if the latest rating is older than 1 day.
+    if (latestRating.timestamp.getTime() + 1000 * 60 * 60 * 24 < Date.now()) {
+      const newRating = RatingCalculator.decay(latestRating, processingEndTime);
+      await this.ratingRepository.createRating({
+        playerId,
+        variant,
+        timeControlClassification,
+        rating: newRating.value,
+        deviation: newRating.deviation,
+        volatility: newRating.volatility,
+        timestamp: processingEndTime,
+      });
+    }
   }
 
-  getRatingByPlayerId(
+  async getRatingByPlayerId(
     playerId: string,
     variant: GameVariantType,
     timeControl: TimeControlClassification,
   ) {
-    const rating = this.ratingRepository.getRatingByPlayerId(
+    const rating = await this.ratingRepository.getRatingByPlayerId(
       playerId,
       variant,
       timeControl,

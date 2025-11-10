@@ -22,8 +22,13 @@ const from = (
   authConfig: AuthConfig,
 ): Api => {
   const processId = randomUUID();
-  const ratingsService = new RatingsService(repos.rating);
   const lockService = new LockService(repos.cache.client);
+  const ratingsService = new RatingsService(
+    repos.rating,
+    repos.game,
+    repos.cache,
+    lockService,
+  );
   const gamesService = new GamesService(
     repos.game,
     repos.move,
