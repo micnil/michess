@@ -128,7 +128,7 @@ const toPlayerInfoV1 = (player: PlayerInfo): PlayerInfoV1 => {
   return {
     id: player.id,
     name: player.name,
-    rating: player.rating?.value,
+    rating: player.rating?.value ? Math.round(player.rating.value) : undefined,
     ratingDiff: player.ratingDiff,
   };
 };
