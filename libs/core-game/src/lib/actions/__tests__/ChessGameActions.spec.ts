@@ -1,5 +1,4 @@
-import { Color } from '@michess/core-board';
-import { ChessboardMock } from '../../mocks/Chessboard.mock';
+import { ChessboardMock, Color } from '@michess/core-board';
 import { ChessGameActions } from '../ChessGameActions';
 import { GameActionOption } from '../model/GameActionOption';
 

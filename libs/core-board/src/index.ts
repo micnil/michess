@@ -11,6 +11,7 @@ export * from './lib/common/Piece';
 export * from './lib/common/PieceType';
 export * from './lib/fen/model/FenStr';
 export * from './lib/mocks/BoardState.mock';
+export * from './lib/mocks/Chessboard.mock';
 export * from './lib/mocks/ChessPosition.mock';
 export * from './lib/mocks/Piece.mock';
 export * from './lib/mocks/PiecePlacements.mock';
