@@ -1,6 +1,8 @@
 import {
+  GameDetailsResponseV1,
   GameDetailsV1,
   JoinGamePayloadV1,
+  MakeActionPayloadV1,
   MakeMovePayloadV1,
   MakeMoveResponseV1,
   MoveMadeV1,
@@ -132,7 +134,6 @@ describe('SocketRouter', () => {
 
   describe('join-game', () => {
     it('should handle valid join-game event', async () => {
-      expect.assertions(4);
       const joinGamePayload: JoinGamePayloadV1 = {
         gameId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
         side: 'white',
@@ -172,7 +173,6 @@ describe('SocketRouter', () => {
 
   describe('make-move', () => {
     it('should handle valid make-move event', async () => {
-      expect.assertions(4);
       const makeMovePayload: MakeMovePayloadV1 = {
         gameId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
         uci: 'e2e4',
@@ -199,6 +199,56 @@ describe('SocketRouter', () => {
       expect(response.status).toEqual('ok');
       expect(response.status === 'ok' && response.data).toEqual(moveV1);
       expect(apiMock.gameplay.makeMove).toHaveBeenCalled();
+    });
+  });
+
+  describe('make-action', () => {
+    it('should handle valid make-action event', async () => {
+      const makeActionPayload: MakeActionPayloadV1 = {
+        gameId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+        action: { type: 'offer_draw' },
+      };
+      serverSocket1.join(makeActionPayload.gameId);
+      serverSocket2.join(makeActionPayload.gameId);
+
+      const mockGameState: GameDetailsV1 = {
+        id: makeActionPayload.gameId,
+        status: 'IN_PROGRESS',
+        timeControl: {
+          classification: 'no_clock',
+        },
+        players: {
+          white: { name: 'Test User', id: 'u1' },
+          black: { name: 'Test User 2', id: 'u2' },
+        },
+        isPrivate: false,
+        moves: [],
+        variant: 'standard',
+        actionOptions: [
+          {
+            type: 'accept_draw',
+            reason: 'by_agreement',
+          },
+        ],
+        clock: undefined,
+      };
+      apiMock.gameplay.makeAction = jest.fn().mockResolvedValue(mockGameState);
+
+      const actionMadePromise = waitFor<GameDetailsV1>(
+        clientSocket2,
+        'game-updated',
+      );
+
+      const response: GameDetailsResponseV1 = await clientSocket1.emitWithAck(
+        'make-action',
+        makeActionPayload,
+      );
+
+      const data = await actionMadePromise;
+      expect(data).toEqual(mockGameState);
+      expect(response.status).toEqual('ok');
+      expect(response.status === 'ok' && response.data).toEqual(mockGameState);
+      expect(apiMock.gameplay.makeAction).toHaveBeenCalled();
     });
   });
 });
