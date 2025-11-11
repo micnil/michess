@@ -1,5 +1,4 @@
-import { Color } from '@michess/core-board';
-import { Chessboard } from '../Chessboard';
+import { Chessboard, Color } from '@michess/core-board';
 import { GameStatusType } from '../model/GameStatusType';
 import { GameAction } from './model/GameAction';
 import { GameActionIn } from './model/GameActionIn';

@@ -1,5 +1,6 @@
 import { assertDefined, isDefined, Maybe } from '@michess/common-utils';
 import {
+  Chessboard,
   ChessPosition,
   Color,
   FenParser,
@@ -10,7 +11,6 @@ import { GameResult } from '@michess/core-rating';
 import { ChessGameActions } from './actions/ChessGameActions';
 import { GameActionIn } from './actions/model/GameActionIn';
 import { GameActionOption } from './actions/model/GameActionOption';
-import { Chessboard } from './Chessboard';
 import { ChessClock } from './ChessClock';
 import { ChessGameError } from './model/ChessGameError';
 import { ChessGameIn } from './model/ChessGameIn';

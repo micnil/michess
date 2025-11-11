@@ -1,5 +1,4 @@
-import { Color } from '@michess/core-board';
-import { Chessboard as ChessboardModel } from '@michess/core-game';
+import { Chessboard as ChessboardModel, Color } from '@michess/core-board';
 import { ChessboardView } from './ChessboardView';
 import { ChessboardContextProvider } from './context/ChessboardContextProvider';
 import { useResponsiveBoardSize } from './hooks/useResponsiveBoardSize';

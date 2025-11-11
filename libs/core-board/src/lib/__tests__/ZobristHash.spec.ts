@@ -1,8 +1,8 @@
 import {
-  createChessPositionMock,
   CastlingAbility,
-  Piece,
   Coordinate,
+  createChessPositionMock,
+  Piece,
 } from '@michess/core-board';
 import { ZobristHash } from '../ZobristHash';
 
