@@ -1,3 +1,4 @@
+import { BotInfoV1 } from '@michess/api-schema';
 import { logger } from '@michess/be-utils';
 import { UserRepository } from '@michess/infra-db';
 import { BotRegistry } from '../config/BotRegistry';
@@ -44,5 +45,20 @@ export class BotService {
     }
 
     logger.info({ count: bots.length }, 'Bot initialization complete');
+  }
+
+  async listBots(): Promise<BotInfoV1[]> {
+    const botUsers = await this.userRepository.listBots();
+
+    return botUsers.map((botUser) => {
+      const botConfig = BotRegistry.get(botUser.id);
+
+      return {
+        id: botUser.id,
+        name: botUser.name,
+        username: botUser.username ?? botUser.id,
+        description: botConfig?.description ?? '',
+      };
+    });
   }
 }

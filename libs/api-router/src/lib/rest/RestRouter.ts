@@ -8,6 +8,7 @@ import { createMiddleware } from 'hono/factory';
 import { requestId } from 'hono/request-id';
 import { RestContext } from '../model/RestContext';
 import { RouterConfig } from '../model/RouterConfig';
+import { BotsController } from './bots/BotsController';
 import { GamesController } from './games/GamesController';
 import { MetricsController } from './metrics/MetricsController';
 
@@ -15,6 +16,7 @@ export const RestRouter = {
   from: (api: Api, config: RouterConfig) => {
     const gamesController = GamesController(api.games);
     const metricsController = MetricsController(api.usageMetrics);
+    const botsController = BotsController(api.bots);
     const honoApp = new Hono().basePath('/api');
     honoApp
       .use(requestId())
@@ -56,6 +58,7 @@ export const RestRouter = {
       );
 
     honoApp.route('/games', gamesController);
+    honoApp.route('/bots', botsController);
     honoApp.route('/metrics', metricsController);
 
     return honoApp;

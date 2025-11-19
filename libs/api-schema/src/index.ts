@@ -1,3 +1,4 @@
+export * from './lib/bot/BotInfoV1';
 export * from './lib/ClientToServerEvents';
 export * from './lib/common/ApiError';
 export * from './lib/common/ApiErrorData';

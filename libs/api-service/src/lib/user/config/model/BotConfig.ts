@@ -7,5 +7,4 @@ export type BotConfig = {
   model: string;
   personality: string;
   temperature: number;
-  skillLevel: 'beginner' | 'intermediate' | 'advanced';
 };

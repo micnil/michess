@@ -12,7 +12,6 @@ const BOT_REGISTRY: Record<string, BotConfig> = {
     personality:
       'You play balanced, solid chess. Consider both tactical and positional factors.',
     temperature: 0.7,
-    skillLevel: 'intermediate',
   },
 };
 
@@ -29,6 +28,7 @@ const isBotUser = (userId: string): boolean => {
 };
 
 export const BotRegistry = {
+  get: getBotConfig,
   getBotConfig,
   index,
   isBotUser,
