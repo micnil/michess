@@ -9,6 +9,7 @@ import { GameplayService } from './games/service/GameplayService';
 import { GamesService } from './games/service/GamesService';
 import { LockService } from './lock/service/LockService';
 import { UsageMetricsService } from './metrics/UsageMetricsService';
+import { BotService } from './user/service/BotService';
 import { RatingsService } from './user/service/RatingsService';
 
 export type Api = {
@@ -17,6 +18,7 @@ export type Api = {
   auth: AuthService;
   usageMetrics: UsageMetricsService;
   gameJobScheduler: GameJobSchedulerService;
+  bots: BotService;
 };
 
 const from = (
@@ -57,6 +59,7 @@ const from = (
     repos.cache,
     repos.game,
   );
+  const botService = new BotService(repos.user);
 
   return {
     games: gamesService,
@@ -64,6 +67,7 @@ const from = (
     auth: authService,
     usageMetrics,
     gameJobScheduler: gameJobSchedulerService,
+    bots: botService,
   };
 };
 export const Api = {

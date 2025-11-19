@@ -25,6 +25,7 @@ const from = (
     restRouter,
     socketRouter,
     init: async () => {
+      await api.bots.initialize();
       await api.gameJobScheduler.initialize();
       await api.usageMetrics.initialize();
     },

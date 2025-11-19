@@ -5,3 +5,5 @@ export * from './lib/games/service/GameJobSchedulerService';
 export * from './lib/games/service/GameplayService';
 export * from './lib/games/service/GamesService';
 export * from './lib/metrics/UsageMetricsService';
+export * from './lib/user/config/BotRegistry';
+export * from './lib/user/service/BotService';
