@@ -7,6 +7,7 @@ import {
 import {
   Api,
   AuthService,
+  BotService,
   GameplayService,
   GamesService,
   Session,
@@ -38,6 +39,7 @@ const apiMock: Api = {
     {} as never,
     {} as never,
   ),
+  bots: new BotService({} as never),
   auth: new AuthService({} as never, {} as never, {} as never, {
     google: { clientId: '', clientSecret: '' },
   }),
