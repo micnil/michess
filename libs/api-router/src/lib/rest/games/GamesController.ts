@@ -1,4 +1,6 @@
 import {
+  CreateChallengeV1,
+  CreateChallengeV1Schema,
   CreateGameV1,
   CreateGameV1Schema,
   PaginationQueryV1,
@@ -20,6 +22,20 @@ export const GamesController = (
       const response = await gameService.createGame(body);
       return c.json(response);
     })
+    .post(
+      '/challenge',
+      zValidator('json', CreateChallengeV1Schema),
+      async (c) => {
+        const body: CreateChallengeV1 = c.req.valid('json');
+        const session = c.get('session');
+        const response = await gameService.createChallenge(
+          session.userId,
+          session.name,
+          body,
+        );
+        return c.json(response);
+      },
+    )
     .get('/lobby', zValidator('query', PaginationQueryV1Schema), async (c) => {
       const query: PaginationQueryV1 = c.req.valid('query');
       const response = await gameService.queryLobby(query);

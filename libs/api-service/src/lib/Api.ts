@@ -39,7 +39,6 @@ const from = (
     repos.game,
     repos.cache,
   );
-  const gamesService = new GamesService(repos.game);
   const gameplayService = new GameplayService(
     repos.game,
     repos.move,
@@ -47,6 +46,11 @@ const from = (
     repos.cache,
     ratingsService,
     lockService,
+  );
+  const gamesService = new GamesService(
+    repos.game,
+    repos.user,
+    gameplayService,
   );
   const authService = new AuthService(
     sql,

@@ -107,7 +107,8 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
           `User joining game`,
         );
         const gameState = await api.gameplay.joinGame(
-          socket.data.session,
+          socket.data.session.userId,
+          socket.data.session.name,
           joinGamePayloadV1,
         );
         if (!socket.rooms.has(joinGamePayloadV1.gameId)) {

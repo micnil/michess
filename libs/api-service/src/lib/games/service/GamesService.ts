@@ -1,4 +1,5 @@
 import {
+  CreateChallengeV1,
   CreateGameV1,
   GameDetailsV1,
   LobbyPageResponseV1,
@@ -6,17 +7,24 @@ import {
   PlayerGameInfoPageResponseV1,
   PlayerGameInfoQueryV1,
 } from '@michess/api-schema';
+import { Maybe } from '@michess/common-utils';
 import { TimeControlClassification } from '@michess/core-game';
 import {
   GameRepository,
   InsertGame,
   TimeControlJsonB,
+  UserRepository,
 } from '@michess/infra-db';
 import { PageResponseMapper } from '../../mapper/PageResponseMapper';
 import { GameMapper } from '../mapper/GameMapper';
+import { GameplayService } from './GameplayService';
 
 export class GamesService {
-  constructor(private gameRepository: GameRepository) {}
+  constructor(
+    private gameRepository: GameRepository,
+    private userRepository: UserRepository,
+    private gameplayService: GameplayService,
+  ) {}
 
   async createGame(data: CreateGameV1): Promise<GameDetailsV1> {
     const {
@@ -102,5 +110,39 @@ export class GamesService {
       totalItems: totalCount,
       page,
     });
+  }
+
+  async createChallenge(
+    userId: string,
+    name: Maybe<string>,
+    request: CreateChallengeV1,
+  ): Promise<GameDetailsV1> {
+    const opponent = await this.userRepository.findUserById(request.opponentId);
+    if (!opponent) {
+      throw new Error('Opponent not found');
+    }
+    if (opponent.role !== 'bot') {
+      throw new Error('Can only challenge bots at this time');
+    }
+
+    const gameDetails = await this.createGame({
+      variant: request.variant ?? 'standard',
+      isPrivate: true,
+      timeControl: request.timeControl,
+    });
+
+    await this.gameplayService.joinGame(userId, name, {
+      gameId: gameDetails.id,
+      side: request.playerColor,
+    });
+    const updatedGameDetails = await this.gameplayService.joinGame(
+      opponent.id,
+      opponent.name,
+      {
+        gameId: gameDetails.id,
+      },
+    );
+
+    return updatedGameDetails;
   }
 }

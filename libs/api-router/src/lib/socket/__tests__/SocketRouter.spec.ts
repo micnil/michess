@@ -26,7 +26,7 @@ jest.mock('@michess/api-service');
 
 const apiMock: Api = {
   bots: new BotService({} as never),
-  games: new GamesService({} as never),
+  games: new GamesService({} as never, {} as never, {} as never),
   gameplay: new GameplayService(
     {} as never,
     {} as never,

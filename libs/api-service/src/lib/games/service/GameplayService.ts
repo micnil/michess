@@ -149,7 +149,8 @@ export class GameplayService {
   }
 
   async joinGame(
-    session: Session,
+    playerId: string,
+    name: Maybe<string>,
     data: JoinGamePayloadV1,
   ): Promise<GameDetailsV1> {
     const { chessGame } = await this.loadChessGame(data.gameId);
@@ -159,15 +160,15 @@ export class GameplayService {
     }
 
     const gameRating = await this.ratingsService.getRatingByPlayerId(
-      session.userId,
+      playerId,
       gameState.variant,
       gameState.timeControl.classification,
     );
 
     const updatedGame = chessGame.joinGame(
       {
-        id: session.userId,
-        name: session.name ?? 'Anonymous',
+        id: playerId,
+        name: name ?? 'Anonymous',
         rating: gameRating,
       },
       data.side,
