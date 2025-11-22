@@ -34,6 +34,7 @@ const from = (
       await api.gameplay.close();
       await api.gameJobScheduler.close();
       await api.usageMetrics.close();
+      await api.bots.close();
     },
   };
 };

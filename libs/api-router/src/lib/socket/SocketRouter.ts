@@ -223,9 +223,9 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
     }
   });
 
-  api.gameplay.subscribe((gameDetails) => {
-    io.to(gameDetails.id).emit('game-updated', gameDetails);
-  });
+  api.gameplay.subscribe((event) => {
+    io.to(event.data.id).emit('game-updated', event.data);
+  }, 'flag_timeout');
 
   return io;
 };

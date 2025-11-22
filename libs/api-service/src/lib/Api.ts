@@ -7,6 +7,7 @@ import { AuthService } from './auth/service/AuthService';
 import { GameJobSchedulerService } from './games/service/GameJobSchedulerService';
 import { GameplayService } from './games/service/GameplayService';
 import { GamesService } from './games/service/GamesService';
+import { LlmConfig } from './llm/config/LlmConfig';
 import { LockService } from './lock/service/LockService';
 import { UsageMetricsService } from './metrics/UsageMetricsService';
 import { BotService } from './user/service/BotService';
@@ -26,6 +27,7 @@ const from = (
   sql: Sql,
   emailClient: EmailClient,
   authConfig: AuthConfig,
+  llmConfig: LlmConfig,
 ): Api => {
   const processId = randomUUID();
   const lockService = new LockService(repos.cache.client);
@@ -63,7 +65,7 @@ const from = (
     repos.cache,
     repos.game,
   );
-  const botService = new BotService(repos.user);
+  const botService = new BotService(repos.user, gameplayService, llmConfig);
 
   return {
     games: gamesService,

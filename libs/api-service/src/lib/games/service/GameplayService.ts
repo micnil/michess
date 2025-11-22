@@ -18,20 +18,20 @@ import {
 } from '@michess/infra-db';
 import { Job, Queue, Worker } from 'bullmq';
 import { Session } from '../../auth/model/Session';
+import { EventEmitter } from '../../common/EventEmitter';
 import { LockService } from '../../lock/service/LockService';
 import { RatingsService } from '../../user/service/RatingsService';
 import { GameMapper } from '../mapper/GameMapper';
+import { GameEvent } from '../model/GameEvent';
 
 type TimeControlJobData = {
   gameId: string;
   flagTimestamp: number;
 };
 
-export class GameplayService {
+export class GameplayService extends EventEmitter<GameEvent> {
   private timeControlQueue: Queue<TimeControlJobData>;
   private timeControlWorker: Worker;
-
-  private observers: Set<(data: GameDetailsV1) => void> = new Set();
 
   constructor(
     private gameRepository: GameRepository,
@@ -41,6 +41,7 @@ export class GameplayService {
     private ratingsService: RatingsService,
     private lockService: LockService,
   ) {
+    super();
     const connectionOptions = { connection: this.cacheRepo.client };
 
     this.timeControlQueue = new Queue(`time-control`, connectionOptions);
@@ -55,7 +56,7 @@ export class GameplayService {
     logger.info('Closing gameplay service');
     await this.timeControlWorker.close();
     await this.timeControlQueue.close();
-    this.observers.clear();
+    this.clearSubscribers();
   }
 
   private async loadChessGame(gameId: string): Promise<{
@@ -137,17 +138,6 @@ export class GameplayService {
     }
   }
 
-  subscribe(observer: (data: GameDetailsV1) => void): () => void {
-    this.observers.add(observer);
-    return () => {
-      this.observers.delete(observer);
-    };
-  }
-
-  notifyObservers(data: GameDetailsV1): void {
-    this.observers.forEach((observer) => observer(data));
-  }
-
   async joinGame(
     playerId: string,
     name: Maybe<string>,
@@ -178,7 +168,14 @@ export class GameplayService {
       updatedGame.id,
       GameMapper.toInsertGame(updatedGame),
     );
-    return GameMapper.toGameDetailsV1(updatedGame);
+    const gameDetails = GameMapper.toGameDetailsV1(updatedGame);
+
+    this.emit({
+      type: 'game_joined',
+      data: gameDetails,
+    });
+
+    return gameDetails;
   }
 
   async leaveGame(
@@ -246,10 +243,18 @@ export class GameplayService {
       clock: clockInstant,
     };
 
+    const gameDetailsV1 = GameMapper.toGameDetailsV1(updatedGame);
+
+    // Emit move_made event to all subscribers
+    this.emit({
+      type: 'move_made',
+      data: gameDetailsV1,
+    });
+
     if (gameStateUpdated) {
       await this.handleGameEnd(updatedGame);
       return {
-        gameDetails: GameMapper.toGameDetailsV1(updatedGame),
+        gameDetails: gameDetailsV1,
         move: moveMadeV1,
       };
     } else {
@@ -306,7 +311,11 @@ export class GameplayService {
     const chessGame = await handleFlagTimeoutWithLock();
     if (chessGame) {
       await this.handleGameEnd(chessGame);
-      this.notifyObservers(GameMapper.toGameDetailsV1(chessGame));
+      const gameDetailsV1 = GameMapper.toGameDetailsV1(chessGame);
+      this.emit({
+        type: 'flag_timeout',
+        data: gameDetailsV1,
+      });
     }
   }
 }

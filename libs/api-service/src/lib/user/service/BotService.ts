@@ -1,10 +1,20 @@
-import { BotInfoV1 } from '@michess/api-schema';
+import { BotInfoV1, GameDetailsV1 } from '@michess/api-schema';
 import { logger } from '@michess/be-utils';
 import { UserRepository } from '@michess/infra-db';
+import { Session } from '../../auth/model/Session';
+import { GameplayService } from '../../games/service/GameplayService';
+import { LlmConfig } from '../../llm/config/LlmConfig';
+import { LlmClientFactory } from '../../llm/service/LlmClientFactory';
 import { BotRegistry } from '../config/BotRegistry';
 
 export class BotService {
-  constructor(private readonly userRepository: UserRepository) {}
+  private unsubscribe?: () => void;
+
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly gameplayService: GameplayService,
+    private readonly llmConfig: LlmConfig,
+  ) {}
 
   async initialize(): Promise<void> {
     logger.info('Initializing bot users...');
@@ -45,6 +55,22 @@ export class BotService {
     }
 
     logger.info({ count: bots.length }, 'Bot initialization complete');
+
+    this.unsubscribe = this.gameplayService.subscribe(
+      (event) => {
+        this.handleGameUpdate(event.data).catch((err) => {
+          logger.error({ error: err }, 'Error in bot move handler');
+        });
+      },
+      ['move_made', 'game_joined'],
+    );
+  }
+
+  async close(): Promise<void> {
+    logger.info('Closing bot service');
+    if (this.unsubscribe) {
+      this.unsubscribe();
+    }
   }
 
   async listBots(): Promise<BotInfoV1[]> {
@@ -59,6 +85,120 @@ export class BotService {
         username: botUser.username ?? botUser.id,
         description: botConfig?.description ?? '',
       };
+    });
+  }
+
+  async handleGameUpdate(gameDetails: GameDetailsV1): Promise<void> {
+    if (gameDetails.status !== 'IN_PROGRESS') {
+      return;
+    }
+
+    const currentPlayerColor =
+      gameDetails.moves.length % 2 === 0 ? 'white' : 'black';
+    const currentPlayer = gameDetails.players[currentPlayerColor];
+
+    if (!currentPlayer) {
+      return;
+    }
+
+    const isBot = BotRegistry.isBotUser(currentPlayer.id);
+    if (!isBot) {
+      return;
+    }
+
+    logger.info(
+      {
+        gameId: gameDetails.id,
+        botId: currentPlayer.id,
+        botName: currentPlayer.name,
+        color: currentPlayerColor,
+      },
+      'Bot turn detected, generating move',
+    );
+
+    try {
+      await this.generateBotMove(gameDetails, currentPlayer.id);
+    } catch (error) {
+      logger.error(
+        {
+          error,
+          gameId: gameDetails.id,
+          botId: currentPlayer.id,
+        },
+        'Failed to generate bot move',
+      );
+    }
+  }
+
+  private async generateBotMove(
+    gameDetails: GameDetailsV1,
+    botId: string,
+  ): Promise<void> {
+    const botConfig = BotRegistry.get(botId);
+    if (!botConfig) {
+      throw new Error(`Bot configuration not found for bot ${botId}`);
+    }
+
+    const llmClient = LlmClientFactory.create(
+      botConfig,
+      this.llmConfig.geminiApiKey,
+    );
+
+    // Format the game state for the LLM
+    const moveHistory =
+      gameDetails.moves.length > 0
+        ? gameDetails.moves.map((m) => m.uci).join(' ')
+        : 'none';
+
+    const systemPrompt = `You are a chess-playing AI with the following personality:
+${botConfig.personality}
+
+You must respond with ONLY a single UCI move notation (e.g., "e2e4", "e7e8q" for promotion).
+Do not include any explanation, analysis, or additional text.`;
+
+    const userPrompt = `Current position (moves from start): ${moveHistory}
+Your color: ${gameDetails.moves.length % 2 === 0 ? 'white' : 'black'}
+Choose your next move in UCI notation:`;
+
+    const response = await llmClient.generateResponse({
+      systemPrompt,
+      userPrompt,
+      temperature: botConfig.temperature,
+    });
+
+    if (response.finishReason === 'error' || !response.content.trim()) {
+      throw new Error('LLM failed to generate a valid response');
+    }
+
+    // Extract UCI move from response (take first word, clean it up)
+    const uciMove = response.content.trim().split(/\s+/)[0].toLowerCase();
+
+    logger.info(
+      {
+        gameId: gameDetails.id,
+        botId,
+        uciMove,
+      },
+      'Bot generated move',
+    );
+
+    // Create a bot session
+    const botSession: Session = {
+      userId: botId,
+      name: botConfig.name,
+      sessionId: `bot-session-${botId}`,
+      token: `bot-token-${botId}`,
+      expiresAt: new Date(Date.now() + 1000 * 60 * 60), // 1 hour from now
+      userAgent: 'BotService/1.0',
+      username: botConfig.username,
+      ipAddress: undefined,
+      isAnonymous: false,
+    };
+
+    // Make the move through GameplayService
+    await this.gameplayService.makeMove(botSession, {
+      gameId: gameDetails.id,
+      uci: uciMove,
     });
   }
 }
