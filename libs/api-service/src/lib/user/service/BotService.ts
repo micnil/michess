@@ -1,5 +1,6 @@
 import { BotInfoV1, GameDetailsV1 } from '@michess/api-schema';
 import { logger } from '@michess/be-utils';
+import { Chessboard, FenParser, FenStr, Move } from '@michess/core-board';
 import { UserRepository } from '@michess/infra-db';
 import { GameplayService } from '../../games/service/GameplayService';
 import { LlmConfig } from '../../llm/config/LlmConfig';
@@ -95,15 +96,15 @@ export class BotService {
       return;
     }
 
-    const currentPlayerColor =
-      gameDetails.moves.length % 2 === 0 ? 'white' : 'black';
-    const currentPlayer = gameDetails.players[currentPlayerColor];
+    const chessboard = Chessboard.fromPosition(
+      FenParser.toChessPosition(
+        gameDetails.initialPosition ?? FenStr.standardInitial(),
+      ),
+      gameDetails.moves.map((m) => Move.fromUci(m.uci)),
+    );
+    const currentPlayer = gameDetails.players[chessboard.position.turn];
 
-    if (!currentPlayer) {
-      return;
-    }
-
-    if (!currentPlayer.isBot) {
+    if (!currentPlayer || !currentPlayer.isBot) {
       return;
     }
 
@@ -112,7 +113,6 @@ export class BotService {
         gameId: gameDetails.id,
         botId: currentPlayer.id,
         botName: currentPlayer.name,
-        color: currentPlayerColor,
       },
       'Bot turn detected, generating move',
     );
