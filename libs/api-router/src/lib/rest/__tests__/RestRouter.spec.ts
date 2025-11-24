@@ -20,6 +20,7 @@ jest.mock('@michess/api-service');
 const mockSession: Session = {
   userId: 'test-user-id',
   sessionId: 'test-session-id',
+  role: 'user',
   token: 'test-token',
   expiresAt: new Date(),
   userAgent: 'test-agent',
@@ -30,7 +31,7 @@ const mockSession: Session = {
 };
 
 const apiMock: Api = {
-  games: new GamesService({} as never),
+  games: new GamesService({} as never, {} as never, {} as never),
   gameplay: new GameplayService(
     {} as never,
     {} as never,
@@ -39,7 +40,7 @@ const apiMock: Api = {
     {} as never,
     {} as never,
   ),
-  bots: new BotService({} as never),
+  bots: new BotService({} as never, {} as never, {} as never),
   auth: new AuthService({} as never, {} as never, {} as never, {
     google: { clientId: '', clientSecret: '' },
   }),
@@ -154,6 +155,7 @@ describe('RestRouter', () => {
               opponent: {
                 id: 'opponent-123',
                 name: 'Opponent Player',
+                isBot: false,
               },
               variant: 'standard',
               createdAt: new Date().toISOString(),
@@ -216,6 +218,7 @@ describe('RestRouter', () => {
               opponent: {
                 id: 'opponent-123',
                 name: 'Opponent Player',
+                isBot: false,
               },
               ownSide: 'white',
               turn: 'white',

@@ -7,8 +7,8 @@ const gameStateMock: GameState = {
     classification: 'no_clock',
   },
   players: {
-    white: { id: 'player1', name: 'Alice' },
-    black: { id: 'player2', name: 'Bob' },
+    white: { id: 'player1', name: 'Alice', isBot: false },
+    black: { id: 'player2', name: 'Bob', isBot: false },
   },
   initialPosition: ChessPosition.standardInitial(),
   movesRecord: [],

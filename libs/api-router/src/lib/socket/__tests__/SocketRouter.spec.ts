@@ -25,7 +25,7 @@ import { SocketRouter } from '../SocketRouter';
 jest.mock('@michess/api-service');
 
 const apiMock: Api = {
-  bots: new BotService({} as never),
+  bots: new BotService({} as never, {} as never, {} as never),
   games: new GamesService({} as never, {} as never, {} as never),
   gameplay: new GameplayService(
     {} as never,
@@ -82,6 +82,7 @@ describe('SocketRouter', () => {
 
   const sessionMock: Session = {
     userId: 'test-user-id',
+    role: 'user',
     sessionId: 'test-session-id',
     token: 'test-token',
     name: 'Test User',
@@ -146,7 +147,10 @@ describe('SocketRouter', () => {
         timeControl: {
           classification: 'no_clock',
         },
-        players: { white: { name: 'Test User', id: 'u1' }, black: undefined },
+        players: {
+          white: { name: 'Test User', id: 'u1', isBot: false },
+          black: undefined,
+        },
         isPrivate: false,
         moves: [],
         variant: 'standard',
@@ -220,8 +224,8 @@ describe('SocketRouter', () => {
           classification: 'no_clock',
         },
         players: {
-          white: { name: 'Test User', id: 'u1' },
-          black: { name: 'Test User 2', id: 'u2' },
+          white: { name: 'Test User', id: 'u1', isBot: false },
+          black: { name: 'Test User 2', id: 'u2', isBot: false },
         },
         isPrivate: false,
         moves: [],

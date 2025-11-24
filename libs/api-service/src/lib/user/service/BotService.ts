@@ -1,7 +1,6 @@
 import { BotInfoV1, GameDetailsV1 } from '@michess/api-schema';
 import { logger } from '@michess/be-utils';
 import { UserRepository } from '@michess/infra-db';
-import { Session } from '../../auth/model/Session';
 import { GameplayService } from '../../games/service/GameplayService';
 import { LlmConfig } from '../../llm/config/LlmConfig';
 import { LlmClientFactory } from '../../llm/service/LlmClientFactory';
@@ -89,7 +88,10 @@ export class BotService {
   }
 
   async handleGameUpdate(gameDetails: GameDetailsV1): Promise<void> {
-    if (gameDetails.status !== 'IN_PROGRESS') {
+    if (
+      gameDetails.status !== 'IN_PROGRESS' &&
+      gameDetails.status !== 'READY'
+    ) {
       return;
     }
 
@@ -101,8 +103,7 @@ export class BotService {
       return;
     }
 
-    const isBot = BotRegistry.isBotUser(currentPlayer.id);
-    if (!isBot) {
+    if (!currentPlayer.isBot) {
       return;
     }
 
@@ -182,21 +183,8 @@ Choose your next move in UCI notation:`;
       'Bot generated move',
     );
 
-    // Create a bot session
-    const botSession: Session = {
-      userId: botId,
-      name: botConfig.name,
-      sessionId: `bot-session-${botId}`,
-      token: `bot-token-${botId}`,
-      expiresAt: new Date(Date.now() + 1000 * 60 * 60), // 1 hour from now
-      userAgent: 'BotService/1.0',
-      username: botConfig.username,
-      ipAddress: undefined,
-      isAnonymous: false,
-    };
-
     // Make the move through GameplayService
-    await this.gameplayService.makeMove(botSession, {
+    await this.gameplayService.makeMove(botId, {
       gameId: gameDetails.id,
       uci: uciMove,
     });

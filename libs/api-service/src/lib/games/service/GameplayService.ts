@@ -23,6 +23,7 @@ import { LockService } from '../../lock/service/LockService';
 import { RatingsService } from '../../user/service/RatingsService';
 import { GameMapper } from '../mapper/GameMapper';
 import { GameEvent } from '../model/GameEvent';
+import { PlayerInfoIn } from '../model/PlayerInfoIn';
 
 type TimeControlJobData = {
   gameId: string;
@@ -139,8 +140,7 @@ export class GameplayService extends EventEmitter<GameEvent> {
   }
 
   async joinGame(
-    playerId: string,
-    name: Maybe<string>,
+    player: PlayerInfoIn,
     data: JoinGamePayloadV1,
   ): Promise<GameDetailsV1> {
     const { chessGame } = await this.loadChessGame(data.gameId);
@@ -150,16 +150,19 @@ export class GameplayService extends EventEmitter<GameEvent> {
     }
 
     const gameRating = await this.ratingsService.getRatingByPlayerId(
-      playerId,
+      player.id,
       gameState.variant,
       gameState.timeControl.classification,
     );
 
+    const isBot = player.role === 'bot';
+
     const updatedGame = chessGame.joinGame(
       {
-        id: playerId,
-        name: name ?? 'Anonymous',
+        id: player.id,
+        name: player.name ?? 'Anonymous',
         rating: gameRating,
+        isBot,
       },
       data.side,
     );
@@ -198,7 +201,7 @@ export class GameplayService extends EventEmitter<GameEvent> {
   }
 
   async makeMove(
-    session: Session,
+    playerId: string,
     data: MakeMovePayloadV1,
   ): Promise<{ gameDetails: Maybe<GameDetailsV1>; move: MoveMadeV1 }> {
     const makeMoveWithLock = async (): Promise<{
@@ -209,7 +212,7 @@ export class GameplayService extends EventEmitter<GameEvent> {
       await using _ = await this.lockService.acquireLock('game', data.gameId);
       const { chessGame } = await this.loadChessGame(data.gameId);
       const moveToPlay = Move.fromUci(data.uci);
-      const updatedGame = chessGame.play(session.userId, moveToPlay);
+      const updatedGame = chessGame.play(playerId, moveToPlay);
       const updatedGameState = updatedGame.getState();
       const newMove = updatedGameState.movesRecord.at(-1);
       assertDefined(newMove, 'No move found after playing move');

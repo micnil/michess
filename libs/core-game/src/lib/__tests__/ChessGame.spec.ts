@@ -1,6 +1,7 @@
 import { Color, createChessPositionMock, FenParser } from '@michess/core-board';
 import { ChessGame } from '../ChessGame';
 import { GameStateMock } from '../model/__mocks__/GameState.mock';
+import { PlayerInfoMock } from '../model/__mocks__/PlayerInfo.mock';
 import { ChessGameResultType } from '../model/ChessGameResultType';
 import { GameStatusType } from '../model/GameStatusType';
 
@@ -154,7 +155,7 @@ describe('ChessGame', () => {
       const chessGame = ChessGame.fromGameState(
         GameStateMock.fromPartial({
           players: {
-            white: {
+            white: PlayerInfoMock.fromPartial({
               id: 'player1',
               name: 'Player One',
               rating: {
@@ -164,8 +165,8 @@ describe('ChessGame', () => {
                 volatility: 0.06,
                 timestamp: new Date(),
               },
-            },
-            black: {
+            }),
+            black: PlayerInfoMock.fromPartial({
               id: 'player2',
               name: 'Player Two',
               rating: {
@@ -175,7 +176,7 @@ describe('ChessGame', () => {
                 volatility: 0.06,
                 timestamp: new Date(),
               },
-            },
+            }),
           },
           status: 'IN_PROGRESS',
         }),
@@ -196,7 +197,7 @@ describe('ChessGame', () => {
       const chessGame = ChessGame.fromGameState(
         GameStateMock.fromPartial({
           players: {
-            white: {
+            white: PlayerInfoMock.fromPartial({
               id: 'player1',
               name: 'Player One',
               rating: {
@@ -206,8 +207,8 @@ describe('ChessGame', () => {
                 volatility: 0.06,
                 timestamp: new Date(),
               },
-            },
-            black: {
+            }),
+            black: PlayerInfoMock.fromPartial({
               id: 'player2',
               name: 'Player Two',
               rating: {
@@ -217,7 +218,7 @@ describe('ChessGame', () => {
                 volatility: 0.06,
                 timestamp: new Date(),
               },
-            },
+            }),
           },
           status: 'IN_PROGRESS',
         }),
@@ -248,7 +249,10 @@ describe('ChessGame', () => {
     it('should allow a player to join as white when white slot is empty', () => {
       const position = createChessPositionMock();
       const chessGame = ChessGame.fromChessPosition(position);
-      const playerInfo = { id: 'player1', name: 'Player One' };
+      const playerInfo = PlayerInfoMock.fromPartial({
+        id: 'player1',
+        name: 'Player One',
+      });
 
       const gameWithPlayer = chessGame.joinGame(playerInfo, Color.White);
       const gameState = gameWithPlayer.getState();
@@ -261,7 +265,10 @@ describe('ChessGame', () => {
     it('should allow a player to join as black when black slot is empty', () => {
       const position = createChessPositionMock();
       const chessGame = ChessGame.fromChessPosition(position);
-      const playerInfo = { id: 'player1', name: 'Player One' };
+      const playerInfo = PlayerInfoMock.fromPartial({
+        id: 'player1',
+        name: 'Player One',
+      });
 
       const gameWithPlayer = chessGame.joinGame(playerInfo, Color.Black);
       const gameState = gameWithPlayer.getState();
@@ -274,7 +281,10 @@ describe('ChessGame', () => {
     it('should assign a random available side when no side is specified', () => {
       const position = createChessPositionMock();
       const chessGame = ChessGame.fromChessPosition(position);
-      const playerInfo = { id: 'player1', name: 'Player One' };
+      const playerInfo = PlayerInfoMock.fromPartial({
+        id: 'player1',
+        name: 'Player One',
+      });
 
       const gameWithPlayer = chessGame.joinGame(playerInfo);
       const gameState = gameWithPlayer.getState();
@@ -289,8 +299,14 @@ describe('ChessGame', () => {
     it('should set status to READY when both players have joined', () => {
       const position = createChessPositionMock();
       const chessGame = ChessGame.fromChessPosition(position);
-      const player1 = { id: 'player1', name: 'Player One' };
-      const player2 = { id: 'player2', name: 'Player Two' };
+      const player1 = PlayerInfoMock.fromPartial({
+        id: 'player1',
+        name: 'Player One',
+      });
+      const player2 = PlayerInfoMock.fromPartial({
+        id: 'player2',
+        name: 'Player Two',
+      });
 
       const gameWithPlayer1 = chessGame.joinGame(player1, Color.White);
       const gameWithBothPlayers = gameWithPlayer1.joinGame(
@@ -307,8 +323,14 @@ describe('ChessGame', () => {
     it('should throw error when trying to join a side that is already taken', () => {
       const position = createChessPositionMock();
       const chessGame = ChessGame.fromChessPosition(position);
-      const player1 = { id: 'player1', name: 'Player One' };
-      const player2 = { id: 'player2', name: 'Player Two' };
+      const player1 = PlayerInfoMock.fromPartial({
+        id: 'player1',
+        name: 'Player One',
+      });
+      const player2 = PlayerInfoMock.fromPartial({
+        id: 'player2',
+        name: 'Player Two',
+      });
 
       const gameWithPlayer1 = chessGame.joinGame(player1, Color.White);
 
@@ -320,9 +342,18 @@ describe('ChessGame', () => {
     it('should throw error when trying to join a game where all sides are taken', () => {
       const position = createChessPositionMock();
       const chessGame = ChessGame.fromChessPosition(position);
-      const player1 = { id: 'player1', name: 'Player One' };
-      const player2 = { id: 'player2', name: 'Player Two' };
-      const player3 = { id: 'player3', name: 'Player Three' };
+      const player1 = PlayerInfoMock.fromPartial({
+        id: 'player1',
+        name: 'Player One',
+      });
+      const player2 = PlayerInfoMock.fromPartial({
+        id: 'player2',
+        name: 'Player Two',
+      });
+      const player3 = PlayerInfoMock.fromPartial({
+        id: 'player3',
+        name: 'Player Three',
+      });
 
       const gameWithPlayer1 = chessGame.joinGame(player1, Color.White);
       const gameWithBothPlayers = gameWithPlayer1.joinGame(
@@ -341,7 +372,10 @@ describe('ChessGame', () => {
     it('should preserve existing game state when a player joins', () => {
       const position = createChessPositionMock();
       const chessGame = ChessGame.fromChessPosition(position);
-      const playerInfo = { id: 'player1', name: 'Player One' };
+      const playerInfo = PlayerInfoMock.fromPartial({
+        id: 'player1',
+        name: 'Player One',
+      });
 
       const gameWithPlayer = chessGame.joinGame(playerInfo, Color.White);
 
@@ -363,8 +397,14 @@ describe('ChessGame', () => {
             'r1bqkbnr/ppp2ppp/2np4/4p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR w KQkq - 0 1',
           ),
           players: {
-            white: { id: 'player1', name: 'Player One' },
-            black: { id: 'player2', name: 'Player Two' },
+            white: PlayerInfoMock.fromPartial({
+              id: 'player1',
+              name: 'Player One',
+            }),
+            black: PlayerInfoMock.fromPartial({
+              id: 'player2',
+              name: 'Player Two',
+            }),
           },
           status: 'IN_PROGRESS',
         }),
@@ -391,8 +431,14 @@ describe('ChessGame', () => {
             '3k4/5K2/8/8/8/8/6Q1/8 w - - 0 1',
           ),
           players: {
-            white: { id: 'player1', name: 'Player One' },
-            black: { id: 'player2', name: 'Player Two' },
+            white: PlayerInfoMock.fromPartial({
+              id: 'player1',
+              name: 'Player One',
+            }),
+            black: PlayerInfoMock.fromPartial({
+              id: 'player2',
+              name: 'Player Two',
+            }),
           },
           status: 'IN_PROGRESS',
         }),
@@ -420,8 +466,14 @@ describe('ChessGame', () => {
             'r1bqkbnr/ppp2ppp/2np4/4p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR w KQkq - 0 1',
           ),
           players: {
-            white: { id: 'player1', name: 'Player One' },
-            black: { id: 'player2', name: 'Player Two' },
+            white: PlayerInfoMock.fromPartial({
+              id: 'player1',
+              name: 'Player One',
+            }),
+            black: PlayerInfoMock.fromPartial({
+              id: 'player2',
+              name: 'Player Two',
+            }),
           },
           status: 'IN_PROGRESS',
           timeControl: {
@@ -454,8 +506,14 @@ describe('ChessGame', () => {
             '3k4/5K2/8/8/8/8/6Q1/8 w - - 0 1',
           ),
           players: {
-            white: { id: 'player1', name: 'Player One' },
-            black: { id: 'player2', name: 'Player Two' },
+            white: PlayerInfoMock.fromPartial({
+              id: 'player1',
+              name: 'Player One',
+            }),
+            black: PlayerInfoMock.fromPartial({
+              id: 'player2',
+              name: 'Player Two',
+            }),
           },
           status: 'IN_PROGRESS',
           timeControl: {
@@ -488,7 +546,7 @@ describe('ChessGame', () => {
             'r1bqkbnr/ppp2ppp/2np4/4p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR w KQkq - 0 1',
           ),
           players: {
-            white: {
+            white: PlayerInfoMock.fromPartial({
               id: 'player1',
               name: 'Player One',
               rating: {
@@ -498,8 +556,8 @@ describe('ChessGame', () => {
                 volatility: 0.06,
                 timestamp: new Date(),
               },
-            },
-            black: {
+            }),
+            black: PlayerInfoMock.fromPartial({
               id: 'player2',
               name: 'Player Two',
               rating: {
@@ -509,7 +567,7 @@ describe('ChessGame', () => {
                 volatility: 0.06,
                 timestamp: new Date(),
               },
-            },
+            }),
           },
           status: 'IN_PROGRESS',
         }),
@@ -536,8 +594,14 @@ describe('ChessGame', () => {
       const chessGame = ChessGame.fromGameState(
         GameStateMock.fromPartial({
           players: {
-            white: { id: 'player1', name: 'Player One' },
-            black: { id: 'player2', name: 'Player Two' },
+            white: PlayerInfoMock.fromPartial({
+              id: 'player1',
+              name: 'Player One',
+            }),
+            black: PlayerInfoMock.fromPartial({
+              id: 'player2',
+              name: 'Player Two',
+            }),
           },
           status: 'READY',
         }),
@@ -559,8 +623,14 @@ describe('ChessGame', () => {
       const chessGame = ChessGame.fromGameState(
         GameStateMock.fromPartial({
           players: {
-            white: { id: 'player1', name: 'Player One' },
-            black: { id: 'player2', name: 'Player Two' },
+            white: PlayerInfoMock.fromPartial({
+              id: 'player1',
+              name: 'Player One',
+            }),
+            black: PlayerInfoMock.fromPartial({
+              id: 'player2',
+              name: 'Player Two',
+            }),
           },
           status: 'READY',
         }),
@@ -581,8 +651,14 @@ describe('ChessGame', () => {
       const chessGame = ChessGame.fromGameState(
         GameStateMock.fromPartial({
           players: {
-            white: { id: 'player1', name: 'Player One' },
-            black: { id: 'player2', name: 'Player Two' },
+            white: PlayerInfoMock.fromPartial({
+              id: 'player1',
+              name: 'Player One',
+            }),
+            black: PlayerInfoMock.fromPartial({
+              id: 'player2',
+              name: 'Player Two',
+            }),
           },
           status: 'IN_PROGRESS',
         }),
@@ -599,8 +675,14 @@ describe('ChessGame', () => {
       const chessGame = ChessGame.fromGameState(
         GameStateMock.fromPartial({
           players: {
-            white: { id: 'player1', name: 'Player One' },
-            black: { id: 'player2', name: 'Player Two' },
+            white: PlayerInfoMock.fromPartial({
+              id: 'player1',
+              name: 'Player One',
+            }),
+            black: PlayerInfoMock.fromPartial({
+              id: 'player2',
+              name: 'Player Two',
+            }),
           },
           status: 'ENDED',
           result: { type: 'white_win', timestamp: Date.now() },
@@ -617,8 +699,14 @@ describe('ChessGame', () => {
       const chessGame = ChessGame.fromGameState(
         GameStateMock.fromPartial({
           players: {
-            white: { id: 'player1', name: 'Player One' },
-            black: { id: 'player2', name: 'Player Two' },
+            white: PlayerInfoMock.fromPartial({
+              id: 'player1',
+              name: 'Player One',
+            }),
+            black: PlayerInfoMock.fromPartial({
+              id: 'player2',
+              name: 'Player Two',
+            }),
           },
           status: 'READY',
         }),
@@ -635,7 +723,10 @@ describe('ChessGame', () => {
       const chessGame = ChessGame.fromGameState(
         GameStateMock.fromPartial({
           players: {
-            white: { id: 'player1', name: 'Player One' },
+            white: PlayerInfoMock.fromPartial({
+              id: 'player1',
+              name: 'Player One',
+            }),
             black: undefined,
           },
           status: 'WAITING',
@@ -654,8 +745,14 @@ describe('ChessGame', () => {
       const chessGame = ChessGame.fromGameState(
         GameStateMock.fromPartial({
           players: {
-            white: { id: 'player1', name: 'Player One' },
-            black: { id: 'player2', name: 'Player Two' },
+            white: PlayerInfoMock.fromPartial({
+              id: 'player1',
+              name: 'Player One',
+            }),
+            black: PlayerInfoMock.fromPartial({
+              id: 'player2',
+              name: 'Player Two',
+            }),
           },
           status: 'ENDED',
           result: { type: 'white_win', timestamp: Date.now() },
@@ -671,8 +768,14 @@ describe('ChessGame', () => {
       const chessGame = ChessGame.fromGameState(
         GameStateMock.fromPartial({
           players: {
-            white: { id: 'player1', name: 'Player One' },
-            black: { id: 'player2', name: 'Player Two' },
+            white: PlayerInfoMock.fromPartial({
+              id: 'player1',
+              name: 'Player One',
+            }),
+            black: PlayerInfoMock.fromPartial({
+              id: 'player2',
+              name: 'Player Two',
+            }),
           },
           status: 'IN_PROGRESS',
         }),
@@ -687,7 +790,7 @@ describe('ChessGame', () => {
       const chessGame = ChessGame.fromGameState(
         GameStateMock.fromPartial({
           players: {
-            white: {
+            white: PlayerInfoMock.fromPartial({
               id: 'player1',
               name: 'Player One',
               rating: {
@@ -697,8 +800,11 @@ describe('ChessGame', () => {
                 volatility: 0.06,
                 timestamp: new Date(),
               },
-            },
-            black: { id: 'player2', name: 'Player Two' }, // No rating
+            }),
+            black: PlayerInfoMock.fromPartial({
+              id: 'player2',
+              name: 'Player Two',
+            }), // No rating
           },
           status: 'ENDED',
           result: { type: 'white_win', timestamp: Date.now() },
@@ -713,7 +819,7 @@ describe('ChessGame', () => {
       const chessGame = ChessGame.fromGameState(
         GameStateMock.fromPartial({
           players: {
-            white: {
+            white: PlayerInfoMock.fromPartial({
               id: 'player1',
               name: 'Player One',
               rating: {
@@ -723,8 +829,8 @@ describe('ChessGame', () => {
                 volatility: 0.06,
                 timestamp: new Date(),
               },
-            },
-            black: {
+            }),
+            black: PlayerInfoMock.fromPartial({
               id: 'player2',
               name: 'Player Two',
               rating: {
@@ -734,7 +840,7 @@ describe('ChessGame', () => {
                 volatility: 0.06,
                 timestamp: new Date(),
               },
-            },
+            }),
           },
           status: 'ENDED',
           result: { type: 'white_win', timestamp: Date.now() },
@@ -753,7 +859,7 @@ describe('ChessGame', () => {
       const chessGame = ChessGame.fromGameState(
         GameStateMock.fromPartial({
           players: {
-            white: {
+            white: PlayerInfoMock.fromPartial({
               id: 'player1',
               name: 'Player One',
               rating: {
@@ -763,8 +869,8 @@ describe('ChessGame', () => {
                 volatility: 0.06,
                 timestamp: new Date(),
               },
-            },
-            black: {
+            }),
+            black: PlayerInfoMock.fromPartial({
               id: 'player2',
               name: 'Player Two',
               rating: {
@@ -774,7 +880,7 @@ describe('ChessGame', () => {
                 volatility: 0.06,
                 timestamp: new Date(),
               },
-            },
+            }),
           },
           status: 'ENDED',
           result: { type: 'white_win', timestamp: Date.now() },
@@ -790,7 +896,7 @@ describe('ChessGame', () => {
       const chessGame = ChessGame.fromGameState(
         GameStateMock.fromPartial({
           players: {
-            white: {
+            white: PlayerInfoMock.fromPartial({
               id: 'player1',
               name: 'Player One',
               rating: {
@@ -800,8 +906,8 @@ describe('ChessGame', () => {
                 volatility: 0.06,
                 timestamp: new Date(),
               },
-            },
-            black: {
+            }),
+            black: PlayerInfoMock.fromPartial({
               id: 'player2',
               name: 'Player Two',
               rating: {
@@ -811,7 +917,7 @@ describe('ChessGame', () => {
                 volatility: 0.06,
                 timestamp: new Date(),
               },
-            },
+            }),
           },
           status: 'ENDED',
           result: { type: 'draw', timestamp: Date.now() },
@@ -833,8 +939,8 @@ describe('ChessGame', () => {
             '8/8/8/8/8/3k4/8/3K4 w - - 0 1', // Just two kings
           ),
           players: {
-            white: { id: 'player1', name: 'Player One' },
-            black: { id: 'player2', name: 'Player Two' },
+            white: PlayerInfoMock.fromId('player1'),
+            black: PlayerInfoMock.fromId('player2'),
           },
           status: 'IN_PROGRESS',
         }),

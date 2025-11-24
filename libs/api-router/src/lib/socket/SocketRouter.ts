@@ -107,8 +107,11 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
           `User joining game`,
         );
         const gameState = await api.gameplay.joinGame(
-          socket.data.session.userId,
-          socket.data.session.name,
+          {
+            id: socket.data.session.userId,
+            name: socket.data.session.name,
+            role: socket.data.session.role,
+          },
           joinGamePayloadV1,
         );
         if (!socket.rooms.has(joinGamePayloadV1.gameId)) {
@@ -149,7 +152,7 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
           'Received make-move event',
         );
         const { gameDetails, move } = await api.gameplay.makeMove(
-          socket.data.session,
+          socket.data.session.userId,
           makeMovePayloadV1,
         );
         socket.to(move.gameId).emit('move-made', move);

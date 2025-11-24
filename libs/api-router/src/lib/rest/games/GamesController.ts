@@ -29,8 +29,7 @@ export const GamesController = (
         const body: CreateChallengeV1 = c.req.valid('json');
         const session = c.get('session');
         const response = await gameService.createChallenge(
-          session.userId,
-          session.name,
+          { id: session.userId, name: session.name, role: session.role },
           body,
         );
         return c.json(response);

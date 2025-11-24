@@ -7,6 +7,7 @@ export type Session = {
   expiresAt: Date;
   userAgent: Maybe<string>;
   username: Maybe<string>;
+  role: Maybe<string>;
   name: Maybe<string>;
   ipAddress: Maybe<string>;
   isAnonymous: boolean;

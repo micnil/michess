@@ -7,7 +7,6 @@ import {
   PlayerGameInfoPageResponseV1,
   PlayerGameInfoQueryV1,
 } from '@michess/api-schema';
-import { Maybe } from '@michess/common-utils';
 import { TimeControlClassification } from '@michess/core-game';
 import {
   GameRepository,
@@ -17,6 +16,7 @@ import {
 } from '@michess/infra-db';
 import { PageResponseMapper } from '../../mapper/PageResponseMapper';
 import { GameMapper } from '../mapper/GameMapper';
+import { PlayerInfoIn } from '../model/PlayerInfoIn';
 import { GameplayService } from './GameplayService';
 
 export class GamesService {
@@ -113,8 +113,7 @@ export class GamesService {
   }
 
   async createChallenge(
-    userId: string,
-    name: Maybe<string>,
+    playerInfoIn: PlayerInfoIn,
     request: CreateChallengeV1,
   ): Promise<GameDetailsV1> {
     const opponent = await this.userRepository.findUserById(request.opponentId);
@@ -131,13 +130,16 @@ export class GamesService {
       timeControl: request.timeControl,
     });
 
-    await this.gameplayService.joinGame(userId, name, {
+    await this.gameplayService.joinGame(playerInfoIn, {
       gameId: gameDetails.id,
       side: request.playerColor,
     });
     const updatedGameDetails = await this.gameplayService.joinGame(
-      opponent.id,
-      opponent.name,
+      {
+        id: opponent.id,
+        name: opponent.name,
+        role: opponent.role,
+      },
       {
         gameId: gameDetails.id,
       },

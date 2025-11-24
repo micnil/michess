@@ -5,4 +5,5 @@ export const PlayerInfoV1Schema = z.object({
   rating: z.number().min(0).optional(),
   ratingDiff: z.number().optional(),
   name: z.string().min(1).max(100),
+  isBot: z.boolean(),
 });
