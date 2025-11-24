@@ -1,20 +1,50 @@
 import { BotInfoV1, GameDetailsV1 } from '@michess/api-schema';
 import { logger } from '@michess/be-utils';
-import { Chessboard, FenParser, FenStr, Move } from '@michess/core-board';
-import { UserRepository } from '@michess/infra-db';
+import { assertDefined } from '@michess/common-utils';
+import {
+  Chessboard,
+  FenParser,
+  FenStr,
+  Move,
+  MoveOption,
+} from '@michess/core-board';
+import {
+  CacheRepository,
+  GameRepository,
+  UserRepository,
+} from '@michess/infra-db';
+import { Job, Queue, Worker } from 'bullmq';
 import { GameplayService } from '../../games/service/GameplayService';
 import { LlmConfig } from '../../llm/config/LlmConfig';
 import { LlmClientFactory } from '../../llm/service/LlmClientFactory';
 import { BotRegistry } from '../config/BotRegistry';
 
+type BotMoveJobData = {
+  gameId: string;
+  botId: string;
+};
+
 export class BotService {
   private unsubscribe?: () => void;
+  private botMoveQueue: Queue<BotMoveJobData>;
+  private botMoveWorker: Worker<BotMoveJobData>;
 
   constructor(
     private readonly userRepository: UserRepository,
+    private readonly gameRepository: GameRepository,
     private readonly gameplayService: GameplayService,
+    private readonly cacheRepository: CacheRepository,
     private readonly llmConfig: LlmConfig,
-  ) {}
+  ) {
+    const connectionOptions = { connection: this.cacheRepository.client };
+
+    this.botMoveQueue = new Queue(`bot-move`, connectionOptions);
+    this.botMoveWorker = new Worker<BotMoveJobData>(
+      `bot-move`,
+      this.processBotMove.bind(this),
+      connectionOptions,
+    );
+  }
 
   async initialize(): Promise<void> {
     logger.info('Initializing bot users...');
@@ -71,6 +101,8 @@ export class BotService {
     if (this.unsubscribe) {
       this.unsubscribe();
     }
+    await this.botMoveQueue.close();
+    await this.botMoveWorker.close();
   }
 
   async listBots(): Promise<BotInfoV1[]> {
@@ -114,30 +146,65 @@ export class BotService {
         botId: currentPlayer.id,
         botName: currentPlayer.name,
       },
-      'Bot turn detected, generating move',
+      'Bot turn detected, queuing move generation',
+    );
+
+    // Queue the bot move job
+    await this.botMoveQueue.add('generate-move', {
+      gameId: gameDetails.id,
+      botId: currentPlayer.id,
+    });
+  }
+
+  private async processBotMove(job: Job<BotMoveJobData>): Promise<void> {
+    const { gameId, botId } = job.data;
+
+    logger.info(
+      {
+        gameId,
+        botId,
+        jobId: job.id,
+      },
+      'Processing bot move job',
     );
 
     try {
-      await this.generateBotMove(gameDetails, currentPlayer.id);
+      await this.playBotMove(gameId, botId);
     } catch (error) {
       logger.error(
         {
           error,
-          gameId: gameDetails.id,
-          botId: currentPlayer.id,
+          gameId,
+          botId,
+          jobId: job.id,
         },
         'Failed to generate bot move',
       );
+      throw error;
     }
   }
 
-  private async generateBotMove(
-    gameDetails: GameDetailsV1,
-    botId: string,
-  ): Promise<void> {
+  private async playBotMove(gameId: string, botId: string): Promise<void> {
     const botConfig = BotRegistry.get(botId);
     if (!botConfig) {
       throw new Error(`Bot configuration not found for bot ${botId}`);
+    }
+
+    // Load game from database
+    const game = await this.gameRepository.findGameWithRelationsById(gameId);
+    assertDefined(game, `Game ${gameId} not found`);
+
+    // Build chessboard from game state
+    const moves = game.moves.map((m) => Move.fromUci(m.uci));
+    const initialPosition = FenParser.toChessPosition(FenStr.standardInitial());
+
+    const chessboard = Chessboard.fromPosition(initialPosition, moves);
+
+    // Get available move options
+    const moveOptions = chessboard.moveOptions;
+
+    if (moveOptions.length === 0) {
+      throw new Error('No legal moves available');
     }
 
     const llmClient = LlmClientFactory.create(
@@ -147,18 +214,25 @@ export class BotService {
 
     // Format the game state for the LLM
     const moveHistory =
-      gameDetails.moves.length > 0
-        ? gameDetails.moves.map((m) => m.uci).join(' ')
+      moves.length > 0
+        ? moves.map((m: Move) => Move.toUci(m)).join(' ')
         : 'none';
+
+    // Format available moves for the LLM
+    const availableMoves = moveOptions
+      .map((opt) => Move.toUci(MoveOption.toMove(opt)))
+      .join(', ');
 
     const systemPrompt = `You are a chess-playing AI with the following personality:
 ${botConfig.personality}
 
-You must respond with ONLY a single UCI move notation (e.g., "e2e4", "e7e8q" for promotion).
-Do not include any explanation, analysis, or additional text.`;
+You must respond with ONLY a single UCI move notation from the available moves (e.g., "e2e4", "e7e8q" for promotion).
+Do not include any explanation, analysis, or additional text.
+You MUST choose one of the available legal moves provided.`;
 
     const userPrompt = `Current position (moves from start): ${moveHistory}
-Your color: ${gameDetails.moves.length % 2 === 0 ? 'white' : 'black'}
+Your color: ${chessboard.position.turn}
+Available legal moves: ${availableMoves}
 Choose your next move in UCI notation:`;
 
     const response = await llmClient.generateResponse({
@@ -174,9 +248,36 @@ Choose your next move in UCI notation:`;
     // Extract UCI move from response (take first word, clean it up)
     const uciMove = response.content.trim().split(/\s+/)[0].toLowerCase();
 
+    // Validate that the move is in the available moves
+    const isValidMove = moveOptions.some(
+      (opt) => Move.toUci(MoveOption.toMove(opt)) === uciMove,
+    );
+
+    if (!isValidMove) {
+      logger.warn(
+        {
+          gameId,
+          botId,
+          suggestedMove: uciMove,
+          availableMoves,
+        },
+        'LLM suggested invalid move, choosing random legal move',
+      );
+      // Fallback to random legal move
+      const randomMove =
+        moveOptions[Math.floor(Math.random() * moveOptions.length)];
+      const fallbackUci = Move.toUci(MoveOption.toMove(randomMove));
+
+      await this.gameplayService.makeMove(botId, {
+        gameId,
+        uci: fallbackUci,
+      });
+      return;
+    }
+
     logger.info(
       {
-        gameId: gameDetails.id,
+        gameId,
         botId,
         uciMove,
       },
@@ -185,7 +286,7 @@ Choose your next move in UCI notation:`;
 
     // Make the move through GameplayService
     await this.gameplayService.makeMove(botId, {
-      gameId: gameDetails.id,
+      gameId,
       uci: uciMove,
     });
   }

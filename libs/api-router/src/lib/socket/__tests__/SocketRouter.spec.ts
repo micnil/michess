@@ -25,7 +25,13 @@ import { SocketRouter } from '../SocketRouter';
 jest.mock('@michess/api-service');
 
 const apiMock: Api = {
-  bots: new BotService({} as never, {} as never, {} as never),
+  bots: new BotService(
+    {} as never,
+    {} as never,
+    {} as never,
+    {} as never,
+    {} as never,
+  ),
   games: new GamesService({} as never, {} as never, {} as never),
   gameplay: new GameplayService(
     {} as never,

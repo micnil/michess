@@ -40,7 +40,13 @@ const apiMock: Api = {
     {} as never,
     {} as never,
   ),
-  bots: new BotService({} as never, {} as never, {} as never),
+  bots: new BotService(
+    {} as never,
+    {} as never,
+    {} as never,
+    {} as never,
+    {} as never,
+  ),
   auth: new AuthService({} as never, {} as never, {} as never, {
     google: { clientId: '', clientSecret: '' },
   }),

@@ -65,7 +65,13 @@ const from = (
     repos.cache,
     repos.game,
   );
-  const botService = new BotService(repos.user, gameplayService, llmConfig);
+  const botService = new BotService(
+    repos.user,
+    repos.game,
+    gameplayService,
+    repos.cache,
+    llmConfig,
+  );
 
   return {
     games: gamesService,
