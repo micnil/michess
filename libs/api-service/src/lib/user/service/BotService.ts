@@ -212,28 +212,19 @@ export class BotService {
       this.llmConfig.geminiApiKey,
     );
 
-    // Format the game state for the LLM
-    const moveHistory =
-      moves.length > 0
-        ? moves.map((m: Move) => Move.toUci(m)).join(' ')
-        : 'none';
+    // Get FEN position for compact representation
+    const fen = FenParser.toFenStr(chessboard.position);
 
     // Format available moves for the LLM
     const availableMoves = moveOptions
       .map((opt) => Move.toUci(MoveOption.toMove(opt)))
-      .join(', ');
+      .join(' ');
 
-    const systemPrompt = `You are a chess-playing AI with the following personality:
-${botConfig.personality}
+    const systemPrompt = `You are a chess AI. Respond with only a single UCI move from the legal moves list. No explanation.`;
 
-You must respond with ONLY a single UCI move notation from the available moves (e.g., "e2e4", "e7e8q" for promotion).
-Do not include any explanation, analysis, or additional text.
-You MUST choose one of the available legal moves provided.`;
-
-    const userPrompt = `Current position (moves from start): ${moveHistory}
-Your color: ${chessboard.position.turn}
-Available legal moves: ${availableMoves}
-Choose your next move in UCI notation:`;
+    const userPrompt = `Position: ${fen}
+Legal moves: ${availableMoves}
+Move:`;
 
     const response = await llmClient.generateResponse({
       systemPrompt,
