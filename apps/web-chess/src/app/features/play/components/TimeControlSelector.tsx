@@ -1,6 +1,6 @@
 import { Button, Flex, Popover, Text } from '@radix-ui/themes';
 import { useState } from 'react';
-import { TimeControlRadioCards } from '../../lobby/components/TimeControlRadioGroup';
+import { TimeControlRadioCards } from './TimeControlRadioCards';
 
 type TimeControlStr = `${number}|${number}`;
 
