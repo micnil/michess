@@ -43,7 +43,7 @@ export class GeminiClient implements LlmClient {
     } catch (error) {
       logger.error(
         {
-          error,
+          err: error,
           modelName: this.modelName,
         },
         'Gemini API call failed',

@@ -8,7 +8,7 @@ const BOT_REGISTRY: Record<string, BotConfig> = {
     username: 'gemini-1',
     description: 'A balanced AI chess player powered by Gemini',
     provider: 'gemini',
-    model: 'gemini-1.5-pro',
+    model: 'gemini-2.5-flash',
     personality:
       'You play balanced, solid chess. Consider both tactical and positional factors.',
     temperature: 0.7,

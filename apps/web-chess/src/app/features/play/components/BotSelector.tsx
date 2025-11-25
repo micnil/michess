@@ -1,5 +1,5 @@
 import { Flex, Select, Skeleton, Text } from '@radix-ui/themes';
-import { use } from 'react';
+import { use, useEffect } from 'react';
 import { ApiContext } from '../../../api/context/ApiContext';
 import { Alert } from '../../../components/Alert';
 import { useQuery } from '../../../util/useQuery';
@@ -22,6 +22,13 @@ export const BotSelector = ({ value, onChange }: Props) => {
     queryKey: ['bots'],
     queryFn: () => api.bots.listBots(),
   });
+
+  // Set the first bot as default when bots load and no value is set
+  useEffect(() => {
+    if (bots && bots.length > 0 && !value && onChange) {
+      onChange(bots[0].id);
+    }
+  }, [bots, value, onChange]);
 
   const selectedValue = value ?? bots?.[0]?.id;
 

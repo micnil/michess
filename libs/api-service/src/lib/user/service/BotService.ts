@@ -173,7 +173,7 @@ export class BotService {
     } catch (error) {
       logger.error(
         {
-          error,
+          err: error,
           gameId,
           botId,
           jobId: job.id,
@@ -232,7 +232,29 @@ Move:`;
       temperature: botConfig.temperature,
     });
 
+    logger.info(
+      {
+        gameId,
+        botId,
+        response: {
+          finishReason: response.finishReason,
+          content: response.content,
+          contentLength: response.content?.length,
+        },
+      },
+      'LLM response received',
+    );
+
     if (response.finishReason === 'error' || !response.content.trim()) {
+      logger.error(
+        {
+          gameId,
+          botId,
+          finishReason: response.finishReason,
+          content: response.content,
+        },
+        'LLM failed to generate a valid response',
+      );
       throw new Error('LLM failed to generate a valid response');
     }
 

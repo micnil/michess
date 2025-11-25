@@ -1,5 +1,7 @@
+import { Maybe } from '@michess/common-utils';
 import { Button, Card, Flex, Heading } from '@radix-ui/themes';
 import { useState } from 'react';
+import { Alert } from '../../components/Alert';
 import { BotSelector } from './components/BotSelector';
 import { OpponentTypeSelector } from './components/OpponentTypeSelector';
 import { TimeControlSelector } from './components/TimeControlSelector';
@@ -13,17 +15,16 @@ type Props = {
     opponentType: OpponentType;
     botId?: string;
   }) => void;
+  error?: Maybe<string>;
+  loading?: boolean;
 };
 
-export const PlayCard = ({ onPlay }: Props) => {
+export const PlayCard = ({ onPlay, error, loading }: Props) => {
   const [timeControl, setTimeControl] = useState<TimeControlStr>('3|2');
   const [opponentType, setOpponentType] = useState<OpponentType>('random');
   const [botId, setBotId] = useState<string | undefined>(undefined);
 
   const handlePlay = () => {
-    // TODO: Wire up to backend API
-    // - If opponentType === 'random': create quick pairing or join queue
-    // - If opponentType === 'bot': POST /api/games/challenge with botId
     onPlay?.({
       timeControl,
       opponentType,
@@ -38,6 +39,8 @@ export const PlayCard = ({ onPlay }: Props) => {
           Play
         </Heading>
 
+        <Alert text={error} />
+
         <Flex gap="3" align="center">
           <TimeControlSelector value={timeControl} onChange={setTimeControl} />
         </Flex>
@@ -51,7 +54,8 @@ export const PlayCard = ({ onPlay }: Props) => {
         <Button
           size="3"
           onClick={handlePlay}
-          disabled={opponentType === 'random'}
+          disabled={opponentType === 'random' || loading}
+          loading={loading}
         >
           Play
         </Button>

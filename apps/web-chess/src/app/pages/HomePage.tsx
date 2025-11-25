@@ -4,7 +4,7 @@ import React from 'react';
 import { GameLobby } from '../features/lobby/GameLobby';
 import { StatsContainer } from '../features/metrics/StatsContainer';
 import { Footer } from '../features/navigation/Footer';
-import { PlayCard } from '../features/play/PlayCard';
+import { PlayCardContainer } from '../features/play/container/PlayCardContainer';
 import { PlayerGamesOverview } from '../features/player-games-overview/PlayerGamesOverview';
 import { WelcomeCard } from '../features/welcome/WelcomeCard';
 
@@ -16,6 +16,10 @@ export const HomePage: React.FC = () => {
   };
 
   const handleJoinGame = async (gameId: string) => {
+    await navigate({ to: `/game/${gameId}/` });
+  };
+
+  const handlePlay = async (gameId: string) => {
     await navigate({ to: `/game/${gameId}/` });
   };
 
@@ -37,7 +41,7 @@ export const HomePage: React.FC = () => {
           px={{ initial: '2', lg: '0' }}
         >
           <Box gridColumn={{ initial: '1', sm: '1 / -1' }}>
-            <PlayCard />
+            <PlayCardContainer onPlay={handlePlay} />
           </Box>
 
           <Box>
