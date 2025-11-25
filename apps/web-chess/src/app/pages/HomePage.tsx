@@ -4,6 +4,7 @@ import React from 'react';
 import { GameLobby } from '../features/lobby/GameLobby';
 import { StatsContainer } from '../features/metrics/StatsContainer';
 import { Footer } from '../features/navigation/Footer';
+import { PlayCard } from '../features/play/PlayCard';
 import { PlayerGamesOverview } from '../features/player-games-overview/PlayerGamesOverview';
 import { WelcomeCard } from '../features/welcome/WelcomeCard';
 
@@ -29,13 +30,16 @@ export const HomePage: React.FC = () => {
         <Box px={{ initial: '2', lg: '0' }} mb="4">
           <WelcomeCard />
         </Box>
-
         <Grid
           columns={{ initial: '1', sm: '2fr 1fr' }}
           gap="4"
           width="100%"
           px={{ initial: '2', lg: '0' }}
         >
+          <Box gridColumn={{ initial: '1', sm: '1 / -1' }}>
+            <PlayCard />
+          </Box>
+
           <Box>
             <Grid gap="4">
               <Box>
