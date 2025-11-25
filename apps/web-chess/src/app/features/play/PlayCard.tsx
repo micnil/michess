@@ -18,7 +18,7 @@ type Props = {
 export const PlayCard = ({ onPlay }: Props) => {
   const [timeControl, setTimeControl] = useState<TimeControlStr>('3|2');
   const [opponentType, setOpponentType] = useState<OpponentType>('random');
-  const [botId, setBotId] = useState<string>('gemini-1');
+  const [botId, setBotId] = useState<string | undefined>(undefined);
 
   const handlePlay = () => {
     // TODO: Wire up to backend API
