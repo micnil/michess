@@ -48,7 +48,11 @@ export const PlayCard = ({ onPlay }: Props) => {
           <BotSelector value={botId} onChange={setBotId} />
         )}
 
-        <Button size="3" onClick={handlePlay}>
+        <Button
+          size="3"
+          onClick={handlePlay}
+          disabled={opponentType === 'random'}
+        >
           Play
         </Button>
       </Flex>
