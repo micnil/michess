@@ -251,7 +251,7 @@ export class GameplayService extends EventEmitter<GameEvent> {
     // Emit move_made event to all subscribers
     this.emit({
       type: 'move_made',
-      data: gameDetailsV1,
+      data: moveMadeV1,
     });
 
     if (gameStateUpdated) {

@@ -89,7 +89,7 @@ export class BotService {
     this.unsubscribe = this.gameplayService.subscribe(
       (event) => {
         this.handleGameUpdate(event.data).catch((err) => {
-          logger.error({ error: err }, 'Error in bot move handler');
+          logger.error({ err }, 'Error in bot move handler');
         });
       },
       ['move_made', 'game_joined'],

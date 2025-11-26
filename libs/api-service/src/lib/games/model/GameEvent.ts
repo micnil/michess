@@ -1,8 +1,15 @@
-import { GameDetailsV1 } from '@michess/api-schema';
+import { GameDetailsV1, MoveMadeV1 } from '@michess/api-schema';
 
-export type GameEventType = 'move_made' | 'flag_timeout' | 'game_joined';
-
-export type GameEvent = {
-  type: GameEventType;
-  data: GameDetailsV1;
-};
+export type GameEvent =
+  | {
+      type: 'move_made';
+      data: MoveMadeV1;
+    }
+  | {
+      type: 'flag_timeout';
+      data: GameDetailsV1;
+    }
+  | {
+      type: 'game_joined';
+      data: GameDetailsV1;
+    };
