@@ -15,6 +15,7 @@ type PlayerInfoProps = {
   isLoading?: boolean;
   clock?: CountdownClock;
   rating?: string;
+  isGameInProgress?: boolean;
   ratingDiff?: string;
 };
 
@@ -27,6 +28,7 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
   isPlayerTurn = false,
   clock,
   rating,
+  isGameInProgress,
   ratingDiff,
   isLoading,
 }) => {
@@ -102,13 +104,15 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
               </Badge>
             </Skeleton>
             <Skeleton loading={isLoading}>
-              <Text
-                size="2"
-                weight={isPlayerTurn ? 'bold' : 'medium'}
-                color={isPlayerTurn ? 'amber' : 'gray'}
-              >
-                {isPlayerTurn ? 'Turn to play' : 'Waiting'}
-              </Text>
+              {isGameInProgress && (
+                <Text
+                  size="2"
+                  weight={isPlayerTurn ? 'bold' : 'medium'}
+                  color={isPlayerTurn ? 'amber' : 'gray'}
+                >
+                  {isPlayerTurn ? 'Turn to play' : 'Waiting'}
+                </Text>
+              )}
             </Skeleton>
           </Flex>
         </Flex>
