@@ -213,7 +213,7 @@ describe('SocketRouter', () => {
         },
         players: {
           white: { name: 'Test User', id: 'u1', isBot: false },
-          black: { name: 'Test User 2', id: 'u2', isBot: false },
+          black: { name: 'Bot', id: 'bot1', isBot: true },
         },
         isPrivate: false,
         moves: [{ uci: 'e2e4' }],
@@ -230,6 +230,7 @@ describe('SocketRouter', () => {
             moveMade: moveV1,
             gameDetails: mockGameState,
             statusChanged: false,
+            moveColor: 'black',
           },
         });
         return { move: moveV1 };

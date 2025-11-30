@@ -7,7 +7,7 @@ import {
   MoveMadeV1,
 } from '@michess/api-schema';
 import { logger } from '@michess/be-utils';
-import { assertDefined, Maybe } from '@michess/common-utils';
+import { assertDefined, EventEmitter, Maybe } from '@michess/common-utils';
 import { Color, Move, MoveRecord } from '@michess/core-board';
 import { ChessGame, GameActionIn } from '@michess/core-game';
 import {
@@ -18,7 +18,6 @@ import {
 } from '@michess/infra-db';
 import { Job, Queue, Worker } from 'bullmq';
 import { Session } from '../../auth/model/Session';
-import { EventEmitter } from '../../common/EventEmitter';
 import { LockService } from '../../lock/service/LockService';
 import { RatingsService } from '../../user/service/RatingsService';
 import { GameMapper } from '../mapper/GameMapper';
