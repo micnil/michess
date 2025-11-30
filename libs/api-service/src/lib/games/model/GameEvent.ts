@@ -3,7 +3,11 @@ import { GameDetailsV1, MoveMadeV1 } from '@michess/api-schema';
 export type GameEvent =
   | {
       type: 'move_made';
-      data: MoveMadeV1;
+      data: {
+        moveMade: MoveMadeV1;
+        gameDetails: GameDetailsV1;
+        statusChanged: boolean;
+      };
     }
   | {
       type: 'flag_timeout';

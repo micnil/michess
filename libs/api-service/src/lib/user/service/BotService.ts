@@ -1,4 +1,4 @@
-import { BotInfoV1, GameDetailsV1 } from '@michess/api-schema';
+import { BotInfoV1 } from '@michess/api-schema';
 import { logger } from '@michess/be-utils';
 import { assertDefined } from '@michess/common-utils';
 import {
@@ -14,6 +14,7 @@ import {
   UserRepository,
 } from '@michess/infra-db';
 import { Job, Queue, Worker } from 'bullmq';
+import { GameEvent } from '../../games/model/GameEvent';
 import { GameplayService } from '../../games/service/GameplayService';
 import { LlmConfig } from '../../llm/config/LlmConfig';
 import { LlmClientFactory } from '../../llm/service/LlmClientFactory';
@@ -88,8 +89,8 @@ export class BotService {
 
     this.unsubscribe = this.gameplayService.subscribe(
       (event) => {
-        this.handleGameUpdate(event.data).catch((err) => {
-          logger.error({ err }, 'Error in bot move handler');
+        this.handleGameEvent(event).catch((err) => {
+          logger.error({ err }, 'Error in bot event handler');
         });
       },
       ['move_made', 'game_joined'],
@@ -120,7 +121,10 @@ export class BotService {
     });
   }
 
-  async handleGameUpdate(gameDetails: GameDetailsV1): Promise<void> {
+  async handleGameEvent(event: GameEvent): Promise<void> {
+    const gameDetails =
+      event.type === 'move_made' ? event.data.gameDetails : event.data;
+
     if (
       gameDetails.status !== 'IN_PROGRESS' &&
       gameDetails.status !== 'READY'
@@ -136,23 +140,27 @@ export class BotService {
     );
     const currentPlayer = gameDetails.players[chessboard.position.turn];
 
-    if (!currentPlayer || !currentPlayer.isBot) {
+    if (currentPlayer?.isBot) {
+      logger.info(
+        {
+          gameId: gameDetails.id,
+          botId: currentPlayer.id,
+          botName: currentPlayer.name,
+          eventType: event.type,
+        },
+        'Bot turn detected, queuing move generation',
+      );
+
+      await this.queueBotMove(gameDetails.id, currentPlayer.id);
+    } else {
       return;
     }
+  }
 
-    logger.info(
-      {
-        gameId: gameDetails.id,
-        botId: currentPlayer.id,
-        botName: currentPlayer.name,
-      },
-      'Bot turn detected, queuing move generation',
-    );
-
-    // Queue the bot move job
+  private async queueBotMove(gameId: string, botId: string): Promise<void> {
     await this.botMoveQueue.add('generate-move', {
-      gameId: gameDetails.id,
-      botId: currentPlayer.id,
+      gameId,
+      botId,
     });
   }
 

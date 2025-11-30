@@ -11,7 +11,6 @@ import {
   Api,
   AuthService,
   BotService,
-  GameplayService,
   GamesService,
   Session,
   UsageMetricsService,
@@ -24,6 +23,22 @@ import { Socket as ClientSocket, io as ioClient } from 'socket.io-client';
 import { SocketRouter } from '../SocketRouter';
 jest.mock('@michess/api-service');
 
+let gameplayEventHandler: ((event: any) => void) | undefined;
+
+const mockGameplayService = {
+  subscribe: jest.fn((handler: (event: any) => void) => {
+    gameplayEventHandler = handler;
+    return () => {
+      gameplayEventHandler = undefined;
+    };
+  }),
+  makeMove: jest.fn(),
+  joinGame: jest.fn(),
+  makeAction: jest.fn(),
+  leaveGame: jest.fn(),
+  close: jest.fn(),
+};
+
 const apiMock: Api = {
   bots: new BotService(
     {} as never,
@@ -33,14 +48,7 @@ const apiMock: Api = {
     {} as never,
   ),
   games: new GamesService({} as never, {} as never, {} as never),
-  gameplay: new GameplayService(
-    {} as never,
-    {} as never,
-    {} as never,
-    {} as never,
-    {} as never,
-    {} as never,
-  ),
+  gameplay: mockGameplayService as any,
   auth: new AuthService({} as never, {} as never, {} as never, {
     google: { clientId: '', clientSecret: '' },
   }),
@@ -165,7 +173,7 @@ describe('SocketRouter', () => {
       };
       serverSocket2.join(joinGamePayload.gameId);
 
-      apiMock.gameplay.joinGame = jest.fn().mockResolvedValue(mockGameState);
+      mockGameplayService.joinGame.mockResolvedValue(mockGameState);
 
       const gameUpdatedPromise = waitFor(clientSocket2, 'game-updated');
 
@@ -179,7 +187,7 @@ describe('SocketRouter', () => {
 
       expect(response.status).toEqual('ok');
       expect(response.status === 'ok' && response.data).toEqual(mockGameState);
-      expect(apiMock.gameplay.joinGame).toHaveBeenCalled();
+      expect(mockGameplayService.joinGame).toHaveBeenCalled();
     });
   });
 
@@ -197,7 +205,35 @@ describe('SocketRouter', () => {
         gameId: makeMovePayload.gameId,
         clock: { whiteMs: 300000, blackMs: 300000 },
       };
-      apiMock.gameplay.makeMove = jest.fn().mockResolvedValue({ move: moveV1 });
+      const mockGameState: GameDetailsV1 = {
+        id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+        status: 'IN_PROGRESS',
+        timeControl: {
+          classification: 'no_clock',
+        },
+        players: {
+          white: { name: 'Test User', id: 'u1', isBot: false },
+          black: { name: 'Test User 2', id: 'u2', isBot: false },
+        },
+        isPrivate: false,
+        moves: [{ uci: 'e2e4' }],
+        variant: 'standard',
+        actionOptions: [],
+        clock: undefined,
+      };
+
+      mockGameplayService.makeMove.mockImplementation(async () => {
+        // Trigger the event handler directly
+        gameplayEventHandler?.({
+          type: 'move_made',
+          data: {
+            moveMade: moveV1,
+            gameDetails: mockGameState,
+            statusChanged: false,
+          },
+        });
+        return { move: moveV1 };
+      });
 
       const moveMadePromise = waitFor<MoveMadeV1>(clientSocket2, 'move-made');
 
@@ -210,7 +246,7 @@ describe('SocketRouter', () => {
       expect(data).toEqual(moveV1);
       expect(response.status).toEqual('ok');
       expect(response.status === 'ok' && response.data).toEqual(moveV1);
-      expect(apiMock.gameplay.makeMove).toHaveBeenCalled();
+      expect(mockGameplayService.makeMove).toHaveBeenCalled();
     });
   });
 
@@ -244,7 +280,7 @@ describe('SocketRouter', () => {
         ],
         clock: undefined,
       };
-      apiMock.gameplay.makeAction = jest.fn().mockResolvedValue(mockGameState);
+      mockGameplayService.makeAction.mockResolvedValue(mockGameState);
 
       const actionMadePromise = waitFor<GameDetailsV1>(
         clientSocket2,
@@ -260,7 +296,7 @@ describe('SocketRouter', () => {
       expect(data).toEqual(mockGameState);
       expect(response.status).toEqual('ok');
       expect(response.status === 'ok' && response.data).toEqual(mockGameState);
-      expect(apiMock.gameplay.makeAction).toHaveBeenCalled();
+      expect(mockGameplayService.makeAction).toHaveBeenCalled();
     });
   });
 });

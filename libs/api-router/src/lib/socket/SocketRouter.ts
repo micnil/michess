@@ -151,16 +151,12 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
           { ...makeMovePayloadV1, rooms: Array.from(socket.rooms) },
           'Received make-move event',
         );
-        const { gameDetails, move } = await api.gameplay.makeMove(
+        const { move } = await api.gameplay.makeMove(
           socket.data.session.userId,
           makeMovePayloadV1,
         );
-        socket.to(move.gameId).emit('move-made', move);
 
         callback(EventResponse.ok(move));
-        if (gameDetails) {
-          io.to(makeMovePayloadV1.gameId).emit('game-updated', gameDetails);
-        }
       } catch (error) {
         logger.error(error);
         callback(EventResponse.error(ApiErrorMapper.from(error)));
@@ -226,13 +222,26 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
     }
   });
 
-  api.gameplay.subscribe((event) => {
-    if (event.type !== 'move_made') {
-      io.to(event.data.id).emit('game-updated', event.data);
-    } else {
-      io.to(event.data.gameId).emit('move-made', event.data);
-    }
-  });
+  api.gameplay.subscribe(
+    (event) => {
+      if (event.type === 'move_made') {
+        if (event.data.statusChanged) {
+          io.to(event.data.gameDetails.id).emit(
+            'game-updated',
+            event.data.gameDetails,
+          );
+        } else {
+          io.to(event.data.moveMade.gameId).emit(
+            'move-made',
+            event.data.moveMade,
+          );
+        }
+      } else {
+        io.to(event.data.id).emit('game-updated', event.data);
+      }
+    },
+    ['move_made', 'flag_timeout'],
+  );
 
   return io;
 };
