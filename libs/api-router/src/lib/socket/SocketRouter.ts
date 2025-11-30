@@ -151,10 +151,16 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
           { ...makeMovePayloadV1, rooms: Array.from(socket.rooms) },
           'Received make-move event',
         );
-        const { move } = await api.gameplay.makeMove(
+        const { move, gameDetails } = await api.gameplay.makeMove(
           socket.data.session.userId,
           makeMovePayloadV1,
         );
+
+        if (gameDetails) {
+          io.to(makeMovePayloadV1.gameId).emit('game-updated', gameDetails);
+        } else {
+          socket.to(makeMovePayloadV1.gameId).emit('move-made', move);
+        }
 
         callback(EventResponse.ok(move));
       } catch (error) {
