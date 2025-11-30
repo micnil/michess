@@ -139,6 +139,26 @@ export class GameService {
     return response;
   }
 
+  async challengeBot(params: {
+    botId: string;
+    timeControl: { initialSec: number; incrementSec: number };
+  }): Promise<GameDetailsV1> {
+    const response = await this.restClient
+      .post<GameDetailsV1>('games/challenge', {
+        json: {
+          opponentId: params.botId,
+          variant: 'standard',
+          timeControl: {
+            type: 'realtime',
+            initialSec: params.timeControl.initialSec,
+            incrementSec: params.timeControl.incrementSec,
+          },
+        },
+      })
+      .json();
+    return response;
+  }
+
   async getLobbyGames(page: number) {
     const queryParams = new URLSearchParams({
       page: page.toString(),

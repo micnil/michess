@@ -107,7 +107,11 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
           `User joining game`,
         );
         const gameState = await api.gameplay.joinGame(
-          socket.data.session,
+          {
+            id: socket.data.session.userId,
+            name: socket.data.session.name,
+            role: socket.data.session.role,
+          },
           joinGamePayloadV1,
         );
         if (!socket.rooms.has(joinGamePayloadV1.gameId)) {
@@ -147,16 +151,12 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
           { ...makeMovePayloadV1, rooms: Array.from(socket.rooms) },
           'Received make-move event',
         );
-        const { gameDetails, move } = await api.gameplay.makeMove(
-          socket.data.session,
+        const { move } = await api.gameplay.makeMove(
+          socket.data.session.userId,
           makeMovePayloadV1,
         );
-        socket.to(move.gameId).emit('move-made', move);
 
         callback(EventResponse.ok(move));
-        if (gameDetails) {
-          io.to(makeMovePayloadV1.gameId).emit('game-updated', gameDetails);
-        }
       } catch (error) {
         logger.error(error);
         callback(EventResponse.error(ApiErrorMapper.from(error)));
@@ -222,9 +222,31 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
     }
   });
 
-  api.gameplay.subscribe((gameDetails) => {
-    io.to(gameDetails.id).emit('game-updated', gameDetails);
-  });
+  api.gameplay.subscribe(
+    (event) => {
+      if (event.type === 'move_made') {
+        const playerWhoMoved =
+          event.data.gameDetails.players[event.data.moveColor];
+
+        if (playerWhoMoved?.isBot) {
+          if (event.data.statusChanged) {
+            io.to(event.data.gameDetails.id).emit(
+              'game-updated',
+              event.data.gameDetails,
+            );
+          } else {
+            io.to(event.data.moveMade.gameId).emit(
+              'move-made',
+              event.data.moveMade,
+            );
+          }
+        }
+      } else {
+        io.to(event.data.id).emit('game-updated', event.data);
+      }
+    },
+    ['move_made', 'flag_timeout', 'game_joined'],
+  );
 
   return io;
 };

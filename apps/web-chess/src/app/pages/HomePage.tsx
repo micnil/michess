@@ -4,6 +4,7 @@ import React from 'react';
 import { GameLobby } from '../features/lobby/GameLobby';
 import { StatsContainer } from '../features/metrics/StatsContainer';
 import { Footer } from '../features/navigation/Footer';
+import { PlayCardContainer } from '../features/play/container/PlayCardContainer';
 import { PlayerGamesOverview } from '../features/player-games-overview/PlayerGamesOverview';
 import { WelcomeCard } from '../features/welcome/WelcomeCard';
 
@@ -18,6 +19,10 @@ export const HomePage: React.FC = () => {
     await navigate({ to: `/game/${gameId}/` });
   };
 
+  const handlePlay = async (gameId: string) => {
+    await navigate({ to: `/game/${gameId}/` });
+  };
+
   return (
     <Flex
       direction="column"
@@ -29,13 +34,16 @@ export const HomePage: React.FC = () => {
         <Box px={{ initial: '2', lg: '0' }} mb="4">
           <WelcomeCard />
         </Box>
-
         <Grid
           columns={{ initial: '1', sm: '2fr 1fr' }}
           gap="4"
           width="100%"
           px={{ initial: '2', lg: '0' }}
         >
+          <Box gridColumn={{ initial: '1', sm: '1 / -1' }}>
+            <PlayCardContainer onPlay={handlePlay} />
+          </Box>
+
           <Box>
             <Grid gap="4">
               <Box>

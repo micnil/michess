@@ -1,3 +1,4 @@
+import { LlmConfig } from '@michess/api-service';
 import { EmailConfig } from '@michess/infra-email';
 
 export type AppConfig = {
@@ -22,4 +23,5 @@ export type AppConfig = {
       clientSecret: string;
     };
   };
+  llm: LlmConfig;
 };

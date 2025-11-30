@@ -62,7 +62,7 @@ describe('GameLobby', () => {
           items: [
             {
               id: 'game-1',
-              opponent: { name: 'Alice', id: 'alice-id' },
+              opponent: { name: 'Alice', id: 'alice-id', isBot: false },
               availableColor: 'white',
               variant: 'standard',
               createdAt: new Date().toISOString(),

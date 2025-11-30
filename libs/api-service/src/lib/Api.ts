@@ -7,8 +7,10 @@ import { AuthService } from './auth/service/AuthService';
 import { GameJobSchedulerService } from './games/service/GameJobSchedulerService';
 import { GameplayService } from './games/service/GameplayService';
 import { GamesService } from './games/service/GamesService';
+import { LlmConfig } from './llm/config/LlmConfig';
 import { LockService } from './lock/service/LockService';
 import { UsageMetricsService } from './metrics/UsageMetricsService';
+import { BotService } from './user/service/BotService';
 import { RatingsService } from './user/service/RatingsService';
 
 export type Api = {
@@ -17,6 +19,7 @@ export type Api = {
   auth: AuthService;
   usageMetrics: UsageMetricsService;
   gameJobScheduler: GameJobSchedulerService;
+  bots: BotService;
 };
 
 const from = (
@@ -24,6 +27,7 @@ const from = (
   sql: Sql,
   emailClient: EmailClient,
   authConfig: AuthConfig,
+  llmConfig: LlmConfig,
 ): Api => {
   const processId = randomUUID();
   const lockService = new LockService(repos.cache.client);
@@ -37,7 +41,6 @@ const from = (
     repos.game,
     repos.cache,
   );
-  const gamesService = new GamesService(repos.game);
   const gameplayService = new GameplayService(
     repos.game,
     repos.move,
@@ -45,6 +48,11 @@ const from = (
     repos.cache,
     ratingsService,
     lockService,
+  );
+  const gamesService = new GamesService(
+    repos.game,
+    repos.user,
+    gameplayService,
   );
   const authService = new AuthService(
     sql,
@@ -57,6 +65,13 @@ const from = (
     repos.cache,
     repos.game,
   );
+  const botService = new BotService(
+    repos.user,
+    repos.game,
+    gameplayService,
+    repos.cache,
+    llmConfig,
+  );
 
   return {
     games: gamesService,
@@ -64,6 +79,7 @@ const from = (
     auth: authService,
     usageMetrics,
     gameJobScheduler: gameJobSchedulerService,
+    bots: botService,
   };
 };
 export const Api = {

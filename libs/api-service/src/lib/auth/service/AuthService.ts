@@ -68,6 +68,7 @@ export class AuthService {
     if (sessionResponse) {
       const { user, session } = sessionResponse;
       return {
+        role: user.role ?? undefined,
         userId: user.id,
         sessionId: session.id,
         token: session.token,

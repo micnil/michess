@@ -21,7 +21,7 @@ const start = (app: App, appConfig: AppConfig): ServerType => {
   });
 
   app.init().catch((err) => {
-    logger.error('Failed to initialize app:', err);
+    logger.error(err, 'Failed to initialize app');
     process.exit(1);
   });
 

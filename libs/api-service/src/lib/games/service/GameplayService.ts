@@ -7,8 +7,8 @@ import {
   MoveMadeV1,
 } from '@michess/api-schema';
 import { logger } from '@michess/be-utils';
-import { assertDefined, Maybe } from '@michess/common-utils';
-import { Move, MoveRecord } from '@michess/core-board';
+import { assertDefined, EventEmitter, Maybe } from '@michess/common-utils';
+import { Color, Move, MoveRecord } from '@michess/core-board';
 import { ChessGame, GameActionIn } from '@michess/core-game';
 import {
   ActionRepository,
@@ -21,17 +21,17 @@ import { Session } from '../../auth/model/Session';
 import { LockService } from '../../lock/service/LockService';
 import { RatingsService } from '../../user/service/RatingsService';
 import { GameMapper } from '../mapper/GameMapper';
+import { GameEvent } from '../model/GameEvent';
+import { PlayerInfoIn } from '../model/PlayerInfoIn';
 
 type TimeControlJobData = {
   gameId: string;
   flagTimestamp: number;
 };
 
-export class GameplayService {
+export class GameplayService extends EventEmitter<GameEvent> {
   private timeControlQueue: Queue<TimeControlJobData>;
   private timeControlWorker: Worker;
-
-  private observers: Set<(data: GameDetailsV1) => void> = new Set();
 
   constructor(
     private gameRepository: GameRepository,
@@ -41,6 +41,7 @@ export class GameplayService {
     private ratingsService: RatingsService,
     private lockService: LockService,
   ) {
+    super();
     const connectionOptions = { connection: this.cacheRepo.client };
 
     this.timeControlQueue = new Queue(`time-control`, connectionOptions);
@@ -55,7 +56,7 @@ export class GameplayService {
     logger.info('Closing gameplay service');
     await this.timeControlWorker.close();
     await this.timeControlQueue.close();
-    this.observers.clear();
+    this.clearSubscribers();
   }
 
   private async loadChessGame(gameId: string): Promise<{
@@ -137,19 +138,8 @@ export class GameplayService {
     }
   }
 
-  subscribe(observer: (data: GameDetailsV1) => void): () => void {
-    this.observers.add(observer);
-    return () => {
-      this.observers.delete(observer);
-    };
-  }
-
-  notifyObservers(data: GameDetailsV1): void {
-    this.observers.forEach((observer) => observer(data));
-  }
-
   async joinGame(
-    session: Session,
+    player: PlayerInfoIn,
     data: JoinGamePayloadV1,
   ): Promise<GameDetailsV1> {
     const { chessGame } = await this.loadChessGame(data.gameId);
@@ -159,16 +149,19 @@ export class GameplayService {
     }
 
     const gameRating = await this.ratingsService.getRatingByPlayerId(
-      session.userId,
+      player.id,
       gameState.variant,
       gameState.timeControl.classification,
     );
 
+    const isBot = player.role === 'bot';
+
     const updatedGame = chessGame.joinGame(
       {
-        id: session.userId,
-        name: session.name ?? 'Anonymous',
+        id: player.id,
+        name: player.name ?? 'Anonymous',
         rating: gameRating,
+        isBot,
       },
       data.side,
     );
@@ -177,7 +170,14 @@ export class GameplayService {
       updatedGame.id,
       GameMapper.toInsertGame(updatedGame),
     );
-    return GameMapper.toGameDetailsV1(updatedGame);
+    const gameDetails = GameMapper.toGameDetailsV1(updatedGame);
+
+    this.emit({
+      type: 'game_joined',
+      data: gameDetails,
+    });
+
+    return gameDetails;
   }
 
   async leaveGame(
@@ -200,7 +200,7 @@ export class GameplayService {
   }
 
   async makeMove(
-    session: Session,
+    playerId: string,
     data: MakeMovePayloadV1,
   ): Promise<{ gameDetails: Maybe<GameDetailsV1>; move: MoveMadeV1 }> {
     const makeMoveWithLock = async (): Promise<{
@@ -211,7 +211,7 @@ export class GameplayService {
       await using _ = await this.lockService.acquireLock('game', data.gameId);
       const { chessGame } = await this.loadChessGame(data.gameId);
       const moveToPlay = Move.fromUci(data.uci);
-      const updatedGame = chessGame.play(session.userId, moveToPlay);
+      const updatedGame = chessGame.play(playerId, moveToPlay);
       const updatedGameState = updatedGame.getState();
       const newMove = updatedGameState.movesRecord.at(-1);
       assertDefined(newMove, 'No move found after playing move');
@@ -245,10 +245,25 @@ export class GameplayService {
       clock: clockInstant,
     };
 
+    const gameDetailsV1 = GameMapper.toGameDetailsV1(updatedGame);
+    const currentTurn = updatedGame.getPosition().turn;
+    const moveColor = Color.opposite(currentTurn);
+
+    // Emit move_made event to all subscribers
+    this.emit({
+      type: 'move_made',
+      data: {
+        moveMade: moveMadeV1,
+        gameDetails: gameDetailsV1,
+        statusChanged: gameStateUpdated,
+        moveColor,
+      },
+    });
+
     if (gameStateUpdated) {
       await this.handleGameEnd(updatedGame);
       return {
-        gameDetails: GameMapper.toGameDetailsV1(updatedGame),
+        gameDetails: gameDetailsV1,
         move: moveMadeV1,
       };
     } else {
@@ -305,7 +320,11 @@ export class GameplayService {
     const chessGame = await handleFlagTimeoutWithLock();
     if (chessGame) {
       await this.handleGameEnd(chessGame);
-      this.notifyObservers(GameMapper.toGameDetailsV1(chessGame));
+      const gameDetailsV1 = GameMapper.toGameDetailsV1(chessGame);
+      this.emit({
+        type: 'flag_timeout',
+        data: gameDetailsV1,
+      });
     }
   }
 }

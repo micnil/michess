@@ -29,4 +29,10 @@ export class UserRepository extends BaseRepository {
   async deleteUser(id: string): Promise<void> {
     await this.db.delete(users).where(eq(this.schema.users.id, id));
   }
+
+  async listBots(): Promise<SelectUser[]> {
+    return this.db.query.users.findMany({
+      where: eq(this.schema.users.role, 'bot'),
+    });
+  }
 }

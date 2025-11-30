@@ -25,6 +25,7 @@ const from = (
     restRouter,
     socketRouter,
     init: async () => {
+      await api.bots.initialize();
       await api.gameJobScheduler.initialize();
       await api.usageMetrics.initialize();
     },
@@ -33,6 +34,7 @@ const from = (
       await api.gameplay.close();
       await api.gameJobScheduler.close();
       await api.usageMetrics.close();
+      await api.bots.close();
     },
   };
 };

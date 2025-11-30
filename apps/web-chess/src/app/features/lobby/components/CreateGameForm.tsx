@@ -3,7 +3,7 @@ import { Button, Flex, SegmentedControl, Switch, Text } from '@radix-ui/themes';
 import { FC, useState } from 'react';
 import { CreateGameInput } from '../../../api/model/CreateGameInput';
 import { Alert } from '../../../components/Alert';
-import { TimeControlRadioCards } from './TimeControlRadioGroup';
+import { TimeControlRadioCards } from '../../play/components/TimeControlRadioCards';
 
 type Props = {
   onSubmit: (formInput: CreateGameInput) => void;
