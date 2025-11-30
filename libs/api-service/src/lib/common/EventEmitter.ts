@@ -19,15 +19,12 @@ export class EventEmitter<TEvent extends { type: string }> {
   ): () => void {
     const wrappedHandler: EventHandler<TEvent> = (event) => {
       if (!filter) {
-        // No filter, pass all events
         handler(event);
       } else if (Array.isArray(filter)) {
-        // Filter is an array of event types
         if (filter.includes(event.type)) {
           handler(event);
         }
       } else {
-        // Filter is a single event type
         if (event.type === filter) {
           handler(event);
         }
