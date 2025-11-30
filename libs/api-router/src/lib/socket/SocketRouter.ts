@@ -225,22 +225,27 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
   api.gameplay.subscribe(
     (event) => {
       if (event.type === 'move_made') {
-        if (event.data.statusChanged) {
-          io.to(event.data.gameDetails.id).emit(
-            'game-updated',
-            event.data.gameDetails,
-          );
-        } else {
-          io.to(event.data.moveMade.gameId).emit(
-            'move-made',
-            event.data.moveMade,
-          );
+        const playerWhoMoved =
+          event.data.gameDetails.players[event.data.moveColor];
+
+        if (playerWhoMoved?.isBot) {
+          if (event.data.statusChanged) {
+            io.to(event.data.gameDetails.id).emit(
+              'game-updated',
+              event.data.gameDetails,
+            );
+          } else {
+            io.to(event.data.moveMade.gameId).emit(
+              'move-made',
+              event.data.moveMade,
+            );
+          }
         }
       } else {
         io.to(event.data.id).emit('game-updated', event.data);
       }
     },
-    ['move_made', 'flag_timeout'],
+    ['move_made', 'flag_timeout', 'game_joined'],
   );
 
   return io;

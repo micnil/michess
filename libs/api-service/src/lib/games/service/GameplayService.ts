@@ -8,7 +8,7 @@ import {
 } from '@michess/api-schema';
 import { logger } from '@michess/be-utils';
 import { assertDefined, Maybe } from '@michess/common-utils';
-import { Move, MoveRecord } from '@michess/core-board';
+import { Color, Move, MoveRecord } from '@michess/core-board';
 import { ChessGame, GameActionIn } from '@michess/core-game';
 import {
   ActionRepository,
@@ -247,6 +247,8 @@ export class GameplayService extends EventEmitter<GameEvent> {
     };
 
     const gameDetailsV1 = GameMapper.toGameDetailsV1(updatedGame);
+    const currentTurn = updatedGame.getPosition().turn;
+    const moveColor = Color.opposite(currentTurn);
 
     // Emit move_made event to all subscribers
     this.emit({
@@ -255,6 +257,7 @@ export class GameplayService extends EventEmitter<GameEvent> {
         moveMade: moveMadeV1,
         gameDetails: gameDetailsV1,
         statusChanged: gameStateUpdated,
+        moveColor,
       },
     });
 

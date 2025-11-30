@@ -1,4 +1,4 @@
-import { GameDetailsV1, MoveMadeV1 } from '@michess/api-schema';
+import { ColorV1, GameDetailsV1, MoveMadeV1 } from '@michess/api-schema';
 
 export type GameEvent =
   | {
@@ -7,6 +7,7 @@ export type GameEvent =
         moveMade: MoveMadeV1;
         gameDetails: GameDetailsV1;
         statusChanged: boolean;
+        moveColor: ColorV1;
       };
     }
   | {
