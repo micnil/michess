@@ -180,13 +180,17 @@ export class GameService {
     await this.restClient.delete('matchmaking/leave').json();
   }
 
-  onMatchFound(callback: (gameId: string) => void): () => void {
-    const handler = (data: { gameId: string }) => {
-      callback(data.gameId);
-    };
-    this.socketClient.on('match-found', handler);
-    return () => {
-      this.socketClient.off('match-found', handler);
+  observeMatchFound(): Observable<string> {
+    return {
+      subscribe: (callback) => {
+        const handler = (data: { gameId: string }) => {
+          callback(data.gameId);
+        };
+        this.socketClient.on('match-found', handler);
+        return () => {
+          this.socketClient.off('match-found', handler);
+        };
+      },
     };
   }
 
@@ -217,6 +221,10 @@ export class GameService {
     gameId: string,
     side?: 'white' | 'black' | 'spectator',
   ): Promise<PlayerGameViewModel> {
+    this.leaveMatchmakingQueue().catch(() => {
+      // Ignore errors if not in queue
+    });
+
     const authState = await this.auth.getSession();
     const response = await this.socketClient.emitWithAck('join-game', {
       gameId,

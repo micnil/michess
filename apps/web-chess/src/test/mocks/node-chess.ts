@@ -77,6 +77,10 @@ export const mswHandlers = [
       startedAt: undefined,
     });
   }),
+
+  http.delete('/api/matchmaking/leave', () => {
+    return HttpResponse.json(null, { status: 200 });
+  }),
 ];
 
 export const server = setupServer(...mswHandlers);

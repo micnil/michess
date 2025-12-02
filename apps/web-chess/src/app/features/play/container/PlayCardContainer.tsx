@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useApi } from '../../../api/hooks/useApi';
+import { useObservable } from '../../../util/useObservable';
 import { PlayCard } from '../PlayCard';
 
 type Props = {
@@ -44,15 +45,11 @@ export const PlayCardContainer = ({ onPlay }: Props) => {
     },
   });
 
-  useEffect(() => {
-    const unsubscribe = api.games.onMatchFound(async (gameId) => {
-      setIsInQueue(false);
-      await api.games.joinGame(gameId);
-      onPlay?.(gameId);
-    });
-
-    return unsubscribe;
-  }, [api.games, onPlay]);
+  useObservable(api.games.observeMatchFound(), async (gameId) => {
+    setIsInQueue(false);
+    await api.games.joinGame(gameId);
+    onPlay?.(gameId);
+  });
 
   const handlePlay = async (params: {
     timeControl: `${number}|${number}`;

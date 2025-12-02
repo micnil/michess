@@ -127,7 +127,9 @@ export class GameRepository extends BaseRepository {
     return await this.db.query.games.findFirst({
       where: eq(this.schema.games.gameId, id),
       with: {
-        moves: true,
+        moves: {
+          orderBy: moves.moveId,
+        },
         whitePlayer: true,
         blackPlayer: true,
         actions: true,
