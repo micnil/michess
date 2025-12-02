@@ -49,7 +49,7 @@ export const PlayCard = ({
 
         <Alert text={error} />
 
-        <Flex gap="3" align="center">
+        <Flex align="center">
           <TimeControlSelector value={timeControl} onChange={setTimeControl} />
         </Flex>
 
@@ -59,20 +59,29 @@ export const PlayCard = ({
           <BotSelector value={botId} onChange={setBotId} />
         )}
 
-        {isInQueue ? (
-          <Button size="3" onClick={onCancel} variant="soft" color="red">
-            Cancel
-          </Button>
-        ) : (
-          <Button
-            size="3"
-            onClick={handlePlay}
-            disabled={opponentType === 'bot' && !botId}
-            loading={loading}
-          >
-            {loading ? 'Finding opponent...' : 'Play'}
-          </Button>
-        )}
+        <Flex align="center">
+          {isInQueue ? (
+            <Button
+              size="2"
+              onClick={onCancel}
+              variant="soft"
+              color="red"
+              style={{ minWidth: '120px' }}
+            >
+              Cancel
+            </Button>
+          ) : (
+            <Button
+              size="2"
+              onClick={handlePlay}
+              disabled={opponentType === 'bot' && !botId}
+              loading={loading}
+              style={{ minWidth: '120px' }}
+            >
+              {loading ? 'Finding opponent...' : 'Play'}
+            </Button>
+          )}
+        </Flex>
       </Flex>
     </Card>
   );
