@@ -33,6 +33,9 @@ export class UsageMetricsService {
   }
 
   async initialize() {
+    await this.cacheRepo.setClientCount(this.processId, 0);
+    await this.cacheRepo.calcTotalClients();
+
     await this.metricCleanupQueue.upsertJobScheduler('cleanup-metrics', {
       every: 5000,
     });
