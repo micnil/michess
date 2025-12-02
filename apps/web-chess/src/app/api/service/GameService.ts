@@ -159,6 +159,37 @@ export class GameService {
     return response;
   }
 
+  async joinMatchmakingQueue(params: {
+    timeControl: { initialSec: number; incrementSec: number };
+  }): Promise<void> {
+    await this.restClient
+      .post('matchmaking/join', {
+        json: {
+          variant: 'standard',
+          timeControl: {
+            type: 'realtime',
+            initialSec: params.timeControl.initialSec,
+            incrementSec: params.timeControl.incrementSec,
+          },
+        },
+      })
+      .json();
+  }
+
+  async leaveMatchmakingQueue(): Promise<void> {
+    await this.restClient.delete('matchmaking/leave').json();
+  }
+
+  onMatchFound(callback: (gameId: string) => void): () => void {
+    const handler = (data: { gameId: string }) => {
+      callback(data.gameId);
+    };
+    this.socketClient.on('match-found', handler);
+    return () => {
+      this.socketClient.off('match-found', handler);
+    };
+  }
+
   async getLobbyGames(page: number) {
     const queryParams = new URLSearchParams({
       page: page.toString(),

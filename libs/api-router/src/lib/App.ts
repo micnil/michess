@@ -28,6 +28,7 @@ const from = (
       await api.bots.initialize();
       await api.gameJobScheduler.initialize();
       await api.usageMetrics.initialize();
+      await api.matchmaking.initialize();
     },
     close: async () => {
       socketRouter.close();
@@ -35,6 +36,7 @@ const from = (
       await api.gameJobScheduler.close();
       await api.usageMetrics.close();
       await api.bots.close();
+      await api.matchmaking.close();
     },
   };
 };

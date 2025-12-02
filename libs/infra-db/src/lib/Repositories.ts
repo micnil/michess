@@ -3,6 +3,7 @@ import { Sql } from 'postgres';
 import { ActionRepository } from './repository/ActionRepository';
 import { CacheRepository } from './repository/CacheRepository';
 import { GameRepository } from './repository/GameRepository';
+import { MatchmakingRepository } from './repository/MatchmakingRepository';
 import { MoveRepository } from './repository/MoveRepository';
 import { RatingRepository } from './repository/RatingRepository';
 import { UserRepository } from './repository/UserRepository';
@@ -14,6 +15,7 @@ export type Repositories = {
   action: ActionRepository;
   cache: CacheRepository;
   rating: RatingRepository;
+  matchmaking: MatchmakingRepository;
 };
 
 const from = (sql: Sql, redis: Redis): Repositories => {
@@ -24,6 +26,7 @@ const from = (sql: Sql, redis: Redis): Repositories => {
     action: new ActionRepository(sql),
     cache: new CacheRepository(redis),
     rating: new RatingRepository(sql),
+    matchmaking: new MatchmakingRepository(redis),
   };
 };
 

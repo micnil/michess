@@ -6,6 +6,7 @@ export * from './lib/games/service/GameJobSchedulerService';
 export * from './lib/games/service/GameplayService';
 export * from './lib/games/service/GamesService';
 export * from './lib/llm/config/LlmConfig';
+export * from './lib/matchmaking/service/MatchmakingService';
 export * from './lib/metrics/UsageMetricsService';
 export * from './lib/user/config/BotRegistry';
 export * from './lib/user/service/BotService';

@@ -1,1 +1,1 @@
-export type ResourceType = 'game' | 'user' | 'rating';
+export type ResourceType = 'game' | 'user' | 'rating' | 'matchmaking';

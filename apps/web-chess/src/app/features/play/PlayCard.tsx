@@ -15,11 +15,19 @@ type Props = {
     opponentType: OpponentType;
     botId?: string;
   }) => void;
+  onCancel?: () => void;
   error?: Maybe<string>;
   loading?: boolean;
+  isInQueue?: boolean;
 };
 
-export const PlayCard = ({ onPlay, error, loading }: Props) => {
+export const PlayCard = ({
+  onPlay,
+  onCancel,
+  error,
+  loading,
+  isInQueue,
+}: Props) => {
   const [timeControl, setTimeControl] = useState<TimeControlStr>('3|2');
   const [opponentType, setOpponentType] = useState<OpponentType>('random');
   const [botId, setBotId] = useState<string | undefined>(undefined);
@@ -51,14 +59,20 @@ export const PlayCard = ({ onPlay, error, loading }: Props) => {
           <BotSelector value={botId} onChange={setBotId} />
         )}
 
-        <Button
-          size="3"
-          onClick={handlePlay}
-          disabled={opponentType === 'random' || loading}
-          loading={loading}
-        >
-          Play
-        </Button>
+        {isInQueue ? (
+          <Button size="3" onClick={onCancel} variant="soft" color="red">
+            Cancel
+          </Button>
+        ) : (
+          <Button
+            size="3"
+            onClick={handlePlay}
+            disabled={opponentType === 'bot' && !botId}
+            loading={loading}
+          >
+            {loading ? 'Finding opponent...' : 'Play'}
+          </Button>
+        )}
       </Flex>
     </Card>
   );

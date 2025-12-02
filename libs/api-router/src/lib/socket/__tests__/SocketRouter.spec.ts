@@ -12,6 +12,7 @@ import {
   AuthService,
   BotService,
   GamesService,
+  MatchmakingService,
   Session,
   UsageMetricsService,
 } from '@michess/api-service';
@@ -40,6 +41,13 @@ const mockGameplayService = {
 };
 
 const apiMock: Api = {
+  matchmaking: new MatchmakingService(
+    {} as never,
+    {} as never,
+    {} as never,
+    {} as never,
+    {} as never,
+  ),
   bots: new BotService(
     {} as never,
     {} as never,

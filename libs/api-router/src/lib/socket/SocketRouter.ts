@@ -254,6 +254,39 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
     ['move_made', 'flag_timeout', 'game_joined'],
   );
 
+  // Subscribe to matchmaking events
+  api.matchmaking.subscribe((event) => {
+    if (event.type === 'match_found') {
+      // Find sockets for both players
+      const sockets = Array.from(io.sockets.sockets.values());
+      const player1Socket = sockets.find(
+        (s) => s.data.session.userId === event.data.player1Id,
+      );
+      const player2Socket = sockets.find(
+        (s) => s.data.session.userId === event.data.player2Id,
+      );
+
+      // Emit to both players
+      if (player1Socket) {
+        player1Socket.emit('match-found', { gameId: event.data.gameId });
+      }
+      if (player2Socket) {
+        player2Socket.emit('match-found', { gameId: event.data.gameId });
+      }
+
+      logger.info(
+        {
+          player1Id: event.data.player1Id,
+          player2Id: event.data.player2Id,
+          gameId: event.data.gameId,
+          player1Connected: !!player1Socket,
+          player2Connected: !!player2Socket,
+        },
+        'Match found notification sent',
+      );
+    }
+  });
+
   return io;
 };
 
