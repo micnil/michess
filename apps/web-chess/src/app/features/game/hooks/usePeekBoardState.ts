@@ -1,4 +1,4 @@
-import { Chessboard } from '@michess/core-game';
+import { Chessboard } from '@michess/core-board';
 import { useState } from 'react';
 import { PeekActions } from '../model/PeekHandlers';
 

@@ -76,10 +76,12 @@ const toGameMeta = (game: SelectGameWithRelations | SelectGame): GameMeta => ({
 const toPlayerInfo = (player: {
   id: string;
   name: string | null;
+  role?: string | null;
   rating: SelectGameWithRelations['whiteRating'];
 }): PlayerInfo => ({
   id: player.id,
   name: player.name ?? 'Anonymous',
+  isBot: player.role === 'bot',
   rating: player.rating
     ? {
         deviation: player.rating.deviation,
@@ -128,6 +130,7 @@ const toPlayerInfoV1 = (player: PlayerInfo): PlayerInfoV1 => {
   return {
     id: player.id,
     name: player.name,
+    isBot: player.isBot,
     rating: player.rating?.value ? Math.round(player.rating.value) : undefined,
     ratingDiff: player.ratingDiff,
   };
@@ -207,6 +210,7 @@ export const GameMapper = {
           : {
               id: 'anon',
               name: 'Anonymous',
+              isBot: false,
             },
       variant: gameState.variant as GameVariantV1,
       createdAt: gameState.createdAt.toISOString(),
@@ -227,14 +231,23 @@ export const GameMapper = {
           : 'white'; // Should not happen, but fail gracefully
     const opponent: PlayerInfo =
       ownSide === 'white'
-        ? (game.players.black ?? { id: 'anon', name: 'Anonymous' })
-        : (game.players.white ?? { id: 'anon', name: 'Anonymous' });
+        ? (game.players.black ?? {
+            id: 'anon',
+            name: 'Anonymous',
+            isBot: false,
+          })
+        : (game.players.white ?? {
+            id: 'anon',
+            name: 'Anonymous',
+            isBot: false,
+          });
     const initialTurn = game.initialPosition.turn;
     return {
       id: game.id,
       opponent: {
         id: opponent.id,
         name: opponent.name,
+        isBot: opponent.isBot,
       },
       ownSide,
       turn:
@@ -270,6 +283,7 @@ export const GameMapper = {
                 : undefined,
               ratingDiff: game.players.white.ratingDiff,
               name: game.players.white.name,
+              isBot: game.players.white.isBot,
             }
           : undefined,
         black: game.players.black
@@ -280,6 +294,7 @@ export const GameMapper = {
                 : undefined,
               ratingDiff: game.players.black.ratingDiff,
               name: game.players.black.name,
+              isBot: game.players.black.isBot,
             }
           : undefined,
       },

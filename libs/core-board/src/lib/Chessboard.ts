@@ -1,15 +1,13 @@
 import { Maybe } from '@michess/common-utils';
-import {
-  ChessPosition,
-  Move,
-  MoveGenerator,
-  MoveNotation,
-  MoveOption,
-  MoveRecord,
-  Piece,
-  PiecePlacements,
-  PieceType,
-} from '@michess/core-board';
+import { Piece } from './common/Piece';
+import { PieceType } from './common/PieceType';
+import { MoveGenerator } from './move/generator/MoveGenerator';
+import { Move } from './move/Move';
+import { MoveNotation } from './move/MoveNotation';
+import { MoveOption } from './move/MoveOption';
+import { MoveRecord } from './move/MoveRecord';
+import { ChessPosition } from './position/model/ChessPosition';
+import { PiecePlacements } from './position/model/PiecePlacements';
 import { ZobristHash } from './ZobristHash';
 
 type BoardState = {

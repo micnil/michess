@@ -1,5 +1,4 @@
-import { Coordinate } from '@michess/core-board';
-import { Chessboard } from '@michess/core-game';
+import { Chessboard, Coordinate } from '@michess/core-board';
 import React from 'react';
 import { GameResultType } from '../model/GameResultType';
 import { Square } from '../model/Square';

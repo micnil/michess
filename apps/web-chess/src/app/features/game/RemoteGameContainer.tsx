@@ -38,6 +38,8 @@ export const RemoteGameContainer = ({
     gameState;
   orientation = playerSide !== 'spectator' ? playerSide : orientation;
 
+  const isGameInProgress =
+    gameState.status === 'IN_PROGRESS' || gameState.status === 'READY';
   const blackPlayer = { ...players.black, color: Color.Black };
   const whitePlayer = { ...players.white, color: Color.White };
   const currentOrientation = orientation || Color.White;
@@ -67,6 +69,7 @@ export const RemoteGameContainer = ({
               color={topPlayer.color}
               rating={topPlayer?.rating}
               ratingDiff={topPlayer?.ratingDiff}
+              isGameInProgress={isGameInProgress}
               isPlayerTurn={chessboard.position.turn === topPlayer.color}
               isLoading={isLoadingInitial}
             />
@@ -95,6 +98,7 @@ export const RemoteGameContainer = ({
               color={bottomPlayer.color}
               rating={bottomPlayer?.rating}
               ratingDiff={bottomPlayer?.ratingDiff}
+              isGameInProgress={isGameInProgress}
               isPlayerTurn={chessboard.position.turn === bottomPlayer.color}
               isLoading={isLoadingInitial}
             />

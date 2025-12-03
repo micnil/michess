@@ -1,12 +1,10 @@
 import { Maybe } from '@michess/common-utils';
-import {
-  ChessPosition,
-  Color,
-  Coordinate,
-  PieceType,
-  CastlingAbility,
-  Piece,
-} from '@michess/core-board';
+import { Color } from './common/Color';
+import { Coordinate } from './common/Coordinate';
+import { Piece } from './common/Piece';
+import { PieceType } from './common/PieceType';
+import { CastlingAbility } from './position/model/CastlingAbility';
+import { ChessPosition } from './position/model/ChessPosition';
 
 // Zobrist hash constants - using pre-generated deterministic 64-bit values
 // These should be consistent across runs for reproducible hashing

@@ -40,8 +40,8 @@ const getGameResult = (
 
 const fromResult = (
   byColor: {
-    white: { id: string; name: string; rating: RatingSnapshot };
-    black: { id: string; name: string; rating: RatingSnapshot };
+    white: { id: string; name: string; rating: RatingSnapshot; isBot: boolean };
+    black: { id: string; name: string; rating: RatingSnapshot; isBot: boolean };
   },
   result: ChessGameResult,
 ): GamePlayers => {
@@ -57,6 +57,7 @@ const fromResult = (
     white: {
       id: byColor.white.id,
       name: byColor.white.name,
+      isBot: byColor.white.isBot,
       rating: byColor.white.rating,
       ratingDiff: RatingCalculator.compute(
         byColor.white.rating,
@@ -66,6 +67,7 @@ const fromResult = (
     black: {
       id: byColor.black.id,
       name: byColor.black.name,
+      isBot: byColor.black.isBot,
       rating: byColor.black.rating,
       ratingDiff: RatingCalculator.compute(
         byColor.black.rating,
@@ -77,8 +79,18 @@ const fromResult = (
 
 const from = (
   byColor: {
-    white?: { id: string; name: string; rating?: RatingSnapshot };
-    black?: { id: string; name: string; rating?: RatingSnapshot };
+    white?: {
+      id: string;
+      name: string;
+      rating?: RatingSnapshot;
+      isBot?: boolean;
+    };
+    black?: {
+      id: string;
+      name: string;
+      rating?: RatingSnapshot;
+      isBot?: boolean;
+    };
   },
   result?: ChessGameResult,
 ): GamePlayers => {
@@ -90,11 +102,13 @@ const from = (
       id: white.id,
       name: white.name,
       rating: white.rating,
+      isBot: white.isBot ?? false,
     };
     const blackWithRating = {
       id: black.id,
       name: black.name,
       rating: black.rating,
+      isBot: black.isBot ?? false,
     };
 
     return fromResult(
@@ -108,6 +122,7 @@ const from = (
       ? {
           id: white.id,
           name: white.name,
+          isBot: white.isBot ?? false,
           rating: white.rating,
         }
       : undefined,
@@ -115,6 +130,7 @@ const from = (
       ? {
           id: black.id,
           name: black.name,
+          isBot: black.isBot ?? false,
           rating: black.rating,
         }
       : undefined,

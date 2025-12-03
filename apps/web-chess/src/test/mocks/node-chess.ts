@@ -34,13 +34,21 @@ export const mswHandlers = [
         {
           id: 'default-game-1',
           availableColor: 'white',
-          opponent: { name: 'Default Player 1', id: 'opponent-1' },
+          opponent: {
+            name: 'Default Player 1',
+            id: 'opponent-1',
+            isBot: false,
+          },
           variant: 'standard',
           createdAt: new Date().toISOString(),
         },
         {
           id: 'default-game-2',
-          opponent: { name: 'Default Player 2', id: 'opponent-2' },
+          opponent: {
+            name: 'Default Player 2',
+            id: 'opponent-2',
+            isBot: false,
+          },
           availableColor: 'black',
           variant: 'standard',
           createdAt: new Date().toISOString(),
@@ -68,6 +76,10 @@ export const mswHandlers = [
       moves: [],
       startedAt: undefined,
     });
+  }),
+
+  http.delete('/api/matchmaking/leave', () => {
+    return HttpResponse.json(null, { status: 200 });
   }),
 ];
 

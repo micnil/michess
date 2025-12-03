@@ -1,5 +1,9 @@
-import { ChessPosition, FenParser, FenStr } from '@michess/core-board';
-import { Chessboard } from '@michess/core-game';
+import {
+  Chessboard,
+  ChessPosition,
+  FenParser,
+  FenStr,
+} from '@michess/core-board';
 import { Command } from 'commander';
 
 // Default FEN for standard starting position

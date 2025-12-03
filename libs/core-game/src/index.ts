@@ -3,7 +3,6 @@ export * from './lib/actions/model/GameAction';
 export * from './lib/actions/model/GameActionIn';
 export * from './lib/actions/model/GameActionOption';
 export * from './lib/actions/model/GameActionType';
-export * from './lib/Chessboard';
 export * from './lib/ChessGame';
 export * from './lib/model/ChessGameError';
 export * from './lib/model/ChessGameErrorCode';

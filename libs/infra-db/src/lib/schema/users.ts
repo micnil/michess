@@ -12,4 +12,8 @@ export const users = pgTable('users', {
   isAnonymous: boolean('is_anonymous'),
   username: text('username').unique(),
   displayUsername: text('display_username'),
+  role: text('role'),
+  banned: boolean('banned').default(false),
+  banReason: text('ban_reason'),
+  banExpires: timestamp('ban_expires'),
 });

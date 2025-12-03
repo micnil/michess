@@ -9,7 +9,7 @@ import { GameStatusEnum } from '../model/GameStatusEnum';
 import { InsertGame } from '../model/InsertGame';
 import { SelectGame } from '../model/SelectGame';
 import { SelectGameWithRelations } from '../model/SelectGameWithRelations';
-import { games } from '../schema';
+import { games, moves } from '../schema';
 import { BaseRepository } from './BaseRepository';
 
 type QueryOptions = {
@@ -100,7 +100,9 @@ export class GameRepository extends BaseRepository {
           blackPlayer: true,
           blackRating: true,
           whiteRating: true,
-          moves: true,
+          moves: {
+            orderBy: moves.moveId,
+          },
           actions: true,
         },
         offset: options.page
@@ -125,7 +127,9 @@ export class GameRepository extends BaseRepository {
     return await this.db.query.games.findFirst({
       where: eq(this.schema.games.gameId, id),
       with: {
-        moves: true,
+        moves: {
+          orderBy: moves.moveId,
+        },
         whitePlayer: true,
         blackPlayer: true,
         actions: true,

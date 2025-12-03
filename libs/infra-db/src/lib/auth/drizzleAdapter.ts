@@ -1,8 +1,10 @@
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { DatabaseClient } from '../DatabaseClient';
+import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import * as schema from '../schema';
 
-export const createDrizzleAdapter = (db: DatabaseClient) => {
+type Schema = typeof schema;
+
+export const createDrizzleAdapter = (db: PostgresJsDatabase<Schema>) => {
   return drizzleAdapter(db, {
     provider: 'pg',
     schema,

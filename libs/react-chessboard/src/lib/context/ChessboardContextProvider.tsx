@@ -1,11 +1,11 @@
 import {
   BoardCoordinates,
+  Chessboard,
   Color,
   Coordinate,
   FenParser,
   MoveOption,
 } from '@michess/core-board';
-import { Chessboard } from '@michess/core-game';
 import {
   ReactNode,
   useCallback,

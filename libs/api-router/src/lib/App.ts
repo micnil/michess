@@ -25,14 +25,18 @@ const from = (
     restRouter,
     socketRouter,
     init: async () => {
+      await api.bots.initialize();
       await api.gameJobScheduler.initialize();
       await api.usageMetrics.initialize();
+      await api.matchmaking.initialize();
     },
     close: async () => {
       socketRouter.close();
       await api.gameplay.close();
       await api.gameJobScheduler.close();
       await api.usageMetrics.close();
+      await api.bots.close();
+      await api.matchmaking.close();
     },
   };
 };

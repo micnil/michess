@@ -2,6 +2,7 @@ export * from './lib/assertDefined';
 export * from './lib/assertEqual';
 export * from './lib/counter';
 export * from './lib/countProps';
+export * from './lib/EventEmitter';
 export * from './lib/immutability/insertItems';
 export * from './lib/immutability/removeItem';
 export * from './lib/immutability/updateItem';

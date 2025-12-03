@@ -1,7 +1,6 @@
 import { GameActionOptionV1 } from '@michess/api-schema';
 import { Maybe } from '@michess/common-utils';
-import { ChessPosition, Move } from '@michess/core-board';
-import { Chessboard } from '@michess/core-game';
+import { Chessboard, ChessPosition, Move } from '@michess/core-board';
 import { MovePayload } from '@michess/react-chessboard';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useMemo } from 'react';

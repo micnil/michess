@@ -139,6 +139,61 @@ export class GameService {
     return response;
   }
 
+  async challengeBot(params: {
+    botId: string;
+    timeControl: { initialSec: number; incrementSec: number };
+  }): Promise<GameDetailsV1> {
+    const response = await this.restClient
+      .post<GameDetailsV1>('games/challenge', {
+        json: {
+          opponentId: params.botId,
+          variant: 'standard',
+          timeControl: {
+            type: 'realtime',
+            initialSec: params.timeControl.initialSec,
+            incrementSec: params.timeControl.incrementSec,
+          },
+        },
+      })
+      .json();
+    return response;
+  }
+
+  async joinMatchmakingQueue(params: {
+    timeControl: { initialSec: number; incrementSec: number };
+  }): Promise<void> {
+    await this.restClient
+      .post('matchmaking/join', {
+        json: {
+          variant: 'standard',
+          timeControl: {
+            type: 'realtime',
+            initialSec: params.timeControl.initialSec,
+            incrementSec: params.timeControl.incrementSec,
+          },
+        },
+      })
+      .json();
+  }
+
+  async leaveMatchmakingQueue(): Promise<void> {
+    await this.restClient.delete('matchmaking/leave').json();
+  }
+
+  observeMatchFound(): Observable<string> {
+    return {
+      subscribe: (callback) => {
+        const handler = (data: { gameId: string }) => {
+          callback(data.gameId);
+        };
+        this.socketClient.on('match-found', handler);
+        return () => {
+          this.socketClient.off('match-found', handler);
+        };
+      },
+    };
+  }
+
   async getLobbyGames(page: number) {
     const queryParams = new URLSearchParams({
       page: page.toString(),
@@ -166,6 +221,10 @@ export class GameService {
     gameId: string,
     side?: 'white' | 'black' | 'spectator',
   ): Promise<PlayerGameViewModel> {
+    this.leaveMatchmakingQueue().catch(() => {
+      // Ignore errors if not in queue
+    });
+
     const authState = await this.auth.getSession();
     const response = await this.socketClient.emitWithAck('join-game', {
       gameId,

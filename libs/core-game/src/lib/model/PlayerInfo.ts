@@ -5,4 +5,5 @@ export type PlayerInfo = {
   rating?: RatingSnapshot;
   ratingDiff?: number;
   name: string;
+  isBot: boolean;
 };

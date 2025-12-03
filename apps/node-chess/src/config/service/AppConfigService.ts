@@ -56,6 +56,9 @@ const getConfig = (): AppConfig => {
         clientSecret: readEnvStrict('GOOGLE_OAUTH_CLIENT_SECRET'),
       },
     },
+    llm: {
+      geminiApiKey: readEnvStrict('GEMINI_API_KEY'),
+    },
   };
 };
 

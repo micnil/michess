@@ -1,23 +1,25 @@
-import Redis from 'ioredis';
+import { betterAuth } from 'better-auth';
+import { admin, anonymous, username } from 'better-auth/plugins';
 import postgres from 'postgres';
-import { AuthClient } from './lib/auth/AuthClient';
-import { DatabaseClient } from './lib/DatabaseClient';
+import { createDrizzleAdapter } from './lib/auth/drizzleAdapter';
+import { Drizzle } from './lib/Drizzle';
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-const client = DatabaseClient.from(postgres(process.env.DATABASE_URL!));
-const redisClient = new Redis(
-  process.env.REDIS_URL || 'redis://localhost:6379',
-);
+const client = Drizzle.from(postgres(process.env.DATABASE_URL!));
 
-export const auth = AuthClient.from(client, {
-  get: async (key) => {
-    return await redisClient.get(key);
+export const auth = betterAuth({
+  emailAndPassword: {
+    enabled: true,
   },
-  set: async (key, value, ttl) => {
-    if (ttl) await redisClient.setex(key, ttl, value);
-    else await redisClient.set(key, value);
+  database: createDrizzleAdapter(client),
+  plugins: [anonymous(), username(), admin()],
+  secondaryStorage: {
+    get: async () => {},
+    set: async () => {},
+    delete: async () => {},
   },
-  delete: async (key) => {
-    await redisClient.del(key);
+  emailVerification: {
+    autoSignInAfterVerification: true,
+    sendOnSignUp: true,
   },
 });

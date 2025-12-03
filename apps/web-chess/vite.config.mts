@@ -2,7 +2,7 @@
 import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   root: __dirname,
@@ -46,7 +46,18 @@ export default defineConfig({
     setupFiles: ['./src/test/utils/setup-tests.ts'],
     coverage: {
       reportsDirectory: '../../coverage/apps/web-chess',
-      provider: 'v8' as const,
+      provider: 'v8',
+      reporter: ['html', 'json', 'text'],
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: [
+        '**/*.d.ts',
+        '**/*.spec.{ts,tsx}',
+        '**/*.test.{ts,tsx}',
+        '**/node_modules/**',
+        '**/__tests__/**',
+        '**/mocks/**',
+        '**/test/**',
+      ],
     },
   },
 });

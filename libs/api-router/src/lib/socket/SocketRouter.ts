@@ -94,6 +94,9 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
       'User connected',
     );
 
+    // Join a room named after the user's ID for direct user messaging
+    socket.join(socket.data.session.userId);
+
     socket.on('join-game', async (payload: unknown, callback) => {
       try {
         const joinGamePayloadV1 = JoinGamePayloadV1Schema.parse(payload);
@@ -107,7 +110,11 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
           `User joining game`,
         );
         const gameState = await api.gameplay.joinGame(
-          socket.data.session,
+          {
+            id: socket.data.session.userId,
+            name: socket.data.session.name,
+            role: socket.data.session.role,
+          },
           joinGamePayloadV1,
         );
         if (!socket.rooms.has(joinGamePayloadV1.gameId)) {
@@ -147,16 +154,13 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
           { ...makeMovePayloadV1, rooms: Array.from(socket.rooms) },
           'Received make-move event',
         );
-        const { gameDetails, move } = await api.gameplay.makeMove(
-          socket.data.session,
+        const { move, gameDetails } = await api.gameplay.makeMove(
+          socket.data.session.userId,
           makeMovePayloadV1,
         );
-        socket.to(move.gameId).emit('move-made', move);
 
+        // Event handler will broadcast to other players
         callback(EventResponse.ok(move));
-        if (gameDetails) {
-          io.to(makeMovePayloadV1.gameId).emit('game-updated', gameDetails);
-        }
       } catch (error) {
         logger.error(error);
         callback(EventResponse.error(ApiErrorMapper.from(error)));
@@ -222,8 +226,48 @@ const from = (api: Api, redis: Redis, config: RouterConfig) => {
     }
   });
 
-  api.gameplay.subscribe((gameDetails) => {
-    io.to(gameDetails.id).emit('game-updated', gameDetails);
+  api.gameplay.subscribe(
+    (event) => {
+      if (event.type === 'move_made') {
+        if (event.data.statusChanged) {
+          io.to(event.data.gameDetails.id).emit(
+            'game-updated',
+            event.data.gameDetails,
+          );
+        } else {
+          const playerWhoMoved =
+            event.data.gameDetails.players[event.data.moveColor];
+          if (playerWhoMoved) {
+            io.to(event.data.moveMade.gameId)
+              .except(playerWhoMoved.id)
+              .emit('move-made', event.data.moveMade);
+          }
+        }
+      } else {
+        io.to(event.data.id).emit('game-updated', event.data);
+      }
+    },
+    ['move_made', 'flag_timeout', 'game_joined'],
+  );
+
+  api.matchmaking.subscribe((event) => {
+    if (event.type === 'match_found') {
+      io.to(event.data.player1Id).emit('match-found', {
+        gameId: event.data.gameId,
+      });
+      io.to(event.data.player2Id).emit('match-found', {
+        gameId: event.data.gameId,
+      });
+
+      logger.info(
+        {
+          player1Id: event.data.player1Id,
+          player2Id: event.data.player2Id,
+          gameId: event.data.gameId,
+        },
+        'Match found notification sent',
+      );
+    }
   });
 
   return io;

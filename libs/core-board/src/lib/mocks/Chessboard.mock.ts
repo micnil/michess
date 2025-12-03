@@ -1,5 +1,4 @@
-import { ChessPosition, Move } from '@michess/core-board';
-import { Chessboard } from '../Chessboard';
+import { Chessboard, ChessPosition, Move } from '@michess/core-board';
 
 const standardInitial = () => {
   return Chessboard.fromPosition(ChessPosition.standardInitial());
