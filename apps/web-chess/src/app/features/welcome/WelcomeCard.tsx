@@ -72,9 +72,9 @@ export const WelcomeCard: React.FC = () => {
             !
           </Heading>
           <Text size="4" color="gray">
-            Play chess with friends online or find new opponents to challenge.
-            Start a game, join an existing match, or spectate ongoing games.
-            Perfect chess skills and have fun!
+            Play chess with friends for free online or find new opponents to
+            challenge. Start a game, join an existing match, or spectate ongoing
+            games. Perfect your chess skills and have fun!
           </Text>
         </Box>
       </Grid>
