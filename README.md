@@ -1,6 +1,6 @@
 # Michess
 
-A modern chess application built with React, Next.js, and TypeScript. Features a interactive chessboard with move validation and game state management.
+A modern chess application built with React, Vite, and TypeScript. Features a interactive chessboard with move validation and game state management.
 
 ## Screenshots
 
@@ -12,19 +12,44 @@ A modern chess application built with React, Next.js, and TypeScript. Features a
 
 ## Development setup
 
-1. Install dependencies:
+Install dependencies:
 
-   ```bash
-   pnpm install
-   ```
+```bash
+pnpm install
+```
 
-2. Start the development server:
+### Frontend
+
+1. Start the development server:
 
    ```bash
    pnpm nx serve web-chess
    ```
 
-3. Open your browser and navigate to `http://localhost:4200`
+2. Open your browser and navigate to `http://localhost:4200`
+
+### Backend
+
+1. Setup docker
+
+   ```bash
+   brew install docker docker-compose colima
+   colima start
+   ```
+
+2. Setup your `apps/node-chess/.env.local` based on the example file `apps/node-chess/.env.example`.
+
+3. Start databases
+
+   `pnpm start:db`
+
+4. Run migrations
+
+   `pnpm migration:run`
+
+5. Start backend service
+
+   `pnpm start:node`
 
 ## Project Structure
 
