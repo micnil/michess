@@ -1,0 +1,5 @@
+{
+  "report-dir": "coverage",
+  "temp-dir": ".nyc_output",
+  "reporter": ["html", "json-summary", "text"]
+}

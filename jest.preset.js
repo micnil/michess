@@ -13,4 +13,15 @@ module.exports = {
    */
   snapshotFormat: { escapeString: true, printBasicPrototype: true },
   transformIgnorePatterns: ['/node_modules/(?!.*(better-auth|@noble|jose)/)'],
+  coverageReporters: ['html', 'json', 'text'],
+  collectCoverageFrom: [
+    'src/**/*.{js,jsx,ts,tsx}',
+    '!**/*.d.ts',
+    '!**/*.spec.{js,jsx,ts,tsx}',
+    '!**/*.test.{js,jsx,ts,tsx}',
+    '!**/node_modules/**',
+    '!**/__tests__/**',
+    '!**/mocks/**',
+    '!**/test/**',
+  ],
 };

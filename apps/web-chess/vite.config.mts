@@ -47,6 +47,17 @@ export default defineConfig({
     coverage: {
       reportsDirectory: '../../coverage/apps/web-chess',
       provider: 'v8',
+      reporter: ['html', 'json', 'text'],
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: [
+        '**/*.d.ts',
+        '**/*.spec.{ts,tsx}',
+        '**/*.test.{ts,tsx}',
+        '**/node_modules/**',
+        '**/__tests__/**',
+        '**/mocks/**',
+        '**/test/**',
+      ],
     },
   },
 });
