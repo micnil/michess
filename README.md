@@ -121,3 +121,11 @@ pnpm nx build web-chess
 ```bash
 pnpm typecheck
 ```
+
+### Scripts
+
+#### Performance test of chess move generation
+
+```bash
+pnpm perft
+```
