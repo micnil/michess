@@ -4,8 +4,9 @@ A modern chess gameplay platform built with React, Vite, and TypeScript. Feature
 
 ## Screenshots
 
-<div style="display:flex; flex-wrap: wrap;">
-  <img src="screenshots/home-page.png" width="420" hspace="50"/>
+<div style="display:flex; flex-wrap: wrap; justify-content: center;">
+  <img src="screenshots/home-page.png" width="440" hspace="30"/>
+  <p>
   <img src="screenshots/desktop-view.png" width="300" hspace="10"/>
   <img src="screenshots/mobile-view.png" height="220"/>
 </div>
