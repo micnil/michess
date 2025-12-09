@@ -19,6 +19,7 @@ export const OpponentTypeSelector = ({ value = 'random', onChange }: Props) => {
         onValueChange={(val) => onChange?.(val as OpponentType)}
         columns="2"
         gap="2"
+        color={'gray'}
       >
         <RadioCards.Item value="random">
           <Flex direction="column" gap="1">
