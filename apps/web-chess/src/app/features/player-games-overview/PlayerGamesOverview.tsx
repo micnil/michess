@@ -40,12 +40,14 @@ export const PlayerGamesOverview: React.FC<Props> = ({ onJoinGame }) => {
     ongoingGamesPage?.items.length === 0 &&
     !ongoingQueryError;
 
+  const defaultTab = isNoOngoingGames ? 'completed' : 'ongoing';
+
   // Check if there are any ongoing games where it's the player's turn
   const hasPlayerTurnGames =
     ongoingGamesPage?.items.some((game) => game.turn === game.ownSide) ?? false;
   return (
     <Card size={{ initial: '1', sm: '3' }}>
-      <Tabs.Root defaultValue={isNoOngoingGames ? 'completed' : 'ongoing'}>
+      <Tabs.Root key={defaultTab} defaultValue={defaultTab}>
         <Flex justify="between" align="center" mb="4">
           <Heading size="4" weight="medium">
             My Games
