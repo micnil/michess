@@ -24,6 +24,17 @@ const BOT_REGISTRY: Record<string, BotConfig> = {
       'You play balanced, solid chess. Consider both tactical and positional factors.',
     temperature: 0.7,
   },
+  'bot-deepseek-1': {
+    id: 'bot-deepseek-1',
+    name: 'DeepSeek 1',
+    username: 'deepseek-1',
+    description: 'A balanced AI chess player powered by DeepSeek',
+    provider: 'deepseek',
+    model: 'deepseek-chat',
+    personality:
+      'You play balanced, solid chess. Consider both tactical and positional factors.',
+    temperature: 0.7,
+  },
 };
 
 const getBotConfig = (botId: string): Maybe<BotConfig> => {

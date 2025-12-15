@@ -1,5 +1,6 @@
 import { logger } from '@michess/be-utils';
 import { BotConfig } from '../../user/config/model/BotConfig';
+import { DeepSeekClient } from '../client/DeepSeekClient';
 import { GeminiClient } from '../client/GeminiClient';
 import { LlmClient } from '../client/LlmClient';
 import { OpenAiClient } from '../client/OpenAiClient';
@@ -12,6 +13,8 @@ export class LlmClientFactory {
         return new GeminiClient(config.geminiApiKey, botConfig.model);
       case 'gpt':
         return new OpenAiClient(config.openAiApiKey, botConfig.model);
+      case 'deepseek':
+        return new DeepSeekClient(config.deepSeekApiKey, botConfig.model);
       case 'claude':
         logger.warn(
           { provider: botConfig.provider },
