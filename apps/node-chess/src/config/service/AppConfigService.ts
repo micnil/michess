@@ -58,6 +58,7 @@ const getConfig = (): AppConfig => {
     },
     llm: {
       geminiApiKey: readEnvStrict('GEMINI_API_KEY'),
+      openAiApiKey: readEnvStrict('OPENAI_API_KEY'),
     },
   };
 };

@@ -13,6 +13,17 @@ const BOT_REGISTRY: Record<string, BotConfig> = {
       'You play balanced, solid chess. Consider both tactical and positional factors.',
     temperature: 0.7,
   },
+  'bot-gpt-1': {
+    id: 'bot-gpt-1',
+    name: 'ChatGPT 1',
+    username: 'gpt-1',
+    description: 'A balanced AI chess player powered by ChatGPT',
+    provider: 'gpt',
+    model: 'gpt-4o-mini',
+    personality:
+      'You play balanced, solid chess. Consider both tactical and positional factors.',
+    temperature: 0.7,
+  },
 };
 
 const getBotConfig = (botId: string): Maybe<BotConfig> => {
