@@ -1,3 +1,5 @@
 export type LlmConfig = {
   geminiApiKey: string;
+  openAiApiKey: string;
+  deepSeekApiKey: string;
 };

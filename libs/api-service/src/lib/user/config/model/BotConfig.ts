@@ -3,7 +3,7 @@ export type BotConfig = {
   name: string;
   username: string;
   description: string;
-  provider: 'gemini' | 'claude' | 'gpt';
+  provider: 'gemini' | 'claude' | 'gpt' | 'deepseek';
   model: string;
   personality: string;
   temperature: number;

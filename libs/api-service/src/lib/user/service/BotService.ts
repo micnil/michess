@@ -198,29 +198,22 @@ export class BotService {
       throw new Error(`Bot configuration not found for bot ${botId}`);
     }
 
-    // Load game from database
     const game = await this.gameRepository.findGameWithRelationsById(gameId);
     assertDefined(game, `Game ${gameId} not found`);
 
-    // Build chessboard from game state
     const moves = game.moves.map((m) => Move.fromUci(m.uci));
     const initialPosition = FenParser.toChessPosition(FenStr.standardInitial());
 
     const chessboard = Chessboard.fromPosition(initialPosition, moves);
 
-    // Get available move options
     const moveOptions = chessboard.moveOptions;
 
     if (moveOptions.length === 0) {
       throw new Error('No legal moves available');
     }
 
-    const llmClient = LlmClientFactory.create(
-      botConfig,
-      this.llmConfig.geminiApiKey,
-    );
+    const llmClient = LlmClientFactory.create(botConfig, this.llmConfig);
 
-    // Get FEN position for compact representation
     const fen = FenParser.toFenStr(chessboard.position);
 
     // Format available moves for the LLM
@@ -269,7 +262,6 @@ Move:`;
     // Extract UCI move from response (take first word, clean it up)
     const uciMove = response.content.trim().split(/\s+/)[0].toLowerCase();
 
-    // Validate that the move is in the available moves
     const isValidMove = moveOptions.some(
       (opt) => Move.toUci(MoveOption.toMove(opt)) === uciMove,
     );
