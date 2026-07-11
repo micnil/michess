@@ -12,6 +12,7 @@ import {
 } from '@michess/infra-db';
 import { Job, Queue, Worker } from 'bullmq';
 import { GameMapper } from '../../games/mapper/GameMapper';
+import { BULLMQ_JOB_OPTIONS } from '../../jobs/BullMqJobOptions';
 import { LockService } from '../../lock/service/LockService';
 
 type UpdateRatingJobData = {
@@ -35,15 +36,19 @@ export class RatingsService {
     private readonly lockService: LockService,
   ) {
     const connectionOptions = { connection: this.cacheRepository.client };
+    const queueOptions = {
+      ...connectionOptions,
+      defaultJobOptions: BULLMQ_JOB_OPTIONS,
+    };
 
-    this.ratingDecayQueue = new Queue('rating-decay', connectionOptions);
+    this.ratingDecayQueue = new Queue('rating-decay', queueOptions);
     this.ratingDecayWorker = new Worker(
       'rating-decay',
       this.processStaleRatings.bind(this),
       connectionOptions,
     );
 
-    this.updateRatingQueue = new Queue('update-rating', connectionOptions);
+    this.updateRatingQueue = new Queue('update-rating', queueOptions);
     this.updateRatingWorker = new Worker(
       'update-rating',
       this.updatePlayerRating.bind(this),
@@ -53,9 +58,16 @@ export class RatingsService {
 
   async initialize() {
     // Schedule job to check for stale ratings every day at 2 AM
-    await this.ratingDecayQueue.upsertJobScheduler('check-stale-ratings', {
-      pattern: '0 2 * * *',
-    });
+    await this.ratingDecayQueue.upsertJobScheduler(
+      'check-stale-ratings',
+      {
+        pattern: '0 2 * * *',
+      },
+      {
+        name: 'check-stale-ratings',
+        opts: BULLMQ_JOB_OPTIONS,
+      },
+    );
   }
 
   async close() {
@@ -84,6 +96,7 @@ export class RatingsService {
         deduplication: {
           id: deduplicationId,
         },
+        ...BULLMQ_JOB_OPTIONS,
       },
     );
   }

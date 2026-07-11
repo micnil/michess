@@ -14,6 +14,7 @@ import {
   UserRepository,
 } from '@michess/infra-db';
 import { Job, Queue, Worker } from 'bullmq';
+import { BULLMQ_JOB_OPTIONS } from '../../jobs/BullMqJobOptions';
 import { GameEvent } from '../../games/model/GameEvent';
 import { GameplayService } from '../../games/service/GameplayService';
 import { LlmConfig } from '../../llm/config/LlmConfig';
@@ -38,8 +39,12 @@ export class BotService {
     private readonly llmConfig: LlmConfig,
   ) {
     const connectionOptions = { connection: this.cacheRepository.client };
+    const queueOptions = {
+      ...connectionOptions,
+      defaultJobOptions: BULLMQ_JOB_OPTIONS,
+    };
 
-    this.botMoveQueue = new Queue(`bot-move`, connectionOptions);
+    this.botMoveQueue = new Queue(`bot-move`, queueOptions);
     this.botMoveWorker = new Worker<BotMoveJobData>(
       `bot-move`,
       this.processBotMove.bind(this),
@@ -158,10 +163,14 @@ export class BotService {
   }
 
   private async queueBotMove(gameId: string, botId: string): Promise<void> {
-    await this.botMoveQueue.add('generate-move', {
-      gameId,
-      botId,
-    });
+    await this.botMoveQueue.add(
+      'generate-move',
+      {
+        gameId,
+        botId,
+      },
+      BULLMQ_JOB_OPTIONS,
+    );
   }
 
   private async processBotMove(job: Job<BotMoveJobData>): Promise<void> {

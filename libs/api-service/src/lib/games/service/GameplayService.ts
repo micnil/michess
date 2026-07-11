@@ -18,6 +18,7 @@ import {
 } from '@michess/infra-db';
 import { Job, Queue, Worker } from 'bullmq';
 import { Session } from '../../auth/model/Session';
+import { BULLMQ_JOB_OPTIONS } from '../../jobs/BullMqJobOptions';
 import { LockService } from '../../lock/service/LockService';
 import { RatingsService } from '../../user/service/RatingsService';
 import { GameMapper } from '../mapper/GameMapper';
@@ -43,8 +44,12 @@ export class GameplayService extends EventEmitter<GameEvent> {
   ) {
     super();
     const connectionOptions = { connection: this.cacheRepo.client };
+    const queueOptions = {
+      ...connectionOptions,
+      defaultJobOptions: BULLMQ_JOB_OPTIONS,
+    };
 
-    this.timeControlQueue = new Queue(`time-control`, connectionOptions);
+    this.timeControlQueue = new Queue(`time-control`, queueOptions);
     this.timeControlWorker = new Worker<TimeControlJobData>(
       `time-control`,
       this.handleFlagTimeout.bind(this),
@@ -121,6 +126,7 @@ export class GameplayService extends EventEmitter<GameEvent> {
             id: state.id,
           },
           delay: newFlag.timeLeftMs,
+          ...BULLMQ_JOB_OPTIONS,
         },
       );
     }

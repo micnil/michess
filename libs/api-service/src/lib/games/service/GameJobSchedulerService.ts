@@ -1,6 +1,7 @@
 import { logger } from '@michess/be-utils';
 import { CacheRepository, GameRepository } from '@michess/infra-db';
 import { Queue, Worker } from 'bullmq';
+import { BULLMQ_JOB_OPTIONS } from '../../jobs/BullMqJobOptions';
 
 export class GameJobSchedulerService {
   private gameCleanupQueue: Queue;
@@ -11,7 +12,11 @@ export class GameJobSchedulerService {
     private cacheRepo: CacheRepository,
   ) {
     const connectionOptions = { connection: this.cacheRepo.client };
-    this.gameCleanupQueue = new Queue(`game-cleanup`, connectionOptions);
+    const queueOptions = {
+      ...connectionOptions,
+      defaultJobOptions: BULLMQ_JOB_OPTIONS,
+    };
+    this.gameCleanupQueue = new Queue(`game-cleanup`, queueOptions);
     this.gameCleanupWorker = new Worker(
       `game-cleanup`,
       this.cleanupGames.bind(this),
@@ -26,9 +31,16 @@ export class GameJobSchedulerService {
   }
 
   async initialize(): Promise<void> {
-    await this.gameCleanupQueue.upsertJobScheduler('cleanup-games', {
-      pattern: '0 3 * * *',
-    });
+    await this.gameCleanupQueue.upsertJobScheduler(
+      'cleanup-games',
+      {
+        pattern: '0 3 * * *',
+      },
+      {
+        name: 'cleanup-games',
+        opts: BULLMQ_JOB_OPTIONS,
+      },
+    );
   }
 
   private async cleanupGames(): Promise<void> {

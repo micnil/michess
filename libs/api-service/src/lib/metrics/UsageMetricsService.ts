@@ -2,6 +2,7 @@ import { UsageMetricsV1 } from '@michess/api-schema';
 import { logger } from '@michess/be-utils';
 import { CacheRepository, GameRepository } from '@michess/infra-db';
 import { Queue, Worker } from 'bullmq';
+import { BULLMQ_JOB_OPTIONS } from '../jobs/BullMqJobOptions';
 
 export class UsageMetricsService {
   private processTrackerQueue: Queue<{ processId: string }>;
@@ -15,16 +16,20 @@ export class UsageMetricsService {
     private gameRepo: GameRepository,
   ) {
     const connectionOptions = { connection: this.cacheRepo.client };
+    const queueOptions = {
+      ...connectionOptions,
+      defaultJobOptions: BULLMQ_JOB_OPTIONS,
+    };
     this.processTrackerQueue = new Queue(
       `process-tracker/${processId}`,
-      connectionOptions,
+      queueOptions,
     );
     this.processTrackerWorker = new Worker(
       `process-tracker/${processId}`,
       this.trackProcess.bind(this),
       connectionOptions,
     );
-    this.metricCleanupQueue = new Queue('metric-cleanup', connectionOptions);
+    this.metricCleanupQueue = new Queue('metric-cleanup', queueOptions);
     this.metricCleanupWorker = new Worker(
       'metric-cleanup',
       this.cleanupMetrics.bind(this),
@@ -36,15 +41,26 @@ export class UsageMetricsService {
     await this.cacheRepo.setClientCount(this.processId, 0);
     await this.cacheRepo.calcTotalClients();
 
-    await this.metricCleanupQueue.upsertJobScheduler('cleanup-metrics', {
-      every: 5000,
-    });
+    await this.metricCleanupQueue.upsertJobScheduler(
+      'cleanup-metrics',
+      {
+        every: 5000,
+      },
+      {
+        name: 'cleanup-metrics',
+        opts: BULLMQ_JOB_OPTIONS,
+      },
+    );
     await this.processTrackerQueue.upsertJobScheduler(
       'process-heartbeat',
       {
         every: 5000,
       },
-      { data: { processId: this.processId } },
+      {
+        name: 'process-heartbeat',
+        data: { processId: this.processId },
+        opts: BULLMQ_JOB_OPTIONS,
+      },
     );
   }
 

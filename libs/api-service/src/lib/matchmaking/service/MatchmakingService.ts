@@ -5,6 +5,7 @@ import { MatchmakingRepository, QueueEntry } from '@michess/infra-db';
 import { Job, Queue, Worker } from 'bullmq';
 import Redis from 'ioredis';
 import { GamesService } from '../../games/service/GamesService';
+import { BULLMQ_JOB_OPTIONS } from '../../jobs/BullMqJobOptions';
 import { LockService } from '../../lock/service/LockService';
 import { RatingsService } from '../../user/service/RatingsService';
 
@@ -35,8 +36,12 @@ export class MatchmakingService extends EventEmitter<MatchmakingEvent> {
     super();
 
     const connectionOptions = { connection: redis };
+    const queueOptions = {
+      ...connectionOptions,
+      defaultJobOptions: BULLMQ_JOB_OPTIONS,
+    };
 
-    this.matchmakingQueue = new Queue('matchmaking', connectionOptions);
+    this.matchmakingQueue = new Queue('matchmaking', queueOptions);
     this.matchmakingWorker = new Worker(
       'matchmaking',
       this.processMatchmaking.bind(this),
@@ -46,9 +51,16 @@ export class MatchmakingService extends EventEmitter<MatchmakingEvent> {
 
   async initialize(): Promise<void> {
     // Run matchmaking every 2 seconds
-    await this.matchmakingQueue.upsertJobScheduler('find-matches', {
-      every: 2000,
-    });
+    await this.matchmakingQueue.upsertJobScheduler(
+      'find-matches',
+      {
+        every: 2000,
+      },
+      {
+        name: 'find-matches',
+        opts: BULLMQ_JOB_OPTIONS,
+      },
+    );
   }
 
   async close(): Promise<void> {
